@@ -1,0 +1,33 @@
+name: Hourly research context check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hourly-research-context
+  cancel-in-progress: true
+
+jobs:
+  validate-context:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out documentation repository
+        uses: actions/checkout@v4
+
+      - name: Load README and durable research context
+        env:
+          RUN_CONTEXT_OUT: ${{ runner.temp }}/how-to-llama-context.md
+        run: ./scripts/start_scheduled_run.sh github-hourly-context-check
+
+      - name: Validate context contract
+        run: python3 scripts/validate_project_context.py
+
+      - name: Validate shell and Python scripts
+        run: |
+          bash -n scripts/*.sh
+          python3 -m py_compile scripts/*.py

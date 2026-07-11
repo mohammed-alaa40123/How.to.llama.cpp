@@ -1,0 +1,55 @@
+name: Refresh upstream source index
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 2 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: refresh-upstream-source-index
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out documentation repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Read README and current project context
+        env:
+          RUN_CONTEXT_OUT: ${{ runner.temp }}/how-to-llama-refresh-context.md
+        run: ./scripts/start_scheduled_run.sh source-index-refresh
+
+      - name: Validate context contract
+        run: python3 scripts/validate_project_context.py
+
+      - name: Refresh upstream mirror and generated index
+        run: ./scripts/update_upstream.sh
+
+      - name: Open or update generated-index pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/refresh-upstream-index
+          delete-branch: true
+          commit-message: 'docs: refresh llama.cpp source index'
+          title: 'docs: refresh upstream source index'
+          body: |
+            Automated source-index refresh for the pinned llama.cpp baseline and current refs.
+
+            The workflow reads the repository README and project-state files before running.
+            Generated symbol relationships are navigation hints and still require human review.
+          add-paths: |
+            data/generated/
+            docs/reference/generated-source-inventory.md
