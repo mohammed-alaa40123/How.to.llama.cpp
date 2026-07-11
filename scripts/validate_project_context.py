@@ -14,7 +14,10 @@ REQUIRED = [
     ROOT / "docs/reference/research-ledger.md",
     ROOT / "docs/roadmap.md",
     ROOT / "scripts/start_scheduled_run.sh",
+    ROOT / "scripts/check_site.sh",
+    ROOT / "docs/assets/interactive/inference-flow.html",
     ROOT / ".github/workflows/pages.yml",
+    ROOT / ".github/workflows/docs-ci.yml",
     ROOT / ".github/workflows/hourly-context-check.yml",
     ROOT / ".github/workflows/refresh-source-index.yml",
 ]
@@ -46,12 +49,22 @@ def main() -> int:
             fail("README scheduled-run instruction markers are reversed")
             errors += 1
 
+        todo_start = "<!-- PROJECT-TODOS:START -->"
+        todo_end = "<!-- PROJECT-TODOS:END -->"
+        if todo_start not in readme or todo_end not in readme:
+            fail("README living TODO markers are missing")
+            errors += 1
+        elif readme.index(todo_start) > readme.index(todo_end):
+            fail("README living TODO markers are reversed")
+            errors += 1
+
         required_mentions = [
             "docs/reference/project-state.md",
             "docs/reference/research-log.md",
             "docs/reference/research-ledger.md",
             "logs/research/",
             "scripts/start_scheduled_run.sh",
+            "scripts/check_site.sh",
         ]
         for mention in required_mentions:
             if mention not in readme:

@@ -1,0 +1,48 @@
+name: Documentation CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out documentation repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Read README and current project context
+        env:
+          RUN_CONTEXT_OUT: ${{ runner.temp }}/how-to-llama-ci-context.md
+        run: ./scripts/start_scheduled_run.sh documentation-ci
+
+      - name: Validate project context and scripts
+        run: |
+          python3 scripts/validate_project_context.py
+          bash -n scripts/*.sh
+          python3 -m py_compile scripts/*.py
+          test -s docs/assets/interactive/inference-flow.html
+
+      - name: Install documentation dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build MkDocs site strictly
+        run: mkdocs build --strict

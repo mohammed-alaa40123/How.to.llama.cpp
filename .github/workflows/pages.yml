@@ -12,11 +12,14 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      pages_enabled: ${{ steps.pages-status.outputs.enabled }}
     steps:
       - name: Check out documentation repository
         uses: actions/checkout@v4
@@ -34,8 +37,12 @@ jobs:
           RUN_CONTEXT_OUT: ${{ runner.temp }}/how-to-llama-pages-context.md
         run: ./scripts/start_scheduled_run.sh pages-build
 
-      - name: Validate context contract
-        run: python3 scripts/validate_project_context.py
+      - name: Validate project context and scripts
+        run: |
+          python3 scripts/validate_project_context.py
+          bash -n scripts/*.sh
+          python3 -m py_compile scripts/*.py
+          test -s docs/assets/interactive/inference-flow.html
 
       - name: Install documentation dependencies
         run: pip install -r requirements.txt
@@ -43,21 +50,75 @@ jobs:
       - name: Build MkDocs site strictly
         run: mkdocs build --strict
 
+      - name: Detect whether GitHub Pages is enabled
+        id: pages-status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          status=$(curl --silent --show-error --output "$RUNNER_TEMP/pages.json" --write-out '%{http_code}' \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header "Accept: application/vnd.github+json" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/pages")
+          if [[ "$status" == "200" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "GitHub Pages is enabled." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "## GitHub Pages is not enabled yet"
+              echo
+              echo "The MkDocs build passed, but deployment was skipped."
+              echo "Open **Settings → Pages** and set **Source** to **GitHub Actions**, then rerun this workflow."
+              echo
+              echo "Pages API status: $status"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Configure GitHub Pages
+        if: steps.pages-status.outputs.enabled == 'true'
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
+        if: steps.pages-status.outputs.enabled == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   deploy:
+    if: needs.build.outputs.pages_enabled == 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: build
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
+
+  verify:
+    if: needs.build.outputs.pages_enabled == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [build, deploy]
+    steps:
+      - name: Verify deployed website
+        env:
+          SITE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          test -n "$SITE_URL"
+          for attempt in {1..12}; do
+            status=$(curl --location --silent --show-error --output "$RUNNER_TEMP/site.html" --write-out '%{http_code}' "$SITE_URL" || true)
+            if [[ "$status" == "200" ]] && grep -q 'How.to.llama.cpp' "$RUNNER_TEMP/site.html"; then
+              echo "Website is healthy: $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "Attempt $attempt: HTTP $status; waiting for Pages propagation"
+            sleep 10
+          done
+          echo "Deployment completed but the site health check did not observe HTTP 200 with the expected title." >&2
+          exit 1

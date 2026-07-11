@@ -75,3 +75,40 @@
 **Next step**
 
 - Trace `llama_decode` through context graph construction/reuse and backend scheduler execution at the pinned revision.
+
+
+## 2026-07-12 01:54 Africa/Cairo — CI and Pages repair
+
+**Scope**
+
+- Repository automation and deployment health for `mohammed-alaa40123/How.to.llama.cpp`.
+
+**Verified findings**
+
+- The documentation corpus builds locally with `mkdocs build --strict`.
+- The published repository was missing `docs/assets/interactive/inference-flow.html`, even though the documentation and README referenced it.
+- The Pages workflow previously called `actions/configure-pages` unconditionally. The action documents that enabling Pages requires a token stronger than the standard `GITHUB_TOKEN`; therefore a repository with Pages disabled can fail after a successful MkDocs build.
+- The repaired workflow separates strict documentation CI from deployment, detects whether Pages is enabled, skips deployment cleanly when it is not, and performs an HTTP/title health check after a successful deployment.
+
+**Interpretation**
+
+- The reported failure was deployment-configuration related rather than a reproducible MkDocs content failure. Independent CI makes that distinction visible.
+
+**Open questions**
+
+- Confirm the new Documentation CI and Deploy documentation runs finish successfully on GitHub.
+- Enable Pages in repository settings and confirm the live site returns HTTP 200 with the expected title.
+
+**Artifacts changed**
+
+- `.github/workflows/docs-ci.yml`
+- `.github/workflows/pages.yml`
+- `scripts/check_site.sh`
+- `scripts/validate_project_context.py`
+- `docs/assets/interactive/inference-flow.html`
+- `README.md`
+- `docs/reference/project-state.md`
+
+**Next step**
+
+- Enable GitHub Pages, rerun deployment, verify the website, then continue the pinned `llama_decode` scheduler trace.

@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12_
+_Last updated: 2026-07-12 01:54 Africa/Cairo_
 
 This file is the compact checkpoint for scheduled and manual research runs. Read it after the root README and update it whenever a meaningful increment is completed.
 
@@ -27,9 +27,12 @@ Trace a minimal application from backend loading and model creation through cont
 - Mermaid overview and clickable 23-stage inference prototype.
 - Upstream mirror and approximate source-index scripts.
 - Hourly context-integrity workflow and mandatory README bootstrap protocol.
+- Independent strict documentation CI, Pages enablement detection, deployment health checking, and the missing interactive HTML asset.
 
 ## In progress
 
+- GitHub Pages must be enabled in repository settings before deployment can run.
+- Latest CI and live-site status must be verified after the repair commit completes.
 - Detailed `llama_context` construction and ownership map.
 - Scheduler reservation for prompt processing versus token generation.
 - `process_ubatch()` graph reuse/build/allocate path.
@@ -62,6 +65,8 @@ Deliverables for that task:
 
 ## Known blockers and caveats
 
+- The GitHub connector available to this run does not expose push-triggered Actions run listings or Pages settings, so repository-side workflows perform the durable checks.
+- Pages deployment remains intentionally skipped until **Settings → Pages → Source: GitHub Actions** is enabled.
 - Regex-based indexing cannot resolve virtual dispatch, macros, function pointers, generated code, or backend registration reliably.
 - Backend behavior varies by build configuration and device capabilities.
 - Current upstream may differ materially from the pinned baseline; version labels are mandatory.
