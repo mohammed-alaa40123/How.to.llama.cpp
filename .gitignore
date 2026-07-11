@@ -1,0 +1,10 @@
+.venv/
+site/
+__pycache__/
+*.pyc
+.DS_Store
+.upstream/
+.run-context/
+data/generated/
+logs/runtime/*
+!logs/runtime/.gitkeep
