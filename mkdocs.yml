@@ -72,6 +72,7 @@ nav:
       - Repository map: architecture/repository-map.md
   - Inference lifecycle:
       - Brief end to end: lifecycle/end-to-end.md
+      - Decode and graph reuse: lifecycle/decode-graph-reuse.md
   - Interactive:
       - Inference workflow: interactive/inference-workflow.md
   - Reference:
