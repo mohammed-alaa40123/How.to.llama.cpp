@@ -150,13 +150,14 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 - [ ] Enable **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 - [ ] Rerun **Deploy documentation** and confirm its build, deploy, and website-verification jobs succeed.
-- [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the repair commit.
+- [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the latest documentation commits.
 - [ ] Confirm the live site returns HTTP 200 and contains `How.to.llama.cpp`.
-- [ ] Trace `llama_decode → llama_context::decode → process_ubatch → graph_compute → ggml_backend_sched_graph_compute_async` at the pinned revision.
-- [ ] Document graph reuse, scheduler reservation, allocation, copies, events, and synchronization.
+- [ ] Trace `ggml_backend_sched_graph_compute_async` through graph splitting, copies/events, backend split submission, and synchronization.
+- [ ] Document CPU-only versus multi-backend scheduler behavior and copy ownership.
 
 ### Future improvements
 
+- [ ] Expand graph-reuse documentation with a table of every `llm_graph_input_*::can_reuse()` predicate.
 - [ ] Expand the interactive workflow to separate prefill, token decode, CPU-only, GPU offload, multi-backend, and MoE paths.
 - [ ] Add direct source and documentation links to every interactive node.
 - [ ] Add an index page for detailed research logs.
@@ -165,6 +166,8 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 ### Completed setup
 
+- [x] Trace `llama_decode → llama_context::decode → process_ubatch → graph_compute → ggml_backend_sched_graph_compute_async` at the pinned revision.
+- [x] Document graph-reuse compatibility, scheduler reservation versus allocation, thread selection, and the pipeline-parallel input synchronization boundary.
 - [x] Repair Pages handling so disabled Pages does not fail a valid MkDocs build.
 - [x] Add independent strict Documentation CI and a post-deployment website health check.
 - [x] Publish and validate the interactive workflow HTML asset.
