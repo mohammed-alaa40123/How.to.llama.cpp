@@ -1,0 +1,8 @@
+{
+  "repository": "ggml-org/llama.cpp",
+  "baseline_commit": "e3546c7948e3af463d0b401e6421d5a4c2faf565",
+  "baseline_reason": "Initial connector-verified source baseline for the first documentation vertical slice.",
+  "mirror_path": ".upstream/llama.cpp.git",
+  "worktree_path": ".upstream/worktree",
+  "generated_index_path": "data/generated/source-index.json"
+}
