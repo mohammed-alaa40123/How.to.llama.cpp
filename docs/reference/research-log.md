@@ -76,7 +76,6 @@
 
 - Trace `llama_decode` through context graph construction/reuse and backend scheduler execution at the pinned revision.
 
-
 ## 2026-07-12 01:54 Africa/Cairo — CI and Pages repair
 
 **Scope**
@@ -112,3 +111,39 @@
 **Next step**
 
 - Enable GitHub Pages, rerun deployment, verify the website, then continue the pinned `llama_decode` scheduler trace.
+
+## 2026-07-12 02:51 Africa/Cairo — Decode and graph-reuse trace
+
+**Scope**
+
+- Pinned path from the public decode API through graph compatibility, rebuild/allocation, and scheduler submission.
+
+**Verified findings**
+
+- `llama_decode()` delegates directly to `llama_context::decode()`.
+- `decode()` initializes the batch allocator, reserves scheduler capacity, applies pending memory work, initializes the active memory batch context, and processes one `llama_ubatch` at a time.
+- `process_ubatch()` reuses the previous graph only when graph reuse is enabled and all graph-result/input compatibility checks accept the new graph parameters.
+- Pipeline-parallel graph reuse synchronizes before rewriting inputs because a previous asynchronous GPU execution may still read those tensors.
+- The rebuild branch resets graph and scheduler state, calls `model.build_graph()`, and allocates the concrete graph with `ggml_backend_sched_alloc_graph()`.
+- `graph_compute()` selects the batch or single-token CPU threadpool and submits through `ggml_backend_sched_graph_compute_async()`.
+- Scheduler reserve and per-graph allocation are distinct: reserve plans buffer capacity; allocation binds a rebuilt graph into that capacity.
+
+**Interpretation**
+
+- Graph reuse is a topology-and-shape cache, not a token-value or output cache. Compatible graph structure and allocations survive while input tensors are rewritten for each micro-batch.
+
+**Open question**
+
+- Trace scheduler splitting, inter-backend copies/events, split submission, and synchronization after `ggml_backend_sched_graph_compute_async()`.
+
+**Artifacts changed**
+
+- `docs/lifecycle/decode-graph-reuse.md`
+- `mkdocs.yml`
+- `docs/reference/project-state.md`
+- `README.md`
+- `logs/research/2026-07-12/0251-decode-graph-reuse.md`
+
+**Next step**
+
+- Document the scheduler split/copy/event execution path at the same pinned revision.
