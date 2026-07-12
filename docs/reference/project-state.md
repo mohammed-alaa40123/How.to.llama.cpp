@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 15:05 Africa/Cairo_
+_Last updated: 2026-07-12 15:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -29,14 +29,14 @@ Return to the foundations and reconstruct llama.cpp from the pinned source in tw
 - Accessible static scheduler SVG replacing a Mermaid renderer failure.
 - Object-centred, searchable, and interactive documentation quality roadmap.
 - Large interactive foundations explorer with system, code-path, memory, GGUF/graph, execution/synchronization, and file-map tabs.
-- Canonical `llama_context` object page covering public creation, constructor phases, model reference versus owned runtime state, memory modules, scheduler/backends, graph/output mutation, decode call chain, threading, synchronization, teardown, source map, backend/version differences, and truth labels.
-- New **Objects** navigation section publishing the `llama_context` page.
+- Canonical `llama_context` object page covering creation, ownership, lifetime, memory, mutation, call chain, synchronization, teardown, source map, backend/version differences, and truth labels.
+- Interactive **llama_context runtime** layer and **Construct context** workflow step now link to the canonical object page through shared pinned metadata.
 - Expanded implementation roadmap with four passes: file inventory, subsystem grouping, cross-file composition, and complete workflow reconstruction.
 
 ## In progress
 
 - Deep GGUF format and model-loader chapter, including the canonical upstream figure with verified attribution.
-- Linking interactive Context nodes to object pages and shared versioned metadata.
+- Generated versioned metadata shared by interactive nodes, object pages, and source maps.
 - GGML op insertion, tensor-as-node semantics, graph expansion, activation allocation, reuse, and execution.
 - Memory atlas and interactive runtime overlays for mmap/page faults, RAM/RSS, backend copies, KV/recurrent state, and workspaces.
 - File-by-file Pass A for public API/examples, model/GGUF loader, and runtime context.
@@ -70,25 +70,26 @@ Required deliverables:
 5. links from the interactive GGUF tab to the detailed page;
 6. Verified, Interpretation, Historical, and Open question sections.
 
-After GGUF, build the GGML graph-construction chapter. The `llama_context` object-page requirement is complete; the next object page is `llama_model`.
+After GGUF, build the GGML graph-construction chapter. The `llama_context` object-page and interactive-link requirements are complete; the next object page is `llama_model`.
 
 ## Latest publication verification
 
-- Latest documentation commit in this increment: `d3898230d514a7602bef3f3889e79a893e0aa242` before this state update.
-- Connected commit-workflow lookup remains limited to pull-request-triggered runs and cannot reliably establish push-triggered Documentation CI or Pages conclusions.
-- The public site is enabled at `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
-- Live HTTP/content verification is still pending for the new `llama_context` page at the time of this checkpoint.
+- Interactive link implementation commit: `b32b8efcbc2ac5c5d976b20d0977be3ba1447e14`.
+- Detailed research note commit: `63897de51dcb95541b52e47c2d668092a419e8d8`.
+- Connected commit-workflow lookup is limited and cannot reliably establish all push-triggered Documentation CI or Pages conclusions.
+- The public site is configured at `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
+- Live HTTP/content verification remains required after the final state commits.
 
 ## Known blockers and caveats
 
-- The connected workflow-run query is limited and may return no associated push-triggered runs.
+- The execution container could not resolve `github.com`, preventing a local checkout and local `mkdocs build --strict`.
+- The connected workflow-run query may omit push-triggered runs.
 - Browser or search fetchers may temporarily miss a newly deployed Pages revision; that is not by itself evidence of deployment failure.
-- The exact "famous GGUF picture" has not yet been identified from a reliable upstream path. Do not copy an image until source, revision, and attribution/license are verified.
-- The interactive explorer currently uses curated JavaScript data rather than generated versioned JSON.
-- Some linked paths represent source areas rather than exact symbol definitions; detailed pages must refine them.
+- The exact canonical GGUF image has not yet been identified from a reliable upstream path. Do not copy an image until source, revision, and attribution/license are verified.
+- The interactive explorer now centralizes baseline/source/docs roots in one JavaScript metadata object, but does not yet consume generated versioned JSON.
 - Regex indexing cannot resolve macros, virtual dispatch, function pointers, generated code, or backend registration reliably.
 - A conceptual layer stack is not a universal execution order for every model architecture or backend combination.
-- "Layer-by-layer loading and freeing" must not be stated as a universal llama.cpp policy: mmap demand paging, OS reclaim, backend placement, graph allocation, and scheduler copies have different lifetimes.
+- "Layer-by-layer loading and freeing" must not be stated as a universal llama.cpp policy.
 - APIs named `async` do not prove host-visible overlap.
 - CPU_Mapped addressability does not imply physical residency or fault-free access.
 - Accelerator unified/shared/system memory does not by itself imply GGML host visibility, command completion, or safe reuse.
