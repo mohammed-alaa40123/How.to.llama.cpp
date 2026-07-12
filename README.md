@@ -150,17 +150,19 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 - [ ] Enable **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 - [ ] Rerun **Deploy documentation** and confirm its build, deploy, and website-verification jobs succeed.
-- [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the latest documentation commits; the connected status interfaces still do not provide complete push-run conclusions.
+- [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the latest documentation commits; connected status interfaces may not expose complete push-run conclusions.
 - [ ] Confirm the live site returns HTTP 200 and contains `How.to.llama.cpp`; direct verification remains blocked until Pages is enabled and publicly reachable.
-- [ ] Trace the generic scheduler fallback route after a backend asynchronous-copy callback returns `false`, including CPU/mmap, CUDA-host/device, and Metal shared/private combinations.
-- [ ] Document synchronization bubbles, staging behavior, and host-visibility guarantees in the generic fallback path.
+- [ ] Trace concrete destination-buffer `cpy_tensor` and blocking `set_tensor`/`get_tensor` implementations for CPU, CUDA, Metal, Vulkan, SYCL, RPC, and Android backends.
+- [ ] Build a source-buffer × destination-buffer compatibility matrix, including direct copy, host-visible pointer, required staging, and completion semantics.
+- [ ] Add a runtime-validation plan for page faults, synchronization bubbles, transfer overlap, and temporary RSS in CPU/mmap-to-accelerator copies.
 - [ ] Trace the exact Metal event primitive and compatibility/fallback behavior across supported Apple OS/GPU generations.
 
 ### Future improvements
 
 - [ ] Add backend-specific runtime traces proving copy/compute overlap during prompt processing and token decode.
-- [ ] Add a matrix for CPU, CUDA, Metal, Vulkan, SYCL, RPC, and Android GPU backend capabilities.
+- [ ] Add a matrix for CPU, CUDA, Metal, Vulkan, SYCL, RPC, and Android GPU graph/event capabilities.
 - [ ] Trace later scheduler PRs that changed copy/event ordering and compare them with the pinned baseline.
+- [ ] Determine whether newer revisions pool or reuse generic host staging allocations.
 - [ ] Compare newer Metal changes affecting queue ownership, `cmd_buf_last`, copy events, and error propagation.
 - [ ] Expand graph-reuse documentation with a table of every `llm_graph_input_*::can_reuse()` predicate.
 - [ ] Expand the interactive workflow to separate prefill, token decode, CPU-only, GPU offload, multi-backend, and MoE paths.
@@ -171,6 +173,9 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 ### Completed setup
 
+- [x] Trace the generic scheduler fallback after `cpy_tensor_async` is absent or returns `false`: synchronize source and destination, invoke blocking tensor copy, and establish completion.
+- [x] Document the blocking copy decision tree: host-source pointer, host-destination pointer, destination-buffer direct copy, then full-tensor `malloc → get → set → free` staging.
+- [x] Document CPU/mmap-to-CUDA, CUDA-host-to-CUDA, and CPU/mmap-to-Metal fallback paths, including page-fault, synchronization, ownership, and host-visibility caveats.
 - [x] Trace the pinned Metal graph-submission path, command-buffer lifecycle, asynchronous blit set/get/copy operations, event signal/wait ordering, and explicit host synchronization boundary.
 - [x] Build a CUDA-versus-Metal capability table, including discrete-memory and unified-memory caveats.
 - [x] Document that Metal shared/unified memory changes addressability and transfer cost but does not imply command completion, safe reuse, or host visibility.
