@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 16:50 Africa/Cairo_
+_Last updated: 2026-07-12 17:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -29,80 +29,77 @@ Return to the foundations and reconstruct llama.cpp from the pinned source in tw
 - Accessible static scheduler SVG replacing a Mermaid renderer failure.
 - Object-centred, searchable, and interactive documentation quality roadmap.
 - Large interactive foundations explorer with system, code-path, memory, GGUF/graph, execution/synchronization, and file-map tabs.
-- Canonical `llama_context` object page covering creation, ownership, lifetime, memory, mutation, call chain, synchronization, teardown, source map, backend/version differences, and truth labels.
-- Interactive **llama_context runtime** layer and **Construct context** workflow step now link to the canonical object page through shared pinned metadata.
-- Canonical GGUF file-anatomy chapter covering official format structure, the attributed upstream diagram, typed metadata, tensor descriptors, alignment, split indexing, loader entry, mmap/page-fault distinctions, ownership, backend consequences, and truth labels.
+- Canonical `llama_context` object page and interactive links.
+- Canonical GGUF file-anatomy chapter covering format structure, split indexing, loader entry, mmap/page-fault distinctions, ownership, and truth labels.
+- Canonical model tensor-placement and data-transfer chapter covering device assignment, per-tensor buffer selection, mapping initialization, host-pointer aliasing, explicit reads, synchronous/asynchronous uploads, progress, cancellation, validation, trimming, and ownership.
 - Expanded implementation roadmap with four passes: file inventory, subsystem grouping, cross-file composition, and complete workflow reconstruction.
 
 ## In progress
 
-- Second GGUF/model-loader slice: `model.load_tensors()`, buffer selection, mappings, prefetch, reads/uploads, direct I/O, and progress accounting.
-- Generated versioned metadata shared by interactive nodes, object pages, and source maps.
+- Linking the interactive GGUF/graph tab to both canonical model-loading chapters.
 - GGML op insertion, tensor-as-node semantics, graph expansion, activation allocation, reuse, and execution.
 - Memory atlas and interactive runtime overlays for mmap/page faults, RAM/RSS, backend copies, KV/recurrent state, and workspaces.
+- Runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, and first-token access.
 - File-by-file Pass A for public API/examples, model/GGUF loader, and runtime context.
 - Architecture-specific graph-builder, prefill/decode, KV/recurrent, and MoE extensions to the explorer.
 - Exact Metal shared/private buffer-level branches.
-- Runtime evidence for page faults, queue/fence waits, temporary RSS, and copy/compute overlap.
 
 ## Immediate next task
 
-Complete the second GGUF/model-loading slice and connect the chapter to the explorer:
+Create the GGML graph-construction chapter and connect the GGUF explorer tab:
 
 ```text
-model.load_tensors(loader)
-  -> architecture tensor creation
-  -> destination buffer-type selection
-  -> loader.init_mappings()
-  -> CPU_Mapped alias or explicit read
-  -> backend upload/copy
-  -> progress accounting
-  -> mapping and buffer ownership
+architecture graph builder
+  -> GGML op calls create output tensors
+  -> source tensors define graph edges
+  -> graph expansion discovers dependencies
+  -> insertion and visit ordering
+  -> views and aliases
+  -> scheduler backend assignment
+  -> activation/workspace allocation
+  -> reuse compatibility checks
+  -> execution and synchronization
 ```
 
 Required deliverables:
 
-1. exact pinned `load_tensors()` and `load_all_data()` call chain;
-2. buffer-placement decision table for CPU, CPU_Mapped, and accelerator destinations;
-3. `init_mappings()` prefetch and file-range behavior;
-4. direct-I/O versus mmap behavior;
-5. links from the interactive GGUF tab to the detailed page;
-6. runtime-measurement plan for parse, mapping, faults, reads, and uploads.
+1. exact pinned graph-builder and `ggml_build_forward_expand()` call chain;
+2. explanation of tensors as lazy operation nodes rather than immediately executed values;
+3. source-edge and topological-order diagrams;
+4. allocation versus execution lifetime table;
+5. graph-reuse boundaries across prefill/decode and architecture variants;
+6. links from the interactive GGUF/graph tab to the GGUF and model-placement chapters.
 
-After GGUF/model loading, build the GGML graph-construction chapter. The next object page remains `llama_model`.
+The next canonical object page remains `llama_model`.
 
 ## Latest publication verification
 
-- GGUF chapter commit: `ef30870f936825cb1aad2875ad3ee3e98020c432`.
-- Durable detailed-note commit: `2078f721f56ddaf889eb23ddf8e8b8125c35e1c1`.
-- The combined-status query for that commit returned no status records.
-- The available commit-workflow query returned no runs and is documented to filter to pull-request-triggered runs, so push-triggered Documentation CI and Pages remain unverified.
-- The public site is configured at `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
-- A direct browser open was rejected because the URL had no prior search result; site-specific search returned no indexed project result.
-- The execution container also failed DNS resolution for `github.com`, preventing checkout, local `mkdocs build --strict`, and direct curl-based Pages verification.
+- Model-placement chapter commit: `b61658e995acee3e4608c429b5aa16c70899409c`.
+- Navigation update commit: `7d44f4db0780bf165d340721b65dbbe6aedc743f`.
+- README milestone commit: `047730e9dce75f0f6c788c1f9144d7f924ecc75b`.
+- CI and Pages verification for the final durable commit must be checked after context updates are complete.
+- Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
 
 ## Known blockers and caveats
 
-- **CI blocker:** the connected commit-workflow endpoint does not expose all push-triggered runs, and the final commit currently has no combined status records.
-- **Pages blocker:** the browser requires an indexed/search-returned URL before direct opening, project-specific search returned no site result, and the execution container cannot resolve GitHub hosts.
-- **Local validation blocker:** no repository checkout is available because `github.com` DNS resolution fails in the execution container.
-- The canonical diagram is linked from the official GGUF specification and attributed to @mishig25; it is not copied into this repository.
-- The official GGUF specification can evolve beyond the pinned llama.cpp implementation. Format statements and implementation statements must remain clearly separated.
-- The interactive explorer does not yet link its GGUF tab to the new canonical chapter.
-- The interactive explorer centralizes baseline/source/docs roots in one JavaScript metadata object, but does not yet consume generated versioned JSON.
-- Regex indexing cannot resolve macros, virtual dispatch, function pointers, generated code, or backend registration reliably.
-- A conceptual layer stack is not a universal execution order for every model architecture or backend combination.
-- "Layer-by-layer loading and freeing" must not be stated as a universal llama.cpp policy.
-- APIs named `async` do not prove host-visible overlap.
+- **CI visibility caveat:** the connected commit-workflow endpoint filters to pull-request-triggered runs and may not expose push-triggered Documentation CI or Pages runs; combined status can also be empty.
+- **Pages verification caveat:** prior runs could not verify the public site because direct browsing required an indexed result and the execution container could not resolve GitHub hosts.
+- **Local validation caveat:** a local checkout may remain unavailable if `github.com` DNS resolution still fails in the execution container.
+- The official GGUF specification can evolve beyond the pinned llama.cpp implementation.
+- Mmap host-pointer wrapping is conditional; “zero-copy model loading” is not a model-wide property under partial offload or incompatible buffer types.
+- Prefetch requests do not prove permanent physical residency.
+- Async upload requires a non-mmap, non-validation path plus device async, host-buffer, and event capabilities.
 - CPU_Mapped addressability does not imply physical residency or fault-free access.
 - Accelerator unified/shared/system memory does not by itself imply GGML host visibility, command completion, or safe reuse.
-- The `llama_context` page infers external serialization for concurrent mutation; a future pass should locate an explicit public thread-safety contract or preserve this as an open question.
+- Regex indexing cannot resolve macros, virtual dispatch, function pointers, generated code, or backend registration reliably.
+- A conceptual layer stack is not a universal execution order for every model architecture or backend combination.
+- APIs named `async` do not prove host-visible overlap.
 
 ## Definition of done for the foundations deepening phase
 
 - Comprehensive clickable system map with accessible hover/click behavior.
 - Source-pinned end-to-end code workflow.
-- Deep GGUF and model-loading chapter.
+- Deep GGUF and model-loading chapters.
 - Canonical `llama_context` ownership/lifetime page.
 - GGML tensor/op/graph-construction and execution chapter.
 - Memory ownership and synchronization atlas.
