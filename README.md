@@ -122,6 +122,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/objects/llama-model.md` | Canonical `llama_model` creation, architecture dispatch, tensor/layer schema, storage ownership, graph factory, sharing, and teardown |
 | `docs/objects/llama-context.md` | Canonical `llama_context` creation, ownership, lifetime, memory, execution, synchronization, and teardown |
 | `docs/ggml/graph-construction-and-moe.md` | Graph construction, MoE routing, graph reuse, router patch points, and per-layer LRU design |
+| `docs/architecture/public-api-minimal-example.md` | File-by-file Pass A map from the minimal example and public API into model/context implementation boundaries, ownership, synchronization, errors, and teardown |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
 | `data/generated/` | Generated source inventories |
@@ -137,17 +138,19 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
+- [ ] Continue file-by-file Pass A with the model/GGUF loader group; map construction order, file and mapping ownership, split indexing, tensor offsets, population paths, cancellation, and partial-construction cleanup.
+- [ ] Continue Pass A with runtime-context files and then synthesize the public API, loader, and context groups into one subsystem relationship map.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
 - [ ] Expand the interactive explorer with architecture-specific graph-builder sublayers, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders the interactive memory overlay plus `foundations/memory-lifetimes/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/public-api-minimal-example/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
 - [ ] Extend interactive-link validation to generated routes, built HTML IDs, non-HTML assets, and MkDocs plugin-generated anchors.
+- [ ] Add RAII guidance or an upstream example patch for deterministic cleanup on every minimal-example error path.
 - [ ] Trace every concrete `llama_memory_i` implementation and map architectures to KV, recurrent, and hybrid memory.
 - [ ] Document exact ownership members inside `llama_model::impl`.
 - [ ] Locate the strongest explicit public contract for model sharing, thread safety, backend teardown synchronization, and destruction order.
@@ -166,6 +169,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Complete file-by-file Pass A for the public API/minimal-example group with a relationship diagram, file/symbol inventory, ownership, synchronization, backend assumptions, error paths, and teardown.
 - [x] Add CI validation for canonical local routes and section anchors embedded in interactive HTML/JavaScript assets, with valid/invalid fixture tests and actionable asset/route/anchor errors.
 - [x] Connect all eight memory-lifecycle explorer entries to the canonical atlas and add an accessible ownership/lifetime overlay with owner, backing, validity/residency, synchronization, and release fields.
 - [x] Publish the canonical memory-lifetime atlas covering GGUF storage, virtual mappings, page faults/page cache/RSS, model buffers, KV/recurrent/hybrid state, graph allocations, scheduler copies, backend staging, outputs, prefill/decode differences, synchronization, teardown, runtime measurements, and truth labels.
