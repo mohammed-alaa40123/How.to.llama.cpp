@@ -78,14 +78,18 @@ The next canonical object page remains `llama_model`.
 - Interactive explorer implementation commit: `580d0f8bac014afc08023b54f61d1bbef2f53b99`.
 - Detailed-note commit: `2f123df858f120970bde60d4f5d303db9ab65985`.
 - README TODO update commit: `01716f039c3f710f5035bca02c383f8ea59206bf`.
+- Research-log commit checked for publication state: `c8db9d0d1423310971b8c26f55b167acec0084a6`.
 - The changed explorer was re-fetched from `main`; both canonical routes and the pinned baseline are present.
-- GitHub Actions and Pages verification for the final durable commit are recorded below after the final checks.
+- The combined-status endpoint returned no status entries for `c8db9d0d1423310971b8c26f55b167acec0084a6`.
+- The available commit-workflow endpoint returned no runs; it only exposes pull-request-associated runs, so push-triggered Documentation CI, Pages deployment, and hourly context checks remain unverified.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
+- A site-specific search returned no indexed result for the project or new explorer links.
+- Direct opening of the site root and interactive page was rejected because those URLs were not returned by search.
 
 ## Known blockers and caveats
 
-- **CI blocker:** the connector exposes no combined statuses and its workflow-run action filters to pull-request-triggered runs, so latest push workflows may remain unverified.
-- **Pages blocker:** if search still returns no indexed site result and direct open remains disallowed, HTTP status and rendered content cannot be verified in this environment.
+- **CI blocker:** the connector returned no combined statuses and its workflow-run action filters to pull-request-triggered runs, so the latest push workflows cannot be confirmed or inspected for failures.
+- **Pages blocker:** search returned no indexed site result, and direct open is disallowed for URLs not returned by search; therefore HTTP status and rendered content cannot be verified in this environment.
 - **Local validation blocker:** the execution container still cannot resolve `github.com`, so it cannot obtain a checkout for `mkdocs build --strict` or local site checks.
 - The official GGUF specification can evolve beyond the pinned llama.cpp implementation.
 - Mmap host-pointer wrapping is conditional; “zero-copy model loading” is not a model-wide property under partial offload or incompatible buffer types.
