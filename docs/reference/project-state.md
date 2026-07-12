@@ -77,14 +77,18 @@ Required deliverables:
 - Loader inventory commit: `06ad84e7f226e0ea0e214361672d815c5f55bcaf`.
 - Navigation commit: `5a6d224283f715d2db5247843401470739a0ce8b`.
 - README TODO commit: `db9e344de0f1cf3722ef8e4dc937b434576c9afe`.
+- Research-log commit: `870c937d2b39dacb10bb2e01e8ab51d34503001a`.
+- Detailed-note commit checked for CI: `b53abbb704f9b569b39004ba1606a68b5cc56aea`.
+- Combined status for `b53abbb704f9b569b39004ba1606a68b5cc56aea` returned an empty status list.
+- The commit-workflow endpoint returned `workflow_runs: []`; it is limited to pull-request-triggered runs and cannot reliably expose these push workflows.
+- Direct browser opening of the Pages root and `architecture/model-gguf-loader-pass-a/` was rejected by the safe-URL gate because those exact URLs were not present in prior search results.
 - Local checkout validation remains blocked because the execution environment cannot resolve `github.com`.
-- CI and Pages status for the final state commit must be checked after the remaining context updates.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
 
 ## Known blockers and caveats
 
-- **CI visibility blocker:** the connected commit-status/workflow surfaces have previously returned empty results for push-triggered Documentation CI, Pages, and hourly-context runs; absence of a result is treated as unverified, not failed.
-- **Pages verification blocker:** site-specific search and direct safe-URL access have previously failed to expose the Pages root; direct container checks are also blocked by DNS resolution.
+- **CI visibility blocker:** for commit `b53abbb704f9b569b39004ba1606a68b5cc56aea`, combined status was empty and the commit-workflow endpoint returned no runs. Because that endpoint does not reliably expose push-triggered Documentation CI, Pages, or hourly-context workflows, status is unverified rather than failed.
+- **Pages verification blocker:** direct opening of the site root and `architecture/model-gguf-loader-pass-a/` was blocked by the browser safe-URL gate; the container also cannot resolve GitHub hosts. HTTP status and rendered content remain unverified.
 - **Local validation blocker:** the execution environment cannot resolve `github.com`, preventing a fresh checkout and full local `mkdocs build --strict`.
 - Static validation approximates Python-Markdown heading IDs; built-HTML validation is still required for plugin-generated or custom anchors.
 - The official GGUF specification can evolve beyond the pinned implementation.
