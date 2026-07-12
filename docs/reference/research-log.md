@@ -97,18 +97,39 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Document the exact storage members inside `llama_model::impl`.
 - Find the strongest public model-sharing and destruction-order contract.
-- Add the Model object explorer route when the interactive asset can be safely updated as a complete file.
 - Measure mapped/read/uploaded bytes, page faults, and teardown synchronization by backend.
+
+## 2026-07-12 21:51 — Interactive `llama_model` explorer link
+
+**Verified**
+
+- The interactive **Model object** system layer now routes to `objects/llama-model/`.
+- The shared canonical-page renderer uses `target="_top"`, so navigation exits the iframe and opens the normal MkDocs page.
+- The pinned baseline and all existing explorer layers, workflows, GGUF/graph cards, memory cards, synchronization entries, and source links were preserved.
+- Both major runtime objects, `llama_model` and `llama_context`, now have canonical explorer routes.
+
+**Interpretation**
+
+- The explorer now provides a cleaner progressive-disclosure path from the persistent loaded-model layer to the detailed architecture, ownership, sharing, graph-factory, and teardown explanation.
+
+**Historical**
+
+- This closes the integration blocker left by the initial `llama_model` object-page increment.
+
+**Open questions**
+
+- Validate interactive routes automatically against built MkDocs output.
+- Replace curated JavaScript metadata with generated versioned records.
+- Build the memory-lifetime chapter and connect the memory cards to canonical sections.
 
 **Artifacts changed**
 
-- `docs/objects/llama-model.md`
-- `mkdocs.yml`
+- `docs/assets/interactive/llama-foundations-explorer.html`
 - `README.md`
 - `docs/reference/project-state.md`
 - `docs/reference/research-log.md`
-- `logs/research/2026-07-12/2108-llama-model-object-page.md`
+- `logs/research/2026-07-12/2151-interactive-model-link.md`
 
 **Next step**
 
-- Build the canonical memory-lifetime chapter and interactive overlay, while linking the explorer’s Model object layer to the new canonical page.
+- Build the canonical memory-lifetime chapter and interactive overlay.
