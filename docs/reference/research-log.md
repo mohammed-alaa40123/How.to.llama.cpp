@@ -227,3 +227,44 @@
 **Next step**
 
 - Trace CUDA asynchronous copy branches, then compare one second accelerator backend.
+
+## 2026-07-12 05:50 Africa/Cairo — CUDA asynchronous tensor-copy branches
+
+**Scope**
+
+- Exact pinned acceptance, transfer, ordering, and fallback branches in `ggml_backend_cuda_cpy_tensor_async()`.
+
+**Verified findings**
+
+- The callback resolves tensor views through their owning buffers and requires both backend objects and both resolved buffers to be CUDA device-backed.
+- Backend context devices must match the devices recorded by their tensor buffers.
+- Same-backend copies queue device-to-device `cudaMemcpyAsync()` on the source stream and rely on same-stream order.
+- Different backend objects on one CUDA device queue the copy on the source stream, record a lazily created source-context event, and make the destination stream wait.
+- Different CUDA devices use `cudaMemcpyPeerAsync()` when peer copy is enabled; `GGML_CUDA_NO_PEER_COPY` returns `false`.
+- CPU/mmap sources, CUDA host buffers, mixed backend pairs, and backend/buffer device mismatches return `false`.
+- Accepted branches copy `ggml_nbytes(dst)`, return `true`, and do not host-synchronize.
+
+**Interpretation**
+
+- This is a device-resident fast path rather than a universal host/device async-copy API.
+- `true` means the transfer and its dependencies were queued, not that the destination is host-visible.
+- `false` is capability negotiation that selects the scheduler's correctness-preserving fallback, though that fallback may introduce synchronization.
+
+**Open questions**
+
+- Exact generic fallback route for CPU/mmap and CUDA-host sources.
+- Measured copy/compute overlap during prefill and one-token decode.
+- Metal command-buffer and event semantics compared with CUDA source-stream/event/destination-wait ordering.
+- Later PRs that changed peer-copy gating, copy-event ownership, or stream selection.
+
+**Artifacts changed**
+
+- `docs/lifecycle/cuda-async-copy.md`
+- `mkdocs.yml`
+- `docs/reference/project-state.md`
+- `README.md`
+- `logs/research/2026-07-12/0550-cuda-async-copy.md`
+
+**Next step**
+
+- Trace the pinned Metal backend and build a CUDA-versus-Metal capability comparison.
