@@ -188,3 +188,42 @@
 **Next step**
 
 - Compare concrete CPU and one accelerator backend implementations behind graph compute, copies, events, and synchronization.
+
+## 2026-07-12 04:51 Africa/Cairo — CPU and CUDA backend semantics
+
+**Scope**
+
+- Pinned concrete backend behavior behind scheduler graph submission, copies, events, and synchronization.
+
+**Verified findings**
+
+- `ggml_backend_cpu_graph_compute()` creates a CPU plan and returns `ggml_graph_compute()` directly; scheduler submission therefore blocks until the CPU graph completes.
+- CPU leaves asynchronous tensor-copy, synchronization, and event callbacks unset at the pinned revision.
+- CUDA graph compute queues kernels or launches a captured CUDA graph on a backend stream without a trailing stream synchronization.
+- CUDA scheduler events map to `cudaEventRecord` and `cudaStreamWaitEvent`, creating device-side dependencies rather than host waits.
+- CUDA ordinary buffer set/get/copy operations use asynchronous CUDA primitives followed by immediate stream synchronization, so those calls remain synchronous to their caller.
+- CUDA advertises asynchronous capability and conditionally advertises events depending on peer-copy build configuration.
+
+**Interpretation**
+
+- CPU threadpool parallelism is internal to a blocking graph call and must not be described as scheduler-level asynchrony.
+- `ggml_backend_graph_compute_async()` means the generic API does not force global completion; the concrete backend decides whether callback return means completion or only command submission.
+- An `Async` API name or `cudaMemcpyAsync` call alone is not proof of host-visible overlap.
+
+**Open questions**
+
+- Exact accepted and rejected branches in `ggml_backend_cuda_cpy_tensor_async()`.
+- Metal or Vulkan ordering primitives compared with CUDA streams and events.
+- Runtime overlap during prompt processing and token decode on discrete and UMA systems.
+
+**Artifacts changed**
+
+- `docs/lifecycle/cpu-cuda-backend-semantics.md`
+- `mkdocs.yml`
+- `docs/reference/project-state.md`
+- `README.md`
+- `logs/research/2026-07-12/0451-cpu-cuda-backend-semantics.md`
+
+**Next step**
+
+- Trace CUDA asynchronous copy branches, then compare one second accelerator backend.
