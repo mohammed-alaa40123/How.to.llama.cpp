@@ -37,10 +37,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - The context stores a non-owning model reference while owning mutable runtime state, scheduler resources, outputs, and memory modules.
 - Interactive Context entries link to the canonical page with top-level navigation.
 
-**Open questions**
-
-- Locate an explicit public thread-safety contract and map every concrete memory-module cleanup guarantee.
-
 ## 2026-07-12 16:50–18:49 — GGUF and model tensor placement
 
 **Verified**
@@ -69,133 +65,78 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Cache-aware routing should usually modify selection-only scores before top-k when the goal is to change expert choice without changing final expert weights.
 - Per-layer expert residency should use `(layer_id, expert_id)` keys and tensor ranges or backend slices, not graph-node identity.
 
-## 2026-07-12 21:08 — Canonical `llama_model` object page
+## 2026-07-12 21:08–21:51 — `llama_model` object and explorer integration
 
 **Verified**
 
-- Published `docs/objects/llama-model.md` and added it to the Objects navigation.
-- `llama_model_create(loader, params)` reads the GGUF architecture and dispatches to an architecture-specific `llama_model_*` subclass.
-- Common model mechanics and virtual architecture hooks separate shared loading behavior from `load_arch_hparams()`, `load_arch_tensors()`, and `build_arch_graph()`.
-- The object owns architecture and vocabulary state plus the lifetime of persistent model tensor storage, backend buffers, and retained mappings.
-- `layers` and model-level fields hold pointers to persistent GGML weight tensor metadata; per-token activations are created later in context-built graphs.
-- Persistent weight placement and scheduler graph-node placement are separate phases.
-- `build_graph()` delegates architecture-specific graph construction for context-provided inputs and mutable memory.
-- A `llama_context` stores a non-owning model reference; the model must outlive every referencing context.
-- `create_memory()` expresses the boundary where model architecture selects a compatible memory implementation while the context owns the returned mutable state.
+- Published `docs/objects/llama-model.md` and added it to Objects navigation.
+- `llama_model_create(loader, params)` dispatches to an architecture-specific subclass.
+- Common model mechanics and architecture hooks separate shared loading from `load_arch_hparams()`, `load_arch_tensors()`, and `build_arch_graph()`.
+- The object owns architecture/vocabulary state and persistent tensor storage, backend buffers, and retained mappings.
+- The interactive Model object layer routes to the canonical page.
 
 **Interpretation**
 
 - `llama_model` is a reusable loaded-model object and architecture-specific graph factory.
 - `llama_layer` is a schema of persistent tensor roles, not a runtime activation layer.
-- Sharing a model can avoid duplicate weight storage but does not make context mutation or backend execution automatically thread-safe.
 
-**Historical**
-
-- Architecture registration, subclass layout, tensor names, split/offload logic, and memory factories evolve quickly; later upstream behavior must remain separately labelled.
-
-**Open questions**
-
-- Document the exact storage members inside `llama_model::impl`.
-- Find the strongest public model-sharing and destruction-order contract.
-- Measure mapped/read/uploaded bytes, page faults, and teardown synchronization by backend.
-
-## 2026-07-12 21:51 — Interactive `llama_model` explorer link
+## 2026-07-12 22:50–23:51 — Memory lifetime atlas and interactive overlay
 
 **Verified**
 
-- The interactive **Model object** system layer now routes to `objects/llama-model/`.
-- The shared canonical-page renderer uses `target="_top"`, so navigation exits the iframe and opens the normal MkDocs page.
-- The pinned baseline and all existing explorer layers, workflows, GGUF/graph cards, memory cards, synchronization entries, and source links were preserved.
-- Both major runtime objects, `llama_model` and `llama_context`, now have canonical explorer routes.
+- Published `docs/foundations/memory-lifetimes.md` and added it to navigation.
+- The atlas separates GGUF storage, mappings, page-cache pages, model buffers, KV/recurrent/hybrid state, graph allocations, scheduler copies, staging, workspaces, outputs, queues, and events.
+- Mapping, allocation, residency, validity, command completion, and ownership are distinct states.
+- Replaced the Memory lifecycle tab's static cards with eight selectable records linked to canonical atlas sections.
+- Each record exposes owner, backing, validity/residency, synchronization, and release/reclaim conditions.
 
 **Interpretation**
 
-- The explorer now provides a cleaner progressive-disclosure path from the persistent loaded-model layer to the detailed architecture, ownership, sharing, graph-factory, and teardown explanation.
-
-**Historical**
-
-- This closes the integration blocker left by the initial `llama_model` object-page increment.
-
-**Open questions**
-
-- Validate interactive routes automatically against built MkDocs output.
-- Replace curated JavaScript metadata with generated versioned records.
-- Build the memory-lifetime chapter and connect the memory cards to canonical sections.
-
-## 2026-07-12 22:50 — Canonical memory-lifetime atlas
-
-**Verified**
-
-- Published `docs/foundations/memory-lifetimes.md` and added it to Foundations navigation.
-- The atlas separates GGUF storage, file descriptors, virtual mappings, OS page-cache pages, model tensor metadata, mapped aliases, explicit CPU/accelerator buffers, KV/recurrent/hybrid context memory, graph metadata, scheduler activations, copy-ring destinations, transfer staging, backend workspaces, outputs, thread pools, events, and queues.
-- Mapping, allocation, physical residency, data validity, command completion, and ownership are documented as distinct states.
-- The page covers CPU-only mapped execution, discrete accelerator offload, shared/unified memory caveats, prefill/decode differences, synchronization, teardown order, and a runtime measurement checklist.
-
-**Interpretation**
-
-- llama.cpp memory is best understood as overlapping ownership and synchronization lifetimes rather than one global cache.
-- Logical expert-cache admission should be measured separately from OS page residency and backend-copy validity.
-- RSS is a process-level residency signal, not a per-tensor cache truth table.
-
-**Historical**
-
-- Memory implementations, buffer types, graph reuse, transfer APIs, and backend synchronization evolve rapidly; the atlas remains pinned to the documented baseline and reviewed backend chapters.
-
-**Open questions**
-
-- Map every architecture to its concrete KV, recurrent, or hybrid `llama_memory_i` implementation.
-- Document backend destructor synchronization contracts.
-- Correlate file offsets, faults, graph tensors, copies, queue events, and device memory in runtime overlays.
-
-## 2026-07-12 23:51 — Interactive memory-lifetime overlay
-
-**Verified**
-
-- Replaced the Memory lifecycle tab's static cards with eight selectable memory records and an `aria-live` detail panel.
-- Every record links with top-level navigation to the matching section of the canonical memory atlas.
-- Each detail view exposes owner, backing storage, validity or physical-residency condition, synchronization boundary, and release or reclaim condition.
-- Native buttons, visible focus/hover state, and `aria-pressed` preserve keyboard accessibility.
-- The overlay explicitly separates logical ownership, virtual mapping, physical residency, backend-copy validity, and command completion.
-
-**Interpretation**
-
-- These five fields are a useful minimum model for comparing mapped CPU execution, explicit CPU storage, accelerator buffers, mutable sequence state, and scheduler temporaries.
-
-**Historical**
-
-- The earlier memory tab offered only short static summaries and no canonical section links.
-
-**Open questions**
-
-- Generate explorer records and anchors from versioned metadata.
-- Validate local routes and anchors against Markdown or built MkDocs HTML in CI.
-- Add runtime overlays for page faults, storage reads, RSS/PSS, device allocations, copy events, and queue waits.
+- llama.cpp memory is better modeled as overlapping ownership and synchronization lifetimes than as one global cache.
+- Logical expert-cache admission, OS page residency, and backend-copy validity require separate measurements.
 
 ## 2026-07-13 00:52 — Interactive route and anchor validator
 
 **Verified**
 
-- Added `scripts/validate_interactive_links.py`, a dependency-free validator for local documentation links embedded in interactive HTML and JavaScript assets.
-- The validator resolves literal HTML `href` values relative to each asset, JavaScript `page` records relative to the MkDocs root, and the foundations explorer's separate memory-atlas `anchor` records.
-- Missing routes report the interactive asset, original reference, and expected Markdown candidates; missing anchors report the target Markdown file and section ID.
-- External URLs, non-document schemes, and dynamically constructed template links are excluded from static route validation.
-- Added fixture tests for valid routes/anchors, missing routes, missing anchors, heading slug generation, and ignored external/dynamic links.
-- Documentation CI now runs project-context validation, interactive-link validation, unit tests, Python compilation, shell syntax checks, required-asset checks, and strict MkDocs build.
-
-**Interpretation**
-
-- Source-level validation catches hand-authored explorer drift earlier than waiting for a broken deployed route, while strict MkDocs remains the final renderer-level check.
-
-**Historical**
-
-- Interactive routes and anchors were previously maintained by hand without an automated consistency check.
+- Added `scripts/validate_interactive_links.py` and fixture tests.
+- The validator resolves literal HTML links, JavaScript page records, and memory-atlas anchors.
+- Documentation CI now runs project-context validation, interactive-link validation, unit tests, Python compilation, shell syntax, required-asset checks, and strict MkDocs build.
 
 **Open questions**
 
-- Validate built HTML IDs to cover MkDocs plugins, custom extensions, and renderer-specific slug behavior.
-- Replace the foundations explorer's asset-specific memory-anchor rule with generated route metadata.
-- Extend validation to non-HTML interactive assets and source-pinned upstream links.
+- Validate built HTML IDs and generated/plugin routes.
+- Replace asset-specific rules with generated versioned metadata.
+
+## 2026-07-13 01:52 — Public API and minimal example Pass A
+
+**Verified**
+
+- Published `docs/architecture/public-api-minimal-example.md` and added it to Architecture navigation.
+- The page maps `examples/simple/simple.cpp`, `include/llama.h`, `src/llama.cpp`, `src/llama-model.cpp`, and `src/llama-context.cpp`.
+- The pinned example loads backend registrations, creates model/context/sampler objects, tokenizes in two passes, optionally encodes, repeatedly decodes and samples, and frees sampler, context, then model.
+- `llama_model_get_vocab()` returns a model-associated vocabulary reference rather than a separately freed object.
+- `llama_batch_get_one()` is used as a caller-backed view over prompt-token or sampled-token storage.
+- Model loading delegates through loader construction, architecture-specific model creation, device selection, metadata/vocabulary loading, and tensor loading.
+- The page includes a subsystem relationship diagram, file/symbol/caller/callee table, ownership and synchronization matrix, error-path map, backend variants, and teardown responsibilities.
+
+**Interpretation**
+
+- The minimal example is an ownership and control-flow skeleton, not a complete production cleanup template.
+- Prefill and one-token decode share `llama_decode()` but should be measured as distinct phases.
+- `n_gpu_layers` is a placement request, not proof that a particular backend exists or every requested layer is offloaded.
+
+**Historical**
+
+- Public initialization, sampler, parameter, and batch APIs have changed across revisions; this inventory remains pinned to the baseline.
+
+**Open questions**
+
+- Strongest public contract for model sharing, context concurrency, and thread safety.
+- Exact output-access synchronization guarantees.
+- Deterministic RAII cleanup for every example error path.
+- Process-level backend/global-resource shutdown requirements.
 
 **Next step**
 
-- Begin file-by-file Pass A with the public API and minimal example group.
+- Continue Pass A with the model/GGUF loader group, including construction order, file and mapping ownership, split indexing, tensor offsets, data population, cancellation, and partial-construction cleanup.
