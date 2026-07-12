@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 02:51 Africa/Cairo_
+_Last updated: 2026-07-12 03:52 Africa/Cairo_
 
 This file is the compact checkpoint for scheduled and manual research runs. Read it after the root README and update it whenever a meaningful increment is completed.
 
@@ -27,38 +27,42 @@ Trace a minimal application from backend loading and model creation through cont
 - Mermaid overview and clickable inference prototype.
 - Upstream mirror and approximate source-index scripts.
 - Hourly context-integrity workflow and mandatory README bootstrap protocol.
-- Independent strict documentation CI, Pages enablement detection, deployment health checking, and the missing interactive HTML asset.
+- Independent strict documentation CI, Pages enablement detection, deployment health checking, and interactive HTML asset.
 - Pinned `llama_decode -> llama_context::decode -> process_ubatch` trace, including memory-batch preparation, graph reuse/rebuild, reserve-versus-allocation, CPU thread selection, and scheduler submission.
+- Pinned scheduler trace covering backend assignment, split construction, destination-copy allocation, copy-slot events, fallback synchronization, MoE partial transfers, split submission, and output visibility.
 
 ## In progress
 
 - GitHub Pages must be enabled in repository settings before deployment can run.
 - Latest CI and live-site status must be verified after this documentation increment.
 - Detailed `llama_context` construction and ownership map.
-- Scheduler split, copy, event, and backend execution ordering after `ggml_backend_sched_graph_compute_async()`.
+- Concrete CPU and accelerator implementations behind asynchronous graph compute, copies, events, and synchronization.
 
 ## Immediate next task
 
-Trace and document this path at the pinned revision:
+Trace and compare the backend interfaces behind the scheduler at the pinned revision:
 
 ```text
-ggml_backend_sched_graph_compute_async
-  -> scheduler graph split / allocation state
-  -> inter-backend copy and event dependencies
-  -> split submission
-  -> backend graph_compute_async
-  -> synchronization and output visibility
+ggml_backend_graph_compute_async
+  -> CPU backend graph execution / threadpool
+  -> one accelerator backend command submission
+cpy_tensor_async
+  -> supported peer/host transfer path or scheduler fallback
+event_wait / event_record
+  -> concrete backend ordering primitive
+ggml_backend_synchronize
+  -> completion and output visibility
 ```
 
 Deliverables for that task:
 
-1. exact scheduler source locations and data structures;
-2. split construction and backend-assignment rules;
-3. copy tensor ownership and lifetime;
-4. event/wait ordering for pipeline parallelism;
-5. CPU-only versus multi-backend differences;
-6. a sequence diagram and update to the interactive workflow;
-7. a concise research-log entry.
+1. exact CPU interface source locations and threadpool handoff;
+2. one accelerator backend comparison, preferably CUDA or Metal;
+3. true-async versus synchronous-fallback table;
+4. event and synchronization semantics;
+5. memory ownership and host/device visibility notes;
+6. sequence diagram and interactive-workflow update;
+7. concise research-log entry.
 
 ## Known blockers and caveats
 
@@ -66,10 +70,12 @@ Deliverables for that task:
 - GitHub status APIs may not expose all check-run conclusions through the connected repository interface; workflow files retain durable checks, and unresolved verification remains a TODO.
 - Regex-based indexing cannot resolve virtual dispatch, macros, function pointers, generated code, or backend registration reliably.
 - Graph reuse compatibility is distributed across graph-input implementations; the base implementation rejects reuse unless a specialized check exists.
-- Backend APIs named `async` may fall back to synchronous behavior when an implementation does not provide an asynchronous path.
+- Scheduler APIs named `async` do not guarantee overlap: concrete backends may queue work asynchronously or use synchronous fallback behavior.
+- Copy tensors are scheduler-owned temporary execution storage, not persistent model-owned duplicates.
+- The pinned MoE partial-copy path optimizes transfer volume but is not a long-lived expert-cache policy.
 - Backend behavior varies by build configuration and device capabilities.
 - Current upstream may differ materially from the pinned baseline; version labels are mandatory.
-- Full runtime validation will require representative CPU and accelerator builds, traces, and models.
+- Full runtime validation requires representative CPU and accelerator builds, traces, and models.
 
 ## Definition of done for the current milestone
 
