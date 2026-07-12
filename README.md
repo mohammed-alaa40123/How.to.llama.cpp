@@ -123,6 +123,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/roadmap.md` | Full implementation, file-analysis, and subsystem-synthesis plan |
 | `docs/reference/documentation-quality-roadmap.md` | Object-centred, searchable, and interactive documentation plan |
 | `docs/foundations/interactive-system-map.md` | Large clickable foundations map and tabbed system explorer |
+| `docs/objects/llama-context.md` | Canonical `llama_context` creation, ownership, lifetime, memory, call-chain, synchronization, and teardown page |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
 | `data/generated/` | Generated source inventories |
@@ -138,17 +139,18 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Highest priority
 
 - [ ] Deepen the GGUF foundations chapter: official format structure, canonical upstream figure with verified attribution, split files, metadata, tensor descriptors, alignment, data region, tensor naming, and loader call chain.
-- [ ] Create the canonical `llama_context` object page: creation, ownership, lifetime, memory modules, scheduler, outputs, decode mutations, synchronization, teardown, and pinned source map.
+- [ ] Link the interactive inference Context node to the canonical `llama_context` page and shared pinned source metadata.
 - [ ] Create the GGML graph-construction chapter: op calls, output tensors as lazy nodes, source edges, graph expansion, insertion ordering, views, activations, allocation, reuse, and execution.
 - [ ] Build the memory-lifetime chapter and interactive overlay: GGUF bytes, mmap, page faults, page cache/RAM, model buffers, context state, KV/recurrent memory, activations, workspaces, scheduler copies, output buffers, and teardown.
 - [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
 - [ ] Expand the interactive foundations explorer with architecture-specific graph-builder sublayers, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders the new interactive foundations page and tabs.
+- [ ] Verify the public Pages site returns HTTP 200 and renders the new `llama_context` page and interactive foundations page.
 
 ### Future improvements
 
 - [ ] Identify the first later upstream revision that registers or replaces SYCL scheduler `cpy_tensor_async`.
+- [ ] Create the next canonical object page for `llama_model`.
 - [ ] Add reusable page metadata for prerequisites, related objects, source symbols, and next pages.
 - [ ] Extend the source index with per-file, object, symbol, subsystem, and caller/callee landing pages.
 - [ ] Make interactive nodes load versioned JSON shared with object pages and source maps.
@@ -170,6 +172,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Create and publish the canonical `llama_context` object page with creation, ownership, lifetime, memory, mutation, call chain, synchronization, teardown, source map, related objects, and truth labels.
 - [x] Add a large tabbed foundations explorer with hover summaries, clickable system layers, end-to-end code path, memory lifecycle, GGUF/graph explanation, synchronization timeline, and file-group map.
 - [x] Update the roadmap with a four-pass file-by-file analysis and subsystem-synthesis program.
 - [x] Add and publish the object-centred, searchable, interactive documentation quality roadmap and website review rubric.
