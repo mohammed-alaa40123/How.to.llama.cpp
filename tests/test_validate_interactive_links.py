@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,6 +10,7 @@ SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "validate_interactive
 SPEC = importlib.util.spec_from_file_location("validate_interactive_links", SCRIPT)
 assert SPEC and SPEC.loader
 validator = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = validator
 SPEC.loader.exec_module(validator)
 
 
