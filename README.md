@@ -152,13 +152,15 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 - [ ] Rerun **Deploy documentation** and confirm its build, deploy, and website-verification jobs succeed.
 - [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the latest documentation commits; connected status interfaces may not expose complete push-run conclusions.
 - [ ] Confirm the live site returns HTTP 200 and contains `How.to.llama.cpp`; direct verification remains blocked until Pages is enabled and publicly reachable.
-- [ ] Trace Vulkan buffer `is_host`, `set_tensor`, `get_tensor`, direct `cpy_tensor`, synchronization, and staging behavior.
+- [ ] Finish the Vulkan transfer-path trace: memory properties, `set_tensor`, `get_tensor`, blocking `cpy_tensor`, scheduler `cpy_tensor_async`, and fence/event completion.
+- [ ] Add exact Vulkan source/destination rows to `docs/lifecycle/buffer-compatibility.md`.
 - [ ] Trace SYCL buffer host/USM/device semantics and extend the source-buffer × destination-buffer compatibility matrix.
 - [ ] Trace exact Metal shared/private buffer-level copy branches below the wrapper layer.
 - [ ] Add runtime instrumentation for page faults, synchronization bubbles, transfer overlap, direct-copy acceptance, heap staging, and temporary RSS.
 
 ### Future improvements
 
+- [ ] Validate Vulkan behavior on Android integrated GPUs and record memory-type and queue-family differences by vendor.
 - [ ] Extend the buffer matrix to RPC, CANN, OpenCL, Vulkan, SYCL, and Android-compiled backend combinations.
 - [ ] Add backend-specific runtime traces proving copy/compute overlap during prompt processing and token decode.
 - [ ] Add a matrix for CPU, CUDA, Metal, Vulkan, SYCL, RPC, and Android GPU graph/event capabilities.
@@ -174,6 +176,7 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 ### Completed setup
 
+- [x] Document the pinned Vulkan capability boundary: non-host-visible device buffers, dedicated host-buffer support, async/events flags, queue/event state, backend synchronization, and graph hazard tracking.
 - [x] Replace the broken backend-scheduler Mermaid sequence with a static accessible SVG and explanatory caption.
 - [x] Document concrete CPU and CPU_Mapped host visibility, ownership, `memcpy()` set/get, and direct-copy behavior.
 - [x] Document CUDA-device blocking set/get/direct-copy behavior, same-device/peer branches, and completion semantics.
