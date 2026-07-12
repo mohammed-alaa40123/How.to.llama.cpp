@@ -125,6 +125,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/foundations/interactive-system-map.md` | Large clickable foundations map and tabbed system explorer |
 | `docs/foundations/gguf-file-anatomy.md` | Canonical GGUF layout, typed metadata, tensor descriptors, split indexing, loader entry, mmap, and ownership foundation |
 | `docs/foundations/model-tensor-placement.md` | Canonical layer/device assignment, per-tensor buffer selection, mappings, alias/read/upload paths, progress, synchronization, and ownership chapter |
+| `docs/ggml/graph-construction-and-moe.md` | Canonical graph-construction, MoE routing, router-logit patching, graph reuse, and per-layer LRU cache design chapter |
 | `docs/objects/llama-context.md` | Canonical `llama_context` creation, ownership, lifetime, memory, call-chain, synchronization, and teardown page |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
@@ -140,23 +141,26 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Create the GGML graph-construction chapter: op calls, output tensors as lazy nodes, source edges, graph expansion, insertion ordering, views, activations, allocation, reuse, and execution.
-- [ ] Link the interactive graph-construction and graph-expansion cards to the canonical GGML chapter after publication.
+- [ ] Link the foundations explorer graph-construction, graph-expansion, and MoE cards to the new canonical graph-construction chapter.
+- [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
+- [ ] Build a dedicated `llama_model` object page that explains tensor registration, layer arrays, architecture dispatch, and `build_graph()` ownership.
 - [ ] Build the memory-lifetime chapter and interactive overlay: GGUF bytes, mmap, page faults, page cache/RAM, model buffers, context state, KV/recurrent memory, activations, workspaces, scheduler copies, output buffers, and teardown.
-- [ ] Add runtime evidence separating metadata parse, mapping/prefetch, major/minor faults, direct reads, alias bytes, upload bytes, event waits, and first-token access.
+- [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, and first-token access.
 - [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
 - [ ] Expand the interactive foundations explorer with architecture-specific graph-builder sublayers, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Add CI validation for canonical local links embedded in interactive JavaScript and HTML assets.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders the GGUF and model-placement chapters, canonical upstream diagram, linked `llama_context` page, and the new explorer links.
+- [ ] Verify the public Pages site returns HTTP 200 and renders the new graph-construction chapter.
 
 ### Future improvements
 
+- [ ] Prototype per-layer LRU expert-cache instrumentation using `(layer_id, expert_id)` keys and post-compute selected-expert logs.
+- [ ] Prototype cache-aware routing by adding selection-only bias before `ggml_argsort_top_k()`.
+- [ ] Evaluate whether `selected_experts_in` can be plumbed as a graph input for controlled routing experiments.
 - [ ] Quantify backend entry into the mmap host-pointer alias path for CPU-only, Metal, CUDA, Vulkan, and SYCL configurations.
 - [ ] Trace direct-I/O alignment/fallback behavior with runtime evidence.
 - [ ] Identify the first later upstream revision that registers or replaces SYCL scheduler `cpy_tensor_async`.
-- [ ] Create the next canonical object page for `llama_model`.
 - [ ] Add reusable page metadata for prerequisites, related objects, source symbols, and next pages.
 - [ ] Extend the source index with per-file, object, symbol, subsystem, and caller/callee landing pages.
 - [ ] Add a dedicated mmap/page-fault visualizer with conceptual and runtime-evidence modes.
@@ -177,6 +181,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Publish the canonical GGML graph-construction, MoE routing, graph reuse, router-logit patching, and per-layer LRU cache-design chapter.
+- [x] Add graph-construction chapter to top-level navigation.
 - [x] Link the interactive GGUF/graph tab to the canonical GGUF file-anatomy and model-tensor-placement pages with top-level navigation.
 - [x] Publish the canonical model tensor-placement and transfer chapter covering device assignment, per-tensor buffer selection, mappings, mmap alias/copy branches, direct reads, asynchronous and synchronous uploads, progress, cancellation, validation, mapping trimming, ownership, and truth labels.
 - [x] Publish the canonical GGUF file-anatomy foundation with official format structure, verified upstream figure attribution, typed metadata, tensor descriptors, split indexing, loader entry, mmap/page-fault distinctions, ownership, and truth labels.
