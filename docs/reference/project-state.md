@@ -74,16 +74,18 @@ After GGUF/model loading, build the GGML graph-construction chapter. The next ob
 ## Latest publication verification
 
 - GGUF chapter commit: `ef30870f936825cb1aad2875ad3ee3e98020c432`.
-- MkDocs navigation commit: `e0764ff363e103aac748fec019d088809b7a72f3`.
-- README/TODO commit: `0017de4febfb112efb69d46bd640bfbe8180252e`.
-- Connected commit-workflow lookup is limited and cannot reliably establish all push-triggered Documentation CI or Pages conclusions.
+- Durable detailed-note commit: `2078f721f56ddaf889eb23ddf8e8b8125c35e1c1`.
+- The combined-status query for that commit returned no status records.
+- The available commit-workflow query returned no runs and is documented to filter to pull-request-triggered runs, so push-triggered Documentation CI and Pages remain unverified.
 - The public site is configured at `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
-- Live HTTP/content verification remains required after the final state commits.
+- A direct browser open was rejected because the URL had no prior search result; site-specific search returned no indexed project result.
+- The execution container also failed DNS resolution for `github.com`, preventing checkout, local `mkdocs build --strict`, and direct curl-based Pages verification.
 
 ## Known blockers and caveats
 
-- The connected workflow-run query may omit push-triggered runs; combined commit status can also be empty before checks publish.
-- Browser or search fetchers may temporarily miss a newly deployed Pages revision; that is not by itself evidence of deployment failure.
+- **CI blocker:** the connected commit-workflow endpoint does not expose all push-triggered runs, and the final commit currently has no combined status records.
+- **Pages blocker:** the browser requires an indexed/search-returned URL before direct opening, project-specific search returned no site result, and the execution container cannot resolve GitHub hosts.
+- **Local validation blocker:** no repository checkout is available because `github.com` DNS resolution fails in the execution container.
 - The canonical diagram is linked from the official GGUF specification and attributed to @mishig25; it is not copied into this repository.
 - The official GGUF specification can evolve beyond the pinned llama.cpp implementation. Format statements and implementation statements must remain clearly separated.
 - The interactive explorer does not yet link its GGUF tab to the new canonical chapter.
