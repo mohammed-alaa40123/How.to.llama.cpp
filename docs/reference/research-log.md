@@ -137,6 +137,36 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Deterministic RAII cleanup for every example error path.
 - Process-level backend/global-resource shutdown requirements.
 
+## 2026-07-13 02:51 — Model and GGUF loader Pass A
+
+**Verified**
+
+- Published `docs/architecture/model-gguf-loader-pass-a.md` and added it to Architecture navigation.
+- The inventory covers `llama-model-loader`, model, mmap, and GGUF parser files.
+- GGUF parsing uses `no_alloc=true`; tensor descriptors are indexed before destination payload allocation.
+- Each tensor index entry preserves source split, absolute bounds-checked offset, and descriptor metadata.
+- Split loading requires shard zero first, validates split count/index metadata, and rejects duplicate tensor names.
+- Destination buffer selection depends on expected operations and backend support.
+- Population paths include mapped host alias, mapped copy/upload, direct read, asynchronous staged upload, and synchronous fallback.
+- Asynchronous staging slots and final uploads use events/synchronization before resource reuse or destruction.
+- Cancellation is an explicit `false` result distinct from exception unwinding.
+
+**Interpretation**
+
+- The loader acts as a transactional bridge from temporary parse/I/O state to persistent model-owned storage.
+- `weights_map` is the central join between GGUF physical layout and architecture/backend-aware tensor construction.
+- A model is not fully loaded merely because metadata parsed or a mapping exists; destination bytes and required asynchronous work must be complete.
+
+**Historical**
+
+- Split conventions, direct-I/O support, buffer selection, and asynchronous upload behavior are revision-sensitive.
+
+**Open questions**
+
+- Exact model-member declaration/destruction order for retained mappings and buffers.
+- Runtime cost split among parsing, mapping, faults, reads, validation, staging, upload, and synchronization.
+- Backend-specific semantics of host-pointer wrapping.
+
 **Next step**
 
-- Continue Pass A with the model/GGUF loader group, including construction order, file and mapping ownership, split indexing, tensor offsets, data population, cancellation, and partial-construction cleanup.
+- Continue Pass A with runtime-context and memory implementations, then synthesize public API, loader, model, and context ownership into one relationship map.
