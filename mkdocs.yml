@@ -73,6 +73,7 @@ nav:
   - Inference lifecycle:
       - Brief end to end: lifecycle/end-to-end.md
       - Decode and graph reuse: lifecycle/decode-graph-reuse.md
+      - Backend scheduler execution: lifecycle/backend-scheduler-execution.md
   - Interactive:
       - Inference workflow: interactive/inference-workflow.md
   - Reference:
