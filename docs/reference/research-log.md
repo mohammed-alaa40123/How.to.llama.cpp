@@ -241,3 +241,42 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Build the canonical GGML graph-construction chapter and connect its graph cards.
+
+## 2026-07-12 19:22 — GGML graph construction, MoE routing, and per-layer LRU design
+
+**Verified**
+
+- Published `docs/ggml/graph-construction-and-moe.md` and added it to Foundations navigation.
+- Current upstream OLMoE tensor loading creates dense attention tensors plus `ffn_gate_inp`, `ffn_gate_exps`, `ffn_down_exps`, and `ffn_up_exps` per layer.
+- Current upstream OLMoE graph construction loops over layers, builds attention, residuals, FFN norm, and calls `build_moe_ffn()` before final norm/output projection and `ggml_build_forward_expand()`.
+- `process_ubatch()` reuses the previous graph only if graph reuse is enabled and `res->can_reuse(gparams)` succeeds; otherwise it resets the graph result and scheduler, calls `model.build_graph()`, and allocates through the backend scheduler.
+- `build_moe_ffn()` computes router logits, probabilities, selection probabilities, top-k selected experts, expert weights, expert `mul_mat_id` paths, and aggregation.
+
+**Interpretation**
+
+- GGUF stores named tensor data and metadata, not an executable graph. The graph is reconstructed by architecture code over loaded model tensors.
+- A graph-reuse hit reuses compatible topology/allocation but still recomputes values for the current ubatch.
+- Cache-aware routing should usually bias `selection_probs` before top-k if the goal is to affect expert choice without changing final expert weights.
+- A per-layer LRU should key on `(layer_id, expert_id)` and track expert tensor ranges or backend tensor slices, not whole-graph nodes.
+
+**Historical**
+
+- The graph/MoE chapter uses current upstream layout under `src/models/`; older pinned baseline layouts may organize architecture files differently.
+
+**Open questions**
+
+- Add generated line-level source links for every statement in the graph chapter.
+- Link the interactive graph-construction, graph-expansion, and MoE cards to the new chapter.
+- Prototype post-compute selected-expert logging and compare global LRU versus per-layer LRU offline.
+
+**Artifacts changed**
+
+- `docs/ggml/graph-construction-and-moe.md`
+- `mkdocs.yml`
+- `README.md`
+- `docs/reference/project-state.md`
+- `docs/reference/research-log.md`
+
+**Next step**
+
+- Link the interactive explorer's graph/MoE cards to the new canonical chapter and add line-level source metadata.
