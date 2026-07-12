@@ -29,57 +29,41 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - `llama_decode()` delegates to `llama_context::decode()`.
 - Decode prepares scheduler and memory state and processes `llama_ubatch` units.
-- Reuse requires specialized compatibility checks to accept new inputs.
-- Pipeline-parallel reuse synchronizes before rewriting inputs.
+- Reuse requires specialized compatibility checks; pipeline-parallel reuse synchronizes before rewriting inputs.
 - Rebuild resets graph/scheduler state, calls `model.build_graph()`, and allocates through the backend scheduler.
 
 **Interpretation**
 
 - Reuse preserves compatible topology and allocation, not token values or outputs.
 
-## 2026-07-12 03:52 — Backend scheduler execution
+## 2026-07-12 03:52–12:52 — Scheduler and backend transfer semantics
 
 **Verified**
 
 - Allocation selects a copy-ring slot, assigns backends, builds splits, and allocates destination copies and dependency views.
 - Execution waits before slot reuse, tries backend async copy, falls back to synchronized blocking copy, submits splits, and records events.
 - Scheduler synchronization waits every backend.
-- The pinned `MUL_MAT_ID` path copies selected expert ranges rather than implementing a persistent expert cache.
-
-## 2026-07-12 04:51–06:49 — CPU, CUDA, and Metal semantics
-
-**Verified**
-
-- CPU graph compute blocks inside the threadpool-backed graph call and exposes no scheduler async-copy/event hooks.
-- CUDA normally queues kernels and uses events for device-side ordering, while ordinary buffer set/get/direct-copy calls synchronize before return.
-- The CUDA scheduler callback accepts only compatible CUDA device-buffer pairs; CPU/mmap and CUDA-host sources are rejected.
-- Metal graph work and blits use command buffers and event ordering; explicit synchronization establishes host-visible completion.
-
-**Interpretation**
-
-- Internal parallelism and APIs named `async` do not by themselves prove scheduler-level overlap or host-visible completion.
-
-## 2026-07-12 07:52 — Generic tensor-copy fallback
-
-**Verified**
-
-- Missing or rejected async copy synchronizes both source and destination backends.
-- Blocking copy checks host-visible source, host-visible destination, destination direct-copy callback, then full `malloc → get → set → free` staging.
-- CPU/mmap-to-accelerator paths may avoid generic heap staging while remaining synchronized and page-fault prone.
+- Missing/rejected async copy synchronizes source and destination; blocking fallback checks host-visible paths, direct-copy callbacks, then full heap staging.
+- CPU graph compute is threadpool-backed and blocking at the backend interface.
+- CUDA queues graph work, while ordinary set/get/copy callbacks establish completion before return.
+- Metal uses command buffers and event ordering; explicit synchronization establishes host-visible completion.
+- Vulkan registered-host and compatible same-device paths can use scheduler async copy; ordinary CPU/mmap and unsupported cross-device paths are rejected.
+- SYCL explicit backend operations may queue work, but the pinned scheduler interface installs no `cpy_tensor_async` callback; backend-specific temporary or host-forward staging can still occur.
+- The shared compatibility matrix records CPU, CPU_Mapped, CUDA, Metal, Vulkan, and SYCL paths.
 
 **Interpretation**
 
 - Async rejection is a correctness-preserving serialization point.
-- No generic heap allocation does not imply zero-copy or overlap.
+- No generic heap staging does not imply zero-copy, no backend staging, or host-visible overlap.
+- CPU_Mapped addressability does not prove physical residency.
 
-## 2026-07-12 08:52 — Buffer compatibility foundation
+**Historical**
 
-**Verified**
+- Backend callback registration, staging, USM, events, and copy ordering may change in later revisions.
 
-- CPU and CPU_Mapped use direct `memcpy()` operations and report host visibility.
-- CPU_Mapped wraps external storage and does not own physical residency.
-- CUDA device buffers are not host-visible and establish completion in blocking callbacks.
-- Metal storage mode does not remove command-completion requirements.
+**Open questions**
+
+- Identify the first later SYCL scheduler-copy revision and gather runtime page-fault, RSS, queue-wait, and overlap evidence.
 
 ## 2026-07-12 09:11 — Scheduler figure repair
 
@@ -87,166 +71,97 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - A deployed Mermaid renderer failure was replaced with an accessible static SVG preserving allocation, split execution, asynchronous return, and later synchronization.
 
-## 2026-07-12 09:49–10:52 — Vulkan capability and transfer path
-
-**Verified**
-
-- Default Vulkan buffers are not publicly host-visible, even when internally mapped.
-- Blocking set/get/copy paths use mapped access or staging with barriers and fence completion.
-- Same-device Vulkan and registered Vulkan-host sources can use scheduler asynchronous copy.
-- Ordinary CPU/mmap and cross-device Vulkan sources are rejected by the scheduler callback.
-
-**Interpretation**
-
-- Vulkan registration, not generic host visibility, enables the queued host-to-device scheduler path.
-- UMA can remove staging without removing synchronization requirements.
-
-## 2026-07-12 11:49 — SYCL buffer and transfer semantics
-
-**Verified**
-
-- Default, split, and optional system-USM buffers report `is_host == false`.
-- Dedicated SYCL host buffers inherit CPU host visibility.
-- Blocking set/get operations wait; non-Windows set performs a full temporary host copy for the documented mmap/PVC workaround.
-- Direct device copy waits devices and uses Level Zero, SYCL peer access, or host-forward staging.
-- Backend async set/get queues work, but the pinned scheduler interface installs `cpy_tensor_async = NULL`.
-
-**Interpretation**
-
-- Queue-based explicit async set/get does not imply graph-split tensor-copy overlap.
-- Backend-specific staging may occur even when generic emergency staging does not.
-
-**Historical**
-
-- Later revisions may change callback registration, staging, USM, and dependency behavior.
-
-## 2026-07-12 12:52 — SYCL compatibility matrix integration
-
-**Verified**
-
-- The shared buffer matrix now includes CPU/mmap → SYCL, SYCL-host → device, device → CPU, same-device, peer-device, and host-forward paths.
-- Every pinned SYCL scheduler split-copy row is asynchronous-copy rejected because the interface callback is `NULL`.
-- Same-device and peer copies may use native transfer paths but remain blocking at the scheduler boundary.
-- CPU/mmap → SYCL avoids generic emergency staging yet can allocate a full backend temporary buffer on non-Windows.
-- Non-peer SYCL device copies use full-size backend host-forward staging.
-
-**Interpretation**
-
-- Generic heap staging, SYCL mmap/PVC staging, and SYCL host-forward staging must be counted separately.
-- `generic_heap_staging_used = false` is insufficient evidence that no full-tensor host allocation occurred.
-- The absent callback is a likely multi-backend overlap boundary in the pinned revision.
-
-**Historical**
-
-- Findings remain pinned to `e3546c7948e3af463d0b401e6421d5a4c2faf565`.
-
-**Open questions**
-
-- Which later upstream revision first registers or replaces SYCL scheduler tensor-copy asynchrony.
-- Whether current PVC and non-Intel runtimes still require the mmap workaround.
-- Runtime page faults, temporary RSS, queue waits, and overlap.
-
 ## 2026-07-12 13:52 — Documentation quality and interaction roadmap
 
 **Verified**
 
-- Added a canonical roadmap for object-centred documentation, a clickable symbol/source explorer, synchronized diagrams, memory and execution visualizers, page navigation contracts, and pinned-version/backend comparisons.
-- Added a ten-part object-page contract covering purpose, creation, ownership, mutation, destruction, lifetime, memory, callers/callees, synchronization, and source evidence.
-- Added a website review rubric covering discoverability, source traceability, ownership clarity, memory and synchronization clarity, diagrams, accessibility, cross-links, version clarity, open questions, and next-step guidance.
-- Added bounded first implementation slices, beginning with a canonical `llama_context` object page.
-- Published the roadmap in MkDocs navigation and linked it from the main implementation roadmap and README context map.
-- Added daily website-quality review responsibility to the durable scheduling plan.
+- Added object-centred documentation, clickable source exploration, synchronized diagrams, memory/execution visualizers, navigation contracts, and pinned-version/backend comparisons.
+- Added a ten-part object-page contract and website review rubric.
+- Published the roadmap and daily website-quality review responsibility.
 
 **Interpretation**
 
-- Object-centred entry points address a major discoverability gap left by file- and chapter-centred documentation.
-- Stable metadata shared by diagrams, object pages, and symbol pages is the most maintainable path to synchronized interactions.
-
-**Historical**
-
-- This extends the original linear end-to-end walkthrough without replacing it; readers will gain multiple entry points into the same pinned evidence.
-
-**Open questions**
-
-- Which interactions can remain static MkDocs assets and which require a generated data bundle or client-side application.
-- The first later SYCL scheduler-copy revision remains unresolved because the available code index did not expose a reliable exact commit or PR.
+- Stable metadata shared by diagrams, object pages, and symbol pages is the maintainable path to synchronized interactions.
 
 ## 2026-07-12 14:55 — Interactive foundations and file-by-file plan
 
 **Verified**
 
-- Added a large interactive foundations explorer with six tabs covering system layers, end-to-end code flow, memory lifecycle, GGUF/graph construction, execution/synchronization, and file groups.
-- System layers support hover summaries and click-to-open details for representative symbols, pinned source areas, ownership, and synchronization.
-- Added an explicit correction that mmap demand paging and OS reclaim are not equivalent to a universal application-level “load one layer, execute, free it” policy.
-- Published the explorer as the first Foundations page and made it the primary homepage entry point.
-- Expanded the roadmap with file-by-file inventory, subsystem grouping, cross-file composition, and complete-workflow reconstruction passes.
+- Added a six-tab foundations explorer covering system layers, end-to-end code flow, memory lifecycle, GGUF/graph construction, execution/synchronization, and file groups.
+- Added hover/click details with representative symbols, ownership, synchronization, and pinned source links.
+- Corrected the claim that mmap demand paging is equivalent to a universal application-level “load one layer, execute, free it” policy.
+- Expanded the roadmap with file inventory, subsystem grouping, cross-file composition, and complete-workflow reconstruction.
 
 **Interpretation**
 
-- Foundations need multiple synchronized views because no single linear diagram can explain API control flow, object ownership, virtual memory, graph construction, and backend synchronization simultaneously.
-- File listings become useful only after they are synthesized into object, memory, and execution relationships.
-
-**Open questions**
-
-- Identify the exact canonical GGUF image from an authoritative upstream path and verify attribution/license before adding it.
-- Replace curated JavaScript data with generated, versioned metadata shared across object pages, source index, and visualizers.
-- Add architecture-specific graph-builder, KV/recurrent, MoE, prefill/decode, and runtime-measurement layers.
+- No single linear diagram can explain API control flow, object ownership, virtual memory, graph construction, and backend synchronization simultaneously.
 
 ## 2026-07-12 15:05 — Canonical `llama_context` object page
 
 **Verified**
 
-- Added a source-pinned object page for `llama_context` creation, ownership, lifetime, memory, mutation, decode, threading, synchronization, and teardown.
+- Added a source-pinned page for context creation, ownership, lifetime, memory, mutation, decode, threading, synchronization, and teardown.
 - The context stores a non-owning model reference while owning mutable runtime state, scheduler resources, outputs, and memory modules.
-- The model must outlive every context that references it.
-- Published the page under an **Objects** navigation section.
+- The model must outlive every referencing context.
 
 **Interpretation**
 
 - `llama_context` is the mutable execution session around a reusable loaded model.
-- Scheduler ownership does not imply ownership or physical residency of mmap-backed model pages.
 
 **Open questions**
 
-- Locate an explicit public thread-safety contract for concurrent context mutation.
-- Map every concrete memory-module selection and cleanup completion guarantee.
+- Locate an explicit public thread-safety contract and map every concrete memory-module selection and cleanup guarantee.
 
 ## 2026-07-12 15:49 — Interactive Context link
 
 **Verified**
 
-- The interactive **llama_context runtime** layer now links to the canonical `llama_context` object page.
-- The **Construct context** end-to-end workflow step links to the same page.
-- Local canonical-page navigation uses `target="_top"`, so the object page replaces the enclosing MkDocs page instead of opening inside the iframe.
-- The explorer now centralizes the pinned upstream baseline, source root, and documentation root in one metadata object.
-- Existing six-view coverage remains intact: system layers, workflow, memory, GGUF/graph, synchronization, and file groups.
-
-**Interpretation**
-
-- Linking both the conceptual object node and the concrete construction step creates a better bridge between overview and detailed source-level documentation.
-- Centralized in-file metadata reduces duplicated literals but is only an intermediate step toward generated versioned JSON.
+- The interactive `llama_context runtime` layer and `Construct context` workflow step link to the canonical page.
+- `target="_top"` prevents canonical pages from opening inside the explorer iframe.
+- The explorer centralizes pinned upstream, source-root, and documentation-root metadata.
 
 **Historical**
 
-- This is the first interactive node-to-canonical-object-page bridge in the project.
+- This is the first interactive node-to-canonical-object-page bridge.
+
+## 2026-07-12 16:50 — GGUF file anatomy and loader entry
+
+**Verified**
+
+- Published `docs/foundations/gguf-file-anatomy.md` in the Foundations navigation.
+- The official GGUF specification defines a self-describing typed format with header/counts, key/value metadata, tensor descriptors, alignment padding, and a tensor-data region.
+- The canonical GGUF v3 diagram is linked from the official specification and attributed there to `@mishig25`; the asset is referenced rather than redistributed.
+- The pinned loader calls `gguf_init_from_file(..., no_alloc = true)` before creating final tensor payload storage.
+- `llama_tensor_weight` records the source split and computes an absolute source-file offset as data-region offset plus tensor-descriptor offset, then validates bounds.
+- The loader unifies tensors from all splits into a name-indexed `weights_map`, while retaining each source-file index and rejecting duplicates/count mismatches.
+- mmap-backed virtual addressability is distinct from physical page residency; accelerator placement may require separate backend-owned storage and transfer.
+
+**Interpretation**
+
+- `weights_map` is the bridge between format parsing and backend-aware model construction: it separates where bytes live in GGUF files from where execution consumes them.
+- “Model loaded” is ambiguous unless metadata parsing, mapping, allocation, transfer, and first-touch faults are measured separately.
+
+**Historical**
+
+- GGUF replaced GGML/GGMF/GGJT file formats; the pinned loader recognizes versions 1–3.
+- The current official specification can evolve beyond the pinned implementation.
 
 **Open questions**
 
-- Which object should be linked next: `llama_model`, scheduler, `ggml_cgraph`, or memory modules.
-- Whether CI should parse interactive JavaScript and verify every local page route.
+- Trace `model.load_tensors()`, buffer selection, `init_mappings()`, `load_all_data()`, prefetch/direct-I/O behavior, backend uploads, and progress accounting.
+- Add runtime evidence separating parse time, mmap setup, faults, storage reads, transfers, and synchronization.
+- Link the interactive GGUF tab to the canonical chapter.
 
 **Artifacts changed**
 
-- `docs/assets/interactive/llama-foundations-explorer.html`
+- `docs/foundations/gguf-file-anatomy.md`
+- `mkdocs.yml`
 - `README.md`
 - `docs/reference/project-state.md`
 - `docs/reference/research-log.md`
-- `logs/research/2026-07-12/1549-interactive-context-link.md`
-
-**Source ledger**
-
-- No new external source was introduced; the pinned baseline and existing canonical object page were reused.
+- `docs/reference/research-ledger.md`
+- `logs/research/2026-07-12/1650-gguf-file-anatomy.md`
 
 **Next step**
 
-- Deepen the GGUF format and model-loader chapter and link its interactive tab to the resulting detailed page.
+- Complete the backend-placement and data-transfer half of model loading, then connect the GGUF explorer tab to the canonical page.
