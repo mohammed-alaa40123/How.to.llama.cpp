@@ -152,17 +152,18 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 - [ ] Rerun **Deploy documentation** and confirm its build, deploy, and website-verification jobs succeed.
 - [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the latest documentation commits; connected status interfaces may not expose complete push-run conclusions.
 - [ ] Confirm the live site returns HTTP 200 and contains `How.to.llama.cpp`; direct verification remains blocked until Pages is enabled and publicly reachable.
-- [ ] Trace SYCL buffer host, USM, and device allocation semantics.
-- [ ] Trace SYCL blocking set/get/direct-copy callbacks, scheduler `cpy_tensor_async` acceptance, queue/event ordering, and return-time completion.
-- [ ] Add exact SYCL source/destination rows to `docs/lifecycle/buffer-compatibility.md`.
+- [ ] Add exact SYCL source/destination rows to `docs/lifecycle/buffer-compatibility.md`, including backend temporary staging versus generic heap staging.
+- [ ] Identify the first later upstream revision that re-enables or replaces SYCL scheduler `cpy_tensor_async` and compare its dependency semantics with the pinned baseline.
 - [ ] Trace exact Metal shared/private buffer-level copy branches below the wrapper layer.
 - [ ] Add runtime instrumentation for page faults, synchronization bubbles, transfer overlap, direct-copy acceptance, backend staging, heap staging, and temporary RSS.
 
 ### Future improvements
 
+- [ ] Measure the non-Windows SYCL mmap/PVC staging workaround: page faults, temporary RSS, extra host memcpy, queue copy, and wait time.
+- [ ] Compare Level Zero, OpenCL, and non-Intel SYCL runtime behavior.
 - [ ] Validate Vulkan behavior on Android integrated GPUs and record memory-type, staging, queue-family, and fence-latency differences by vendor.
 - [ ] Add Vulkan runtime counters for registered-host fast paths versus ordinary-host synchronizing staging.
-- [ ] Extend the buffer matrix to RPC, CANN, OpenCL, SYCL, and Android-compiled backend combinations.
+- [ ] Extend the buffer matrix to RPC, CANN, OpenCL, and Android-compiled backend combinations.
 - [ ] Add backend-specific runtime traces proving copy/compute overlap during prompt processing and token decode.
 - [ ] Add a matrix for CPU, CUDA, Metal, Vulkan, SYCL, RPC, and Android GPU graph/event capabilities.
 - [ ] Trace later scheduler PRs that changed copy/event ordering and compare them with the pinned baseline.
@@ -177,6 +178,7 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 ### Completed setup
 
+- [x] Document the pinned SYCL allocation and transfer model: device versus optional system USM, host-buffer ownership, blocking set/get, backend mmap staging, device-copy fallbacks, async set/get, synchronization, and disabled scheduler `cpy_tensor_async` registration.
 - [x] Complete the pinned Vulkan transfer-path trace: memory-property selection, blocking set/get, same-device and cross-device blocking copies, backend async set/get fallbacks, scheduler async-copy acceptance, fence completion, and registered-host behavior.
 - [x] Add exact Vulkan source/destination rows to `docs/lifecycle/buffer-compatibility.md`.
 - [x] Document the pinned Vulkan capability boundary: non-host-visible default buffers, dedicated host-buffer support, async/events flags, queue/event state, backend synchronization, and graph hazard tracking.
