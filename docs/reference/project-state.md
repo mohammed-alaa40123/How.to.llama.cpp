@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 17:50 Africa/Cairo_
+_Last updated: 2026-07-12 18:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -32,12 +32,13 @@ Return to the foundations and reconstruct llama.cpp from the pinned source in tw
 - Canonical `llama_context` object page and interactive links.
 - Canonical GGUF file-anatomy chapter covering format structure, split indexing, loader entry, mmap/page-fault distinctions, ownership, and truth labels.
 - Canonical model tensor-placement and data-transfer chapter covering device assignment, per-tensor buffer selection, mapping initialization, host-pointer aliasing, explicit reads, synchronous/asynchronous uploads, progress, cancellation, validation, trimming, and ownership.
+- Interactive GGUF/graph cards now link directly to both canonical model-loading chapters with top-level navigation.
 - Expanded implementation roadmap with four passes: file inventory, subsystem grouping, cross-file composition, and complete workflow reconstruction.
 
 ## In progress
 
-- Linking the interactive GGUF/graph tab to both canonical model-loading chapters.
 - GGML op insertion, tensor-as-node semantics, graph expansion, activation allocation, reuse, and execution.
+- Linking graph-construction and graph-expansion cards after the canonical chapter is published.
 - Memory atlas and interactive runtime overlays for mmap/page faults, RAM/RSS, backend copies, KV/recurrent state, and workspaces.
 - Runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, and first-token access.
 - File-by-file Pass A for public API/examples, model/GGUF loader, and runtime context.
@@ -46,7 +47,7 @@ Return to the foundations and reconstruct llama.cpp from the pinned source in tw
 
 ## Immediate next task
 
-Create the GGML graph-construction chapter and connect the GGUF explorer tab:
+Create the GGML graph-construction chapter and connect its explorer cards:
 
 ```text
 architecture graph builder
@@ -68,27 +69,24 @@ Required deliverables:
 3. source-edge and topological-order diagrams;
 4. allocation versus execution lifetime table;
 5. graph-reuse boundaries across prefill/decode and architecture variants;
-6. links from the interactive GGUF/graph tab to the GGUF and model-placement chapters.
+6. links from the interactive graph-construction and graph-expansion cards to the canonical chapter.
 
 The next canonical object page remains `llama_model`.
 
 ## Latest publication verification
 
-- Model-placement chapter commit: `b61658e995acee3e4608c429b5aa16c70899409c`.
-- Navigation update commit: `7d44f4db0780bf165d340721b65dbbe6aedc743f`.
-- README milestone commit: `047730e9dce75f0f6c788c1f9144d7f924ecc75b`.
-- Detailed-note commit checked for publication state: `3fe43f6f5cb8ae14132047357cb1679395fb7a10`.
-- The combined-status endpoint returned no status records for that commit.
-- The available commit-workflow endpoint returned no runs; it is documented to expose only pull-request-associated runs, so push-triggered Documentation CI, Pages, and hourly context checks remain unverified.
+- Interactive explorer implementation commit: `580d0f8bac014afc08023b54f61d1bbef2f53b99`.
+- Detailed-note commit: `2f123df858f120970bde60d4f5d303db9ab65985`.
+- README TODO update commit: `01716f039c3f710f5035bca02c383f8ea59206bf`.
+- The changed explorer was re-fetched from `main`; both canonical routes and the pinned baseline are present.
+- GitHub Actions and Pages verification for the final durable commit are recorded below after the final checks.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
-- Site-specific searches returned no indexed results for either the project title or the new model-placement page.
-- Direct opens of both the site root and new page were rejected by the browser safety layer because neither URL came from a prior search result.
 
 ## Known blockers and caveats
 
-- **CI blocker:** the connector exposes no combined statuses and its workflow-run action filters to pull-request-triggered runs, so the latest push workflows cannot be confirmed or inspected for failures.
-- **Pages blocker:** search returned no indexed site result, and direct open is disallowed for URLs not returned by search; therefore HTTP status and rendered content cannot be verified in this environment.
-- **Local validation blocker:** prior runs could not obtain a checkout because the execution container failed DNS resolution for GitHub hosts; no new local checkout became available in this run.
+- **CI blocker:** the connector exposes no combined statuses and its workflow-run action filters to pull-request-triggered runs, so latest push workflows may remain unverified.
+- **Pages blocker:** if search still returns no indexed site result and direct open remains disallowed, HTTP status and rendered content cannot be verified in this environment.
+- **Local validation blocker:** the execution container still cannot resolve `github.com`, so it cannot obtain a checkout for `mkdocs build --strict` or local site checks.
 - The official GGUF specification can evolve beyond the pinned llama.cpp implementation.
 - Mmap host-pointer wrapping is conditional; “zero-copy model loading” is not a model-wide property under partial offload or incompatible buffer types.
 - Prefetch requests do not prove permanent physical residency.
