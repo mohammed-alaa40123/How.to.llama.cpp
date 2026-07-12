@@ -101,6 +101,8 @@ def is_ignored(raw: str) -> bool:
     parsed = urlparse(raw)
     return (
         not raw
+        or "${" in raw
+        or "{{" in raw
         or raw.startswith(("mailto:", "tel:", "javascript:", "data:"))
         or parsed.scheme in {"http", "https"}
         or raw.startswith("//")
