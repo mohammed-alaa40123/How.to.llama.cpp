@@ -153,6 +153,14 @@ Each node opens:
 
 The animation must support prefill, single-token decode, CPU-only, GPU offload, multi-backend, and MoE variants rather than presenting one path as universal.
 
+## Milestone 10 — Object-centred and searchable documentation
+
+Treat runtime objects and source symbols as first-class entry points, not only files and chapters. Build canonical pages for `llama_model`, `llama_context`, `llama_batch`, `ggml_tensor`, `ggml_cgraph`, `ggml_backend_sched`, backend buffers, GGUF loaders, and KV/recurrent memory.
+
+Connect those pages to a clickable source explorer, synchronized diagrams, memory and execution visualizers, backend/version comparisons, prerequisites, related topics, and next-step navigation.
+
+The complete quality contract, review rubric, and first implementation slices live in [Documentation quality and interaction roadmap](reference/documentation-quality-roadmap.md).
+
 ## Ongoing research tracks
 
 - Official docs, source comments, tests, examples, and benchmarks.
@@ -160,3 +168,4 @@ The animation must support prefill, single-token decode, CPU-only, GPU offload, 
 - Papers evaluating llama.cpp, GGML, quantization, and heterogeneous execution.
 - Conference talks, maintainer interviews, videos, blogs, and technical social posts.
 - Runtime validation with logs, profilers, page-fault counters, memory maps, and backend traces.
+- Periodic live-site reviews covering discoverability, source traceability, ownership clarity, accessibility, cross-links, and interaction quality.
