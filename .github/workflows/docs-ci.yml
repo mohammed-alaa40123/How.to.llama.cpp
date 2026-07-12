@@ -34,12 +34,15 @@ jobs:
           RUN_CONTEXT_OUT: ${{ runner.temp }}/how-to-llama-ci-context.md
         run: ./scripts/start_scheduled_run.sh documentation-ci
 
-      - name: Validate project context and scripts
+      - name: Validate project context, interactive links, and scripts
         run: |
           python3 scripts/validate_project_context.py
+          python3 scripts/validate_interactive_links.py
+          python3 -m unittest discover -s tests -p 'test_*.py'
           bash -n scripts/*.sh
-          python3 -m py_compile scripts/*.py
+          python3 -m py_compile scripts/*.py tests/*.py
           test -s docs/assets/interactive/inference-flow.html
+          test -s docs/assets/interactive/llama-foundations-explorer.html
 
       - name: Install documentation dependencies
         run: pip install -r requirements.txt
