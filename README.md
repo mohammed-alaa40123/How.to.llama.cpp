@@ -134,15 +134,14 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Connect every memory-lifecycle explorer card to the canonical memory atlas and add a compact interactive ownership/lifetime overlay.
+- [ ] Add CI validation for canonical local links and section anchors embedded in interactive JavaScript and HTML assets.
+- [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
-- [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
 - [ ] Expand the interactive explorer with architecture-specific graph-builder sublayers, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
-- [ ] Add CI validation for canonical local links and section anchors embedded in interactive JavaScript and HTML assets.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `foundations/memory-lifetimes/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders the interactive memory overlay plus `foundations/memory-lifetimes/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
@@ -164,6 +163,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Connect all eight memory-lifecycle explorer entries to the canonical atlas and add an accessible ownership/lifetime overlay with owner, backing, validity/residency, synchronization, and release fields.
 - [x] Publish the canonical memory-lifetime atlas covering GGUF storage, virtual mappings, page faults/page cache/RSS, model buffers, KV/recurrent/hybrid state, graph allocations, scheduler copies, backend staging, outputs, prefill/decode differences, synchronization, teardown, runtime measurements, and truth labels.
 - [x] Link the interactive **Model object** layer to `objects/llama-model/` with top-level navigation.
 - [x] Publish the canonical `llama_model` object page with architecture dispatch, common/architecture loading boundaries, tensor and layer schemas, persistent storage ownership, device placement, graph-builder delegation, context sharing, memory factory, teardown, source map, and truth labels.
