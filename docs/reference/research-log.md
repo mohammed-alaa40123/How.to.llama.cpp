@@ -147,3 +147,44 @@
 **Next step**
 
 - Document the scheduler split/copy/event execution path at the same pinned revision.
+
+## 2026-07-12 03:52 Africa/Cairo — Backend scheduler split execution
+
+**Scope**
+
+- Pinned `ggml_backend_sched_graph_compute_async()` path through backend assignment, split construction, destination copies, events, submission, and synchronization.
+
+**Verified findings**
+
+- Graph allocation selects a copy-ring slot before splitting and allocating the augmented scheduler graph.
+- Backend assignment is multi-pass and treats the final registered backend as the CPU fallback.
+- Splits are contiguous graph regions; a new split starts on a backend change and may also start to shorten incompatible weight-copy lifetimes or respect split-input limits.
+- Cross-backend sources are replaced with scheduler-owned destination-layout copies, while dependency views keep original source storage alive until the copy completes.
+- Execution waits before overwriting a destination copy slot, tries backend asynchronous copy support, and falls back to synchronized tensor copy when needed.
+- Each split is submitted with `ggml_backend_graph_compute_async()`, then an event is recorded for the active backend/copy slot.
+- The synchronous scheduler wrapper waits for every backend after asynchronous submission.
+- The pinned MoE specialization reads routing IDs and copies only used consecutive expert ranges for host-resident `MUL_MAT_ID` weights.
+
+**Interpretation**
+
+- Copy-slot events are reuse fences for scheduler-owned destination storage.
+- The MoE specialization reduces transfer volume but is not a persistent expert cache or a guarantee that mmap source pages remain resident.
+- Scheduler-level `async` permits but does not guarantee overlap; concrete backend interfaces determine whether execution and copies are truly asynchronous.
+
+**Open questions**
+
+- Which pinned CUDA, Metal, Vulkan, SYCL, and RPC interfaces implement true asynchronous compute, peer copies, and events?
+- What overlap is observable in prompt processing versus one-token decode?
+- Which later PRs changed copy/event ordering or MoE partial transfers?
+
+**Artifacts changed**
+
+- `docs/lifecycle/backend-scheduler-execution.md`
+- `mkdocs.yml`
+- `docs/reference/project-state.md`
+- `README.md`
+- `logs/research/2026-07-12/0352-backend-scheduler-execution.md`
+
+**Next step**
+
+- Compare concrete CPU and one accelerator backend implementations behind graph compute, copies, events, and synchronization.
