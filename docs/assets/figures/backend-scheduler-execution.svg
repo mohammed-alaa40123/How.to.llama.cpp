@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="980" viewBox="0 0 1400 980" role="img" aria-labelledby="title desc">
+  <title id="title">Backend scheduler execution path</title>
+  <desc id="desc">Conceptual flow from scheduler graph submission through allocation, split copies, backend execution, events, return to caller, and later synchronization.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c9d1d9"/>
+    </marker>
+    <style>
+      .bg { fill:#0d1117; }
+      .panel { fill:#111827; stroke:#334155; stroke-width:2; rx:16; }
+      .sched { fill:#10263e; stroke:#4aa3df; stroke-width:2; rx:12; }
+      .copy { fill:#3a2109; stroke:#f59e0b; stroke-width:2; rx:12; }
+      .backend { fill:#1b2d16; stroke:#84b547; stroke-width:2; rx:12; }
+      .event { fill:#281b3f; stroke:#a879d8; stroke-width:2; rx:12; }
+      .phase { fill:#0f172a; stroke:#475569; stroke-width:2; rx:18; }
+      .title { fill:#f8fafc; font:700 34px system-ui,-apple-system,Segoe UI,sans-serif; }
+      .subtitle { fill:#cbd5e1; font:20px system-ui,-apple-system,Segoe UI,sans-serif; }
+      .label { fill:#f8fafc; font:18px system-ui,-apple-system,Segoe UI,sans-serif; text-anchor:middle; }
+      .small { fill:#cbd5e1; font:16px system-ui,-apple-system,Segoe UI,sans-serif; text-anchor:middle; }
+      .mono { fill:#e2e8f0; font:16px ui-monospace,SFMono-Regular,Menlo,monospace; text-anchor:middle; }
+      .phase-title { fill:#f8fafc; font:700 20px system-ui,-apple-system,Segoe UI,sans-serif; }
+      .line { stroke:#c9d1d9; stroke-width:2; fill:none; marker-end:url(#arrow); }
+      .dash { stroke:#64748b; stroke-width:2; stroke-dasharray:8 8; fill:none; }
+      .legend { fill:#cbd5e1; font:16px system-ui,-apple-system,Segoe UI,sans-serif; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1400" height="980"/>
+  <text class="title" x="50" y="58">Backend scheduler execution path</text>
+  <text class="subtitle" x="50" y="92">From graph submission through split preparation, asynchronous work, reuse fences, and final visibility.</text>
+
+  <rect class="panel" x="35" y="120" width="1330" height="800" rx="18"/>
+
+  <rect class="event" x="65" y="145" width="190" height="70"/>
+  <text class="label" x="160" y="177">llama.cpp caller</text>
+  <text class="small" x="160" y="201">llama_context</text>
+
+  <rect class="sched" x="315" y="145" width="240" height="70"/>
+  <text class="label" x="435" y="176">GGML scheduler</text>
+  <text class="small" x="435" y="201">ggml_backend_sched</text>
+
+  <rect class="copy" x="655" y="145" width="220" height="70"/>
+  <text class="label" x="765" y="176">Transfer path</text>
+  <text class="small" x="765" y="201">async or fallback</text>
+
+  <rect class="backend" x="965" y="145" width="190" height="70"/>
+  <text class="label" x="1060" y="176">Split backend</text>
+  <text class="small" x="1060" y="201">CPU / GPU / accelerator</text>
+
+  <rect class="event" x="1195" y="145" width="140" height="70"/>
+  <text class="label" x="1265" y="176">Events</text>
+  <text class="small" x="1265" y="201">copy slots</text>
+
+  <path class="dash" d="M160 215 V865"/>
+  <path class="dash" d="M435 215 V865"/>
+  <path class="dash" d="M765 215 V865"/>
+  <path class="dash" d="M1060 215 V865"/>
+  <path class="dash" d="M1265 215 V865"/>
+
+  <path class="line" d="M160 250 H420"/>
+  <text class="mono" x="290" y="242">ggml_backend_sched_graph_compute_async(graph)</text>
+
+  <rect class="phase" x="285" y="280" width="300" height="250"/>
+  <text class="phase-title" x="310" y="314">1. Allocation-time preparation</text>
+
+  <rect class="sched" x="330" y="340" width="210" height="46"/>
+  <text class="small" x="435" y="368">Select copy slot</text>
+  <path class="line" d="M435 386 V410"/>
+  <rect class="sched" x="330" y="410" width="210" height="46"/>
+  <text class="small" x="435" y="438">Assign and split graph</text>
+  <path class="line" d="M435 456 V480"/>
+  <rect class="sched" x="330" y="480" width="210" height="46"/>
+  <text class="small" x="435" y="508">Allocate copies + views</text>
+
+  <rect class="phase" x="285" y="555" width="890" height="215"/>
+  <text class="phase-title" x="310" y="589">2. Per-split execution loop</text>
+
+  <rect class="sched" x="330" y="615" width="210" height="52"/>
+  <text class="small" x="435" y="637">Populate this split's</text>
+  <text class="small" x="435" y="658">backend-local inputs</text>
+
+  <path class="line" d="M540 640 H650"/>
+  <text class="mono" x="595" y="628">cpy_tensor_async(...)</text>
+
+  <rect class="copy" x="660" y="610" width="210" height="62"/>
+  <text class="small" x="765" y="635">Queue async copy,</text>
+  <text class="small" x="765" y="657">or synchronize + block</text>
+
+  <path class="line" d="M870 641 H950"/>
+  <rect class="backend" x="960" y="610" width="200" height="62"/>
+  <text class="small" x="1060" y="635">Submit split graph</text>
+  <text class="small" x="1060" y="657">enqueue or compute</text>
+
+  <path class="line" d="M1060 672 V714 H1245"/>
+  <rect class="event" x="1195" y="690" width="140" height="54"/>
+  <text class="small" x="1265" y="714">record(slot)</text>
+  <text class="small" x="1265" y="735">reuse fence</text>
+
+  <path class="line" d="M1195 716 H1148 V690 H540"/>
+  <text class="mono" x="860" y="682">wait(slot) before overwrite</text>
+
+  <rect class="phase" x="285" y="795" width="300" height="90"/>
+  <text class="phase-title" x="310" y="828">3. Return after submission</text>
+  <rect class="sched" x="330" y="842" width="210" height="32"/>
+  <text class="small" x="435" y="864">status returned to caller</text>
+  <path class="line" d="M330 858 H180"/>
+
+  <rect class="phase" x="650" y="795" width="685" height="90"/>
+  <text class="phase-title" x="675" y="828">4. Later synchronization makes results safe to read or storage safe to reuse</text>
+  <path class="line" d="M680 858 H1235"/>
+  <text class="mono" x="955" y="850">ggml_backend_sched_synchronize() / backend event dependency</text>
+
+  <rect class="sched" x="75" y="936" width="24" height="24"/>
+  <text class="legend" x="112" y="954">Scheduler action</text>
+  <rect class="copy" x="330" y="936" width="24" height="24"/>
+  <text class="legend" x="367" y="954">Transfer path</text>
+  <rect class="backend" x="570" y="936" width="24" height="24"/>
+  <text class="legend" x="607" y="954">Backend execution</text>
+  <rect class="event" x="840" y="936" width="24" height="24"/>
+  <text class="legend" x="877" y="954">Event / synchronization</text>
+</svg>
