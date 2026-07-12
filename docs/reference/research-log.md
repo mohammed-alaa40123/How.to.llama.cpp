@@ -147,6 +147,30 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Document backend destructor synchronization contracts.
 - Correlate file offsets, faults, graph tensors, copies, queue events, and device memory in runtime overlays.
 
+## 2026-07-12 23:51 — Interactive memory-lifetime overlay
+
+**Verified**
+
+- Replaced the Memory lifecycle tab's static cards with eight selectable memory records and an `aria-live` detail panel.
+- Every record links with top-level navigation to the matching section of the canonical memory atlas.
+- Each detail view exposes owner, backing storage, validity or physical-residency condition, synchronization boundary, and release or reclaim condition.
+- Native buttons, visible focus/hover state, and `aria-pressed` preserve keyboard accessibility.
+- The overlay explicitly separates logical ownership, virtual mapping, physical residency, backend-copy validity, and command completion.
+
+**Interpretation**
+
+- These five fields are a useful minimum model for comparing mapped CPU execution, explicit CPU storage, accelerator buffers, mutable sequence state, and scheduler temporaries.
+
+**Historical**
+
+- The earlier memory tab offered only short static summaries and no canonical section links.
+
+**Open questions**
+
+- Generate explorer records and anchors from versioned metadata.
+- Validate local routes and anchors against Markdown or built MkDocs HTML in CI.
+- Add runtime overlays for page faults, storage reads, RSS/PSS, device allocations, copy events, and queue waits.
+
 **Next step**
 
-- Connect the explorer’s memory-lifecycle cards to canonical atlas sections and add a compact ownership/lifetime overlay.
+- Add automated validation for interactive routes and anchors, then begin file-by-file Pass A.
