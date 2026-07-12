@@ -76,6 +76,7 @@ nav:
       - Backend scheduler execution: lifecycle/backend-scheduler-execution.md
       - CPU and CUDA backend semantics: lifecycle/cpu-cuda-backend-semantics.md
       - CUDA asynchronous copies: lifecycle/cuda-async-copy.md
+      - Metal backend semantics: lifecycle/metal-backend-semantics.md
   - Interactive:
       - Inference workflow: interactive/inference-workflow.md
   - Reference:
