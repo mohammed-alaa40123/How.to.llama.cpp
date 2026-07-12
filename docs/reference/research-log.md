@@ -146,22 +146,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Whether current PVC and non-Intel runtimes still require the mmap workaround.
 - Runtime page faults, temporary RSS, queue waits, and overlap.
 
-**Artifacts changed**
-
-- `docs/lifecycle/buffer-compatibility.md`
-- `README.md`
-- `docs/reference/project-state.md`
-- `docs/reference/research-log.md`
-- `logs/research/2026-07-12/1252-sycl-compatibility-matrix.md`
-
-**Source ledger**
-
-- No new external source was introduced; existing pinned source links were reused.
-
-**Next step**
-
-- Identify and compare the first later upstream SYCL scheduler-copy implementation.
-
 ## 2026-07-12 13:52 — Documentation quality and interaction roadmap
 
 **Verified**
@@ -187,14 +171,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Which interactions can remain static MkDocs assets and which require a generated data bundle or client-side application.
 - The first later SYCL scheduler-copy revision remains unresolved because the available code index did not expose a reliable exact commit or PR.
 
-**Source ledger**
-
-- No new external source was added; this was an implementation and information-architecture increment.
-
-**Next step**
-
-- Build the canonical `llama_context` object page using the new page contract.
-
 ## 2026-07-12 14:55 — Interactive foundations and file-by-file plan
 
 **Verified**
@@ -204,16 +180,11 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Added an explicit correction that mmap demand paging and OS reclaim are not equivalent to a universal application-level “load one layer, execute, free it” policy.
 - Published the explorer as the first Foundations page and made it the primary homepage entry point.
 - Expanded the roadmap with file-by-file inventory, subsystem grouping, cross-file composition, and complete-workflow reconstruction passes.
-- Updated the scheduling plan and TODO priorities around GGUF, `llama_context`, GGML graph construction, memory lifetimes, and file-by-file analysis.
 
 **Interpretation**
 
 - Foundations need multiple synchronized views because no single linear diagram can explain API control flow, object ownership, virtual memory, graph construction, and backend synchronization simultaneously.
 - File listings become useful only after they are synthesized into object, memory, and execution relationships.
-
-**Historical**
-
-- The earlier interactive workflow remains as a focused minimal decode path; the new explorer is a broader foundations map rather than a replacement for detailed lifecycle pages.
 
 **Open questions**
 
@@ -221,22 +192,61 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Replace curated JavaScript data with generated, versioned metadata shared across object pages, source index, and visualizers.
 - Add architecture-specific graph-builder, KV/recurrent, MoE, prefill/decode, and runtime-measurement layers.
 
+## 2026-07-12 15:05 — Canonical `llama_context` object page
+
+**Verified**
+
+- Added a source-pinned object page for `llama_context` creation, ownership, lifetime, memory, mutation, decode, threading, synchronization, and teardown.
+- The context stores a non-owning model reference while owning mutable runtime state, scheduler resources, outputs, and memory modules.
+- The model must outlive every context that references it.
+- Published the page under an **Objects** navigation section.
+
+**Interpretation**
+
+- `llama_context` is the mutable execution session around a reusable loaded model.
+- Scheduler ownership does not imply ownership or physical residency of mmap-backed model pages.
+
+**Open questions**
+
+- Locate an explicit public thread-safety contract for concurrent context mutation.
+- Map every concrete memory-module selection and cleanup completion guarantee.
+
+## 2026-07-12 15:49 — Interactive Context link
+
+**Verified**
+
+- The interactive **llama_context runtime** layer now links to the canonical `llama_context` object page.
+- The **Construct context** end-to-end workflow step links to the same page.
+- Local canonical-page navigation uses `target="_top"`, so the object page replaces the enclosing MkDocs page instead of opening inside the iframe.
+- The explorer now centralizes the pinned upstream baseline, source root, and documentation root in one metadata object.
+- Existing six-view coverage remains intact: system layers, workflow, memory, GGUF/graph, synchronization, and file groups.
+
+**Interpretation**
+
+- Linking both the conceptual object node and the concrete construction step creates a better bridge between overview and detailed source-level documentation.
+- Centralized in-file metadata reduces duplicated literals but is only an intermediate step toward generated versioned JSON.
+
+**Historical**
+
+- This is the first interactive node-to-canonical-object-page bridge in the project.
+
+**Open questions**
+
+- Which object should be linked next: `llama_model`, scheduler, `ggml_cgraph`, or memory modules.
+- Whether CI should parse interactive JavaScript and verify every local page route.
+
 **Artifacts changed**
 
 - `docs/assets/interactive/llama-foundations-explorer.html`
-- `docs/foundations/interactive-system-map.md`
-- `docs/index.md`
-- `docs/roadmap.md`
-- `mkdocs.yml`
 - `README.md`
 - `docs/reference/project-state.md`
 - `docs/reference/research-log.md`
-- `logs/research/2026-07-12/1455-interactive-foundations.md`
+- `logs/research/2026-07-12/1549-interactive-context-link.md`
 
 **Source ledger**
 
-- No new secondary source was added. The explorer reuses the pinned llama.cpp baseline and the already-ledgered official GGUF specification.
+- No new external source was introduced; the pinned baseline and existing canonical object page were reused.
 
 **Next step**
 
-- Deepen the GGUF format and model-loader chapter, verify the canonical upstream figure, and link the GGUF tab to the detailed page.
+- Deepen the GGUF format and model-loader chapter and link its interactive tab to the resulting detailed page.
