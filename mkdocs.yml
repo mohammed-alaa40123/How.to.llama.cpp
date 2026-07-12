@@ -77,6 +77,7 @@ nav:
       - Generic copy fallback: lifecycle/generic-copy-fallback.md
       - Buffer compatibility: lifecycle/buffer-compatibility.md
       - Vulkan buffer capabilities: lifecycle/vulkan-buffer-capabilities.md
+      - SYCL buffer capabilities: lifecycle/sycl-buffer-capabilities.md
       - CPU and CUDA backend semantics: lifecycle/cpu-cuda-backend-semantics.md
       - CUDA asynchronous copies: lifecycle/cuda-async-copy.md
       - Metal backend semantics: lifecycle/metal-backend-semantics.md
