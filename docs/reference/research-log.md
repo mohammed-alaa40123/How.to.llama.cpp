@@ -196,3 +196,37 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Trace Vulkan and SYCL buffer interfaces and extend the compatibility matrix.
+
+## 2026-07-12 09:11 Africa/Cairo — Backend scheduler figure repair
+
+**Verified**
+
+- The deployed Mermaid 11 renderer displayed a syntax error for the scheduler execution sequence.
+- The broken Mermaid block was replaced with an accessible static SVG at `docs/assets/figures/backend-scheduler-execution.svg`.
+- The figure preserves the four documented phases: allocation-time preparation, per-split execution, return after submission, and later synchronization.
+- The SVG includes a title and description for accessibility and passed XML parsing.
+
+**Interpretation**
+
+- Static SVG is a more robust representation for this dense sequence while keeping the page scalable and readable on mobile.
+- The figure is conceptual; the pinned prose and source map remain authoritative for exact branches.
+
+**Historical**
+
+- The removed Mermaid diagram described the same pinned baseline but was not portable across the deployed renderer configuration.
+
+**Open question**
+
+- Audit other complex Mermaid diagrams for renderer-specific failures.
+
+**Artifacts changed**
+
+- `docs/assets/figures/backend-scheduler-execution.svg`
+- `docs/lifecycle/backend-scheduler-execution.md`
+- `docs/reference/project-state.md`
+- `README.md`
+- `logs/research/2026-07-12/0911-scheduler-figure-repair.md`
+
+**Next step**
+
+- Confirm the SVG renders in Documentation CI and Pages, then continue the Vulkan and SYCL buffer compatibility trace.
