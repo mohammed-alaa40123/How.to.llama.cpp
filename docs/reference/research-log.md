@@ -175,8 +175,8 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Candidate buffer types are ordered per CPU or accelerator device, but the final selection is per tensor after operation/backend compatibility checks.
 - Destination tensor metadata is grouped into one GGML context per selected buffer type.
 - `init_mappings(true, ...)` creates one mmap per source split, initializes used-range tracking, and computes total tensor bytes for progress.
-- Mmap loading can either wrap mapped bytes through `buffer_from_host_ptr` or copy/upload from the mapping into independently allocated storage.
-- Non-mmap accelerator loading can use four pinned host staging buffers with events and asynchronous tensor sets; unsupported cases use a whole-tensor host staging vector and synchronous set.
+- Mmap loading can either wrap mapped bytes through `buffer_from_host_ptr` or copy/upload from the mapped address into independently allocated storage.
+- Non-mmap accelerator loading can use four pinned host staging buffers plus events and asynchronous tensor sets; unsupported configurations use a whole-tensor host staging vector and synchronous set.
 - Upload events are synchronized before staging resources are freed; retained mappings are moved into model ownership.
 
 **Interpretation**
@@ -207,3 +207,37 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Build the GGML graph-construction chapter and connect the GGUF/graph explorer tab to the canonical model-loading pages.
+
+## 2026-07-12 18:49 — Interactive GGUF and model-loading links
+
+**Verified**
+
+- The explorer's GGUF container card now links to the canonical GGUF file-anatomy chapter.
+- The tensor registration and placement card now links to the canonical model-placement chapter.
+- Both routes use top-level navigation so canonical pages open outside the iframe.
+- The pinned baseline and the six existing explorer views remain intact.
+
+**Interpretation**
+
+- Readers can now move from the compact format/placement distinction to the two detailed source-pinned chapters without conflating on-disk GGUF structure with runtime backend residency.
+
+**Historical**
+
+- This is the second canonical-documentation integration in the explorer after the `llama_context` bridge.
+
+**Open questions**
+
+- Move hard-coded local routes into generated versioned metadata and validate them in CI.
+- Link graph-construction cards after the canonical GGML chapter is published.
+
+**Artifacts changed**
+
+- `docs/assets/interactive/llama-foundations-explorer.html`
+- `README.md`
+- `docs/reference/project-state.md`
+- `docs/reference/research-log.md`
+- `logs/research/2026-07-12/1849-interactive-gguf-links.md`
+
+**Next step**
+
+- Build the canonical GGML graph-construction chapter and connect its graph cards.
