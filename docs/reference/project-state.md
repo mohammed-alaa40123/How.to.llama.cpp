@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 20:07 Africa/Cairo_
+_Last updated: 2026-07-12 21:08 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -31,6 +31,7 @@ Return to the foundations and reconstruct llama.cpp from the source in two compl
 - Object-centred, searchable, and interactive documentation quality roadmap.
 - Large interactive foundations explorer with system, code-path, memory, GGUF/graph, execution/synchronization, and file-map tabs.
 - Canonical `llama_context` object page and interactive links.
+- Canonical `llama_model` object page covering architecture dispatch, common versus architecture-specific loading, tensor/layer schemas, persistent storage ownership, device placement, graph-builder delegation, context sharing, memory factories, and teardown.
 - Canonical GGUF file-anatomy chapter covering format structure, split indexing, loader entry, mmap/page-fault distinctions, ownership, and truth labels.
 - Canonical model tensor-placement and data-transfer chapter covering device assignment, per-tensor buffer selection, mapping initialization, host-pointer aliasing, explicit reads, synchronous/asynchronous uploads, progress, cancellation, validation, trimming, and ownership.
 - Interactive GGUF/graph cards link directly to both canonical model-loading chapters with top-level navigation.
@@ -41,8 +42,8 @@ Return to the foundations and reconstruct llama.cpp from the source in two compl
 
 ## In progress
 
+- Linking the interactive Model object layer to the canonical `llama_model` page.
 - Adding exact line-level source citations and generated source-link checking to the graph-construction chapter.
-- Canonical `llama_model` object page covering architecture dispatch, tensor registration, layer arrays, buffer ownership, graph-builder delegation, context sharing, and teardown.
 - Memory atlas and interactive runtime overlays for mmap/page faults, RAM/RSS, backend copies, KV/recurrent state, and workspaces.
 - Runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, and first-token access.
 - File-by-file Pass A for public API/examples, model/GGUF loader, and runtime context.
@@ -51,35 +52,35 @@ Return to the foundations and reconstruct llama.cpp from the source in two compl
 
 ## Immediate next task
 
-Build the canonical `llama_model` object page:
+Build the canonical memory-lifetime chapter and interactive overlay:
 
 ```text
-GGUF metadata and architecture
-  -> llama_model construction
-  -> vocabulary and hyperparameters
-  -> tensor registration into layer structures
-  -> layer/device assignment
-  -> backend buffers and retained mappings
-  -> build_graph() architecture dispatch
-  -> sharing across llama_context instances
-  -> lifetime and teardown
+GGUF bytes on storage
+  -> source-file descriptors and mappings
+  -> virtual address ranges
+  -> page faults and OS page cache
+  -> model-owned CPU/backend buffers
+  -> context-owned KV or recurrent memory
+  -> graph activations and workspaces
+  -> scheduler copies and staging
+  -> host-visible output buffers
+  -> synchronization, teardown, and reclaim
 ```
 
 Required deliverables:
 
-1. source-pinned creation and loading call chain;
-2. field-by-field ownership map for tensors, buffers, mappings, devices, vocabulary, and architecture data;
-3. graph-builder delegation and architecture-specific boundaries;
-4. model-versus-context lifetime contract;
-5. CPU/GPU/offload implications;
+1. one ownership/lifetime table spanning storage, model, context, scheduler, backend, and OS boundaries;
+2. mmap/page-fault/RSS distinctions with exact caveats;
+3. KV versus recurrent and hybrid-memory branches;
+4. CPU/GPU/accelerator copy and staging lifetimes;
+5. prefill versus decode differences;
 6. Verified, Interpretation, Historical, and Open question sections;
-7. explorer link from the Model object layer.
+7. explorer link from the Model object layer to the new canonical `llama_model` page before or alongside the memory overlay.
 
 ## Latest publication verification
 
-- Interactive graph/MoE integration commit: `fb88ac1c8b5e69a24c179c42225aefd1bd68fdd6`.
-- Detailed run-note commit: `5151497dbb05e1e860b059bb47f44cacc0702a81`.
-- README state commit: `b0c01efb47582f01f919b5cce788d76a955b6bde`.
+- `llama_model` page commit: `db4c2f1e5e04bfd5cd14752dae03e7e65ab737e9`.
+- Navigation commit: `662f8c39c137f98cd0ce1b74df82fe7aefea351c`.
 - The GitHub connector exposes commit/file fetch and combined status, but its commit-workflow endpoint does not reliably expose push-triggered runs.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
 
@@ -87,7 +88,8 @@ Required deliverables:
 
 - **CI blocker:** connector workflow-run access has repeatedly returned no push-triggered runs, so latest push workflow status may remain unverified without check-run or UI access.
 - **Pages blocker:** direct site verification depends on DNS/browser access; if the site lags the latest commit, rerun **Deploy documentation** from the Actions tab.
-- **Local validation blocker:** the execution container still cannot resolve `github.com`, so this run could not clone or run `mkdocs build --strict` locally.
+- **Local validation blocker:** the execution container has previously failed DNS resolution for `github.com`, preventing a checkout and local `mkdocs build --strict`.
+- The Model object explorer card still needs a canonical-page route; direct safe editing of the minified single-line interactive asset is pending a reliable full-file fetch/update path.
 - Interactive local section anchors are currently hand-authored and not validated against the built MkDocs output.
 - The official GGUF specification can evolve beyond the pinned llama.cpp implementation.
 - Mmap host-pointer wrapping is conditional; “zero-copy model loading” is not a model-wide property under partial offload or incompatible buffer types.
