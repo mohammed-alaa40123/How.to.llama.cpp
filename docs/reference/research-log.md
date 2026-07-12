@@ -230,3 +230,45 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Confirm the SVG renders in Documentation CI and Pages, then continue the Vulkan and SYCL buffer compatibility trace.
+
+## 2026-07-12 09:49 Africa/Cairo — Vulkan buffer capability boundary
+
+**Scope**
+
+- Pinned Vulkan device-buffer host visibility, dedicated host-buffer support, backend capability flags, queue/event state, synchronization, and graph hazard ordering.
+
+**Verified**
+
+- The ordinary Vulkan buffer type leaves `.is_host` unset, so GGML treats Vulkan device-buffer tensor pointers as not host-visible.
+- The Vulkan device advertises asynchronous execution, a dedicated host-buffer type, and events; arbitrary host-pointer wrapping is not advertised.
+- The backend maintains compute and transfer queues, command pools, submissions, semaphores, and events.
+- Event state uses Vulkan events for command-side waits and a timeline semaphore for host synchronization.
+- Backend synchronization calls `ggml_vk_synchronize()` and then graph cleanup.
+- Graph execution batches command buffers and inserts internal synchronization for overlapping unsynchronized tensor regions when at least one access writes.
+
+**Interpretation**
+
+- Dedicated host-buffer support is distinct from device-buffer host visibility.
+- Scheduler-visible asynchronous capability does not prove the completion behavior of buffer-level set/get operations.
+- Vulkan graph hazard tracking and cross-backend scheduler ordering protect different boundaries.
+
+**Historical**
+
+- The findings apply to pinned commit `e3546c7948e3af463d0b401e6421d5a4c2faf565`; later Vulkan memory and event paths may differ.
+
+**Open questions**
+
+- Exact Vulkan device/host memory-property selection, set/get paths, direct-copy acceptance, scheduler async-copy acceptance, and fence-wait return points.
+- Android integrated-GPU behavior across vendor Vulkan drivers.
+
+**Artifacts changed**
+
+- `docs/lifecycle/vulkan-buffer-capabilities.md`
+- `mkdocs.yml`
+- `docs/reference/project-state.md`
+- `README.md`
+- `logs/research/2026-07-12/0949-vulkan-buffer-capabilities.md`
+
+**Next step**
+
+- Finish the concrete Vulkan transfer-path trace and add exact Vulkan rows to the buffer compatibility matrix before moving to SYCL.
