@@ -60,7 +60,7 @@ Start a local run with:
 | Daily | Website quality review | Review foundations, discoverability, source traceability, accessibility, cross-links, diagrams, and interaction opportunities |
 | Hourly at minute 23 UTC | `.github/workflows/hourly-context-check.yml` | Validate context and scripts |
 | Daily at 02:17 UTC | `.github/workflows/refresh-source-index.yml` | Refresh upstream source inventory through a PR |
-| Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, scripts, assets, and `mkdocs build --strict` |
+| Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, interactive routes/anchors, scripts, assets, tests, and `mkdocs build --strict` |
 | Every push to `main` | `.github/workflows/pages.yml` | Build, deploy, and verify the public site |
 
 ## Implementation method
@@ -94,7 +94,9 @@ A mature topic should include:
 
 ```bash
 python3 scripts/validate_project_context.py
-python3 -m py_compile scripts/*.py
+python3 scripts/validate_interactive_links.py
+python3 -m unittest discover -s tests -p 'test_*.py'
+python3 -m py_compile scripts/*.py tests/*.py
 bash -n scripts/*.sh
 mkdocs build --strict
 ./scripts/check_site.sh
@@ -124,6 +126,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `data/upstream.json` | Pinned upstream metadata |
 | `data/generated/` | Generated source inventories |
 | `docs/assets/interactive/` | Interactive architecture assets |
+| `scripts/validate_interactive_links.py` | Static validation for local routes and Markdown section anchors embedded in interactive assets |
 | `.github/workflows/` | CI, Pages, context, and indexing automation |
 | `scripts/` | Bootstrap, validation, indexing, and health checks |
 
@@ -134,7 +137,6 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Add CI validation for canonical local links and section anchors embedded in interactive JavaScript and HTML assets.
 - [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
@@ -145,6 +147,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
+- [ ] Extend interactive-link validation to generated routes, built HTML IDs, non-HTML assets, and MkDocs plugin-generated anchors.
 - [ ] Trace every concrete `llama_memory_i` implementation and map architectures to KV, recurrent, and hybrid memory.
 - [ ] Document exact ownership members inside `llama_model::impl`.
 - [ ] Locate the strongest explicit public contract for model sharing, thread safety, backend teardown synchronization, and destruction order.
@@ -163,6 +166,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add CI validation for canonical local routes and section anchors embedded in interactive HTML/JavaScript assets, with valid/invalid fixture tests and actionable asset/route/anchor errors.
 - [x] Connect all eight memory-lifecycle explorer entries to the canonical atlas and add an accessible ownership/lifetime overlay with owner, backing, validity/residency, synchronization, and release fields.
 - [x] Publish the canonical memory-lifetime atlas covering GGUF storage, virtual mappings, page faults/page cache/RSS, model buffers, KV/recurrent/hybrid state, graph allocations, scheduler copies, backend staging, outputs, prefill/decode differences, synchronization, teardown, runtime measurements, and truth labels.
 - [x] Link the interactive **Model object** layer to `objects/llama-model/` with top-level navigation.
