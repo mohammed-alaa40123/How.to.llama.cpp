@@ -174,6 +174,7 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 ### Completed setup
 
+- [x] Replace the broken backend-scheduler Mermaid sequence with a static accessible SVG and explanatory caption.
 - [x] Document concrete CPU and CPU_Mapped host visibility, ownership, `memcpy()` set/get, and direct-copy behavior.
 - [x] Document CUDA-device blocking set/get/direct-copy behavior, same-device/peer branches, and completion semantics.
 - [x] Build a representative CPU/mmap/CUDA/Metal source-buffer × destination-buffer compatibility matrix.
