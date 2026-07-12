@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 09:11 Africa/Cairo_
+_Last updated: 2026-07-12 09:49 Africa/Cairo_
 
 This file is the compact checkpoint for scheduled and manual research runs. Read it after the root README and update it whenever a meaningful increment is completed.
 
@@ -39,56 +39,61 @@ Trace a minimal application from backend loading and model creation through cont
 - CPU/mmap-to-CUDA, CUDA-host-to-CUDA, and CPU/mmap-to-Metal fallback paths with ownership, visibility, and synchronization-bubble analysis.
 - Concrete CPU, CPU_Mapped, CUDA-device, CUDA-host, and Metal capability documentation for `is_host`, blocking set/get, direct copy, ownership, completion, and staging behavior.
 - Source-buffer × destination-buffer matrix for representative CPU/mmap/CUDA/Metal pairs plus a runtime validation schema for page faults, synchronization bubbles, overlap, and temporary RSS.
+- Pinned Vulkan capability boundary covering non-host-visible device buffers, dedicated host-buffer support, async/events capability flags, compute/transfer queues, timeline-semaphore-backed host synchronization, and internal graph hazard tracking.
 
 ## In progress
 
 - GitHub Pages must be enabled in repository settings before deployment can run.
 - Latest CI and live-site status must be verified after this documentation increment.
 - Detailed `llama_context` construction and ownership map.
-- Exact Vulkan, SYCL, RPC, CANN, and Android-compiled-backend buffer compatibility.
+- Exact Vulkan buffer allocation, set/get, direct-copy, scheduler async-copy, and fence-completion branches.
+- Exact SYCL, RPC, CANN, and Android-compiled-backend buffer compatibility.
 - Exact Metal shared/private buffer-level branches below the wrapper layer.
 
 ## Immediate next task
 
-Trace Vulkan and SYCL buffer implementations and extend the compatibility matrix:
+Finish the pinned Vulkan transfer-path trace before moving to SYCL:
 
 ```text
-buffer type is_host
+Vulkan device/host buffer allocation
+  -> selected memory properties
   -> set_tensor / get_tensor
-  -> destination cpy_tensor acceptance
-  -> queue or command-list synchronization
-  -> generic host staging when rejected
-  -> ownership and completion guarantees
+  -> blocking cpy_tensor acceptance
+  -> scheduler cpy_tensor_async acceptance
+  -> queue submission and fence/event waits
+  -> return-time completion guarantee
 ```
 
 Deliverables for that task:
 
-1. Vulkan host/device buffer semantics;
-2. SYCL host/device/USM behavior;
-3. direct-copy acceptance and synchronization rules;
-4. extension of `docs/lifecycle/buffer-compatibility.md`;
-5. runtime instrumentation points;
-6. concise research-log entry.
+1. device versus host buffer memory-property table;
+2. exact host/device set and get branches;
+3. direct-copy and async-copy acceptance matrix;
+4. queue, fence, event, and return-time completion rules;
+5. Vulkan rows in `docs/lifecycle/buffer-compatibility.md`;
+6. runtime instrumentation points for Android integrated GPUs.
 
 ## Known blockers and caveats
 
 - Pages deployment remains intentionally skipped until **Settings -> Pages -> Source: GitHub Actions** is enabled.
 - GitHub status APIs may not expose all check-run conclusions through the connected repository interface; workflow files retain durable checks, and unresolved verification remains a TODO.
-- The execution environment cannot currently resolve `github.com`, so local clone and strict MkDocs validation are blocked; connector-side publication checks and GitHub Actions remain the durable validation route.
+- The execution environment has no local repository checkout, so strict MkDocs validation is delegated to GitHub Actions; connector-side source and publication checks remain available.
 - Regex-based indexing cannot resolve virtual dispatch, macros, function pointers, generated code, or backend registration reliably.
 - Graph reuse compatibility is distributed across graph-input implementations; the base implementation rejects reuse unless a specialized check exists.
-- Scheduler APIs named `async` do not guarantee overlap: the pinned CPU backend blocks in `ggml_graph_compute`, while CUDA and Metal normally queue accelerator work.
+- Scheduler APIs named `async` do not guarantee overlap: the pinned CPU backend blocks in `ggml_graph_compute`, while CUDA, Metal, and Vulkan advertise asynchronous execution paths.
 - CPU threadpool parallelism is internal to a blocking graph call and is not scheduler-level asynchronous submission.
 - CUDA ordinary buffer operations may call asynchronous CUDA primitives and then immediately synchronize; the primitive name alone does not prove host-visible asynchrony.
 - The pinned CUDA async-copy callback accepts only CUDA backend objects with CUDA device buffers whose backend and buffer devices agree; CPU/mmap and CUDA host buffers return `false`.
 - Cross-device CUDA copies require peer-copy support; `GGML_CUDA_NO_PEER_COPY` forces the generic fallback.
-- A successful CUDA or Metal async-copy callback means the copy and dependencies were queued, not that bytes are host-visible.
+- A successful accelerator async-copy callback means the copy and dependencies were queued, not that bytes are host-visible.
 - Rejected async copies synchronize both source and destination backends before blocking copy, potentially eliminating overlap on both sides.
 - If neither buffer is host-visible and the destination buffer rejects direct `cpy_tensor`, the generic fallback allocates a full-tensor host buffer, performs blocking get and set operations, then frees it.
 - CPU and CPU_Mapped report host visibility and use direct `memcpy()`, but CPU_Mapped does not imply physical residency or fault-free access.
 - CUDA device set/get/direct-copy functions synchronize before returning and therefore expose blocking buffer semantics.
 - CPU/mmap host-source paths avoid generic heap allocation but may still incur mmap page faults and a blocking accelerator transfer.
 - Metal shared or unified memory does not imply command completion, safe reuse, or immediate host visibility.
+- Vulkan's dedicated host-buffer capability is separate from ordinary Vulkan device-buffer host visibility; exact transfer mechanics are still open.
+- Vulkan internal graph hazard tracking and cross-backend scheduler ordering solve different synchronization problems.
 - Copy tensors are scheduler-owned temporary execution storage, not persistent model-owned duplicates.
 - The pinned MoE partial-copy path optimizes transfer volume but is not a long-lived expert-cache policy.
 - Backend behavior varies by build configuration and device capabilities.
