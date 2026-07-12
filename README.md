@@ -134,7 +134,6 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Highest priority
 
 - [ ] Build the memory-lifetime chapter and interactive overlay: GGUF bytes, mmap, page faults, page cache/RAM, model buffers, context state, KV/recurrent memory, activations, workspaces, scheduler copies, output buffers, and teardown.
-- [ ] Link the interactive **Model object** layer to `objects/llama-model/` using top-level navigation.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, and first-token access.
 - [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
@@ -142,7 +141,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Add CI validation for canonical local links and section anchors embedded in interactive JavaScript and HTML assets.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders the new `llama_model` page.
+- [ ] Verify the public Pages site returns HTTP 200 and renders the interactive `llama_model` route.
 
 ### Future improvements
 
@@ -163,6 +162,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Link the interactive **Model object** layer to `objects/llama-model/` with top-level navigation.
 - [x] Publish the canonical `llama_model` object page with architecture dispatch, common/architecture loading boundaries, tensor and layer schemas, persistent storage ownership, device placement, graph-builder delegation, context sharing, memory factory, teardown, source map, and truth labels.
 - [x] Add `llama_model` to top-level Objects navigation.
 - [x] Link graph-construction, graph-expansion, MoE routing, GGML graph, and graph-reuse explorer entries to the canonical graph chapter.
