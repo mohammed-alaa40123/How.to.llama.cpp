@@ -152,8 +152,9 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 - [ ] Rerun **Deploy documentation** and confirm its build, deploy, and website-verification jobs succeed.
 - [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the latest documentation commits; the connected status interfaces still do not provide complete push-run conclusions.
 - [ ] Confirm the live site returns HTTP 200 and contains `How.to.llama.cpp`; direct verification remains blocked until Pages is enabled and publicly reachable.
-- [ ] Trace `ggml_backend_cuda_cpy_tensor_async()` branch by branch, including same-device, peer-device, host-buffer, and false-return fallback cases.
-- [ ] Compare CUDA stream/event semantics with one second accelerator backend, preferably Metal or Vulkan.
+- [ ] Trace the pinned Metal backend's graph submission, buffer copies, command-buffer lifecycle, event/shared-event ordering, and host synchronization boundary.
+- [ ] Build a CUDA-versus-Metal capability table, including discrete-memory and unified-memory caveats.
+- [ ] Trace the generic scheduler fallback route for rejected CPU/mmap/CUDA-host to CUDA-device copies.
 
 ### Future improvements
 
@@ -169,6 +170,8 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 ### Completed setup
 
+- [x] Trace `ggml_backend_cuda_cpy_tensor_async()` branch by branch, including CUDA backend/buffer eligibility, device consistency, same-backend D2D, same-device cross-backend D2D, peer copies, event ordering, and every false-return fallback.
+- [x] Document that CPU/mmap and CUDA host buffers are outside the pinned CUDA device-copy callback, and that successful return means queued dependency rather than host-visible completion.
 - [x] Compare pinned CPU and CUDA graph submission, thread/stream completion, event semantics, synchronization, and synchronous buffer-operation behavior.
 - [x] Build a true-async versus fallback table for CPU, CUDA, and scheduler-level APIs.
 - [x] Trace `ggml_backend_sched_graph_compute_async` through backend assignment, graph splitting, destination copies, copy-slot events, backend split submission, and synchronization.
