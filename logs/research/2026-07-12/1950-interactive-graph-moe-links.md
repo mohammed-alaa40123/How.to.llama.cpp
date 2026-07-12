@@ -51,9 +51,11 @@ The MoE card also records the cache-design interpretation that a per-layer exper
 
 ## Validation
 
-- Connector-side update succeeded and the changed file was re-fetched for route and label checks.
-- Local checkout and `mkdocs build --strict` remain blocked because the execution container cannot resolve `github.com`.
-- CI and Pages status are checked after durable context updates; any unverified state is recorded in project state and README TODOs.
+- Connector-side update succeeded and the changed file was re-fetched; all five new canonical routes and the router/cache labels are present.
+- The execution container still returns `Could not resolve host: github.com`, so a local checkout, script validation, and `mkdocs build --strict` could not run.
+- Combined commit status for the final research-log commit returned an empty status list.
+- The connector's commit-workflow endpoint returned `workflow_runs: []`; because it filters to pull-request-triggered runs, push-triggered Documentation CI and Pages deployment remain unverified.
+- Site-specific web search returned no indexed result for the project. Direct opening of the Pages URLs was rejected by the browser safety gate because no prior search result exposed those exact URLs, so live HTTP status and rendered content remain unverified.
 
 ## Next priority
 
