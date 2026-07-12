@@ -4,16 +4,12 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 ## 2026-07-12 — Milestone 0/1 start
 
-**Pinned baseline**
-
-- Commit: `e3546c7948e3af463d0b401e6421d5a4c2faf565`.
-- Purpose: reproducible source baseline; newer refs are indexed separately.
-
 **Verified**
 
-- The minimal example loads dynamic backends, loads the model, tokenizes, creates `llama_context`, decodes, samples, and feeds the next token back into the loop.
-- Model loading constructs a loader and architecture-specific model, prepares devices, then loads hyperparameters, vocabulary, statistics, and tensors.
-- mmap-deferred page faults are explicitly acknowledged in load-time accounting.
+- Baseline pinned to `e3546c7948e3af463d0b401e6421d5a4c2faf565`.
+- The minimal example loads backends and a model, tokenizes, creates `llama_context`, decodes, samples, and feeds the next token back.
+- Model loading dispatches architecture-specific construction, device preparation, metadata, vocabulary, statistics, and tensors.
+- Load-time accounting explicitly acknowledges mmap-deferred page faults.
 
 **Open questions**
 
@@ -24,8 +20,8 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Verified**
 
 - The root README is the scheduled-run operating manual.
-- `scripts/start_scheduled_run.sh` reads README, project state, research log, ledger, and latest detailed note.
-- CI includes hourly context validation, daily source-index refresh, strict documentation CI, and Pages deployment.
+- The startup script reads README, project state, research log, source ledger, and latest detailed note.
+- CI includes hourly context validation, daily source indexing, strict documentation CI, and Pages deployment.
 
 **Interpretation**
 
@@ -36,13 +32,12 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Verified**
 
 - The corpus passed `mkdocs build --strict` in the repair environment.
-- The interactive HTML asset had been omitted from the repository.
-- Pages configuration could fail after a valid build when Pages was disabled.
-- CI was separated from deployment; Pages enablement is detected; deployed content receives an HTTP/title check.
+- The interactive HTML asset had been omitted.
+- CI was separated from deployment; Pages enablement is detected and deployed content receives an HTTP/title check.
 
 **Blocker**
 
-- Pages still requires the one-time **Settings -> Pages -> Source: GitHub Actions** selection.
+- Pages requires **Settings -> Pages -> Source: GitHub Actions**.
 
 ## 2026-07-12 02:51 Africa/Cairo — Decode and graph reuse
 
@@ -50,51 +45,51 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - `llama_decode()` delegates to `llama_context::decode()`.
 - Decode prepares scheduler/memory state and processes `llama_ubatch` units.
-- `process_ubatch()` reuses a graph only when all compatibility checks accept the new inputs.
+- Graph reuse requires all specialized compatibility checks to accept new inputs.
 - Pipeline-parallel reuse synchronizes before rewriting inputs.
-- Rebuild resets graph/scheduler state, calls `model.build_graph()`, and allocates with `ggml_backend_sched_alloc_graph()`.
-- `graph_compute()` selects the CPU threadpool and submits through the backend scheduler.
+- Rebuild resets graph/scheduler state, calls `model.build_graph()`, and allocates through the backend scheduler.
+- `graph_compute()` selects the CPU threadpool and submits through the scheduler.
 
 **Interpretation**
 
-- Graph reuse preserves compatible topology/allocation, not token values or outputs.
+- Reuse preserves compatible topology and allocation, not token values or outputs.
 
 ## 2026-07-12 03:52 Africa/Cairo — Backend scheduler execution
 
 **Verified**
 
-- Allocation chooses a copy-ring slot, assigns backends, builds contiguous splits, and allocates destination copies/dependency views.
-- Execution waits before reusing a destination slot, tries backend async copy, falls back to synchronized blocking copy, submits each split, and records events.
-- Scheduler sync waits every backend.
+- Allocation selects a copy-ring slot, assigns backends, builds contiguous splits, and allocates destination copies and dependency views.
+- Execution waits before slot reuse, tries backend async copy, falls back to synchronized blocking copy, submits splits, and records events.
+- Scheduler synchronization waits every backend.
 - The pinned `MUL_MAT_ID` specialization copies only selected expert ranges.
 
 **Interpretation**
 
 - Copy-slot events are reuse fences.
-- The MoE specialization is a transfer optimization, not a persistent expert cache.
+- The MoE specialization reduces transfer volume but is not a persistent expert cache.
 
 ## 2026-07-12 04:51 Africa/Cairo — CPU and CUDA semantics
 
 **Verified**
 
-- CPU graph compute blocks inside `ggml_graph_compute()` and leaves async-copy/event hooks unset.
+- CPU graph compute blocks inside `ggml_graph_compute()` and exposes no scheduler async-copy/event hooks.
 - CUDA normally queues kernels or CUDA Graph launch without trailing stream synchronization.
-- CUDA events create device-side ordering.
+- CUDA events provide device-side ordering.
 - Ordinary CUDA buffer operations may use async primitives internally but synchronize before return.
 
 **Interpretation**
 
 - CPU threadpool parallelism is not scheduler-level asynchrony.
-- API names containing `async` do not prove host-visible overlap.
+- An API name containing `async` does not prove host-visible overlap.
 
 ## 2026-07-12 05:50 Africa/Cairo — CUDA asynchronous copy branches
 
 **Verified**
 
-- The pinned callback requires CUDA backend objects and CUDA device buffers with consistent devices.
-- Same-stream copies use D2D ordering; cross-stream same-device copies add source event/destination wait; peer devices use `cudaMemcpyPeerAsync` when enabled.
-- CPU/mmap, CUDA-host, mixed backend, and device-mismatch pairs return `false`.
-- Successful return means queued transfer/dependencies, not host-visible completion.
+- The callback requires CUDA backend objects and CUDA device buffers with consistent devices.
+- Same-stream copies use D2D ordering; cross-stream same-device copies add source event and destination wait; peer copies use `cudaMemcpyPeerAsync` when enabled.
+- CPU/mmap, CUDA-host, mixed-backend, and device-mismatch pairs return `false`.
+- Success means queued transfer and dependencies, not host-visible completion.
 
 ## 2026-07-12 06:49 Africa/Cairo — Metal backend semantics
 
@@ -103,7 +98,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Ordinary Metal graph execution encodes and commits command buffers and returns without waiting.
 - Async set/get/copy operations use retained blit command buffers.
 - Metal-to-Metal copy signals a source event and queues a destination wait.
-- Synchronization waits `cmd_buf_last`, checks all command-buffer status, releases completed extras, and preserves an error state after failure.
+- Synchronization waits the last command buffer, checks status, releases completed extras, and preserves error state.
 
 **Interpretation**
 
@@ -111,218 +106,124 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 ## 2026-07-12 07:52 Africa/Cairo — Generic tensor-copy fallback
 
-**Scope**
-
-- Pinned generic path after backend asynchronous-copy capability is absent or rejects a tensor pair.
-
 **Verified**
 
-- `ggml_backend_tensor_copy_async()` synchronizes both source and destination backends before the blocking fallback.
-- `ggml_backend_tensor_copy()` first uses a host-visible source pointer, then a host-visible destination pointer, then the destination buffer's optional direct `cpy_tensor` callback.
-- If neither side is host-visible and direct copy fails, GGML allocates the full tensor size with `malloc()`, performs blocking source `get_tensor`, destination `set_tensor`, and frees the staging allocation.
-- CPU/mmap-to-CUDA and CUDA-host-to-CUDA avoid the generic heap buffer because their source buffers are host-visible, but they still cross the synchronized blocking path.
-- CPU/mmap-to-Metal likewise enters the destination `set_tensor` path after both backends have been synchronized.
-- Fallback completion is stronger than accepted async submission: queued prior work is drained and the blocking copy has returned.
+- Rejected or unavailable async copy synchronizes both source and destination backends.
+- Blocking copy checks host-visible source, host-visible destination, destination direct-copy callback, then full `malloc -> get -> set -> free` staging.
+- CPU/mmap-to-CUDA, CUDA-host-to-CUDA, and CPU/mmap-to-Metal avoid generic full-size heap staging but remain synchronized blocking paths.
 
 **Interpretation**
 
-- Async rejection is a correctness-preserving serialization point that may remove overlap on both sides of a split.
-- CPU/mmap accelerator copies can combine page faults, queue drains, and transfer latency.
-- Unsupported device-to-device pairs can transiently duplicate the full tensor in pageable host memory.
-- Avoiding generic heap staging does not imply zero-copy or asynchronous transfer.
-
-**Historical**
-
-- Newer revisions may add specialized transfers, reusable staging pools, or different event/ownership rules.
-
-**Open questions**
-
-- Exact destination-buffer `cpy_tensor` support matrix across CPU, CUDA, Metal, Vulkan, SYCL, RPC, and Android backends.
-- Runtime page-fault, overlap, and temporary-RSS evidence for prefill and token decode.
-
-**Artifacts changed**
-
-- `docs/lifecycle/generic-copy-fallback.md`
-- `mkdocs.yml`
-- `docs/reference/project-state.md`
-- `README.md`
-- `logs/research/2026-07-12/0752-generic-copy-fallback.md`
-
-**Next step**
-
-- Trace concrete buffer-level `set_tensor`, `get_tensor`, and `cpy_tensor` implementations and build a backend buffer-pair compatibility matrix.
+- Async rejection is a correctness-preserving serialization point.
+- File-backed accelerator copies can combine page faults, queue drains, and transfer latency.
+- Avoiding generic heap staging does not imply zero-copy or overlap.
 
 ## 2026-07-12 08:52 Africa/Cairo — CPU, mmap, CUDA, and Metal buffer compatibility
 
-**Scope**
-
-- Concrete buffer-level host visibility, ownership, set/get, direct blocking copy, staging, and completion semantics.
-
 **Verified**
 
-- CPU and CPU_Mapped set/get operations are direct `memcpy()` calls.
-- CPU_Mapped wraps an external aligned pointer and does not free it.
-- CPU and CPU_Mapped report host visibility; CPU destination direct copy accepts host-visible sources.
-- CUDA device buffers do not report host visibility.
-- CUDA device set/get issue H2D/D2H copies and synchronize before returning.
-- CUDA blocking direct copy accepts CUDA device sources, uses same-device or peer transfer, and synchronizes before return.
-- Generic host-visible branches avoid full-tensor heap staging.
-- Metal command-buffer/event ordering remains required independently of shared/private storage mode.
+- CPU and CPU_Mapped set/get are direct `memcpy()` operations and report host visibility.
+- CPU_Mapped wraps an external pointer and does not free it.
+- CUDA device buffers are not host-visible; set/get/direct-copy functions synchronize before return.
+- CUDA blocking direct copy accepts same-device or peer CUDA-device sources.
+- Metal command-buffer/event ordering remains required independently of storage mode.
 
 **Interpretation**
 
-- `CPU_Mapped` is an addressability property, not a physical-residency guarantee.
-- CPU_Mapped-to-accelerator transfer time can include mmap page faults and storage reads.
-- Avoiding generic heap staging does not imply zero-copy or asynchronous overlap.
-
-**Historical**
-
-- Newer backends may add staging pools, registered-host paths, unified-memory specializations, or broader direct-copy support.
-
-**Open questions**
-
-- Exact Metal shared/private buffer-level branch table.
-- Concrete Vulkan, SYCL, RPC, CANN, and Android-compiled-backend matrices.
-- Runtime evidence for page faults, synchronization stalls, overlap, and temporary RSS.
-
-**Artifacts changed**
-
-- `docs/lifecycle/buffer-compatibility.md`
-- `mkdocs.yml`
-- `docs/reference/project-state.md`
-- `README.md`
-- `logs/research/2026-07-12/0852-buffer-compatibility.md`
-
-**Next step**
-
-- Trace Vulkan and SYCL buffer interfaces and extend the compatibility matrix.
+- CPU_Mapped is an addressability property, not a physical-residency guarantee.
+- CPU_Mapped accelerator transfers can include mmap faults and storage reads.
 
 ## 2026-07-12 09:11 Africa/Cairo — Backend scheduler figure repair
 
 **Verified**
 
-- The deployed Mermaid 11 renderer displayed a syntax error for the scheduler execution sequence.
-- The broken Mermaid block was replaced with an accessible static SVG at `docs/assets/figures/backend-scheduler-execution.svg`.
-- The figure preserves the four documented phases: allocation-time preparation, per-split execution, return after submission, and later synchronization.
-- The SVG includes a title and description for accessibility and passed XML parsing.
-
-**Interpretation**
-
-- Static SVG is a more robust representation for this dense sequence while keeping the page scalable and readable on mobile.
-- The figure is conceptual; the pinned prose and source map remain authoritative for exact branches.
-
-**Historical**
-
-- The removed Mermaid diagram described the same pinned baseline but was not portable across the deployed renderer configuration.
+- Mermaid 11 displayed a syntax error for the scheduler sequence.
+- The block was replaced with an accessible static SVG preserving allocation, split execution, async return, and later synchronization.
 
 **Open question**
 
 - Audit other complex Mermaid diagrams for renderer-specific failures.
 
-**Artifacts changed**
-
-- `docs/assets/figures/backend-scheduler-execution.svg`
-- `docs/lifecycle/backend-scheduler-execution.md`
-- `docs/reference/project-state.md`
-- `README.md`
-- `logs/research/2026-07-12/0911-scheduler-figure-repair.md`
-
-**Next step**
-
-- Confirm the SVG renders in Documentation CI and Pages, then continue the Vulkan and SYCL buffer compatibility trace.
-
-## 2026-07-12 09:49 Africa/Cairo — Vulkan buffer capability boundary
-
-**Scope**
-
-- Pinned Vulkan device-buffer host visibility, dedicated host-buffer support, backend capability flags, queue/event state, synchronization, and graph hazard ordering.
+## 2026-07-12 09:49 Africa/Cairo — Vulkan capability boundary
 
 **Verified**
 
-- The ordinary Vulkan buffer type leaves `.is_host` unset, so GGML treats Vulkan device-buffer tensor pointers as not host-visible.
-- The Vulkan device advertises asynchronous execution, a dedicated host-buffer type, and events; arbitrary host-pointer wrapping is not advertised.
-- The backend maintains compute and transfer queues, command pools, submissions, semaphores, and events.
-- Event state uses Vulkan events for command-side waits and a timeline semaphore for host synchronization.
-- Backend synchronization calls `ggml_vk_synchronize()` and then graph cleanup.
-- Graph execution batches command buffers and inserts internal synchronization for overlapping unsynchronized tensor regions when at least one access writes.
+- Default Vulkan buffers leave `.is_host` unset.
+- Vulkan advertises asynchronous execution, a dedicated host-buffer type, and events.
+- Event state combines Vulkan events with timeline-semaphore-backed host synchronization.
+- Graph execution inserts internal synchronization for overlapping hazardous tensor regions.
 
 **Interpretation**
 
 - Dedicated host-buffer support is distinct from device-buffer host visibility.
-- Scheduler-visible asynchronous capability does not prove the completion behavior of buffer-level set/get operations.
-- Vulkan graph hazard tracking and cross-backend scheduler ordering protect different boundaries.
+- Vulkan graph hazards and cross-backend scheduler ordering protect different boundaries.
 
-**Historical**
-
-- The findings apply to pinned commit `e3546c7948e3af463d0b401e6421d5a4c2faf565`; later Vulkan memory and event paths may differ.
-
-**Open questions**
-
-- Exact Vulkan device/host memory-property selection, set/get paths, direct-copy acceptance, scheduler async-copy acceptance, and fence-wait return points.
-- Android integrated-GPU behavior across vendor Vulkan drivers.
-
-**Artifacts changed**
-
-- `docs/lifecycle/vulkan-buffer-capabilities.md`
-- `mkdocs.yml`
-- `docs/reference/project-state.md`
-- `README.md`
-- `logs/research/2026-07-12/0949-vulkan-buffer-capabilities.md`
-
-**Next step**
-
-- Finish the concrete Vulkan transfer-path trace and add exact Vulkan rows to the buffer compatibility matrix before moving to SYCL.
-
-## 2026-07-12 10:52 Africa/Cairo — Vulkan transfer path and compatibility matrix
-
-**Scope**
-
-- Pinned Vulkan memory-property selection, mapped and staged blocking operations, registered host buffers, scheduler asynchronous-copy acceptance, cross-device behavior, and completion guarantees.
+## 2026-07-12 10:52 Africa/Cairo — Vulkan transfer path
 
 **Verified**
 
-- `ggml_vk_create_buffer_device()` selects memory-property preference lists based on UMA, `prefer_host_memory`, host-visible-VRAM policy, and system-memory fallback.
-- Host-visible Vulkan allocations are internally mapped, but the default GGML Vulkan buffer type still leaves `is_host` unset.
-- Blocking Vulkan writes use direct `memcpy()` for coherent mapped allocations or coherent staging plus a fence wait for non-host-visible allocations.
-- Blocking reads wait for prior GPU writes: UMA mapped reads use a host-read barrier and fence; other reads use staging, a fence, and a deferred CPU copy.
-- Blocking Vulkan-to-Vulkan copy accepts same-device and cross-device sources. Same-device copies wait for a fence; cross-device copies serialize through host-visible staging.
-- Vulkan host buffers use registered host allocation, inherit CPU buffer operations and host visibility, and fall back to ordinary CPU allocation if registration fails.
-- Scheduler `cpy_tensor_async` accepts same-device Vulkan-device sources and Vulkan-registered host sources when the destination is the default Vulkan device buffer.
-- Scheduler `cpy_tensor_async` rejects cross-device Vulkan, ordinary CPU, CPU_Mapped, and Vulkan-host destinations.
-- Backend async set/get preserves queued behavior only for Vulkan-registered host pointers; ordinary host pointers use coherent staging and call `ggml_vk_synchronize()` before return.
-- `ggml_vk_synchronize()` joins pending transfer/compute work, waits a fence, and performs deferred output `memcpy()` operations.
+- Vulkan memory-property preferences depend on UMA, host-memory preference, host-visible-VRAM policy, and system-memory fallback.
+- Blocking writes use mapped coherent memory or staging plus a fence wait.
+- Blocking reads use a host-read barrier on mapped UMA memory or staging plus a fence and deferred CPU copy.
+- Same-device blocking copies wait a fence; cross-device copies stage through host-visible memory.
+- Scheduler async copy accepts same-device Vulkan-device and Vulkan-registered-host sources, but rejects ordinary CPU/mmap and cross-device Vulkan sources.
+- Backend async set/get remains queued only for registered host pointers; ordinary host pointers synchronize staging before return.
 
 **Interpretation**
 
-- Vulkan registration, not generic host visibility alone, is the capability that enables overlapping host-to-device scheduler copies.
-- Internally mapped Vulkan device memory and GGML `is_host` answer different questions.
-- Cross-device Vulkan support in the blocking callback is a compatibility path rather than an asynchronous peer-copy path.
-- UMA can remove a staging transfer while still requiring command barriers and fence completion before host reads.
+- Vulkan registration, not generic host visibility, enables queued host-to-device scheduler copies.
+- UMA can remove staging without removing barrier and fence requirements.
+
+## 2026-07-12 11:49 Africa/Cairo — SYCL buffer and transfer semantics
+
+**Scope**
+
+- Pinned SYCL device, optional system-USM, and host allocations; blocking and backend-async operations; cross-device copy fallbacks; scheduler callback registration.
+
+**Verified**
+
+- Default SYCL buffers allocate device memory unless large system-USM mode is enabled, the allocation is at least 1 GiB, and the device reports system-USM support.
+- Default and split buffer types report `is_host == false`, including optional system-USM-backed allocations.
+- The dedicated SYCL host-buffer type wraps aligned host memory with CPU operations and host visibility, falling back to ordinary CPU allocation on failure.
+- Blocking `set_tensor` waits device queues; non-Windows builds make a full temporary host copy before the waited host-to-device copy as an mmap/PVC workaround.
+- Blocking `get_tensor` waits the device-to-host queue copy.
+- Direct SYCL-device copy waits both devices and uses Level Zero, SYCL peer access, or full host-forward staging.
+- Backend async set/get callbacks enqueue stream-zero copies without waiting; backend synchronization waits that stream.
+- A `ggml_backend_sycl_cpy_tensor_async()` helper exists, but the pinned backend interface explicitly installs `.cpy_tensor_async = NULL`.
+- Scheduler graph-split tensor copies therefore take the synchronized generic fallback even for same-device SYCL buffers.
+
+**Interpretation**
+
+- System USM changes allocation mechanics but not the public GGML host-visibility contract.
+- Non-Windows GGUF loading can combine mmap page faults, a full CPU copy, temporary RSS equal to the tensor, a device transfer, and a queue wait.
+- Queue-based async set/get support does not imply scheduler tensor-to-tensor copy overlap.
+- Peer access can avoid host staging while the blocking callback still establishes completion before return.
 
 **Historical**
 
-- These findings apply to pinned commit `e3546c7948e3af463d0b401e6421d5a4c2faf565`; later memory preference lists, device-specific host buffers, staging reuse, and async-copy coverage may differ.
+- These findings apply to `e3546c7948e3af463d0b401e6421d5a4c2faf565`; later revisions may register a replacement async-copy callback or change staging and dependency behavior.
 
 **Open questions**
 
-- Actual memory-heap choices and fence latency on Qualcomm, ARM, Imagination, Samsung, and Mesa Android Vulkan drivers.
-- Runtime overlap and staging-pressure evidence during prompt processing and one-token decode.
-- Whether later revisions add direct cross-device Vulkan transfer or device-specific host-buffer types.
+- Which revision first restores scheduler-level SYCL tensor-copy asynchrony.
+- Whether the mmap/PVC staging workaround remains required on current runtimes.
+- Runtime page-fault, temporary-RSS, queue-wait, and Level Zero versus OpenCL behavior.
 
 **Artifacts changed**
 
-- `docs/lifecycle/vulkan-buffer-capabilities.md`
-- `docs/lifecycle/buffer-compatibility.md`
+- `docs/lifecycle/sycl-buffer-capabilities.md`
+- `mkdocs.yml`
 - `README.md`
 - `docs/reference/project-state.md`
 - `docs/reference/research-log.md`
-- `logs/research/2026-07-12/1052-vulkan-transfer-path.md`
+- `logs/research/2026-07-12/1149-sycl-buffer-semantics.md`
 
 **Validation**
 
-- Connector-side reads verified the pinned Vulkan symbols and exact branches.
-- Local clone and strict MkDocs validation remain blocked because the execution environment cannot resolve `github.com`; GitHub Actions remains the durable validation route.
+- Connector-side reads verified the pinned allocation, buffer, copy, synchronization, and interface-registration branches.
+- Local clone and strict MkDocs validation remain blocked because the execution environment cannot resolve `github.com`.
+- Connected status interfaces returned no workflow runs for the latest commit, and the Pages site remains unverified until Pages is enabled.
 
 **Next step**
 
-- Trace SYCL host, shared/USM, and device-buffer semantics, then extend the compatibility matrix with exact blocking and asynchronous-copy branches.
+- Add exact SYCL rows to the shared compatibility matrix and compare the first later upstream revision that restores scheduler async tensor copying.
