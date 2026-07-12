@@ -152,15 +152,16 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 - [ ] Rerun **Deploy documentation** and confirm its build, deploy, and website-verification jobs succeed.
 - [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the latest documentation commits; the connected status interfaces still do not provide complete push-run conclusions.
 - [ ] Confirm the live site returns HTTP 200 and contains `How.to.llama.cpp`; direct verification remains blocked until Pages is enabled and publicly reachable.
-- [ ] Trace the pinned Metal backend's graph submission, buffer copies, command-buffer lifecycle, event/shared-event ordering, and host synchronization boundary.
-- [ ] Build a CUDA-versus-Metal capability table, including discrete-memory and unified-memory caveats.
-- [ ] Trace the generic scheduler fallback route for rejected CPU/mmap/CUDA-host to CUDA-device copies.
+- [ ] Trace the generic scheduler fallback route after a backend asynchronous-copy callback returns `false`, including CPU/mmap, CUDA-host/device, and Metal shared/private combinations.
+- [ ] Document synchronization bubbles, staging behavior, and host-visibility guarantees in the generic fallback path.
+- [ ] Trace the exact Metal event primitive and compatibility/fallback behavior across supported Apple OS/GPU generations.
 
 ### Future improvements
 
 - [ ] Add backend-specific runtime traces proving copy/compute overlap during prompt processing and token decode.
 - [ ] Add a matrix for CPU, CUDA, Metal, Vulkan, SYCL, RPC, and Android GPU backend capabilities.
 - [ ] Trace later scheduler PRs that changed copy/event ordering and compare them with the pinned baseline.
+- [ ] Compare newer Metal changes affecting queue ownership, `cmd_buf_last`, copy events, and error propagation.
 - [ ] Expand graph-reuse documentation with a table of every `llm_graph_input_*::can_reuse()` predicate.
 - [ ] Expand the interactive workflow to separate prefill, token decode, CPU-only, GPU offload, multi-backend, and MoE paths.
 - [ ] Add direct source and documentation links to every interactive node.
@@ -170,6 +171,9 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 ### Completed setup
 
+- [x] Trace the pinned Metal graph-submission path, command-buffer lifecycle, asynchronous blit set/get/copy operations, event signal/wait ordering, and explicit host synchronization boundary.
+- [x] Build a CUDA-versus-Metal capability table, including discrete-memory and unified-memory caveats.
+- [x] Document that Metal shared/unified memory changes addressability and transfer cost but does not imply command completion, safe reuse, or host visibility.
 - [x] Trace `ggml_backend_cuda_cpy_tensor_async()` branch by branch, including CUDA backend/buffer eligibility, device consistency, same-backend D2D, same-device cross-backend D2D, peer copies, event ordering, and every false-return fallback.
 - [x] Document that CPU/mmap and CUDA host buffers are outside the pinned CUDA device-copy callback, and that successful return means queued dependency rather than host-visible completion.
 - [x] Compare pinned CPU and CUDA graph submission, thread/stream completion, event semantics, synchronization, and synchronous buffer-operation behavior.
