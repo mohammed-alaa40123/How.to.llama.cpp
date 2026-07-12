@@ -272,3 +272,57 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Finish the concrete Vulkan transfer-path trace and add exact Vulkan rows to the buffer compatibility matrix before moving to SYCL.
+
+## 2026-07-12 10:52 Africa/Cairo — Vulkan transfer path and compatibility matrix
+
+**Scope**
+
+- Pinned Vulkan memory-property selection, mapped and staged blocking operations, registered host buffers, scheduler asynchronous-copy acceptance, cross-device behavior, and completion guarantees.
+
+**Verified**
+
+- `ggml_vk_create_buffer_device()` selects memory-property preference lists based on UMA, `prefer_host_memory`, host-visible-VRAM policy, and system-memory fallback.
+- Host-visible Vulkan allocations are internally mapped, but the default GGML Vulkan buffer type still leaves `is_host` unset.
+- Blocking Vulkan writes use direct `memcpy()` for coherent mapped allocations or coherent staging plus a fence wait for non-host-visible allocations.
+- Blocking reads wait for prior GPU writes: UMA mapped reads use a host-read barrier and fence; other reads use staging, a fence, and a deferred CPU copy.
+- Blocking Vulkan-to-Vulkan copy accepts same-device and cross-device sources. Same-device copies wait for a fence; cross-device copies serialize through host-visible staging.
+- Vulkan host buffers use registered host allocation, inherit CPU buffer operations and host visibility, and fall back to ordinary CPU allocation if registration fails.
+- Scheduler `cpy_tensor_async` accepts same-device Vulkan-device sources and Vulkan-registered host sources when the destination is the default Vulkan device buffer.
+- Scheduler `cpy_tensor_async` rejects cross-device Vulkan, ordinary CPU, CPU_Mapped, and Vulkan-host destinations.
+- Backend async set/get preserves queued behavior only for Vulkan-registered host pointers; ordinary host pointers use coherent staging and call `ggml_vk_synchronize()` before return.
+- `ggml_vk_synchronize()` joins pending transfer/compute work, waits a fence, and performs deferred output `memcpy()` operations.
+
+**Interpretation**
+
+- Vulkan registration, not generic host visibility alone, is the capability that enables overlapping host-to-device scheduler copies.
+- Internally mapped Vulkan device memory and GGML `is_host` answer different questions.
+- Cross-device Vulkan support in the blocking callback is a compatibility path rather than an asynchronous peer-copy path.
+- UMA can remove a staging transfer while still requiring command barriers and fence completion before host reads.
+
+**Historical**
+
+- These findings apply to pinned commit `e3546c7948e3af463d0b401e6421d5a4c2faf565`; later memory preference lists, device-specific host buffers, staging reuse, and async-copy coverage may differ.
+
+**Open questions**
+
+- Actual memory-heap choices and fence latency on Qualcomm, ARM, Imagination, Samsung, and Mesa Android Vulkan drivers.
+- Runtime overlap and staging-pressure evidence during prompt processing and one-token decode.
+- Whether later revisions add direct cross-device Vulkan transfer or device-specific host-buffer types.
+
+**Artifacts changed**
+
+- `docs/lifecycle/vulkan-buffer-capabilities.md`
+- `docs/lifecycle/buffer-compatibility.md`
+- `README.md`
+- `docs/reference/project-state.md`
+- `docs/reference/research-log.md`
+- `logs/research/2026-07-12/1052-vulkan-transfer-path.md`
+
+**Validation**
+
+- Connector-side reads verified the pinned Vulkan symbols and exact branches.
+- Local clone and strict MkDocs validation remain blocked because the execution environment cannot resolve `github.com`; GitHub Actions remains the durable validation route.
+
+**Next step**
+
+- Trace SYCL host, shared/USM, and device-buffer semantics, then extend the compatibility matrix with exact blocking and asynchronous-copy branches.
