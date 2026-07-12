@@ -7,6 +7,19 @@
   <p><strong>Initial pinned baseline:</strong> <code>e3546c7948e3</code></p>
 </div>
 
+## Start with the interactive foundations map
+
+The [interactive llama.cpp system map](foundations/interactive-system-map.md) is now the primary foundations entry point. It includes clickable system layers and tabs for:
+
+- the full architecture stack;
+- the end-to-end code path;
+- memory allocation, mapping, page faults, ownership, and teardown;
+- GGUF loading and GGML graph construction;
+- backend execution and synchronization;
+- file-by-file subsystem groups.
+
+Hover over a layer for a brief explanation and click it for symbols, source files, ownership, and synchronization details.
+
 ## The map
 
 ```mermaid
@@ -31,17 +44,21 @@ flowchart LR
 
 ## Reading modes
 
+=== "Interactive foundations"
+
+    Start with the [clickable system map](foundations/interactive-system-map.md), then follow its pinned source links and tabs.
+
 === "Five-minute overview"
 
-    Read [Brief end to end](lifecycle/end-to-end.md) and use the [interactive workflow](interactive/inference-workflow.md).
+    Read [Brief end to end](lifecycle/end-to-end.md) and use the [interactive inference workflow](interactive/inference-workflow.md).
 
 === "Source deep dive"
 
-    Start at the [repository map](architecture/repository-map.md), then follow source links and the generated index.
+    Start at the [repository map](architecture/repository-map.md), then follow source links, file groups, and the generated index.
 
 === "Systems foundations"
 
-    Begin with [What GGML is](ggml/what-is-ggml.md), followed by memory, scheduling, concurrency, and backend chapters as they are added.
+    Begin with [What GGML is](ggml/what-is-ggml.md), followed by GGUF, memory, graph construction, scheduling, concurrency, and backend chapters.
 
 ## Evidence convention
 
@@ -61,9 +78,9 @@ flowchart LR
 
 - [x] Pin an initial source baseline.
 - [x] Trace the public example through model load, context creation, decode, and sampling.
-- [x] Create a Mermaid overview.
-- [x] Build the first clickable inference explorer.
+- [x] Build a clickable tabbed foundations explorer.
+- [x] Build a focused inference workflow.
 - [x] Create source-mirror and indexing automation.
 - [ ] Complete the full repository inventory against every upstream ref.
-- [ ] Deep-trace context construction, graph reuse, and scheduler allocation.
-- [ ] Add backend-by-backend chapters and runtime experiments.
+- [ ] Deep-trace GGUF, `llama_context`, graph construction, memory lifetimes, and file-by-file subsystem composition.
+- [ ] Add architecture, backend, and runtime-measured interactive variants.
