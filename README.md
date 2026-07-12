@@ -152,20 +152,21 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 - [ ] Rerun **Deploy documentation** and confirm its build, deploy, and website-verification jobs succeed.
 - [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the latest documentation commits; connected status interfaces may not expose complete push-run conclusions.
 - [ ] Confirm the live site returns HTTP 200 and contains `How.to.llama.cpp`; direct verification remains blocked until Pages is enabled and publicly reachable.
-- [ ] Finish the Vulkan transfer-path trace: memory properties, `set_tensor`, `get_tensor`, blocking `cpy_tensor`, scheduler `cpy_tensor_async`, and fence/event completion.
-- [ ] Add exact Vulkan source/destination rows to `docs/lifecycle/buffer-compatibility.md`.
-- [ ] Trace SYCL buffer host/USM/device semantics and extend the source-buffer × destination-buffer compatibility matrix.
+- [ ] Trace SYCL buffer host, USM, and device allocation semantics.
+- [ ] Trace SYCL blocking set/get/direct-copy callbacks, scheduler `cpy_tensor_async` acceptance, queue/event ordering, and return-time completion.
+- [ ] Add exact SYCL source/destination rows to `docs/lifecycle/buffer-compatibility.md`.
 - [ ] Trace exact Metal shared/private buffer-level copy branches below the wrapper layer.
-- [ ] Add runtime instrumentation for page faults, synchronization bubbles, transfer overlap, direct-copy acceptance, heap staging, and temporary RSS.
+- [ ] Add runtime instrumentation for page faults, synchronization bubbles, transfer overlap, direct-copy acceptance, backend staging, heap staging, and temporary RSS.
 
 ### Future improvements
 
-- [ ] Validate Vulkan behavior on Android integrated GPUs and record memory-type and queue-family differences by vendor.
-- [ ] Extend the buffer matrix to RPC, CANN, OpenCL, Vulkan, SYCL, and Android-compiled backend combinations.
+- [ ] Validate Vulkan behavior on Android integrated GPUs and record memory-type, staging, queue-family, and fence-latency differences by vendor.
+- [ ] Add Vulkan runtime counters for registered-host fast paths versus ordinary-host synchronizing staging.
+- [ ] Extend the buffer matrix to RPC, CANN, OpenCL, SYCL, and Android-compiled backend combinations.
 - [ ] Add backend-specific runtime traces proving copy/compute overlap during prompt processing and token decode.
 - [ ] Add a matrix for CPU, CUDA, Metal, Vulkan, SYCL, RPC, and Android GPU graph/event capabilities.
 - [ ] Trace later scheduler PRs that changed copy/event ordering and compare them with the pinned baseline.
-- [ ] Determine whether newer revisions pool or reuse generic host staging allocations.
+- [ ] Determine whether newer revisions pool or reuse generic and backend-specific host staging allocations.
 - [ ] Compare newer Metal changes affecting queue ownership, `cmd_buf_last`, copy events, and error propagation.
 - [ ] Expand graph-reuse documentation with a table of every `llm_graph_input_*::can_reuse()` predicate.
 - [ ] Expand the interactive workflow to separate prefill, token decode, CPU-only, GPU offload, multi-backend, and MoE paths.
@@ -176,12 +177,14 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 ### Completed setup
 
-- [x] Document the pinned Vulkan capability boundary: non-host-visible device buffers, dedicated host-buffer support, async/events flags, queue/event state, backend synchronization, and graph hazard tracking.
+- [x] Complete the pinned Vulkan transfer-path trace: memory-property selection, blocking set/get, same-device and cross-device blocking copies, backend async set/get fallbacks, scheduler async-copy acceptance, fence completion, and registered-host behavior.
+- [x] Add exact Vulkan source/destination rows to `docs/lifecycle/buffer-compatibility.md`.
+- [x] Document the pinned Vulkan capability boundary: non-host-visible default buffers, dedicated host-buffer support, async/events flags, queue/event state, backend synchronization, and graph hazard tracking.
 - [x] Replace the broken backend-scheduler Mermaid sequence with a static accessible SVG and explanatory caption.
 - [x] Document concrete CPU and CPU_Mapped host visibility, ownership, `memcpy()` set/get, and direct-copy behavior.
 - [x] Document CUDA-device blocking set/get/direct-copy behavior, same-device/peer branches, and completion semantics.
 - [x] Build a representative CPU/mmap/CUDA/Metal source-buffer × destination-buffer compatibility matrix.
-- [x] Add a runtime-validation schema for page faults, synchronization bubbles, copy overlap, direct-copy acceptance, heap staging, and RSS deltas.
+- [x] Add a runtime-validation schema for page faults, synchronization bubbles, overlap, direct-copy acceptance, heap staging, and RSS deltas.
 - [x] Trace the generic scheduler fallback after `cpy_tensor_async` is absent or returns `false`: synchronize source and destination, invoke blocking tensor copy, and establish completion.
 - [x] Document the blocking copy decision tree: host-source pointer, host-destination pointer, destination-buffer direct copy, then full-tensor `malloc → get → set → free` staging.
 - [x] Document CPU/mmap-to-CUDA, CUDA-host-to-CUDA, and CPU/mmap-to-Metal fallback paths, including page-fault, synchronization, ownership, and host-visibility caveats.
