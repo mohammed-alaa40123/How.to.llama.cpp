@@ -78,11 +78,14 @@ const memory=[{anchor:'#page-faults-and-page-cache'}];
         self.assertEqual(1, len(problems))
         self.assertIn("anchor '#missing-section' not found", problems[0].message)
 
-    def test_ignores_external_and_non_document_asset_links(self) -> None:
+    def test_ignores_external_dynamic_and_non_document_asset_links(self) -> None:
         self.write("docs/assets/diagram.svg", "<svg></svg>")
         asset = self.write(
             "docs/assets/interactive/example.html",
-            '<a href="https://example.com/x">External</a><img src="../diagram.svg">',
+            """<a href="https://example.com/x">External</a>
+<img src="../diagram.svg">
+<script>const rendered = `<a href="${base + path}">Source</a>`;</script>
+""",
         )
         self.assertEqual([], validator.validate_assets([asset]))
 
