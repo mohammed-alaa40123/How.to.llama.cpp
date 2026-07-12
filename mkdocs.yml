@@ -84,6 +84,7 @@ nav:
   - Interactive:
       - Inference workflow: interactive/inference-workflow.md
   - Reference:
+      - Documentation quality roadmap: reference/documentation-quality-roadmap.md
       - Source index: reference/source-index.md
       - Research ledger: reference/research-ledger.md
       - Project state: reference/project-state.md
