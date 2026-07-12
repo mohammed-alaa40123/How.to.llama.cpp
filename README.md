@@ -13,7 +13,7 @@ How.to.llama.cpp explains the path from a GGUF file to generated tokens: backend
 - MkDocs Material documentation with source-pinned figures and tables.
 - Beginner-readable and source-level inference walkthroughs.
 - Documentation for GGUF, model loading, context construction, graph reuse, schedulers, memory, synchronization, and backends.
-- A clickable inference-flow explorer.
+- Clickable foundations and inference explorers.
 - A research ledger for official docs, PRs, discussions, papers, talks, videos, blogs, and technical posts.
 - Scripts for source mirroring, indexing, context loading, validation, and site health checks.
 - GitHub Actions for hourly context validation, daily upstream indexing, strict documentation CI, and Pages deployment.
@@ -56,8 +56,8 @@ Start a local run with:
 
 | Schedule | Workflow | Responsibility |
 |---|---|---|
-| Every hour | Research automation | Complete one increment and update durable context, CI status, and website status |
-| Daily | Website quality review | Review navigation, discoverability, source traceability, accessibility, cross-links, and interaction opportunities |
+| Every hour | Research automation | Complete one source-pinned increment; prioritize foundations, file-by-file analysis, subsystem synthesis, interactive explanations, and durable context updates |
+| Daily | Website quality review | Navigate the live site; review foundations, tabs, discoverability, source traceability, accessibility, cross-links, diagrams, and interaction opportunities |
 | Hourly at minute 23 UTC | `.github/workflows/hourly-context-check.yml` | Validate context and scripts |
 | Daily at 02:17 UTC | `.github/workflows/refresh-source-index.yml` | Refresh upstream source inventory through a PR |
 | Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, scripts, assets, and `mkdocs build --strict` |
@@ -69,17 +69,20 @@ Start a local run with:
 
 Record the exact commit, branch, PR, discussion, test, or trace. Baseline metadata is in [`data/upstream.json`](data/upstream.json).
 
-### Map the subsystem before writing prose
+### Analyze files, then synthesize subsystems
 
-For each topic, record:
+For each relevant file, record:
 
-- public entry points and internal functions;
-- interfaces, callbacks, virtual dispatch, and runtime registration;
-- owning objects and lifetimes;
-- tensors, inputs, outputs, and state changes;
-- allocations, mappings, copies, and reclaim;
+- purpose and directory role;
+- major objects, functions, interfaces, callbacks, and registration points;
+- callers/callees recoverable from source;
+- objects created, owned, referenced, mutated, and destroyed;
+- allocations, mappings, copies, workspaces, and reclaim;
 - threads, queues, events, barriers, and synchronization;
-- error paths, fallbacks, build flags, and backend differences.
+- error paths, fallbacks, build flags, and backend differences;
+- tests, examples, PRs, discussions, and runtime evidence.
+
+Then group files into public API, model/GGUF loading, runtime context, memory modules, GGML core, scheduler, CPU backend, accelerator backends, model architectures, and tools/tests. Explain how control, objects, memory, and synchronization cross those boundaries.
 
 `scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph.
 
@@ -117,8 +120,9 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/reference/research-log.md` | Concise chronological findings |
 | `logs/research/` | Detailed per-run notes |
 | `docs/reference/research-ledger.md` | External-source assessment |
-| `docs/roadmap.md` | Full implementation and research plan |
+| `docs/roadmap.md` | Full implementation, file-analysis, and subsystem-synthesis plan |
 | `docs/reference/documentation-quality-roadmap.md` | Object-centred, searchable, and interactive documentation plan |
+| `docs/foundations/interactive-system-map.md` | Large clickable foundations map and tabbed system explorer |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
 | `data/generated/` | Generated source inventories |
@@ -133,21 +137,27 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Identify the first later upstream revision that registers or replaces SYCL scheduler `cpy_tensor_async`; compare accepted pairs, dependency ordering, and completion semantics with the pinned baseline.
-- [ ] Create the canonical `llama_context` object page using the documentation quality contract: creation, ownership, lifetime, memory, callers/callees, synchronization, source map, related pages, and open questions.
-- [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment; record any connector visibility gap precisely.
-- [ ] Verify the public Pages site returns HTTP 200 and contains the expected `How.to.llama.cpp` title and documentation-quality roadmap.
-- [ ] Trace exact Metal shared/private buffer-level set/get/copy branches.
-- [ ] Add runtime instrumentation separating generic heap staging, backend temporary staging, and host-forward staging.
-- [ ] Measure mmap page faults, queue/fence waits, temporary RSS, and copy/compute overlap for representative prefill and decode runs.
+- [ ] Deepen the GGUF foundations chapter: official format structure, canonical upstream figure with verified attribution, split files, metadata, tensor descriptors, alignment, data region, tensor naming, and loader call chain.
+- [ ] Create the canonical `llama_context` object page: creation, ownership, lifetime, memory modules, scheduler, outputs, decode mutations, synchronization, teardown, and pinned source map.
+- [ ] Create the GGML graph-construction chapter: op calls, output tensors as lazy nodes, source edges, graph expansion, insertion ordering, views, activations, allocation, reuse, and execution.
+- [ ] Build the memory-lifetime chapter and interactive overlay: GGUF bytes, mmap, page faults, page cache/RAM, model buffers, context state, KV/recurrent memory, activations, workspaces, scheduler copies, output buffers, and teardown.
+- [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
+- [ ] Expand the interactive foundations explorer with architecture-specific graph-builder sublayers, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
+- [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
+- [ ] Verify the public Pages site returns HTTP 200 and renders the new interactive foundations page and tabs.
 
 ### Future improvements
 
+- [ ] Identify the first later upstream revision that registers or replaces SYCL scheduler `cpy_tensor_async`.
 - [ ] Add reusable page metadata for prerequisites, related objects, source symbols, and next pages.
-- [ ] Extend the source index with object and symbol landing pages.
-- [ ] Link existing interactive inference nodes to exact source and object pages.
-- [ ] Add an mmap/page-fault visualizer with conceptual and runtime-evidence modes.
-- [ ] Add automated checks for truth labels, source maps, and navigation metadata on mature pages.
+- [ ] Extend the source index with per-file, object, symbol, subsystem, and caller/callee landing pages.
+- [ ] Make interactive nodes load versioned JSON shared with object pages and source maps.
+- [ ] Add a dedicated mmap/page-fault visualizer with conceptual and runtime-evidence modes.
+- [ ] Add CPU-thread, backend-queue, KV-cache, MoE-routing, and scheduler-timeline visualizers.
+- [ ] Add automated checks for truth labels, source maps, navigation metadata, iframe assets, and accessible interaction labels.
+- [ ] Trace exact Metal shared/private buffer-level set/get/copy branches.
+- [ ] Add runtime instrumentation separating generic heap staging, backend temporary staging, and host-forward staging.
+- [ ] Measure mmap page faults, queue/fence waits, temporary RSS, and copy/compute overlap for representative prefill and decode runs.
 - [ ] Compare Level Zero, OpenCL, and non-Intel SYCL runtime behavior.
 - [ ] Validate Vulkan behavior on Android integrated GPUs by vendor.
 - [ ] Extend the compatibility matrix to RPC, CANN, OpenCL, and Android-specific backends.
@@ -155,21 +165,20 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Trace later scheduler PRs that changed copy/event ordering.
 - [ ] Determine whether newer revisions pool generic or backend staging allocations.
 - [ ] Expand graph-reuse documentation with every specialized `can_reuse()` predicate.
-- [ ] Expand the interactive workflow into separate prefill, decode, CPU-only, GPU-offload, multi-backend, and MoE traces.
 - [ ] Add a searchable index for detailed research logs.
 - [ ] Add commit-pinned link checking and backend profiler evidence.
 
 ### Completed
 
+- [x] Add a large tabbed foundations explorer with hover summaries, clickable system layers, end-to-end code path, memory lifecycle, GGUF/graph explanation, synchronization timeline, and file-group map.
+- [x] Update the roadmap with a four-pass file-by-file analysis and subsystem-synthesis program.
 - [x] Add and publish the object-centred, searchable, interactive documentation quality roadmap and website review rubric.
 - [x] Add website-quality review to the scheduling plan.
-- [x] Enable GitHub Pages with **Build and deployment → Source: GitHub Actions**.
-- [x] Publish the public documentation site.
+- [x] Enable GitHub Pages and publish the public documentation site.
 - [x] Add exact pinned SYCL source/destination rows to the central buffer compatibility matrix.
 - [x] Distinguish generic emergency staging from SYCL mmap/PVC staging and SYCL host-forward staging.
-- [x] Document pinned SYCL allocation, host visibility, blocking set/get, direct-copy, async set/get, synchronization, and disabled scheduler callback registration.
 - [x] Complete Vulkan capability and transfer-path documentation and matrix rows.
-- [x] Document CPU, CPU_Mapped, CUDA, and Metal buffer/copy semantics.
+- [x] Document CPU, CPU_Mapped, CUDA, Metal, Vulkan, and SYCL buffer/copy semantics.
 - [x] Trace generic scheduler fallback and full host-staging behavior.
 - [x] Trace decode, graph reuse, scheduler allocation, split execution, and synchronization.
 - [x] Replace the broken scheduler Mermaid sequence with an accessible static SVG.
