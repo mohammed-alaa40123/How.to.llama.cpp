@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 01:52 Africa/Cairo_
+_Last updated: 2026-07-13 02:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -36,11 +36,13 @@ Reconstruct llama.cpp from the source in two complementary directions:
 - Canonical memory-lifetime atlas and interactive ownership/lifetime overlay.
 - Static interactive-link validator, fixture tests, and Documentation CI integration.
 - Expanded four-pass roadmap: file inventory, subsystem grouping, cross-file composition, and complete workflow reconstruction.
-- File-by-file Pass A public API/minimal-example inventory covering `examples/simple/simple.cpp`, `include/llama.h`, `src/llama.cpp`, `src/llama-model.cpp`, and `src/llama-context.cpp`, with relationship diagram, ownership, error paths, synchronization, backend assumptions, and teardown.
+- File-by-file Pass A public API/minimal-example inventory.
+- File-by-file Pass A model/GGUF loader inventory covering construction order, split discovery, source offsets, file/mapping/buffer ownership, population paths, cancellation, synchronization, and partial cleanup.
 
 ## In progress
 
-- File-by-file Pass A for model/GGUF loader and runtime-context groups.
+- File-by-file Pass A for runtime-context and memory groups.
+- Exact `llama_model` implementation-member ownership and destruction ordering for retained mappings/buffers.
 - Exact line-level source citations and generated source-link checking for the graph-construction chapter.
 - Runtime evidence separating parsing, mapping/prefetch, page faults, reads, aliases, uploads, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
 - Architecture-specific graph-builder, prefill/decode, KV/recurrent, and MoE extensions to the explorer.
@@ -48,46 +50,41 @@ Reconstruct llama.cpp from the source in two complementary directions:
 
 ## Immediate next task
 
-Continue file-by-file Pass A with the model/GGUF loader group:
+Continue file-by-file Pass A with runtime-context and memory implementations:
 
 ```text
-src/llama-model-loader.cpp
-src/llama-model-loader.h
-src/llama-model.cpp
-src/llama-model.h
-src/llama-mmap.cpp
-src/llama-mmap.h
-ggml/src/gguf.cpp
+src/llama-context.cpp
+src/llama-context.h
+src/llama-memory.cpp
+src/llama-memory.h
+src/llama-kv-cache.cpp
+src/llama-kv-cache.h
+recurrent and hybrid memory implementations
 ```
 
 Required deliverables:
 
-1. one bounded loader-file inventory page;
-2. construction order and caller/callee table;
-3. file descriptor, GGUF context, split-file, mmap, tensor-offset, buffer, and model ownership transitions;
-4. cancellation and partial-construction cleanup paths;
+1. one bounded runtime-context/memory inventory page;
+2. creation and mutation call chains;
+3. ownership of scheduler, outputs, KV/recurrent/hybrid memory, graph caches, thread pools, and backend resources;
+4. synchronization, reset, sequence-state, and teardown paths;
 5. explicit Verified, Interpretation, Historical, and Open question sections;
 6. README, project-state, research-log, and detailed-note updates;
 7. CI and Pages verification after publication.
 
 ## Latest publication verification
 
-- Public API inventory commit: `2624123764db654bc32734d67f3b05cf68b4e74e`.
-- Navigation commit: `3ac54a9861ca5ae9c91a65bb81779b9b5b560eb5`.
-- Detailed note commit: `421d8d4a9d140fe6c6bdab5b1b1f343741a05874`.
-- README living-TODO commit: `a20de8ec61f0426e7dd88a6715a2c6252a88ea31`.
-- Research-log commit checked for CI: `484b4cd02d44691483903e0c2c8d1afeb2317395`.
-- The combined-status endpoint returned an empty status list for `484b4cd02d44691483903e0c2c8d1afeb2317395`.
-- The commit-workflow endpoint returned `workflow_runs: []`; that endpoint is limited and does not reliably expose push-triggered runs.
-- Site-specific search returned no results for the Pages root or the new public-API page.
-- Direct opening of both URLs was rejected by the browser safe-URL gate because the exact URLs were not present in search results.
-- Local checkout validation is blocked because the execution environment cannot resolve `github.com`.
+- Loader inventory commit: `06ad84e7f226e0ea0e214361672d815c5f55bcaf`.
+- Navigation commit: `5a6d224283f715d2db5247843401470739a0ce8b`.
+- README TODO commit: `db9e344de0f1cf3722ef8e4dc937b434576c9afe`.
+- Local checkout validation remains blocked because the execution environment cannot resolve `github.com`.
+- CI and Pages status for the final state commit must be checked after the remaining context updates.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
 
 ## Known blockers and caveats
 
-- **CI blocker:** for commit `484b4cd02d44691483903e0c2c8d1afeb2317395`, combined status was empty and the commit-workflow endpoint returned no runs. Because that workflow endpoint does not reliably expose push-triggered Documentation CI, Pages, or hourly-context runs, status is unverified rather than failed.
-- **Pages blocker:** site-specific search returned no indexed result, and direct opening of the root and `architecture/public-api-minimal-example/` was blocked by the safe-URL gate. HTTP status and rendered content remain unverified.
+- **CI visibility blocker:** the connected commit-status/workflow surfaces have previously returned empty results for push-triggered Documentation CI, Pages, and hourly-context runs; absence of a result is treated as unverified, not failed.
+- **Pages verification blocker:** site-specific search and direct safe-URL access have previously failed to expose the Pages root; direct container checks are also blocked by DNS resolution.
 - **Local validation blocker:** the execution environment cannot resolve `github.com`, preventing a fresh checkout and full local `mkdocs build --strict`.
 - Static validation approximates Python-Markdown heading IDs; built-HTML validation is still required for plugin-generated or custom anchors.
 - The official GGUF specification can evolve beyond the pinned implementation.
@@ -100,6 +97,7 @@ Required deliverables:
 - A conceptual layer stack is not a universal execution order for every architecture/backend combination.
 - APIs named `async` do not prove host-visible overlap.
 - The minimal example is a control-flow skeleton; several early-return paths rely on process exit rather than deterministic cleanup.
+- Loader cancellation is an explicit `false` return and must not be confused with exception unwinding.
 
 ## Definition of done for the foundations deepening phase
 
