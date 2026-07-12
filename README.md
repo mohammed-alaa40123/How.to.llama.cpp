@@ -140,16 +140,16 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Link the interactive GGUF/graph tab to the canonical GGUF file-anatomy and model-tensor-placement pages through shared pinned metadata.
 - [ ] Create the GGML graph-construction chapter: op calls, output tensors as lazy nodes, source edges, graph expansion, insertion ordering, views, activations, allocation, reuse, and execution.
+- [ ] Link the interactive graph-construction and graph-expansion cards to the canonical GGML chapter after publication.
 - [ ] Build the memory-lifetime chapter and interactive overlay: GGUF bytes, mmap, page faults, page cache/RAM, model buffers, context state, KV/recurrent memory, activations, workspaces, scheduler copies, output buffers, and teardown.
 - [ ] Add runtime evidence separating metadata parse, mapping/prefetch, major/minor faults, direct reads, alias bytes, upload bytes, event waits, and first-token access.
 - [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
 - [ ] Expand the interactive foundations explorer with architecture-specific graph-builder sublayers, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
-- [ ] Add CI validation for canonical local links embedded in interactive JavaScript assets.
+- [ ] Add CI validation for canonical local links embedded in interactive JavaScript and HTML assets.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders the GGUF and model-placement chapters, canonical upstream diagram, and linked `llama_context` page.
+- [ ] Verify the public Pages site returns HTTP 200 and renders the GGUF and model-placement chapters, canonical upstream diagram, linked `llama_context` page, and the new explorer links.
 
 ### Future improvements
 
@@ -177,6 +177,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Link the interactive GGUF/graph tab to the canonical GGUF file-anatomy and model-tensor-placement pages with top-level navigation.
 - [x] Publish the canonical model tensor-placement and transfer chapter covering device assignment, per-tensor buffer selection, mappings, mmap alias/copy branches, direct reads, asynchronous and synchronous uploads, progress, cancellation, validation, mapping trimming, ownership, and truth labels.
 - [x] Publish the canonical GGUF file-anatomy foundation with official format structure, verified upstream figure attribution, typed metadata, tensor descriptors, split indexing, loader entry, mmap/page-fault distinctions, ownership, and truth labels.
 - [x] Link the interactive **llama_context runtime** layer and **Construct context** workflow step to the canonical `llama_context` page through shared pinned metadata.
