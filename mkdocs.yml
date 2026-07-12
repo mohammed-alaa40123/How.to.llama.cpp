@@ -69,6 +69,8 @@ nav:
   - Foundations:
       - Interactive system map: foundations/interactive-system-map.md
       - What GGML is: ggml/what-is-ggml.md
+  - Objects:
+      - llama_context: objects/llama-context.md
   - Architecture:
       - Repository map: architecture/repository-map.md
   - Inference lifecycle:
