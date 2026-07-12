@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 23:51 Africa/Cairo_
+_Last updated: 2026-07-13 00:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -34,45 +34,48 @@ Reconstruct llama.cpp from the source in two complementary directions:
 - Canonical GGUF file-anatomy and model tensor-placement/data-transfer chapters plus explorer links.
 - Canonical GGML graph-construction and MoE chapter plus graph, expansion, routing, and reuse explorer links.
 - Canonical memory-lifetime atlas covering storage, mappings, page faults/page cache/RSS, model buffers, KV/recurrent/hybrid state, graph allocations, scheduler copies, staging, outputs, synchronization, teardown, and runtime measurement requirements.
-- Interactive memory-lifetime overlay: all eight memory entries now expose owner, backing storage, validity/residency, synchronization, release/reclaim, and canonical atlas links.
+- Interactive memory-lifetime overlay: all eight memory entries expose owner, backing storage, validity/residency, synchronization, release/reclaim, and canonical atlas links.
+- Static interactive-link validator covering literal HTML `href` values, JavaScript `page` records, and the foundations explorer's generated memory-atlas anchors.
+- Fixture tests covering valid links, missing routes, missing anchors, dynamic/external link exclusion, and Markdown heading slug generation.
+- Documentation CI integration for project context, interactive links, unit tests, script compilation, shell syntax, required assets, and strict MkDocs build.
 - Expanded four-pass roadmap: file inventory, subsystem grouping, cross-file composition, and complete workflow reconstruction.
 
 ## In progress
 
-- Automated validation for local routes and section anchors embedded in interactive assets.
+- File-by-file Pass A for public API/examples, model/GGUF loader, and runtime context.
 - Exact line-level source citations and generated source-link checking for the graph-construction chapter.
 - Runtime evidence separating parsing, mapping/prefetch, page faults, reads, aliases, uploads, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
-- File-by-file Pass A for public API/examples, model/GGUF loader, and runtime context.
 - Architecture-specific graph-builder, prefill/decode, KV/recurrent, and MoE extensions to the explorer.
 - Exact Metal shared/private buffer-level branches.
 
 ## Immediate next task
 
-Add CI validation for canonical routes and section anchors embedded in interactive HTML and JavaScript assets:
+Begin file-by-file Pass A with the public API and minimal example group:
 
 ```text
-extract href values and generated page routes
-  -> distinguish external links from local MkDocs routes
-  -> verify referenced source files and documentation paths
-  -> validate section anchors against Markdown headings or built HTML
-  -> report the exact asset and broken route
-  -> run in docs-ci before mkdocs build --strict
+include/llama.h
+  -> examples/simple/simple.cpp
+  -> public initialization, model/context, batch, decode, output, sampler, and teardown calls
+  -> implementation entry points in src/llama.cpp, src/llama-model.cpp, and src/llama-context.cpp
+  -> ownership, error paths, synchronization, and backend assumptions
+  -> subsystem relationship diagram
 ```
 
 Required deliverables:
 
-1. a bounded validation script or extension to the existing context validator;
-2. coverage for the foundations explorer's object, GGUF, graph, MoE, and memory links;
-3. clear errors naming the asset, route, and anchor;
-4. workflow integration without weakening strict MkDocs validation;
-5. tests or fixture checks for valid and invalid links;
-6. Verified, Interpretation, Historical, and Open question sections in the detailed note.
+1. one bounded public-API/examples inventory page;
+2. a table of relevant files, symbols, callers, callees, owned/referenced objects, and teardown responsibilities;
+3. a pinned end-to-end relationship diagram from example code to implementation entry points;
+4. explicit Verified, Interpretation, Historical, and Open question sections;
+5. README, project-state, research-log, and detailed-note updates;
+6. CI and Pages verification after publication.
 
 ## Latest publication verification
 
-- Interactive memory overlay commit: `f848385b8e85e77fb3af2183140f6a92fab5c1ea`.
-- Detailed note commit: `5545b20801303e68c9cfa977ffb637c90f9fff67`.
-- README state commit: `63929c4f6be9c98c2eaf1d748eeb538029937a84`.
+- Interactive-link validator initial commit: `d388f49567da7feaf5df8c5874e8e3a986bd9ca0`.
+- Fixture-test commit: `421e24b773c43a03b773a7e5306d4b7eaa534fe0`.
+- Documentation CI integration commit: `c0f1084f50f20834d9b21c95b07b1b97c3ff0936`.
+- Dynamic-template handling fix: `880918c2169d0fb5efa30251c0c156357c44b457`.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
 - The available connector exposes commit status and a limited workflow endpoint, but may not expose push-triggered Actions runs; verification must be attempted and exact limitations retained below.
 
@@ -80,8 +83,9 @@ Required deliverables:
 
 - **CI blocker:** connector access does not currently provide a reliable repository-wide listing of push-triggered workflow runs, so Documentation CI, Pages deployment, and hourly context status may remain unverified.
 - **Pages blocker:** live verification depends on browser/DNS access; failure to fetch is a verification blocker, not evidence of deployment failure.
-- **Local validation blocker:** the execution container cannot resolve `github.com`, so no checkout is available for `mkdocs build --strict` or repository scripts.
-- Interactive routes and anchors are still hand-authored and are not automatically checked against built MkDocs output.
+- **Local validation blocker:** the execution container may be unable to resolve `github.com`, so a full checkout and `mkdocs build --strict` may remain unavailable outside Actions.
+- Static validation approximates Python-Markdown heading IDs; built-HTML validation is still required for plugin-generated or custom anchors.
+- The validator intentionally ignores dynamically constructed template `href` values and currently handles the foundations explorer's separate memory anchors through an explicit asset rule.
 - The official GGUF specification can evolve beyond the pinned implementation.
 - Mmap host-pointer wrapping is conditional; “zero-copy model loading” is not a model-wide property.
 - Mapping, allocation, residency, validity, ownership, and command completion are distinct states.
