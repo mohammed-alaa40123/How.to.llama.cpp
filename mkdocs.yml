@@ -67,6 +67,7 @@ nav:
   - Home: index.md
   - Roadmap: roadmap.md
   - Foundations:
+      - Interactive system map: foundations/interactive-system-map.md
       - What GGML is: ggml/what-is-ggml.md
   - Architecture:
       - Repository map: architecture/repository-map.md
@@ -82,6 +83,7 @@ nav:
       - CUDA asynchronous copies: lifecycle/cuda-async-copy.md
       - Metal backend semantics: lifecycle/metal-backend-semantics.md
   - Interactive:
+      - Foundations explorer: foundations/interactive-system-map.md
       - Inference workflow: interactive/inference-workflow.md
   - Reference:
       - Documentation quality roadmap: reference/documentation-quality-roadmap.md
