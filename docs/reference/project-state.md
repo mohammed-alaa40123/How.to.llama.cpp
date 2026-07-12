@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 21:08 Africa/Cairo_
+_Last updated: 2026-07-12 21:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -32,6 +32,7 @@ Return to the foundations and reconstruct llama.cpp from the source in two compl
 - Large interactive foundations explorer with system, code-path, memory, GGUF/graph, execution/synchronization, and file-map tabs.
 - Canonical `llama_context` object page and interactive links.
 - Canonical `llama_model` object page covering architecture dispatch, common versus architecture-specific loading, tensor/layer schemas, persistent storage ownership, device placement, graph-builder delegation, context sharing, memory factories, and teardown.
+- Interactive Model object layer now links to the canonical `llama_model` page with top-level navigation.
 - Canonical GGUF file-anatomy chapter covering format structure, split indexing, loader entry, mmap/page-fault distinctions, ownership, and truth labels.
 - Canonical model tensor-placement and data-transfer chapter covering device assignment, per-tensor buffer selection, mapping initialization, host-pointer aliasing, explicit reads, synchronous/asynchronous uploads, progress, cancellation, validation, trimming, and ownership.
 - Interactive GGUF/graph cards link directly to both canonical model-loading chapters with top-level navigation.
@@ -42,7 +43,6 @@ Return to the foundations and reconstruct llama.cpp from the source in two compl
 
 ## In progress
 
-- Linking the interactive Model object layer to the canonical `llama_model` page.
 - Adding exact line-level source citations and generated source-link checking to the graph-construction chapter.
 - Memory atlas and interactive runtime overlays for mmap/page faults, RAM/RSS, backend copies, KV/recurrent state, and workspaces.
 - Runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, and first-token access.
@@ -74,23 +74,20 @@ Required deliverables:
 3. KV versus recurrent and hybrid-memory branches;
 4. CPU/GPU/accelerator copy and staging lifetimes;
 5. prefill versus decode differences;
-6. Verified, Interpretation, Historical, and Open question sections;
-7. explorer link from the Model object layer to the new canonical `llama_model` page before or alongside the memory overlay.
+6. Verified, Interpretation, Historical, and Open question sections.
 
 ## Latest publication verification
 
-- `llama_model` page commit: `db4c2f1e5e04bfd5cd14752dae03e7e65ab737e9`.
-- Navigation commit: `662f8c39c137f98cd0ce1b74df82fe7aefea351c`.
-- The GitHub connector exposes commit/file fetch and combined status, but its commit-workflow endpoint does not reliably expose push-triggered runs.
+- Interactive Model object route commit: `14df510c970f62a23ffb1d327a55189afc25bbaf`.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
+- The GitHub connector exposes commit/file fetch and combined status, but its commit-workflow endpoint filters to pull-request-triggered runs and does not reliably expose push-triggered workflows.
 
 ## Known blockers and caveats
 
-- **CI blocker:** connector workflow-run access has repeatedly returned no push-triggered runs, so latest push workflow status may remain unverified without check-run or UI access.
-- **Pages blocker:** direct site verification depends on DNS/browser access; if the site lags the latest commit, rerun **Deploy documentation** from the Actions tab.
-- **Local validation blocker:** the execution container has previously failed DNS resolution for `github.com`, preventing a checkout and local `mkdocs build --strict`.
-- The Model object explorer card still needs a canonical-page route; direct safe editing of the minified single-line interactive asset is pending a reliable full-file fetch/update path.
-- Interactive local section anchors are currently hand-authored and not validated against the built MkDocs output.
+- **CI blocker:** connector workflow-run access may return no push-triggered runs, so the latest Documentation CI, Pages deployment, and hourly context status can remain unverified without check-run or UI access.
+- **Pages blocker:** direct site verification depends on DNS/browser access; the execution container currently cannot resolve `github.com`, and direct Pages verification may therefore remain unavailable.
+- **Local validation blocker:** the execution container failed DNS resolution for `github.com`, preventing a checkout and local `mkdocs build --strict`.
+- Interactive local section anchors and routes are hand-authored and are not yet validated automatically against built MkDocs output.
 - The official GGUF specification can evolve beyond the pinned llama.cpp implementation.
 - Mmap host-pointer wrapping is conditional; “zero-copy model loading” is not a model-wide property under partial offload or incompatible buffer types.
 - Prefetch requests do not prove permanent physical residency.
