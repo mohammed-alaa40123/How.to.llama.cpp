@@ -139,13 +139,14 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Highest priority
 
 - [ ] Deepen the GGUF foundations chapter: official format structure, canonical upstream figure with verified attribution, split files, metadata, tensor descriptors, alignment, data region, tensor naming, and loader call chain.
-- [ ] Link the interactive inference Context node to the canonical `llama_context` page and shared pinned source metadata.
 - [ ] Create the GGML graph-construction chapter: op calls, output tensors as lazy nodes, source edges, graph expansion, insertion ordering, views, activations, allocation, reuse, and execution.
 - [ ] Build the memory-lifetime chapter and interactive overlay: GGUF bytes, mmap, page faults, page cache/RAM, model buffers, context state, KV/recurrent memory, activations, workspaces, scheduler copies, output buffers, and teardown.
 - [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
 - [ ] Expand the interactive foundations explorer with architecture-specific graph-builder sublayers, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
+- [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
+- [ ] Add CI validation for canonical local links embedded in interactive JavaScript assets.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders the new `llama_context` page and interactive foundations page.
+- [ ] Verify the public Pages site returns HTTP 200 and renders the linked `llama_context` object page from both Context entry points.
 
 ### Future improvements
 
@@ -153,7 +154,6 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Create the next canonical object page for `llama_model`.
 - [ ] Add reusable page metadata for prerequisites, related objects, source symbols, and next pages.
 - [ ] Extend the source index with per-file, object, symbol, subsystem, and caller/callee landing pages.
-- [ ] Make interactive nodes load versioned JSON shared with object pages and source maps.
 - [ ] Add a dedicated mmap/page-fault visualizer with conceptual and runtime-evidence modes.
 - [ ] Add CPU-thread, backend-queue, KV-cache, MoE-routing, and scheduler-timeline visualizers.
 - [ ] Add automated checks for truth labels, source maps, navigation metadata, iframe assets, and accessible interaction labels.
@@ -172,6 +172,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Link the interactive **llama_context runtime** layer and **Construct context** workflow step to the canonical `llama_context` page through shared pinned metadata.
 - [x] Create and publish the canonical `llama_context` object page with creation, ownership, lifetime, memory, mutation, call chain, synchronization, teardown, source map, related objects, and truth labels.
 - [x] Add a large tabbed foundations explorer with hover summaries, clickable system layers, end-to-end code path, memory lifecycle, GGUF/graph explanation, synchronization timeline, and file-group map.
 - [x] Update the roadmap with a four-pass file-by-file analysis and subsystem-synthesis program.
