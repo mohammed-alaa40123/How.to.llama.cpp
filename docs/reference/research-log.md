@@ -171,6 +171,31 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Validate local routes and anchors against Markdown or built MkDocs HTML in CI.
 - Add runtime overlays for page faults, storage reads, RSS/PSS, device allocations, copy events, and queue waits.
 
+## 2026-07-13 00:52 — Interactive route and anchor validator
+
+**Verified**
+
+- Added `scripts/validate_interactive_links.py`, a dependency-free validator for local documentation links embedded in interactive HTML and JavaScript assets.
+- The validator resolves literal HTML `href` values relative to each asset, JavaScript `page` records relative to the MkDocs root, and the foundations explorer's separate memory-atlas `anchor` records.
+- Missing routes report the interactive asset, original reference, and expected Markdown candidates; missing anchors report the target Markdown file and section ID.
+- External URLs, non-document schemes, and dynamically constructed template links are excluded from static route validation.
+- Added fixture tests for valid routes/anchors, missing routes, missing anchors, heading slug generation, and ignored external/dynamic links.
+- Documentation CI now runs project-context validation, interactive-link validation, unit tests, Python compilation, shell syntax checks, required-asset checks, and strict MkDocs build.
+
+**Interpretation**
+
+- Source-level validation catches hand-authored explorer drift earlier than waiting for a broken deployed route, while strict MkDocs remains the final renderer-level check.
+
+**Historical**
+
+- Interactive routes and anchors were previously maintained by hand without an automated consistency check.
+
+**Open questions**
+
+- Validate built HTML IDs to cover MkDocs plugins, custom extensions, and renderer-specific slug behavior.
+- Replace the foundations explorer's asset-specific memory-anchor rule with generated route metadata.
+- Extend validation to non-HTML interactive assets and source-pinned upstream links.
+
 **Next step**
 
-- Add automated validation for interactive routes and anchors, then begin file-by-file Pass A.
+- Begin file-by-file Pass A with the public API and minimal example group.
