@@ -74,6 +74,7 @@ nav:
       - Brief end to end: lifecycle/end-to-end.md
       - Decode and graph reuse: lifecycle/decode-graph-reuse.md
       - Backend scheduler execution: lifecycle/backend-scheduler-execution.md
+      - CPU and CUDA backend semantics: lifecycle/cpu-cuda-backend-semantics.md
   - Interactive:
       - Inference workflow: interactive/inference-workflow.md
   - Reference:
