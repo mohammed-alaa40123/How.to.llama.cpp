@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 06:49 Africa/Cairo_
+_Last updated: 2026-07-12 07:52 Africa/Cairo_
 
 This file is the compact checkpoint for scheduled and manual research runs. Read it after the root README and update it whenever a meaningful increment is completed.
 
@@ -34,44 +34,45 @@ Trace a minimal application from backend loading and model creation through cont
 - Pinned branch-by-branch `ggml_backend_cuda_cpy_tensor_async()` trace covering eligibility checks, same-backend copies, same-device cross-backend copies, peer copies, source-stream events, destination waits, and every `false` fallback condition.
 - Pinned Metal backend trace covering graph command-buffer submission, dispatch-worker encoding, asynchronous blit set/get/copy operations, event signal/wait command buffers, explicit synchronization, and persistent error handling.
 - CUDA-versus-Metal capability table distinguishing stream/event and command-buffer/event semantics, discrete-memory and unified-memory caveats, and scheduler-visible completion boundaries.
+- Pinned generic tensor-copy fallback trace covering two-backend synchronization, host-source/host-destination branches, destination-buffer direct copies, and full-tensor heap staging.
+- CPU/mmap-to-CUDA, CUDA-host-to-CUDA, and CPU/mmap-to-Metal fallback paths with ownership, visibility, and synchronization-bubble analysis.
 
 ## In progress
 
 - GitHub Pages must be enabled in repository settings before deployment can run.
 - Latest CI and live-site status must be verified after this documentation increment.
 - Detailed `llama_context` construction and ownership map.
-- Generic scheduler fallback routing for rejected CPU/CUDA/Metal copy combinations.
+- Exact destination-buffer `cpy_tensor` compatibility across CPU, CUDA, Metal, Vulkan, SYCL, RPC, and Android backends.
 - Exact Metal event primitive and OS/device compatibility behavior below the context wrapper.
 
 ## Immediate next task
 
-Trace the generic scheduler fallback route for rejected asynchronous copies:
+Trace concrete blocking buffer-copy implementations and build a source/destination compatibility matrix:
 
 ```text
-backend async-copy callback returns false
-  -> source backend synchronization
-  -> destination backend synchronization
-  -> generic ggml_backend_tensor_copy()
-  -> source/destination buffer cpy_tensor capability
-  -> staged get/set fallback when direct copy is unavailable
-  -> completion and visibility guarantees
+generic ggml_backend_tensor_copy
+  -> source or destination is_host branch
+  -> destination buffer cpy_tensor
+  -> backend set_tensor / get_tensor
+  -> direct transfer, mapped access, or staged transfer
+  -> completion and memory ownership
 ```
 
 Deliverables for that task:
 
-1. exact generic fallback call chain;
-2. CPU/mmap to CUDA-device path;
-3. CUDA-host to CUDA-device path;
-4. CPU/mmap to Metal shared/private path;
-5. synchronization bubbles and ownership boundaries;
-6. capability/fallback table;
+1. CPU and mmap host-buffer semantics;
+2. CUDA device and CUDA host buffer `set/get/cpy_tensor` behavior;
+3. Metal shared/private buffer behavior;
+4. Vulkan, SYCL, RPC, and Android capability placeholders grounded in source;
+5. buffer-pair compatibility table;
+6. runtime-validation plan for page faults, transfer overlap, and temporary RSS;
 7. concise research-log entry.
 
 ## Known blockers and caveats
 
 - Pages deployment remains intentionally skipped until **Settings -> Pages -> Source: GitHub Actions** is enabled.
 - GitHub status APIs may not expose all check-run conclusions through the connected repository interface; workflow files retain durable checks, and unresolved verification remains a TODO.
-- The execution environment currently cannot resolve `github.com`, so local cloning and strict MkDocs validation cannot run here.
+- The execution environment may not support a local clone or strict MkDocs validation; connector-side publication checks and GitHub Actions remain the durable validation route.
 - Regex-based indexing cannot resolve virtual dispatch, macros, function pointers, generated code, or backend registration reliably.
 - Graph reuse compatibility is distributed across graph-input implementations; the base implementation rejects reuse unless a specialized check exists.
 - Scheduler APIs named `async` do not guarantee overlap: the pinned CPU backend blocks in `ggml_graph_compute`, while CUDA and Metal normally queue accelerator work.
@@ -80,9 +81,10 @@ Deliverables for that task:
 - The pinned CUDA async-copy callback accepts only CUDA backend objects with CUDA device buffers whose backend and buffer devices agree; CPU/mmap and CUDA host buffers return `false`.
 - Cross-device CUDA copies require peer-copy support; `GGML_CUDA_NO_PEER_COPY` forces the generic fallback.
 - A successful CUDA or Metal async-copy callback means the copy and dependencies were queued, not that bytes are host-visible.
-- Metal graph submission normally returns without waiting; capture/debug paths are exceptional blocking paths.
+- Rejected async copies synchronize both source and destination backends before blocking copy, potentially eliminating overlap on both sides.
+- If neither buffer is host-visible and the destination buffer rejects direct `cpy_tensor`, the generic fallback allocates a full-tensor host buffer, performs blocking get and set operations, then frees it.
+- CPU/mmap host-source paths avoid the generic heap allocation but may still incur mmap page faults and a blocking accelerator transfer.
 - Metal shared or unified memory does not imply command completion, safe reuse, or immediate host visibility.
-- Metal synchronization waits for `cmd_buf_last`, checks graph and extra command-buffer status, and leaves the backend in a persistent error state after command-buffer failure.
 - Copy tensors are scheduler-owned temporary execution storage, not persistent model-owned duplicates.
 - The pinned MoE partial-copy path optimizes transfer volume but is not a long-lived expert-cache policy.
 - Backend behavior varies by build configuration and device capabilities.
