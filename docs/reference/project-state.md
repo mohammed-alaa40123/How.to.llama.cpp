@@ -74,14 +74,20 @@ Required deliverables:
 
 - Public API inventory commit: `2624123764db654bc32734d67f3b05cf68b4e74e`.
 - Navigation commit: `3ac54a9861ca5ae9c91a65bb81779b9b5b560eb5`.
+- Detailed note commit: `421d8d4a9d140fe6c6bdab5b1b1f343741a05874`.
+- README living-TODO commit: `a20de8ec61f0426e7dd88a6715a2c6252a88ea31`.
+- Research-log commit checked for CI: `484b4cd02d44691483903e0c2c8d1afeb2317395`.
+- The combined-status endpoint returned an empty status list for `484b4cd02d44691483903e0c2c8d1afeb2317395`.
+- The commit-workflow endpoint returned `workflow_runs: []`; that endpoint is limited and does not reliably expose push-triggered runs.
+- Site-specific search returned no results for the Pages root or the new public-API page.
+- Direct opening of both URLs was rejected by the browser safe-URL gate because the exact URLs were not present in search results.
 - Local checkout validation is blocked because the execution environment cannot resolve `github.com`.
-- CI and Pages checks must be performed against the final durable state commit for this increment.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
 
 ## Known blockers and caveats
 
-- **CI blocker:** available combined-status and commit-workflow endpoints may return no records and do not reliably expose push-triggered Documentation CI, Pages deployment, or hourly-context runs. Empty results mean unverified status, not evidence of failure.
-- **Pages blocker:** direct verification can be blocked by DNS or browser safe-URL restrictions. Record the exact result after every increment.
+- **CI blocker:** for commit `484b4cd02d44691483903e0c2c8d1afeb2317395`, combined status was empty and the commit-workflow endpoint returned no runs. Because that workflow endpoint does not reliably expose push-triggered Documentation CI, Pages, or hourly-context runs, status is unverified rather than failed.
+- **Pages blocker:** site-specific search returned no indexed result, and direct opening of the root and `architecture/public-api-minimal-example/` was blocked by the safe-URL gate. HTTP status and rendered content remain unverified.
 - **Local validation blocker:** the execution environment cannot resolve `github.com`, preventing a fresh checkout and full local `mkdocs build --strict`.
 - Static validation approximates Python-Markdown heading IDs; built-HTML validation is still required for plugin-generated or custom anchors.
 - The official GGUF specification can evolve beyond the pinned implementation.
