@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 10:52 Africa/Cairo_
+_Last updated: 2026-07-12 11:49 Africa/Cairo_
 
 This file is the compact checkpoint for scheduled and manual research runs. Read it after the root README and update it whenever a meaningful increment is completed.
 
@@ -42,38 +42,37 @@ Trace a minimal application from backend loading and model creation through cont
 - Pinned Vulkan capability boundary covering non-host-visible default buffers, dedicated host-buffer support, async/events flags, queues, timeline-semaphore-backed host synchronization, and internal graph hazard tracking.
 - Complete pinned Vulkan transfer trace covering adaptive memory-property selection, mapped versus staging writes, UMA and staged reads, same-device and cross-device blocking copies, Vulkan host registration, conditional async set/get behavior, scheduler async-copy acceptance, and fence/deferred-copy completion.
 - Vulkan rows in the buffer compatibility matrix, including CPU/mmap, registered host, same-device device, cross-device device, and host-buffer destinations.
+- Pinned SYCL buffer and transfer trace covering device versus optional system-USM allocation, host-buffer ownership, blocking set/get, backend-specific mmap staging, Level Zero/SYCL/host-forward device copies, asynchronous set/get callbacks, synchronization, and the disabled scheduler `cpy_tensor_async` registration.
 
 ## In progress
 
 - GitHub Pages must be enabled in repository settings before deployment can run.
 - Latest CI and live-site status must be verified after this documentation increment.
 - Detailed `llama_context` construction and ownership map.
-- Exact SYCL, RPC, CANN, and Android-compiled-backend buffer compatibility.
+- Exact RPC, CANN, OpenCL, and Android-compiled-backend buffer compatibility.
 - Exact Metal shared/private buffer-level branches below the wrapper layer.
-- Runtime evidence for Vulkan memory-type selection and transfer behavior on Android integrated GPUs.
+- Runtime evidence for Vulkan and SYCL transfer behavior, page faults, temporary RSS, and overlap.
+- SYCL rows still need to be merged into the central compatibility matrix.
 
 ## Immediate next task
 
-Trace the pinned SYCL transfer and memory model:
+Extend `docs/lifecycle/buffer-compatibility.md` with exact SYCL rows and then trace the first newer upstream revision that re-enables or replaces scheduler-level SYCL tensor-copy asynchrony:
 
 ```text
-SYCL buffer type and allocation
-  -> device, shared, host, and USM ownership
-  -> set_tensor / get_tensor
-  -> blocking cpy_tensor acceptance
-  -> scheduler cpy_tensor_async acceptance
-  -> queue and event dependencies
-  -> return-time completion guarantee
+pinned SYCL source/destination matrix
+  -> CPU/mmap, host-buffer, same-device, peer-device, host-forward paths
+  -> generic scheduler fallback consequences
+  -> identify later callback-registration change
+  -> compare queue/event/dependency semantics
 ```
 
 Deliverables for that task:
 
-1. host/shared/device allocation and visibility table;
-2. exact blocking set/get branches;
-3. direct-copy and scheduler async-copy acceptance matrix;
-4. queue, event, and synchronization rules;
-5. SYCL rows in `docs/lifecycle/buffer-compatibility.md`;
-6. runtime instrumentation points for Intel and non-Intel SYCL implementations.
+1. exact SYCL rows in the shared compatibility table;
+2. explicit accounting for backend temporary mmap staging versus generic heap staging;
+3. same-device, peer-device, and host-forward completion table;
+4. pinned-versus-newer revision comparison for `cpy_tensor_async` registration;
+5. runtime instrumentation points for page faults, temporary RSS, and queue waits.
 
 ## Known blockers and caveats
 
@@ -99,6 +98,11 @@ Deliverables for that task:
 - Vulkan backend async set/get callbacks synchronize when they must use the backend's coherent sync-staging buffer for an unregistered host pointer.
 - Cross-device Vulkan blocking copies are host-mediated and complete synchronously; the scheduler async callback rejects them.
 - Vulkan internal graph hazard tracking and cross-backend scheduler ordering solve different synchronization problems.
+- Default and split SYCL buffers report `is_host == false`, including optional large system-USM allocations.
+- The pinned non-Windows SYCL `set_tensor` path makes a full temporary host copy before the queue copy as an mmap/PVC workaround.
+- SYCL blocking direct copies wait source and destination devices, then use Level Zero, SYCL peer access, or full host-forward staging.
+- SYCL backend async set/get callbacks enqueue without waiting, but scheduler `cpy_tensor_async` is explicitly `NULL` in the pinned backend interface.
+- Therefore SYCL graph-split tensor copies take the synchronized generic fallback even for same-device SYCL buffers.
 - Copy tensors are scheduler-owned temporary execution storage, not persistent model-owned duplicates.
 - The pinned MoE partial-copy path optimizes transfer volume but is not a long-lived expert-cache policy.
 - Backend behavior varies by build configuration, memory heaps, drivers, and device capabilities.
