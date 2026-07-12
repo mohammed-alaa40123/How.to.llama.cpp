@@ -71,6 +71,7 @@ nav:
       - GGUF file anatomy: foundations/gguf-file-anatomy.md
       - Model tensor placement: foundations/model-tensor-placement.md
       - What GGML is: ggml/what-is-ggml.md
+      - GGML graph construction and MoE: ggml/graph-construction-and-moe.md
   - Objects:
       - llama_context: objects/llama-context.md
   - Architecture:
