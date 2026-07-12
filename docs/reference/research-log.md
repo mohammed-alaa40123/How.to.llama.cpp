@@ -280,3 +280,40 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Link the interactive explorer's graph/MoE cards to the new canonical chapter and add line-level source metadata.
+
+## 2026-07-12 19:50 — Interactive graph construction and MoE integration
+
+**Verified**
+
+- The explorer's Graph construction card links to section 2 of the canonical graph chapter.
+- The Graph expansion card links to section 3.
+- A new MoE router and selected experts card links to section 5 and names `logits`, `selection_probs`, `selected_experts`, and `MUL_MAT_ID` explicitly.
+- The GGML computation graph system layer and Build or reuse graph workflow step link to the canonical chapter root.
+- All canonical routes use top-level navigation, preserving normal MkDocs navigation outside the iframe.
+
+**Interpretation**
+
+- Separating router logits, selection scores, chosen IDs, and final expert weights makes the cache-aware routing patch point precise.
+- Per-layer cache residency belongs to expert tensor storage and should use `(layer_id, expert_id)` keys rather than graph-node identity.
+
+**Historical**
+
+- This is the third canonical-documentation bridge in the foundations explorer.
+
+**Open questions**
+
+- Generate versioned route and anchor metadata instead of hard-coding it.
+- Add built-site CI validation for interactive links and anchors.
+- Add exact generated line-level source citations to the graph chapter.
+
+**Artifacts changed**
+
+- `docs/assets/interactive/llama-foundations-explorer.html`
+- `README.md`
+- `docs/reference/project-state.md`
+- `docs/reference/research-log.md`
+- `logs/research/2026-07-12/1950-interactive-graph-moe-links.md`
+
+**Next step**
+
+- Build the canonical `llama_model` object page and link the Model object explorer layer to it.
