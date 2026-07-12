@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 12:52 Africa/Cairo_
+_Last updated: 2026-07-12 13:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -29,6 +29,8 @@ Trace a minimal application from backend loading and model creation through cont
 - SYCL allocation, system-USM, host-buffer, blocking set/get, Level Zero/peer/host-forward copy, async set/get, and disabled scheduler callback semantics.
 - Shared buffer compatibility matrix now includes exact pinned SYCL rows and distinguishes generic emergency staging from SYCL mmap/PVC and host-forward staging.
 - Accessible static scheduler SVG replacing a deployed Mermaid renderer failure.
+- Published object-centred, searchable, and interactive documentation quality roadmap with a page contract, live-site review rubric, and bounded first implementation slices.
+- Added website-quality review to the durable scheduling plan and navigation.
 
 ## In progress
 
@@ -37,36 +39,41 @@ Trace a minimal application from backend loading and model creation through cont
 - RPC, CANN, OpenCL, and Android-compiled backend compatibility.
 - Runtime evidence for page faults, queue/fence waits, temporary RSS, and copy/compute overlap.
 - Historical comparison of later scheduler and backend changes.
+- Object and symbol navigation, source-linked interactive nodes, and memory visualizers.
 
 ## Immediate next task
 
-Identify the first later llama.cpp revision that registers or replaces SYCL scheduler tensor-copy asynchrony:
+Create the canonical `llama_context` object page using the new documentation quality contract:
 
 ```text
-pinned interface: cpy_tensor_async = NULL
-  -> search later commits and PRs
-  -> identify first semantic change
-  -> compare accepted source/destination pairs
-  -> compare queue/event dependency construction
-  -> compare host-return and safe-reuse boundaries
+public creation API and constructor path
+  -> owned and referenced subsystems
+  -> scheduler, memory, output, sampler-facing state
+  -> decode/prefill mutation points
+  -> thread and synchronization boundaries
+  -> teardown order
+  -> exact pinned source map
 ```
 
-Deliver one reviewable pinned-versus-later comparison with exact refs, truth labels, and implications for the shared compatibility matrix.
+Deliver one reviewable object page with prerequisites, five-minute explanation, ownership/lifetime table, call chain, memory and concurrency notes, related pages, truth labels, and open questions.
+
+The historical SYCL comparison remains high priority, but the available source index did not expose a reliable first later revision in this run; do not claim one without an exact commit or PR.
 
 ## Latest publication verification
 
-- Latest documentation commit checked: `93e1243a8181c42b0e441839be58b51d084bde48`.
+- Latest documentation commit checked: `b49b7f08cd59edd00c973f6cce52e085192259e9`.
 - Connected combined-status response contained no status entries.
 - Connected commit-workflow query returned an empty run list because that interface exposes only a limited subset of runs; it did not prove success or failure for push-triggered Documentation CI or Pages deployment.
-- The public site is known to be enabled at `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
-- Automated browser verification could not fetch the root page in this run: the fetcher returned a cache-miss error, and search had not indexed the site or newly changed page.
-- The execution container also could not resolve `github.com`, so local clone, strict MkDocs build, and direct `curl` verification were unavailable.
+- The public site is enabled at `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
+- Automated browser verification could not fetch the root page in this run: the fetcher returned a cache-miss error.
+- Search did not yet index the site or the newly added documentation-quality page.
 - These are verification-tooling blockers, not evidence that the site or CI failed. Recheck the Actions UI and public site on the next run.
 
 ## Known blockers and caveats
 
 - The connected commit-status interface may omit push-triggered workflow conclusions.
-- The execution container currently cannot resolve `github.com`; GitHub Actions remains the authoritative strict-build environment.
+- The connected workflow-run query is limited and returned no associated runs for the latest commit.
+- The browser fetcher currently returns a cache-miss error for the Pages root, and search indexing is unavailable for the site.
 - Regex indexing cannot resolve macros, virtual dispatch, function pointers, generated code, or backend registration reliably.
 - APIs named `async` do not prove host-visible overlap.
 - Rejected scheduler async copies synchronize both source and destination before blocking fallback.
