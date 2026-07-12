@@ -77,14 +77,18 @@ The next canonical object page remains `llama_model`.
 - Model-placement chapter commit: `b61658e995acee3e4608c429b5aa16c70899409c`.
 - Navigation update commit: `7d44f4db0780bf165d340721b65dbbe6aedc743f`.
 - README milestone commit: `047730e9dce75f0f6c788c1f9144d7f924ecc75b`.
-- CI and Pages verification for the final durable commit must be checked after context updates are complete.
+- Detailed-note commit checked for publication state: `3fe43f6f5cb8ae14132047357cb1679395fb7a10`.
+- The combined-status endpoint returned no status records for that commit.
+- The available commit-workflow endpoint returned no runs; it is documented to expose only pull-request-associated runs, so push-triggered Documentation CI, Pages, and hourly context checks remain unverified.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
+- Site-specific searches returned no indexed results for either the project title or the new model-placement page.
+- Direct opens of both the site root and new page were rejected by the browser safety layer because neither URL came from a prior search result.
 
 ## Known blockers and caveats
 
-- **CI visibility caveat:** the connected commit-workflow endpoint filters to pull-request-triggered runs and may not expose push-triggered Documentation CI or Pages runs; combined status can also be empty.
-- **Pages verification caveat:** prior runs could not verify the public site because direct browsing required an indexed result and the execution container could not resolve GitHub hosts.
-- **Local validation caveat:** a local checkout may remain unavailable if `github.com` DNS resolution still fails in the execution container.
+- **CI blocker:** the connector exposes no combined statuses and its workflow-run action filters to pull-request-triggered runs, so the latest push workflows cannot be confirmed or inspected for failures.
+- **Pages blocker:** search returned no indexed site result, and direct open is disallowed for URLs not returned by search; therefore HTTP status and rendered content cannot be verified in this environment.
+- **Local validation blocker:** prior runs could not obtain a checkout because the execution container failed DNS resolution for GitHub hosts; no new local checkout became available in this run.
 - The official GGUF specification can evolve beyond the pinned llama.cpp implementation.
 - Mmap host-pointer wrapping is conditional; “zero-copy model loading” is not a model-wide property under partial offload or incompatible buffer types.
 - Prefetch requests do not prove permanent physical residency.
