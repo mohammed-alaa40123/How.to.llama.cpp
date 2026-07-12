@@ -194,3 +194,49 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Build the canonical `llama_context` object page using the new page contract.
+
+## 2026-07-12 14:55 — Interactive foundations and file-by-file plan
+
+**Verified**
+
+- Added a large interactive foundations explorer with six tabs covering system layers, end-to-end code flow, memory lifecycle, GGUF/graph construction, execution/synchronization, and file groups.
+- System layers support hover summaries and click-to-open details for representative symbols, pinned source areas, ownership, and synchronization.
+- Added an explicit correction that mmap demand paging and OS reclaim are not equivalent to a universal application-level “load one layer, execute, free it” policy.
+- Published the explorer as the first Foundations page and made it the primary homepage entry point.
+- Expanded the roadmap with file-by-file inventory, subsystem grouping, cross-file composition, and complete-workflow reconstruction passes.
+- Updated the scheduling plan and TODO priorities around GGUF, `llama_context`, GGML graph construction, memory lifetimes, and file-by-file analysis.
+
+**Interpretation**
+
+- Foundations need multiple synchronized views because no single linear diagram can explain API control flow, object ownership, virtual memory, graph construction, and backend synchronization simultaneously.
+- File listings become useful only after they are synthesized into object, memory, and execution relationships.
+
+**Historical**
+
+- The earlier interactive workflow remains as a focused minimal decode path; the new explorer is a broader foundations map rather than a replacement for detailed lifecycle pages.
+
+**Open questions**
+
+- Identify the exact canonical GGUF image from an authoritative upstream path and verify attribution/license before adding it.
+- Replace curated JavaScript data with generated, versioned metadata shared across object pages, source index, and visualizers.
+- Add architecture-specific graph-builder, KV/recurrent, MoE, prefill/decode, and runtime-measurement layers.
+
+**Artifacts changed**
+
+- `docs/assets/interactive/llama-foundations-explorer.html`
+- `docs/foundations/interactive-system-map.md`
+- `docs/index.md`
+- `docs/roadmap.md`
+- `mkdocs.yml`
+- `README.md`
+- `docs/reference/project-state.md`
+- `docs/reference/research-log.md`
+- `logs/research/2026-07-12/1455-interactive-foundations.md`
+
+**Source ledger**
+
+- No new secondary source was added. The explorer reuses the pinned llama.cpp baseline and the already-ledgered official GGUF specification.
+
+**Next step**
+
+- Deepen the GGUF format and model-loader chapter, verify the canonical upstream figure, and link the GGUF tab to the detailed page.
