@@ -141,17 +141,16 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Link the foundations explorer graph-construction, graph-expansion, and MoE cards to the new canonical graph-construction chapter.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
-- [ ] Build a dedicated `llama_model` object page that explains tensor registration, layer arrays, architecture dispatch, and `build_graph()` ownership.
+- [ ] Build a dedicated `llama_model` object page that explains tensor registration, layer arrays, architecture dispatch, buffer ownership, `build_graph()` delegation, context sharing, and teardown.
 - [ ] Build the memory-lifetime chapter and interactive overlay: GGUF bytes, mmap, page faults, page cache/RAM, model buffers, context state, KV/recurrent memory, activations, workspaces, scheduler copies, output buffers, and teardown.
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, and first-token access.
 - [ ] Begin file-by-file Pass A with public API/examples, model/GGUF loader, and runtime context files; produce subsystem relationship diagrams after each group.
 - [ ] Expand the interactive foundations explorer with architecture-specific graph-builder sublayers, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
-- [ ] Add CI validation for canonical local links embedded in interactive JavaScript and HTML assets.
+- [ ] Add CI validation for canonical local links and section anchors embedded in interactive JavaScript and HTML assets.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders the new graph-construction chapter.
+- [ ] Verify the public Pages site returns HTTP 200 and renders the graph-construction links and MoE card.
 
 ### Future improvements
 
@@ -181,6 +180,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Link the foundations explorer graph-construction, graph-expansion, MoE routing, GGML graph layer, and graph-reuse workflow entries to the canonical graph-construction chapter.
+- [x] Add explicit explorer labels for router `logits`, `selection_probs`, `selected_experts`, and per-layer LRU key `(layer_id, expert_id)`.
 - [x] Publish the canonical GGML graph-construction, MoE routing, graph reuse, router-logit patching, and per-layer LRU cache-design chapter.
 - [x] Add graph-construction chapter to top-level navigation.
 - [x] Link the interactive GGUF/graph tab to the canonical GGUF file-anatomy and model-tensor-placement pages with top-level navigation.
