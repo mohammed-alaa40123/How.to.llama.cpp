@@ -46,11 +46,11 @@
   - `ggml_backend_sched_graph_compute_async()`
   - `ggml_backend_sched_synchronize()`
 
-## Validation plan
+## Validation
 
-- Project context validator
-- Python syntax compilation
-- shell syntax checking
-- strict MkDocs build
-- GitHub Actions workflow inspection
-- Pages HTTP/title check
+- Connector-side reads confirmed the new page, MkDocs navigation entry, project-state update, research-log entry, and README TODO update exist on `main`.
+- A local clone required to run `validate_project_context.py`, shell/Python syntax checks, and `mkdocs build --strict` could not start because the execution environment could not resolve `github.com`.
+- The connected commit-status endpoint returned no status records for the latest commit.
+- The commit-associated workflow endpoint returned no workflow runs; it is limited and did not establish whether push-triggered Actions completed.
+- Public search did not locate the configured Pages URL, and the environment could not directly verify its HTTP response.
+- These exact CI and Pages blockers remain at the top of the README TODO list and in project state.
