@@ -150,13 +150,15 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 - [ ] Enable **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 - [ ] Rerun **Deploy documentation** and confirm its build, deploy, and website-verification jobs succeed.
-- [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the latest documentation commits.
-- [ ] Confirm the live site returns HTTP 200 and contains `How.to.llama.cpp`.
-- [ ] Trace `ggml_backend_sched_graph_compute_async` through graph splitting, copies/events, backend split submission, and synchronization.
-- [ ] Document CPU-only versus multi-backend scheduler behavior and copy ownership.
+- [ ] Confirm **Documentation CI** and **Hourly research context check** succeed on the latest documentation commits; the connected commit-status and workflow-run endpoints currently return no check records.
+- [ ] Confirm the live site returns HTTP 200 and contains `How.to.llama.cpp`; the Pages endpoint is not publicly discoverable or verifiable yet.
+- [ ] Trace concrete CPU and one accelerator backend implementations behind graph compute, asynchronous copies, events, and synchronization.
+- [ ] Build a true-async versus fallback table for CPU, CUDA or Metal, and scheduler-level APIs.
 
 ### Future improvements
 
+- [ ] Add backend-specific runtime traces proving copy/compute overlap during prompt processing and token decode.
+- [ ] Trace later scheduler PRs that changed copy/event ordering and compare them with the pinned baseline.
 - [ ] Expand graph-reuse documentation with a table of every `llm_graph_input_*::can_reuse()` predicate.
 - [ ] Expand the interactive workflow to separate prefill, token decode, CPU-only, GPU offload, multi-backend, and MoE paths.
 - [ ] Add direct source and documentation links to every interactive node.
@@ -166,6 +168,8 @@ Every run maintains this list. Keep unfinished items in priority order and move 
 
 ### Completed setup
 
+- [x] Trace `ggml_backend_sched_graph_compute_async` through backend assignment, graph splitting, destination copies, copy-slot events, backend split submission, and synchronization.
+- [x] Document CPU-only versus multi-backend scheduler behavior, copy ownership, immediate user-input capture, fallback synchronization, and the pinned MoE partial-copy path.
 - [x] Trace `llama_decode → llama_context::decode → process_ubatch → graph_compute → ggml_backend_sched_graph_compute_async` at the pinned revision.
 - [x] Document graph-reuse compatibility, scheduler reservation versus allocation, thread selection, and the pipeline-parallel input synchronization boundary.
 - [x] Repair Pages handling so disabled Pages does not fail a valid MkDocs build.
