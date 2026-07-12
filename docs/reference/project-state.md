@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 22:50 Africa/Cairo_
+_Last updated: 2026-07-12 23:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -15,9 +15,9 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 **Foundations deepening — interactive system map plus file-by-file subsystem synthesis**
 
-Return to the foundations and reconstruct llama.cpp from the source in two complementary directions:
+Reconstruct llama.cpp from the source in two complementary directions:
 
-1. a large clickable system map that explains layers, code paths, memory, GGUF, graph construction, execution, synchronization, and MoE variants;
+1. a large clickable system map explaining layers, code paths, memory, GGUF, graph construction, execution, synchronization, and MoE variants;
 2. file-by-file analysis followed by subsystem grouping and end-to-end composition.
 
 ## Completed
@@ -30,68 +30,66 @@ Return to the foundations and reconstruct llama.cpp from the source in two compl
 - Accessible static scheduler SVG replacing a Mermaid renderer failure.
 - Object-centred, searchable, and interactive documentation quality roadmap.
 - Large interactive foundations explorer with system, code-path, memory, GGUF/graph, execution/synchronization, and file-map tabs.
-- Canonical `llama_context` object page and interactive links.
-- Canonical `llama_model` object page and interactive Model object route.
+- Canonical `llama_context` and `llama_model` object pages plus interactive routes.
 - Canonical GGUF file-anatomy and model tensor-placement/data-transfer chapters plus explorer links.
 - Canonical GGML graph-construction and MoE chapter plus graph, expansion, routing, and reuse explorer links.
-- Canonical memory-lifetime atlas covering GGUF storage, virtual mappings, page faults/page cache/RSS, persistent model buffers, KV/recurrent/hybrid context state, graph metadata and activations, scheduler copies, staging, outputs, prefill/decode differences, synchronization, teardown, and runtime measurement requirements.
-- Expanded implementation roadmap with four passes: file inventory, subsystem grouping, cross-file composition, and complete workflow reconstruction.
+- Canonical memory-lifetime atlas covering storage, mappings, page faults/page cache/RSS, model buffers, KV/recurrent/hybrid state, graph allocations, scheduler copies, staging, outputs, synchronization, teardown, and runtime measurement requirements.
+- Interactive memory-lifetime overlay: all eight memory entries now expose owner, backing storage, validity/residency, synchronization, release/reclaim, and canonical atlas links.
+- Expanded four-pass roadmap: file inventory, subsystem grouping, cross-file composition, and complete workflow reconstruction.
 
 ## In progress
 
-- Interactive memory overlay and canonical links from every memory-lifecycle card.
-- Adding exact line-level source citations and generated source-link checking to the graph-construction chapter.
-- Runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
+- Automated validation for local routes and section anchors embedded in interactive assets.
+- Exact line-level source citations and generated source-link checking for the graph-construction chapter.
+- Runtime evidence separating parsing, mapping/prefetch, page faults, reads, aliases, uploads, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
 - File-by-file Pass A for public API/examples, model/GGUF loader, and runtime context.
 - Architecture-specific graph-builder, prefill/decode, KV/recurrent, and MoE extensions to the explorer.
 - Exact Metal shared/private buffer-level branches.
 
 ## Immediate next task
 
-Connect the memory-lifecycle explorer cards to the canonical memory atlas and add a compact interactive ownership/lifetime overlay:
+Add CI validation for canonical routes and section anchors embedded in interactive HTML and JavaScript assets:
 
 ```text
-GGUF storage
-  -> mapping and page residency
-  -> model buffer ownership
-  -> context KV/recurrent ownership
-  -> graph activation lifetime
-  -> scheduler copy-ring and staging lifetime
-  -> output visibility
-  -> synchronization and teardown
+extract href values and generated page routes
+  -> distinguish external links from local MkDocs routes
+  -> verify referenced source files and documentation paths
+  -> validate section anchors against Markdown headings or built HTML
+  -> report the exact asset and broken route
+  -> run in docs-ci before mkdocs build --strict
 ```
 
 Required deliverables:
 
-1. canonical links from each existing memory card to the matching atlas section;
-2. owner, backing storage, validity/residency, synchronization, and release fields in the detail panel;
-3. explicit distinction between logical cache state, virtual mapping, OS residency, backend-copy validity, and command completion;
-4. preserved keyboard/hover accessibility and top-level navigation;
-5. Verified, Interpretation, Historical, and Open question sections in the detailed note.
+1. a bounded validation script or extension to the existing context validator;
+2. coverage for the foundations explorer's object, GGUF, graph, MoE, and memory links;
+3. clear errors naming the asset, route, and anchor;
+4. workflow integration without weakening strict MkDocs validation;
+5. tests or fixture checks for valid and invalid links;
+6. Verified, Interpretation, Historical, and Open question sections in the detailed note.
 
 ## Latest publication verification
 
-- Memory atlas creation commit: `5eafa682baf90e014ce6585faac9b816b5367f84`.
-- Navigation update commit: `4142b3c515a68c047c4b2454825b99822e25db92`.
-- README state update commit: `80d3618b7890682660e65d31635bd08e7fd8015c`.
+- Interactive memory overlay commit: `f848385b8e85e77fb3af2183140f6a92fab5c1ea`.
+- Detailed note commit: `5545b20801303e68c9cfa977ffb637c90f9fff67`.
+- README state commit: `63929c4f6be9c98c2eaf1d748eeb538029937a84`.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
-- The available connector exposes repository files but may not expose push-triggered workflow runs or Pages deployment checks; verification must be attempted and exact limitations retained below.
+- The available connector exposes commit status and a limited workflow endpoint, but may not expose push-triggered Actions runs; verification must be attempted and exact limitations retained below.
 
 ## Known blockers and caveats
 
-- **CI blocker:** available connector access does not currently expose a reliable push-triggered workflow-run/check-run listing, so Documentation CI, Pages deployment, and hourly context status may remain unverified.
-- **Pages blocker:** live site verification depends on browser/DNS access; failure to fetch must be recorded as a verification blocker rather than treated as deployment failure.
-- **Local validation blocker:** no local authenticated checkout is available in the execution container, and earlier runs failed DNS resolution for `github.com`; therefore `mkdocs build --strict` may remain unavailable.
-- Interactive local section anchors and routes are hand-authored and are not yet validated automatically against built MkDocs output.
-- The official GGUF specification can evolve beyond the pinned llama.cpp implementation.
-- Mmap host-pointer wrapping is conditional; “zero-copy model loading” is not a model-wide property under partial offload or incompatible buffer types.
-- Mapping, allocation, residency, validity, and command completion are distinct states.
+- **CI blocker:** connector access does not currently provide a reliable repository-wide listing of push-triggered workflow runs, so Documentation CI, Pages deployment, and hourly context status may remain unverified.
+- **Pages blocker:** live verification depends on browser/DNS access; failure to fetch is a verification blocker, not evidence of deployment failure.
+- **Local validation blocker:** the execution container cannot resolve `github.com`, so no checkout is available for `mkdocs build --strict` or repository scripts.
+- Interactive routes and anchors are still hand-authored and are not automatically checked against built MkDocs output.
+- The official GGUF specification can evolve beyond the pinned implementation.
+- Mmap host-pointer wrapping is conditional; “zero-copy model loading” is not a model-wide property.
+- Mapping, allocation, residency, validity, ownership, and command completion are distinct states.
 - Prefetch requests do not prove permanent physical residency.
-- CPU_Mapped addressability does not imply physical residency or fault-free access.
 - RSS is not a per-tensor residency oracle.
-- Accelerator unified/shared/system memory does not by itself imply GGML host visibility, command completion, or safe reuse.
+- Shared or unified memory does not itself prove host visibility, coherence, or command completion.
 - Regex indexing cannot resolve macros, virtual dispatch, function pointers, generated code, or backend registration reliably.
-- A conceptual layer stack is not a universal execution order for every model architecture or backend combination.
+- A conceptual layer stack is not a universal execution order for every architecture/backend combination.
 - APIs named `async` do not prove host-visible overlap.
 
 ## Definition of done for the foundations deepening phase
@@ -101,7 +99,7 @@ Required deliverables:
 - Deep GGUF and model-loading chapters.
 - Canonical `llama_context` and `llama_model` ownership/lifetime pages.
 - GGML tensor/op/graph-construction and execution chapter.
-- Memory ownership and synchronization atlas.
+- Memory ownership and synchronization atlas plus interactive overlay.
 - File-by-file source inventory grouped into subsystem explanations.
 - Prefill, decode, CPU-only, GPU-offload, multi-backend, KV/recurrent, and MoE variants.
 - Runtime evidence overlays where conceptual explanations are insufficient.
