@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 03:52 Africa/Cairo_
+_Last updated: 2026-07-12 04:51 Africa/Cairo_
 
 This file is the compact checkpoint for scheduled and manual research runs. Read it after the root README and update it whenever a meaningful increment is completed.
 
@@ -30,47 +30,53 @@ Trace a minimal application from backend loading and model creation through cont
 - Independent strict documentation CI, Pages enablement detection, deployment health checking, and interactive HTML asset.
 - Pinned `llama_decode -> llama_context::decode -> process_ubatch` trace, including memory-batch preparation, graph reuse/rebuild, reserve-versus-allocation, CPU thread selection, and scheduler submission.
 - Pinned scheduler trace covering backend assignment, split construction, destination-copy allocation, copy-slot events, fallback synchronization, MoE partial transfers, split submission, and output visibility.
+- Pinned CPU-versus-CUDA backend comparison covering threadpool completion, CUDA stream submission, event semantics, synchronous buffer operations, and the difference between internal parallelism and scheduler-level asynchrony.
 
 ## In progress
 
 - GitHub Pages must be enabled in repository settings before deployment can run.
 - Latest CI and live-site status must be verified after this documentation increment.
 - Detailed `llama_context` construction and ownership map.
-- Concrete CPU and accelerator implementations behind asynchronous graph compute, copies, events, and synchronization.
+- Exact branch-by-branch behavior of `ggml_backend_cuda_cpy_tensor_async()`.
+- Metal or Vulkan comparison against the CUDA stream/event model.
 
 ## Immediate next task
 
-Trace and compare the backend interfaces behind the scheduler at the pinned revision:
+Trace the pinned CUDA copy callback and compare one second accelerator backend:
 
 ```text
-ggml_backend_graph_compute_async
-  -> CPU backend graph execution / threadpool
-  -> one accelerator backend command submission
-cpy_tensor_async
-  -> supported peer/host transfer path or scheduler fallback
-event_wait / event_record
-  -> concrete backend ordering primitive
-ggml_backend_synchronize
-  -> completion and output visibility
+ggml_backend_cuda_cpy_tensor_async
+  -> accepted source/destination buffer combinations
+  -> device-to-device or peer transfer primitive
+  -> false return and scheduler fallback
+
+Metal or Vulkan
+  -> graph submission primitive
+  -> copy primitive
+  -> event/semaphore ordering
+  -> host synchronization boundary
 ```
 
 Deliverables for that task:
 
-1. exact CPU interface source locations and threadpool handoff;
-2. one accelerator backend comparison, preferably CUDA or Metal;
-3. true-async versus synchronous-fallback table;
-4. event and synchronization semantics;
-5. memory ownership and host/device visibility notes;
-6. sequence diagram and interactive-workflow update;
+1. exact CUDA copy branches and return conditions;
+2. one Metal or Vulkan backend source map;
+3. host, same-device, and peer-device transfer table;
+4. device-side versus host-side wait semantics;
+5. build-configuration caveats;
+6. update to the backend comparison page and interactive workflow;
 7. concise research-log entry.
 
 ## Known blockers and caveats
 
 - Pages deployment remains intentionally skipped until **Settings -> Pages -> Source: GitHub Actions** is enabled.
 - GitHub status APIs may not expose all check-run conclusions through the connected repository interface; workflow files retain durable checks, and unresolved verification remains a TODO.
+- The execution environment currently cannot resolve `github.com`, so local cloning and strict MkDocs validation cannot run here.
 - Regex-based indexing cannot resolve virtual dispatch, macros, function pointers, generated code, or backend registration reliably.
 - Graph reuse compatibility is distributed across graph-input implementations; the base implementation rejects reuse unless a specialized check exists.
-- Scheduler APIs named `async` do not guarantee overlap: concrete backends may queue work asynchronously or use synchronous fallback behavior.
+- Scheduler APIs named `async` do not guarantee overlap: the pinned CPU backend blocks in `ggml_graph_compute`, while CUDA normally queues work on a stream.
+- CPU threadpool parallelism is internal to a blocking graph call and is not scheduler-level asynchronous submission.
+- CUDA ordinary buffer operations may call asynchronous CUDA primitives and then immediately synchronize; the primitive name alone does not prove host-visible asynchrony.
 - Copy tensors are scheduler-owned temporary execution storage, not persistent model-owned duplicates.
 - The pinned MoE partial-copy path optimizes transfer volume but is not a long-lived expert-cache policy.
 - Backend behavior varies by build configuration and device capabilities.
