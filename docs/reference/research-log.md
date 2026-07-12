@@ -268,3 +268,48 @@
 **Next step**
 
 - Trace the pinned Metal backend and build a CUDA-versus-Metal capability comparison.
+
+## 2026-07-12 06:49 Africa/Cairo — Metal backend submission and synchronization
+
+**Scope**
+
+- Pinned Metal graph submission, command-buffer lifecycle, asynchronous blit copies, event ordering, synchronization, and CUDA comparison.
+
+**Verified findings**
+
+- `ggml_backend_metal_graph_compute()` delegates to `ggml_metal_graph_compute()`, whose ordinary path encodes graph regions into one or more `MTLCommandBuffer` objects and returns without waiting for GPU completion.
+- The first graph region is encoded by the calling thread while optional dispatch workers encode remaining regions; `cmd_buf_last` tracks the final queued command buffer needed by synchronization.
+- Capture/debug execution is exceptional and explicitly waits for completion.
+- Metal async set/get operations commit blit command buffers, retain them in `cmd_bufs_ext`, and defer host completion.
+- Metal-to-Metal async copy blits the tensor bytes, signals a source-context copy event, commits, and queues a destination-context event wait.
+- Event record and wait are themselves command-buffer operations and do not host-wait.
+- `ggml_metal_synchronize()` waits for `cmd_buf_last`, checks graph and extra command-buffer status, releases completed extra command buffers, and sets persistent `has_error` after failure.
+
+**Interpretation**
+
+- `cmd_buf_last` is a coarse host-completion fence, while Metal events provide finer queue dependencies.
+- Unified memory can reduce transfer cost but does not imply completion, safe reuse, or immediate host visibility.
+- Pinned Metal and CUDA expose similar scheduler-visible asynchronous behavior through command buffers/events and streams/events respectively.
+
+**Historical**
+
+- Findings apply to the pinned source baseline; newer Metal queue ownership, event implementation, graph optimization, and multi-device behavior may differ.
+
+**Open questions**
+
+- Exact Metal event primitive and fallback across supported Apple OS/GPU generations.
+- Cross-context or multi-device Metal copy legality and performance.
+- Measured command-buffer preparation/compute overlap in prefill and one-token decode.
+- Later PRs changing `cmd_buf_last`, copy-event ownership, synchronization, or error propagation.
+
+**Artifacts changed**
+
+- `docs/lifecycle/metal-backend-semantics.md`
+- `mkdocs.yml`
+- `docs/reference/project-state.md`
+- `README.md`
+- `logs/research/2026-07-12/0649-metal-backend-semantics.md`
+
+**Next step**
+
+- Trace the generic synchronized fallback after a backend asynchronous-copy callback returns `false`, including CPU/mmap, CUDA-host/device, and Metal shared/private combinations.
