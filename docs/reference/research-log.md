@@ -122,14 +122,31 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Replace curated JavaScript metadata with generated versioned records.
 - Build the memory-lifetime chapter and connect the memory cards to canonical sections.
 
-**Artifacts changed**
+## 2026-07-12 22:50 — Canonical memory-lifetime atlas
 
-- `docs/assets/interactive/llama-foundations-explorer.html`
-- `README.md`
-- `docs/reference/project-state.md`
-- `docs/reference/research-log.md`
-- `logs/research/2026-07-12/2151-interactive-model-link.md`
+**Verified**
+
+- Published `docs/foundations/memory-lifetimes.md` and added it to Foundations navigation.
+- The atlas separates GGUF storage, file descriptors, virtual mappings, OS page-cache pages, model tensor metadata, mapped aliases, explicit CPU/accelerator buffers, KV/recurrent/hybrid context memory, graph metadata, scheduler activations, copy-ring destinations, transfer staging, backend workspaces, outputs, thread pools, events, and queues.
+- Mapping, allocation, physical residency, data validity, command completion, and ownership are documented as distinct states.
+- The page covers CPU-only mapped execution, discrete accelerator offload, shared/unified memory caveats, prefill/decode differences, synchronization, teardown order, and a runtime measurement checklist.
+
+**Interpretation**
+
+- llama.cpp memory is best understood as overlapping ownership and synchronization lifetimes rather than one global cache.
+- Logical expert-cache admission should be measured separately from OS page residency and backend-copy validity.
+- RSS is a process-level residency signal, not a per-tensor cache truth table.
+
+**Historical**
+
+- Memory implementations, buffer types, graph reuse, transfer APIs, and backend synchronization evolve rapidly; the atlas remains pinned to the documented baseline and reviewed backend chapters.
+
+**Open questions**
+
+- Map every architecture to its concrete KV, recurrent, or hybrid `llama_memory_i` implementation.
+- Document backend destructor synchronization contracts.
+- Correlate file offsets, faults, graph tensors, copies, queue events, and device memory in runtime overlays.
 
 **Next step**
 
-- Build the canonical memory-lifetime chapter and interactive overlay.
+- Connect the explorer’s memory-lifecycle cards to canonical atlas sections and add a compact ownership/lifetime overlay.
