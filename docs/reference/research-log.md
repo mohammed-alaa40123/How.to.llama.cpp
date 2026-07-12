@@ -151,3 +151,48 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Trace concrete buffer-level `set_tensor`, `get_tensor`, and `cpy_tensor` implementations and build a backend buffer-pair compatibility matrix.
+
+## 2026-07-12 08:52 Africa/Cairo — CPU, mmap, CUDA, and Metal buffer compatibility
+
+**Scope**
+
+- Concrete buffer-level host visibility, ownership, set/get, direct blocking copy, staging, and completion semantics.
+
+**Verified**
+
+- CPU and CPU_Mapped set/get operations are direct `memcpy()` calls.
+- CPU_Mapped wraps an external aligned pointer and does not free it.
+- CPU and CPU_Mapped report host visibility; CPU destination direct copy accepts host-visible sources.
+- CUDA device buffers do not report host visibility.
+- CUDA device set/get issue H2D/D2H copies and synchronize before returning.
+- CUDA blocking direct copy accepts CUDA device sources, uses same-device or peer transfer, and synchronizes before return.
+- Generic host-visible branches avoid full-tensor heap staging.
+- Metal command-buffer/event ordering remains required independently of shared/private storage mode.
+
+**Interpretation**
+
+- `CPU_Mapped` is an addressability property, not a physical-residency guarantee.
+- CPU_Mapped-to-accelerator transfer time can include mmap page faults and storage reads.
+- Avoiding generic heap staging does not imply zero-copy or asynchronous overlap.
+
+**Historical**
+
+- Newer backends may add staging pools, registered-host paths, unified-memory specializations, or broader direct-copy support.
+
+**Open questions**
+
+- Exact Metal shared/private buffer-level branch table.
+- Concrete Vulkan, SYCL, RPC, CANN, and Android-compiled-backend matrices.
+- Runtime evidence for page faults, synchronization stalls, overlap, and temporary RSS.
+
+**Artifacts changed**
+
+- `docs/lifecycle/buffer-compatibility.md`
+- `mkdocs.yml`
+- `docs/reference/project-state.md`
+- `README.md`
+- `logs/research/2026-07-12/0852-buffer-compatibility.md`
+
+**Next step**
+
+- Trace Vulkan and SYCL buffer interfaces and extend the compatibility matrix.
