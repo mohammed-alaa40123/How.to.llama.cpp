@@ -78,6 +78,7 @@ nav:
       - llama_context: objects/llama-context.md
   - Architecture:
       - Repository map: architecture/repository-map.md
+      - Public API and minimal example: architecture/public-api-minimal-example.md
   - Inference lifecycle:
       - Brief end to end: lifecycle/end-to-end.md
       - Decode and graph reuse: lifecycle/decode-graph-reuse.md
