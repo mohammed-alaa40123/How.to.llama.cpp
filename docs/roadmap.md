@@ -161,6 +161,74 @@ Connect those pages to a clickable source explorer, synchronized diagrams, memor
 
 The complete quality contract, review rubric, and first implementation slices live in [Documentation quality and interaction roadmap](reference/documentation-quality-roadmap.md).
 
+## Milestone 11 — File-by-file analysis and subsystem synthesis
+
+Analyze the pinned repository file by file, then group files into subsystems and explain how their interfaces compose into end-to-end behavior.
+
+### Pass A — File inventory
+
+For every relevant source file, record:
+
+1. purpose and directory role;
+2. major structs, classes, functions, and callbacks;
+3. public and internal entry points;
+4. direct includes and important dependencies;
+5. objects created, owned, referenced, mutated, and destroyed;
+6. allocations, mappings, copies, and reclaim paths;
+7. threads, queues, events, locks, barriers, and synchronization;
+8. build flags and backend-specific branches;
+9. callers/callees recoverable from source and tests;
+10. unresolved dispatch through macros, function pointers, virtual methods, registration, or generated code.
+
+### Pass B — Group files into subsystem bundles
+
+Initial bundles:
+
+- **Public API and applications:** `include/llama.h`, examples, CLI/server entry points.
+- **Model and GGUF loading:** model loader, mmap/file helpers, architecture metadata, tensor naming, vocabulary.
+- **Runtime context:** `llama_context`, batching, outputs, graph inputs, decode/prefill control.
+- **Memory modules:** KV, recurrent, hybrid memory, sequence state, movement, update, and teardown.
+- **GGML core:** tensor metadata, operations, graph expansion, planning, allocation, quantized types.
+- **Scheduler and backend interface:** registration, buffer types, split construction, copy-ring storage, events, generic fallback.
+- **CPU execution:** thread pools, barriers, graph planning, kernels, scratch/workspace.
+- **Accelerator execution:** CUDA, Metal, Vulkan, SYCL, OpenCL, CANN, RPC, and platform-specific backends.
+- **Model architectures:** transformer, MoE, recurrent, multimodal, speculative, and architecture-specific builders.
+- **Tools and evidence:** converters, GGUF tools, tests, benchmarks, profiling, and CI.
+
+### Pass C — Explain cross-file composition
+
+For each subsystem bundle, produce:
+
+- a five-minute explanation;
+- a file relationship diagram;
+- public entry → internal call chain;
+- object ownership and lifetime map;
+- memory and synchronization timeline;
+- error/fallback paths;
+- tests and runtime evidence;
+- links into the interactive system map;
+- exact boundaries where control crosses into another subsystem.
+
+### Pass D — Reconstruct complete workflows
+
+Use the subsystem bundles to build source-pinned workflows for:
+
+- startup and backend discovery;
+- GGUF open, metadata parse, tensor creation, mmap/read/upload;
+- `llama_context` construction;
+- prompt tokenization and prefill;
+- one-token decode;
+- graph build versus graph reuse;
+- operation insertion into `ggml_cgraph`;
+- scheduler assignment, split copies, compute, events, and synchronization;
+- KV/recurrent memory update;
+- logits, sampling, next-token loop;
+- teardown and memory reclaim.
+
+### Required quality bar
+
+A file is not considered documented merely because its functions are listed. The final explanation must show how it participates in object lifetime, memory ownership, graph construction, execution, and synchronization with neighboring files.
+
 ## Ongoing research tracks
 
 - Official docs, source comments, tests, examples, and benchmarks.
