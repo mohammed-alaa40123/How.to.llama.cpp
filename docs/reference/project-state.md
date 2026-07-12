@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 08:52 Africa/Cairo_
+_Last updated: 2026-07-12 09:11 Africa/Cairo_
 
 This file is the compact checkpoint for scheduled and manual research runs. Read it after the root README and update it whenever a meaningful increment is completed.
 
@@ -30,6 +30,7 @@ Trace a minimal application from backend loading and model creation through cont
 - Independent strict documentation CI, Pages enablement detection, deployment health checking, and interactive HTML asset.
 - Pinned `llama_decode -> llama_context::decode -> process_ubatch` trace, including memory-batch preparation, graph reuse/rebuild, reserve-versus-allocation, CPU thread selection, and scheduler submission.
 - Pinned scheduler trace covering backend assignment, split construction, destination-copy allocation, copy-slot events, fallback synchronization, MoE partial transfers, split submission, and output visibility.
+- Static accessible SVG replacement for the backend-scheduler Mermaid sequence that failed under the deployed Mermaid 11 renderer.
 - Pinned CPU-versus-CUDA backend comparison covering threadpool completion, CUDA stream submission, event semantics, synchronous buffer operations, and the difference between internal parallelism and scheduler-level asynchrony.
 - Pinned branch-by-branch `ggml_backend_cuda_cpy_tensor_async()` trace covering eligibility checks, same-backend copies, same-device cross-backend copies, peer copies, source-stream events, destination waits, and every `false` fallback condition.
 - Pinned Metal backend trace covering graph command-buffer submission, dispatch-worker encoding, asynchronous blit set/get/copy operations, event signal/wait command buffers, explicit synchronization, and persistent error handling.
