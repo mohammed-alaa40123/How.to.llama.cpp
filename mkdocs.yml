@@ -68,6 +68,7 @@ nav:
   - Roadmap: roadmap.md
   - Foundations:
       - Interactive system map: foundations/interactive-system-map.md
+      - GGUF file anatomy: foundations/gguf-file-anatomy.md
       - What GGML is: ggml/what-is-ggml.md
   - Objects:
       - llama_context: objects/llama-context.md
