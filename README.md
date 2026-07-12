@@ -57,6 +57,7 @@ Start a local run with:
 | Schedule | Workflow | Responsibility |
 |---|---|---|
 | Every hour | Research automation | Complete one increment and update durable context, CI status, and website status |
+| Daily | Website quality review | Review navigation, discoverability, source traceability, accessibility, cross-links, and interaction opportunities |
 | Hourly at minute 23 UTC | `.github/workflows/hourly-context-check.yml` | Validate context and scripts |
 | Daily at 02:17 UTC | `.github/workflows/refresh-source-index.yml` | Refresh upstream source inventory through a PR |
 | Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, scripts, assets, and `mkdocs build --strict` |
@@ -117,6 +118,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `logs/research/` | Detailed per-run notes |
 | `docs/reference/research-ledger.md` | External-source assessment |
 | `docs/roadmap.md` | Full implementation and research plan |
+| `docs/reference/documentation-quality-roadmap.md` | Object-centred, searchable, and interactive documentation plan |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
 | `data/generated/` | Generated source inventories |
@@ -132,14 +134,20 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Highest priority
 
 - [ ] Identify the first later upstream revision that registers or replaces SYCL scheduler `cpy_tensor_async`; compare accepted pairs, dependency ordering, and completion semantics with the pinned baseline.
+- [ ] Create the canonical `llama_context` object page using the documentation quality contract: creation, ownership, lifetime, memory, callers/callees, synchronization, source map, related pages, and open questions.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment; record any connector visibility gap precisely.
-- [ ] Verify the public Pages site returns HTTP 200 and contains the expected `How.to.llama.cpp` title and newly updated buffer-compatibility content.
+- [ ] Verify the public Pages site returns HTTP 200 and contains the expected `How.to.llama.cpp` title and documentation-quality roadmap.
 - [ ] Trace exact Metal shared/private buffer-level set/get/copy branches.
 - [ ] Add runtime instrumentation separating generic heap staging, backend temporary staging, and host-forward staging.
 - [ ] Measure mmap page faults, queue/fence waits, temporary RSS, and copy/compute overlap for representative prefill and decode runs.
 
 ### Future improvements
 
+- [ ] Add reusable page metadata for prerequisites, related objects, source symbols, and next pages.
+- [ ] Extend the source index with object and symbol landing pages.
+- [ ] Link existing interactive inference nodes to exact source and object pages.
+- [ ] Add an mmap/page-fault visualizer with conceptual and runtime-evidence modes.
+- [ ] Add automated checks for truth labels, source maps, and navigation metadata on mature pages.
 - [ ] Compare Level Zero, OpenCL, and non-Intel SYCL runtime behavior.
 - [ ] Validate Vulkan behavior on Android integrated GPUs by vendor.
 - [ ] Extend the compatibility matrix to RPC, CANN, OpenCL, and Android-specific backends.
@@ -147,14 +155,14 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Trace later scheduler PRs that changed copy/event ordering.
 - [ ] Determine whether newer revisions pool generic or backend staging allocations.
 - [ ] Expand graph-reuse documentation with every specialized `can_reuse()` predicate.
-- [ ] Build detailed `llama_context` construction and ownership documentation.
 - [ ] Expand the interactive workflow into separate prefill, decode, CPU-only, GPU-offload, multi-backend, and MoE traces.
-- [ ] Add direct source links and related-document links to every interactive node.
 - [ ] Add a searchable index for detailed research logs.
 - [ ] Add commit-pinned link checking and backend profiler evidence.
 
 ### Completed
 
+- [x] Add and publish the object-centred, searchable, interactive documentation quality roadmap and website review rubric.
+- [x] Add website-quality review to the scheduling plan.
 - [x] Enable GitHub Pages with **Build and deployment → Source: GitHub Actions**.
 - [x] Publish the public documentation site.
 - [x] Add exact pinned SYCL source/destination rows to the central buffer compatibility matrix.
