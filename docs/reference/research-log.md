@@ -165,3 +165,45 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Complete the backend-placement and data-transfer half of model loading, then connect the GGUF explorer tab to the canonical page.
+
+## 2026-07-12 17:50 — Model tensor placement and data transfer
+
+**Verified**
+
+- Published `docs/foundations/model-tensor-placement.md` and added it to Foundations navigation.
+- `load_tensors()` assigns the input layer to CPU and repeating/output layers using `n_gpu_layers` plus normalized device split points.
+- Candidate buffer types are ordered per CPU or accelerator device, but the final selection is per tensor after operation/backend compatibility checks.
+- Destination tensor metadata is grouped into one GGML context per selected buffer type.
+- `init_mappings(true, ...)` creates one mmap per source split, initializes used-range tracking, and computes total tensor bytes for progress.
+- Mmap loading can either wrap mapped bytes through `buffer_from_host_ptr` or copy/upload from the mapping into independently allocated storage.
+- Non-mmap accelerator loading can use four pinned host staging buffers with events and asynchronous tensor sets; unsupported cases use a whole-tensor host staging vector and synchronous set.
+- Upload events are synchronized before staging resources are freed; retained mappings are moved into model ownership.
+
+**Interpretation**
+
+- The loader acts like a placement compiler: architecture declarations, device assignment, operation compatibility, and backend capabilities become concrete tensor storage choices.
+- “Zero-copy loading” applies only to the mapped host-pointer alias branch and is not a model-wide property under partial offload.
+- Prefetch can move I/O earlier but does not guarantee permanent physical page residency.
+
+**Historical**
+
+- Buffer capabilities, host-pointer wrapping, and asynchronous upload paths may differ in later revisions and backends.
+
+**Open questions**
+
+- Measure branch entry and bytes aliased/read/uploaded for CPU, Metal, CUDA, Vulkan, and SYCL configurations.
+- Trace direct-I/O alignment and fallback behavior at runtime.
+- Link the interactive GGUF/graph tab to both model-loading chapters.
+
+**Artifacts changed**
+
+- `docs/foundations/model-tensor-placement.md`
+- `mkdocs.yml`
+- `README.md`
+- `docs/reference/project-state.md`
+- `docs/reference/research-log.md`
+- `logs/research/2026-07-12/1750-model-tensor-placement.md`
+
+**Next step**
+
+- Build the GGML graph-construction chapter and connect the GGUF/graph explorer tab to the canonical model-loading pages.
