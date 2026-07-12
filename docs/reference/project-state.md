@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-12 05:50 Africa/Cairo_
+_Last updated: 2026-07-12 06:49 Africa/Cairo_
 
 This file is the compact checkpoint for scheduled and manual research runs. Read it after the root README and update it whenever a meaningful increment is completed.
 
@@ -32,40 +32,39 @@ Trace a minimal application from backend loading and model creation through cont
 - Pinned scheduler trace covering backend assignment, split construction, destination-copy allocation, copy-slot events, fallback synchronization, MoE partial transfers, split submission, and output visibility.
 - Pinned CPU-versus-CUDA backend comparison covering threadpool completion, CUDA stream submission, event semantics, synchronous buffer operations, and the difference between internal parallelism and scheduler-level asynchrony.
 - Pinned branch-by-branch `ggml_backend_cuda_cpy_tensor_async()` trace covering eligibility checks, same-backend copies, same-device cross-backend copies, peer copies, source-stream events, destination waits, and every `false` fallback condition.
+- Pinned Metal backend trace covering graph command-buffer submission, dispatch-worker encoding, asynchronous blit set/get/copy operations, event signal/wait command buffers, explicit synchronization, and persistent error handling.
+- CUDA-versus-Metal capability table distinguishing stream/event and command-buffer/event semantics, discrete-memory and unified-memory caveats, and scheduler-visible completion boundaries.
 
 ## In progress
 
 - GitHub Pages must be enabled in repository settings before deployment can run.
 - Latest CI and live-site status must be verified after this documentation increment.
 - Detailed `llama_context` construction and ownership map.
-- Metal comparison against the CUDA stream/event and copy model.
-- Generic scheduler fallback routing for rejected CPU/CUDA copy combinations.
+- Generic scheduler fallback routing for rejected CPU/CUDA/Metal copy combinations.
+- Exact Metal event primitive and OS/device compatibility behavior below the context wrapper.
 
 ## Immediate next task
 
-Trace the pinned Metal backend and compare it with CUDA:
+Trace the generic scheduler fallback route for rejected asynchronous copies:
 
 ```text
-Metal backend
-  -> graph submission and command-buffer lifecycle
-  -> shared/private buffer copy paths
-  -> event or shared-event ordering
-  -> host completion boundary
-
-CUDA comparison
-  -> source stream and destination wait
-  -> discrete versus unified-memory implications
-  -> scheduler-visible asynchronous capability
+backend async-copy callback returns false
+  -> source backend synchronization
+  -> destination backend synchronization
+  -> generic ggml_backend_tensor_copy()
+  -> source/destination buffer cpy_tensor capability
+  -> staged get/set fallback when direct copy is unavailable
+  -> completion and visibility guarantees
 ```
 
 Deliverables for that task:
 
-1. exact Metal graph and copy callbacks;
-2. command-buffer ownership and commit/wait points;
-3. event/shared-event support and fallback behavior;
-4. CUDA-versus-Metal capability table;
-5. unified-memory caveats without assuming coherence equals completion;
-6. update to the backend comparison page and interactive workflow;
+1. exact generic fallback call chain;
+2. CPU/mmap to CUDA-device path;
+3. CUDA-host to CUDA-device path;
+4. CPU/mmap to Metal shared/private path;
+5. synchronization bubbles and ownership boundaries;
+6. capability/fallback table;
 7. concise research-log entry.
 
 ## Known blockers and caveats
@@ -75,12 +74,15 @@ Deliverables for that task:
 - The execution environment currently cannot resolve `github.com`, so local cloning and strict MkDocs validation cannot run here.
 - Regex-based indexing cannot resolve virtual dispatch, macros, function pointers, generated code, or backend registration reliably.
 - Graph reuse compatibility is distributed across graph-input implementations; the base implementation rejects reuse unless a specialized check exists.
-- Scheduler APIs named `async` do not guarantee overlap: the pinned CPU backend blocks in `ggml_graph_compute`, while CUDA normally queues work on a stream.
+- Scheduler APIs named `async` do not guarantee overlap: the pinned CPU backend blocks in `ggml_graph_compute`, while CUDA and Metal normally queue accelerator work.
 - CPU threadpool parallelism is internal to a blocking graph call and is not scheduler-level asynchronous submission.
 - CUDA ordinary buffer operations may call asynchronous CUDA primitives and then immediately synchronize; the primitive name alone does not prove host-visible asynchrony.
 - The pinned CUDA async-copy callback accepts only CUDA backend objects with CUDA device buffers whose backend and buffer devices agree; CPU/mmap and CUDA host buffers return `false`.
 - Cross-device CUDA copies require peer-copy support; `GGML_CUDA_NO_PEER_COPY` forces the generic fallback.
-- A successful CUDA async-copy callback means the copy and dependencies were queued, not that bytes are host-visible.
+- A successful CUDA or Metal async-copy callback means the copy and dependencies were queued, not that bytes are host-visible.
+- Metal graph submission normally returns without waiting; capture/debug paths are exceptional blocking paths.
+- Metal shared or unified memory does not imply command completion, safe reuse, or immediate host visibility.
+- Metal synchronization waits for `cmd_buf_last`, checks graph and extra command-buffer status, and leaves the backend in a persistent error state after command-buffer failure.
 - Copy tensors are scheduler-owned temporary execution storage, not persistent model-owned duplicates.
 - The pinned MoE partial-copy path optimizes transfer volume but is not a long-lived expert-cache policy.
 - Backend behavior varies by build configuration and device capabilities.
