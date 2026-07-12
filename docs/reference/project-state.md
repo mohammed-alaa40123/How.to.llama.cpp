@@ -53,11 +53,20 @@ pinned interface: cpy_tensor_async = NULL
 
 Deliver one reviewable pinned-versus-later comparison with exact refs, truth labels, and implications for the shared compatibility matrix.
 
+## Latest publication verification
+
+- Latest documentation commit checked: `93e1243a8181c42b0e441839be58b51d084bde48`.
+- Connected combined-status response contained no status entries.
+- Connected commit-workflow query returned an empty run list because that interface exposes only a limited subset of runs; it did not prove success or failure for push-triggered Documentation CI or Pages deployment.
+- The public site is known to be enabled at `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
+- Automated browser verification could not fetch the root page in this run: the fetcher returned a cache-miss error, and search had not indexed the site or newly changed page.
+- The execution container also could not resolve `github.com`, so local clone, strict MkDocs build, and direct `curl` verification were unavailable.
+- These are verification-tooling blockers, not evidence that the site or CI failed. Recheck the Actions UI and public site on the next run.
+
 ## Known blockers and caveats
 
-- The public Pages site is enabled and available at `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`; each run must verify HTTP response and expected title/content.
-- The connected commit-status interface may omit push-triggered workflow conclusions. Use available workflow data and public deployment checks, and record any unresolved CI visibility precisely.
-- The execution container currently cannot resolve `github.com`, so local clone and `mkdocs build --strict` are unavailable there; GitHub Actions is the authoritative strict-build environment.
+- The connected commit-status interface may omit push-triggered workflow conclusions.
+- The execution container currently cannot resolve `github.com`; GitHub Actions remains the authoritative strict-build environment.
 - Regex indexing cannot resolve macros, virtual dispatch, function pointers, generated code, or backend registration reliably.
 - APIs named `async` do not prove host-visible overlap.
 - Rejected scheduler async copies synchronize both source and destination before blocking fallback.
