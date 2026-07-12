@@ -161,3 +161,36 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Identify and compare the first later upstream SYCL scheduler-copy implementation.
+
+## 2026-07-12 13:52 — Documentation quality and interaction roadmap
+
+**Verified**
+
+- Added a canonical roadmap for object-centred documentation, a clickable symbol/source explorer, synchronized diagrams, memory and execution visualizers, page navigation contracts, and pinned-version/backend comparisons.
+- Added a ten-part object-page contract covering purpose, creation, ownership, mutation, destruction, lifetime, memory, callers/callees, synchronization, and source evidence.
+- Added a website review rubric covering discoverability, source traceability, ownership clarity, memory and synchronization clarity, diagrams, accessibility, cross-links, version clarity, open questions, and next-step guidance.
+- Added bounded first implementation slices, beginning with a canonical `llama_context` object page.
+- Published the roadmap in MkDocs navigation and linked it from the main implementation roadmap and README context map.
+- Added daily website-quality review responsibility to the durable scheduling plan.
+
+**Interpretation**
+
+- Object-centred entry points address a major discoverability gap left by file- and chapter-centred documentation.
+- Stable metadata shared by diagrams, object pages, and symbol pages is the most maintainable path to synchronized interactions.
+
+**Historical**
+
+- This extends the original linear end-to-end walkthrough without replacing it; readers will gain multiple entry points into the same pinned evidence.
+
+**Open questions**
+
+- Which interactions can remain static MkDocs assets and which require a generated data bundle or client-side application.
+- The first later SYCL scheduler-copy revision remains unresolved because the available code index did not expose a reliable exact commit or PR.
+
+**Source ledger**
+
+- No new external source was added; this was an implementation and information-architecture increment.
+
+**Next step**
+
+- Build the canonical `llama_context` object page using the new page contract.
