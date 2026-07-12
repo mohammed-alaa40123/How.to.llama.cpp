@@ -21,41 +21,20 @@ The public asynchronous entry point returns after submitting the work. A later s
 
 ## The execution path
 
-```mermaid
-sequenceDiagram
-    participant C as llama_context
-    participant S as GGML backend scheduler
-    participant A as graph allocator
-    participant Src as source backend
-    participant Dst as split backend
+<figure markdown>
 
-    C->>S: ggml_backend_sched_graph_compute_async(graph)
-    alt graph not allocated
-        S->>S: ggml_backend_sched_alloc_graph(graph)
-        S->>S: choose cur_copy; advance next_copy
-        S->>S: assign backends and split graph
-        S->>A: allocate graph, copies, dependencies
-    end
+![Backend scheduler execution path](../assets/figures/backend-scheduler-execution.svg)
 
-    loop each backend split
-        loop each cross-backend input
-            S->>Dst: wait for cur_copy slot
-            alt backend supports async peer copy
-                S->>Dst: cpy_tensor_async(source, copy)
-            else fallback
-                S->>Src: synchronize source backend
-                S->>Dst: synchronize copy slot/backend
-                S->>Dst: synchronous tensor copy
-            end
-        end
-        S->>Dst: ggml_backend_graph_compute_async(split graph)
-        S->>Dst: record event for cur_copy
-    end
+<figcaption>
 
-    S-->>C: submission status
-    C->>S: synchronize when outputs must be visible
-    S->>Dst: synchronize every backend
-```
+**Figure.** Conceptual execution path of `ggml_backend_sched_graph_compute_async()`. Allocation prepares graph splits, destination copies, dependency views, and a copy-ring slot. Execution then populates split inputs, uses an asynchronous transfer when supported or a synchronized blocking fallback, submits each split, and records a reuse fence. The asynchronous API returns after submission; later synchronization establishes result visibility and safe storage reuse.
+
+</figcaption>
+
+</figure>
+
+!!! note "Static figure"
+    This SVG replaces the former Mermaid sequence diagram because the deployed Mermaid 11 renderer reported a syntax error on the complex nested sequence. The surrounding prose and pinned source map remain the implementation authority; the figure is a compact conceptual overview.
 
 ## Allocation-time work versus execution-time work
 
