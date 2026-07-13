@@ -94,6 +94,7 @@ nav:
       - SYCL backend teardown: architecture/sycl-backend-teardown.md
       - RPC backend teardown: architecture/rpc-backend-teardown.md
       - CANN backend teardown: architecture/cann-backend-teardown.md
+      - OpenCL build and buffer lifetimes: architecture/opencl-build-and-buffer-lifetimes.md
   - Inference lifecycle:
       - Brief end to end: lifecycle/end-to-end.md
       - Decode and graph reuse: lifecycle/decode-graph-reuse.md
