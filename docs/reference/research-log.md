@@ -150,10 +150,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Which backend frees synchronize implicitly and which require caller synchronization.
 - Whether stress tests cover immediate context destruction after asynchronous graph submission.
 
-**Next step**
-
-- Trace `ggml_backend_sched_free`, events, buffers, and concrete backend deleters to resolve the observed backend-before-scheduler member order.
-
 ## 2026-07-13 09:49 — Scheduler core teardown dependencies
 
 **Verified**
@@ -170,19 +166,11 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Scheduler teardown requires device, buffer-type, allocator, queue, and callback state to remain valid beyond the lifetime of the scheduler struct itself.
 - Explicit synchronization is a clear completion boundary, but it cannot repair a concrete backend object-lifetime violation.
 
-**Historical**
-
-- Event ownership, copy-slot count, graph allocator structure, and teardown order are revision-sensitive.
-
 **Open questions**
 
 - Whether each concrete backend keeps device and buffer-deleter state valid after its backend wrapper is freed.
 - Which event and buffer destructors require live streams, queues, allocators, or backend contexts.
 - Whether backend wrapper free synchronizes or invalidates scheduler-owned resources.
-
-**Next step**
-
-- Audit concrete CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown implementations and classify the pinned backend-before-scheduler order.
 
 ## 2026-07-13 10:50 — Ordinary CPU backend teardown
 
@@ -199,19 +187,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Scheduler-owned ordinary CPU buffers remain independently destructible after backend-wrapper deletion.
 - Backend-before-scheduler destruction is verified safe for the ordinary pinned CPU backend.
-
-**Historical**
-
-- CPU async/event capabilities and buffer implementations are revision-sensitive.
-
-**Open questions**
-
-- Whether optional CPU extra-buffer implementations preserve the same backend-independent destruction property.
-- Whether a sanitizer regression test covers backend-first CPU scheduler destruction.
-
-**Next step**
-
-- Audit CUDA stream, event, graph-resource, device, buffer-type, and `cudaFree` teardown behavior.
 
 ## 2026-07-13 11:49 — CUDA backend teardown
 
@@ -231,21 +206,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Queued-work completion remains conditional because the pinned source relies on CUDA-family runtime destruction semantics rather than explicitly synchronizing all created streams before teardown.
 - Explicit synchronization before context destruction remains the clearest portable application boundary.
 
-**Historical**
-
-- CUDA graphs, concurrent streams, VMM pools, copy-event ownership, registry lifetime, and CUDA/HIP/MUSA behavior are revision-sensitive.
-
-**Open questions**
-
-- Whether all supported CUDA-family runtimes guarantee safe destruction in the pinned order with queued work.
-- Whether the synchronize callback covers every lazily created concurrent stream.
-- Whether pools, concurrent events, and graph maps should be cleared before streams.
-- Whether immediate asynchronous-destruction regression tests exist.
-
-**Next step**
-
-- Audit Metal command queues/buffers, event/fence objects, shared/private allocations, Objective-C ownership, synchronization, and backend-before-scheduler safety.
-
 ## 2026-07-13 12:49 — Metal backend teardown
 
 **Verified**
@@ -263,18 +223,29 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Backend-before-scheduler destruction is verified safe for ordinary pinned Metal resources because backend free establishes queued-work completion and later scheduler deleters retain valid device-level dependencies.
 - Metal provides a stronger explicit teardown boundary than the pinned CUDA-family path.
-- Unified memory, storage mode, residency, wrapper ownership, and command completion remain separate states.
 
-**Historical**
+## 2026-07-13 13:52 — Vulkan command and synchronization lifetimes
 
-- Queue ownership, backend-free synchronization, event primitives, residency sets, storage-mode defaults, and registry lifetime are revision-sensitive.
+**Verified**
+
+- Published `docs/architecture/vulkan-command-lifetime.md` and added it to Architecture navigation.
+- Vulkan command pools are scoped per `(context, queue)` and `(device, queue)` pairing and track stable command-buffer records with reuse state.
+- `ggml_vk_command_pool_cleanup()` resets a pool only under the explicit source precondition that command buffers are complete.
+- Synchronous Vulkan buffer read, same-device copy, and GPU memset helpers submit with a device fence, wait indefinitely, reset the fence, and then recycle command-pool state.
+- Deferred host copies in the read path happen after the fence wait.
+- Binary semaphores, timeline semaphores, and Vulkan events are pooled and reused through context indices.
+- Vulkan graph compute is submission-oriented and does not make a universal host-completion guarantee merely by returning.
+
+**Interpretation**
+
+- Command-pool reset is a reuse step after completion, not a synchronization mechanism.
+- Fence waits are the clearest host completion boundary in the inspected synchronous helper paths.
+- Timeline semaphores and events may establish device ordering without proving host completion.
 
 **Open questions**
 
-- Whether asynchronous Metal destruction is covered by a regression test under Metal API validation.
-- Whether final-synchronization command-buffer failures should be surfaced more explicitly during shutdown.
-- Whether unusual plugin unload ordering can invalidate static device state before scheduler cleanup.
+- The exact final backend/context free chain, queue coverage, synchronization-object destruction order, scheduler event/buffer independence, and backend-before-scheduler safety classification remain unresolved.
 
 **Next step**
 
-- Audit Vulkan queue/device completion, command pools and buffers, fences/semaphores/events, allocator-backed buffers, synchronization, and backend-before-scheduler safety.
+- Finish the exact Vulkan teardown chain and classify the pinned destruction order.
