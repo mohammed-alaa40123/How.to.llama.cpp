@@ -88,6 +88,7 @@ nav:
       - Scheduler core teardown: architecture/scheduler-teardown-core.md
       - CPU backend teardown: architecture/cpu-backend-teardown.md
       - CUDA backend teardown: architecture/cuda-backend-teardown.md
+      - Metal backend teardown: architecture/metal-backend-teardown.md
   - Inference lifecycle:
       - Brief end to end: lifecycle/end-to-end.md
       - Decode and graph reuse: lifecycle/decode-graph-reuse.md
