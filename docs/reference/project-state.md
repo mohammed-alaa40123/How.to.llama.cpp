@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 10:50 Africa/Cairo_
+_Last updated: 2026-07-13 11:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -23,66 +23,67 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Exact pinned declaration and reverse-destruction map for `llama_model` and `llama_context`.
 - Exact pinned generic scheduler teardown path.
 - Ordinary pinned CPU backend teardown classification.
+- Pinned CUDA backend teardown dependency audit and conditional safety classification.
 
 ## Latest concrete findings
 
-- CPU graph execution calls `ggml_graph_compute()` directly and completes before the backend callback returns.
-- The ordinary CPU backend interface has no async tensor-copy methods, synchronize callback, or event record/wait callbacks.
-- The CPU device advertises `async = false` and `events = false`; its event callbacks are null.
-- The CPU device and device context are static registry objects, independent of individual backend wrappers.
-- `ggml_backend_cpu_free()` deletes only the per-backend work allocation, CPU context, and backend wrapper.
-- Scheduler-owned ordinary CPU buffers are destroyed through buffer callbacks rather than through the deleted CPU backend context.
-- Backend-before-scheduler destruction is therefore **verified safe for the ordinary pinned CPU backend**.
+- `ggml_backend_cuda_free()` deletes the CUDA context and then the backend wrapper.
+- The CUDA context destructor waits for active graph capture to end, then destroys its copy event, created streams, and cuBLAS handles; it does not explicitly synchronize queued work first.
+- CUDA graph compute is asynchronous and returns after enqueueing kernels or launching a CUDA graph.
+- `ggml_backend_cuda_synchronize()` synchronizes the current context stream.
+- Scheduler CUDA events own their own `cudaEvent_t` and are freed through the static CUDA device interface without accessing the deleted backend context.
+- Scheduler CUDA buffers own a device id and pointer and reach `cudaFree` through their own buffer context; CUDA buffer types are static per-device registry objects.
+- Context-owned pools, concurrent events, and CUDA graph objects unwind after the destructor body, after the explicit stream-destruction loop.
+- Backend-before-scheduler destruction is therefore structurally independent for ordinary CUDA scheduler events and buffers, but queued-work completion remains conditional on CUDA-family runtime destruction semantics.
 
 ## In progress
 
-- CUDA teardown audit: streams, events, `cudaFree`, graph resources, device and buffer-type lifetime.
-- Remaining concrete backend teardown audits for Metal, Vulkan, SYCL, RPC, CANN, and OpenCL.
+- Metal teardown audit: command queues/buffers, events/fences, Objective-C ownership, synchronization, and buffer lifetime.
+- Remaining concrete backend teardown audits for Vulkan, SYCL, RPC, CANN, and OpenCL.
 - Optional CPU extra-buffer teardown audit.
 - Architecture-specific graph-builder downcasts and exact state tensors.
 - Runtime evidence for synchronization, event waits, page faults, memory updates, and teardown.
 
 ## Immediate next task
 
-Trace CUDA teardown dependencies:
+Trace Metal teardown dependencies:
 
 ```text
-CUDA backend wrapper free
-→ stream and graph-resource destruction
-→ implicit or explicit synchronization
-→ scheduler event_free
-→ scheduler buffer cudaFree/free_buffer
-→ device and buffer-type lifetime
+Metal backend wrapper free
+→ command-buffer and queue completion
+→ event/fence destruction
+→ shared/private buffer release
+→ Objective-C/autorelease ownership
+→ scheduler event and buffer lifetime
 → classify backend-before-scheduler ordering
 ```
 
 Required deliverables:
 
-1. exact CUDA backend free and context-destructor chain;
-2. stream/event/graph-resource synchronization behavior;
+1. exact Metal backend/context free chain;
+2. command queue, command buffer, event, and fence synchronization behavior;
 3. buffer and buffer-type ownership;
-4. queued-work requirements during `cudaFree` and event destruction;
+4. queued-work requirements during Objective-C resource release;
 5. safety classification for the pinned context member order;
 6. truth labels and durable context updates.
 
 ## Publication and verification state
 
-- New page: `docs/architecture/cpu-backend-teardown.md`.
-- Page commit: `9f8a58354d6f24d2cef2494ab14a4b14ac1fc347`.
-- Navigation commit: `a59a922df471b6caa5720900ebc479755ce62e68`.
-- README/TODO commit: `b1e59e34dc8f74ecf79e1a766590970fc4f6212a`.
-- Detailed-note commit: `3c1ee3b0d55230846e1ec9ef2d93db38e035d924`.
-- Connector-side re-fetch confirmed that the new page exists on `main` and contains the expected pinned classification.
-- Combined-status lookup for `3c1ee3b0d55230846e1ec9ef2d93db38e035d924` returned `statuses: []`; push-triggered Documentation CI, Pages deployment, and hourly-context validation are therefore unverified rather than failed.
-- Site-specific searches for the project and CPU teardown page returned no results. Direct opening of both the Pages root and `architecture/cpu-backend-teardown/` was rejected by the safe-URL gate because those exact URLs were absent from search results.
-- No new external secondary source was introduced; the research ledger remains unchanged.
+- New page: `docs/architecture/cuda-backend-teardown.md`.
+- Page commit: `b7b8eb2cea00eccf5f4a7984d9639d5d1877ef48`.
+- Navigation commit: `733afe97c96798043a65d84871c128df40711752`.
+- Detailed-note commit: `d12b7772860934e4bb2a1445c085be01d63b077f`.
+- Connector-side source inspection confirmed the pinned CUDA free path, context-destructor order, async interface, explicit synchronize callback, static device/buffer-type lifetime, scheduler event deleter, and buffer `cudaFree` path.
+- GitHub Actions and Pages status for this increment are checked after all state updates. If unavailable, the exact visibility blocker remains recorded below and in README TODOs.
+- No new external secondary source passed the verification bar; the research ledger remains unchanged.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** this environment has no usable checkout and cannot run the repository's local validation commands.
-- **CI visibility blocker:** the connected combined-status endpoint returned an empty status list and does not expose the push-triggered workflow state for the latest commit.
-- **Pages verification blocker:** search returned no indexed result and direct opening was blocked by the safe-URL gate; live HTTP status and rendered content remain unverified.
-- The CPU conclusion covers the ordinary CPU backend only. AMX, KleidiAI, repack, HBM, BLAS, and other optional CPU-adjacent buffer implementations require separate review.
+- **Local validation blocker:** the execution environment cannot resolve `github.com` and has no usable checkout, so repository validation commands cannot run locally.
+- **CI visibility blocker:** the connected status endpoint may return an empty status list and does not necessarily expose push-triggered workflow runs.
+- **Pages verification blocker:** if the Pages URL is absent from search results, direct verification may be rejected by the safe-URL gate; live HTTP status and rendered content then remain unverified.
+- The CUDA classification proves object-path independence, not universal queued-work completion safety across CUDA, HIP, and MUSA runtimes.
+- `ggml_backend_cuda_synchronize()` appears to synchronize the current stream only; concurrent-stream coverage requires further verification.
 - Mapping, allocation, physical residency, data validity, queued completion, ownership, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
