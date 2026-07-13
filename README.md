@@ -66,7 +66,7 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It now emits source-ordered symbol locations with approximate declaration kinds and line numbers for large translation units.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, and optional revision-pinned file and symbol links for large translation units.
 
 ### Write layered documentation
 
@@ -114,7 +114,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/rpc-backend-teardown.md` | RPC client/server ownership, remote completion, and teardown |
 | `docs/architecture/cann-backend-teardown.md` | CANN device synchronization, reset ordering, and resource lifetimes |
 | `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build composition, kernel deployment, and initial buffer ownership |
-| `docs/reference/source-index.md` | Human-reviewed source areas and generated symbol-location format |
+| `docs/reference/source-index.md` | Human-reviewed source areas and generated symbol-location/link format |
 | `docs/assets/interactive/` | Interactive architecture assets |
 | `.github/workflows/` | CI, Pages, context, and indexing automation |
 
@@ -125,7 +125,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, then use it to finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
+- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then use it to finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
 - [ ] Audit optional CPU extra-buffer implementations and classify their deleter independence from ordinary CPU backend wrappers.
 - [ ] Verify CANN reset semantics with authoritative runtime documentation and a test matrix: destroy streams/events/buffers before versus after `aclrtResetDevice`, one versus two contexts, and scheduler-resource release after backend free.
 - [ ] Design and test a real RPC synchronization/completion command; verify immediate graph-compute → remote-buffer-free and graph-compute → connection-close behavior on CPU and accelerator servers.
@@ -144,6 +144,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
+- [ ] Validate generated pinned blob URLs and line fragments during Documentation CI.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
 - [ ] Extend interactive-link validation to built HTML IDs, generated routes, assets, and plugin-generated anchors.
 - [ ] Add RAII guidance or an upstream example patch for deterministic cleanup on minimal-example error paths.
@@ -159,6 +160,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add revision-pinned file and `#L<line>` symbol URLs to the generated source inventory, derive them from the selected llama.cpp revision, and cover URL generation with regression tests.
 - [x] Add untruncated, source-ordered symbol records with approximate declaration kind and 1-based line numbers to the generated source inventory, while retaining the legacy compact symbol list and adding regression tests.
 - [x] Map pinned OpenCL build composition, kernel deployment modes, official platform scope, and the initial `cl_mem` RAII ownership path.
 - [x] Audit pinned CANN teardown: backend/context free, device-wide synchronization, reset ordering, events, allocator buffers, registry lifetime, scheduler-resource independence, and conditional teardown classification.
