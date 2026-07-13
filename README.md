@@ -106,6 +106,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/system-ownership-and-execution-map.md` | Cross-subsystem ownership/execution synthesis |
 | `docs/architecture/model-context-teardown-order.md` | Exact model/context destruction order |
 | `docs/architecture/scheduler-teardown-core.md` | Generic scheduler free chain and dependencies |
+| `docs/architecture/backend-teardown-comparison.md` | Cross-backend completion, resource-independence, and safety matrix |
 | `docs/architecture/cpu-backend-teardown.md` | Ordinary CPU teardown classification |
 | `docs/architecture/cuda-backend-teardown.md` | CUDA teardown and conditional completion |
 | `docs/architecture/metal-backend-teardown.md` | Metal explicit synchronization and teardown |
@@ -140,7 +141,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Expand the interactive explorer with architecture-specific builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `reference/source-index/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/backend-teardown-comparison/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
@@ -160,6 +161,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add a revision-pinned cross-backend teardown comparison matrix that separates command completion from scheduler-resource deleter independence and links each classification to its detailed audit.
 - [x] Add revision-pinned file and `#L<line>` symbol URLs to the generated source inventory, derive them from the selected llama.cpp revision, and cover URL generation with regression tests.
 - [x] Add untruncated, source-ordered symbol records with approximate declaration kind and 1-based line numbers to the generated source inventory, while retaining the legacy compact symbol list and adding regression tests.
 - [x] Map pinned OpenCL build composition, kernel deployment modes, official platform scope, and the initial `cl_mem` RAII ownership path.
