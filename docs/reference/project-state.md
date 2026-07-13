@@ -71,15 +71,17 @@ Required deliverables:
 - Page commit: `9f8a58354d6f24d2cef2494ab14a4b14ac1fc347`.
 - Navigation commit: `a59a922df471b6caa5720900ebc479755ce62e68`.
 - README/TODO commit: `b1e59e34dc8f74ecf79e1a766590970fc4f6212a`.
-- Connector-side source inspection confirmed synchronous CPU graph execution, null async/synchronize/event callbacks, static CPU device lifetime, and the narrow backend-free ownership boundary.
+- Detailed-note commit: `3c1ee3b0d55230846e1ec9ef2d93db38e035d924`.
+- Connector-side re-fetch confirmed that the new page exists on `main` and contains the expected pinned classification.
+- Combined-status lookup for `3c1ee3b0d55230846e1ec9ef2d93db38e035d924` returned `statuses: []`; push-triggered Documentation CI, Pages deployment, and hourly-context validation are therefore unverified rather than failed.
+- Site-specific searches for the project and CPU teardown page returned no results. Direct opening of both the Pages root and `architecture/cpu-backend-teardown/` was rejected by the safe-URL gate because those exact URLs were absent from search results.
 - No new external secondary source was introduced; the research ledger remains unchanged.
-- Latest push-triggered workflow and Pages verification are checked after the final context commits; exact results or blockers are recorded below and in the README TODOs.
 
 ## Known blockers and caveats
 
 - **Local validation blocker:** this environment has no usable checkout and cannot run the repository's local validation commands.
-- **CI visibility caveat:** the connected commit-status endpoint may return no statuses for push-triggered Actions; an empty result means unverified, not failed.
-- **Pages visibility caveat:** direct site verification may be blocked if the Pages URL is not indexed or retrievable through the available web path.
+- **CI visibility blocker:** the connected combined-status endpoint returned an empty status list and does not expose the push-triggered workflow state for the latest commit.
+- **Pages verification blocker:** search returned no indexed result and direct opening was blocked by the safe-URL gate; live HTTP status and rendered content remain unverified.
 - The CPU conclusion covers the ordinary CPU backend only. AMX, KleidiAI, repack, HBM, BLAS, and other optional CPU-adjacent buffer implementations require separate review.
 - Mapping, allocation, physical residency, data validity, queued completion, ownership, and release remain distinct states.
 
