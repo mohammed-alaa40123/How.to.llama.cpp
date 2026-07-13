@@ -108,6 +108,28 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Verify exact destruction dependencies among scheduler, memory, graph results, output buffers, and backend instances.
 - Measure KV/recurrent allocation, update-graph cost, scheduler copies, event waits, and state-save synchronization.
 
+## 2026-07-13 05:52 — System ownership and execution synthesis
+
+**Verified**
+
+- Published `docs/architecture/system-ownership-and-execution-map.md` and added it to Architecture navigation.
+- The synthesis connects application ownership, loader publication, persistent model storage, context-owned runtime state, polymorphic memory, graph construction, scheduler splits/copies, backend execution, output visibility, and teardown.
+- Ownership, virtual addressability, physical residency, destination allocation, data validity, and queued-command completion are tracked as distinct states.
+- The model must outlive every context; scheduler copies and events must outlive queued work; context teardown precedes model teardown.
+
+**Interpretation**
+
+- `llama_model_loader` is a transactional publisher, `llama_context` is a mutable execution session around a borrowed model, and the scheduler is an execution planner rather than the persistent owner of weights or sequence memory.
+- The per-batch memory context is best understood as a transaction plan separating candidate state from committed mutation.
+
+**Historical**
+
+- Exact memory implementations, graph-reuse predicates, scheduler copy behavior, and backend synchronization remain revision-sensitive.
+
+**Open questions**
+
+- Exact model/context member destruction order, public concurrency contracts, output synchronization guarantees, architecture-to-memory mapping, and scheduler copy validity across graph reuse.
+
 **Next step**
 
-- Synthesize the public API, loader/model, context, and memory groups into one ownership and synchronization relationship map.
+- Complete file-by-file Pass A for backend scheduler internals, including graph assignment, splits, copy-ring allocation, destination validity, events, asynchronous submission, fallback synchronization, reuse, and teardown.
