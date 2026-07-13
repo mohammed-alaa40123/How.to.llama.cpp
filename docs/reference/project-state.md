@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 09:49 Africa/Cairo_
+_Last updated: 2026-07-13 10:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -20,63 +20,67 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - MkDocs Material site, strict documentation CI, Pages deployment, health checks, source indexing, and durable run context.
 - Canonical GGUF, model placement, model/context, graph/MoE, scheduler, memory-lifetime, and system-ownership pages.
 - Pass A pages for public API, model/GGUF loading, runtime context/memory, scheduler, and concrete context-memory implementations.
-- Exact pinned declaration and reverse-destruction map for `llama_model` and `llama_context`, including partial construction, RAII, model mappings/buffers, output and memory resources, backends, scheduler, and application teardown.
-- Exact pinned generic scheduler teardown path, including event destruction, graph allocator and backend-buffer destruction, host metadata release, and borrowed lifetime dependencies.
+- Exact pinned declaration and reverse-destruction map for `llama_model` and `llama_context`.
+- Exact pinned generic scheduler teardown path.
+- Ordinary pinned CPU backend teardown classification.
 
 ## Latest concrete findings
 
-- `ggml_backend_sched_free()` destroys scheduler events first, graph-allocation resources second, and host scheduler metadata last.
-- The generic scheduler free path does not call `ggml_backend_sched_synchronize()`.
-- Event free dispatches through `event->device->iface.event_free`, so the event's device and backend-specific event state must remain valid.
-- Graph allocator free reaches `ggml_backend_buffer_free()`, which invokes concrete `free_buffer` callbacks for scheduler-owned buffer chunks.
-- The scheduler borrows backend, device, and buffer-type relationships; generic code does not prove that destroying owning backend wrappers before `sched` is safe for every concrete backend.
+- CPU graph execution calls `ggml_graph_compute()` directly and completes before the backend callback returns.
+- The ordinary CPU backend interface has no async tensor-copy methods, synchronize callback, or event record/wait callbacks.
+- The CPU device advertises `async = false` and `events = false`; its event callbacks are null.
+- The CPU device and device context are static registry objects, independent of individual backend wrappers.
+- `ggml_backend_cpu_free()` deletes only the per-backend work allocation, CPU context, and backend wrapper.
+- Scheduler-owned ordinary CPU buffers are destroyed through buffer callbacks rather than through the deleted CPU backend context.
+- Backend-before-scheduler destruction is therefore **verified safe for the ordinary pinned CPU backend**.
 
 ## In progress
 
-- Concrete backend teardown audit for CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL.
-- Architecture-specific graph-builder downcasts to concrete memory-context types and exact state tensors read/written.
+- CUDA teardown audit: streams, events, `cudaFree`, graph resources, device and buffer-type lifetime.
+- Remaining concrete backend teardown audits for Metal, Vulkan, SYCL, RPC, CANN, and OpenCL.
+- Optional CPU extra-buffer teardown audit.
+- Architecture-specific graph-builder downcasts and exact state tensors.
 - Runtime evidence for synchronization, event waits, page faults, memory updates, and teardown.
 
 ## Immediate next task
 
-Trace concrete backend teardown dependencies:
+Trace CUDA teardown dependencies:
 
 ```text
-backend wrapper free
+CUDA backend wrapper free
+→ stream and graph-resource destruction
 → implicit or explicit synchronization
-→ device lifetime
-→ event_free requirements
-→ scheduler buffer free_buffer requirements
-→ allocator/queue/stream dependencies
+→ scheduler event_free
+→ scheduler buffer cudaFree/free_buffer
+→ device and buffer-type lifetime
 → classify backend-before-scheduler ordering
 ```
 
 Required deliverables:
 
-1. per-backend `free`, `event_free`, `free_buffer`, and synchronization call chains;
-2. device and buffer-type ownership/lifetime;
-3. queued-work behavior during destruction;
-4. a safety classification for the pinned context member order;
-5. runtime or test evidence where available;
+1. exact CUDA backend free and context-destructor chain;
+2. stream/event/graph-resource synchronization behavior;
+3. buffer and buffer-type ownership;
+4. queued-work requirements during `cudaFree` and event destruction;
+5. safety classification for the pinned context member order;
 6. truth labels and durable context updates.
 
 ## Publication and verification state
 
-- New page: `docs/architecture/scheduler-teardown-core.md`.
-- Page commit: `d954c67d1558fb7db3b86f2e1c7fceed8e505c2f`.
-- Navigation commit: `52fe517f9b62a2070c96e0c066fec3d3cb09cd53`.
-- README/TODO commit: `600587c3f56c4814a56dd12dae03d64f2938ab8a`.
-- Connector-side source inspection confirmed the pinned scheduler free order, event dispatch through the device, graph allocator ownership, and backend-buffer callback chain.
-- Combined-status lookup for `600587c3f56c4814a56dd12dae03d64f2938ab8a` returned no statuses, so push-triggered Documentation CI, Pages deployment, and hourly-context validation remain unverified rather than failed.
-- Site-specific search returned no indexed project or scheduler-teardown page. Direct opening of the Pages root and new route was rejected by the safe-URL gate because the exact URLs were absent from search results.
+- New page: `docs/architecture/cpu-backend-teardown.md`.
+- Page commit: `9f8a58354d6f24d2cef2494ab14a4b14ac1fc347`.
+- Navigation commit: `a59a922df471b6caa5720900ebc479755ce62e68`.
+- README/TODO commit: `b1e59e34dc8f74ecf79e1a766590970fc4f6212a`.
+- Connector-side source inspection confirmed synchronous CPU graph execution, null async/synchronize/event callbacks, static CPU device lifetime, and the narrow backend-free ownership boundary.
 - No new external secondary source was introduced; the research ledger remains unchanged.
+- Latest push-triggered workflow and Pages verification are checked after the final context commits; exact results or blockers are recorded below and in the README TODOs.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** this environment cannot resolve `github.com`, so a checkout and local validators, tests, script checks, and strict MkDocs build cannot run.
-- **CI visibility blocker:** the connected combined-status endpoint returned an empty status list and does not expose the push-triggered workflow run state.
-- **Pages verification blocker:** search returned no indexed result and direct open was blocked by the safe-URL gate; live HTTP status and rendered content remain unverified.
-- The generic scheduler call chain is verified, but backend-before-scheduler safety remains an open question until concrete deleters and synchronization behavior are traced.
+- **Local validation blocker:** this environment has no usable checkout and cannot run the repository's local validation commands.
+- **CI visibility caveat:** the connected commit-status endpoint may return no statuses for push-triggered Actions; an empty result means unverified, not failed.
+- **Pages visibility caveat:** direct site verification may be blocked if the Pages URL is not indexed or retrievable through the available web path.
+- The CPU conclusion covers the ordinary CPU backend only. AMX, KleidiAI, repack, HBM, BLAS, and other optional CPU-adjacent buffer implementations require separate review.
 - Mapping, allocation, physical residency, data validity, queued completion, ownership, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
