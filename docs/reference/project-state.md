@@ -75,15 +75,19 @@ Required deliverables:
 - Page commit: `f74a3ca31ba9a61022f114c176a22063912aa022`.
 - Navigation commit: `322a5bc8920fde2ce7ca24dca5e05c74120e7559`.
 - README/TODO commit: `20c7404071f02da542632954ab9349b5cc4f50b7`.
+- Detailed-note commit: `ca5fcac1460e8490c681804f1e98322f8b5ebcb4`.
+- Research-log commit: `21caccb2a9721244c0e876ad8b089e360fd59941`.
 - Connector-side source inspection confirmed the explicit Metal backend-free synchronization path, command-buffer/context release sequence, scheduler event independence, shared/private/mapped buffer ownership, residency-set cleanup, and static device/registry lifetime.
+- The new page was re-fetched from `main` and contains the expected verified-safe classification, teardown graph, truth labels, and source map.
+- Commit-scoped workflow lookup for `21caccb2a9721244c0e876ad8b089e360fd59941` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
+- Site-specific searches for the project root and `architecture/metal-backend-teardown/` returned no indexed results. The available web safety gate therefore rejected direct opening of both Pages URLs, so live HTTP status and rendered content remain unverified.
 - No new external secondary source passed the verification bar; the research ledger remains unchanged.
-- GitHub Actions and Pages checks are performed after the durable context updates; exact results or blockers are recorded below and in the README TODOs.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** the execution environment has no usable repository checkout, so repository validation commands cannot run locally.
-- **CI visibility caveat:** the available workflow lookup is limited and may not expose push-triggered runs for the latest commit.
-- **Pages verification caveat:** public search indexing may lag deployment; direct HTTP verification is attempted separately.
+- **Local validation blocker:** the execution environment has no usable repository checkout, so `validate_project_context.py`, interactive-link tests, unit tests, strict MkDocs build, and `check_site.sh` could not run locally.
+- **CI visibility blocker:** the available commit workflow endpoint returned an empty run list and is limited to a subset of workflow triggers, so push-triggered results cannot be confirmed through it.
+- **Pages verification blocker:** search returned no indexed root or Metal teardown route, and the web safety gate only permits direct opening of URLs already present in search results or user content.
 - The Metal safety classification covers ordinary resources at the pinned revision, not future queue ownership, plugin unload ordering, or alternative device lifecycle designs.
 - Mapping, allocation, physical residency, data validity, queued completion, ownership, and release remain distinct states.
 
