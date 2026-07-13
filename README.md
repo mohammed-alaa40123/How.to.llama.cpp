@@ -120,6 +120,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/system-ownership-and-execution-map.md` | Cross-subsystem ownership, execution, mutation, synchronization, and teardown synthesis |
 | `docs/architecture/model-context-teardown-order.md` | Exact declaration order, reverse destruction, RAII ownership, synchronization caveats, and safe teardown |
 | `docs/architecture/scheduler-teardown-core.md` | Exact scheduler free order, event and graph-buffer deleter chains, borrowed lifetime dependencies, and unresolved backend contracts |
+| `docs/architecture/cpu-backend-teardown.md` | Ordinary CPU backend free path, synchronous execution contract, event/device lifetime, and backend-before-scheduler safety classification |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
 | `docs/assets/interactive/` | Interactive architecture assets |
@@ -133,17 +134,19 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Trace concrete backend `free`, `event_free`, `free_buffer`, synchronization, and queued-work requirements across CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL; classify backend-before-scheduler destruction as verified safe, conditional, or unsafe.
+- [ ] Audit CUDA backend-context destruction, stream synchronization, event destruction, device/buffer-type lifetime, `cudaFree`, and CUDA graph resources; classify backend-before-scheduler destruction.
+- [ ] Continue concrete teardown audits for Metal, Vulkan, SYCL, RPC, CANN, and OpenCL, including optional CPU extra-buffer implementations.
 - [ ] Map each architecture-specific graph builder downcast to `llama_memory_context_i` subtypes and identify exact state tensors read and written.
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, scheduler copy generations, event waits, memory-update graphs, first-token access, KV/recurrent growth, activation peaks, synchronization, and teardown.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
 - [ ] Expand the interactive explorer with architecture-specific graph builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/scheduler-teardown-core/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-backend-teardown/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
+- [ ] Add a sanitizer regression test that frees a CPU backend wrapper before its scheduler and then destroys the scheduler.
 - [ ] Extend interactive-link validation to built HTML IDs, generated routes, non-HTML assets, and plugin-generated anchors.
 - [ ] Add RAII guidance or an upstream example patch for deterministic cleanup on every minimal-example error path.
 - [ ] Locate the strongest public contract for model sharing, context concurrency, thread safety, backend teardown synchronization, and destruction order.
@@ -160,6 +163,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Classify ordinary pinned CPU backend teardown: synchronous graph execution, no events/synchronize callback, static device lifetime, backend-independent scheduler buffers, and verified-safe backend-before-scheduler destruction.
 - [x] Trace the pinned generic scheduler free chain: event destruction, graph allocator and backend-buffer destruction, host metadata release, borrowed backend/device/buffer-type dependencies, and the limits of the generic safety conclusion.
 - [x] Trace exact `llama_model` and `llama_context` member declaration and reverse-destruction order, including retained mappings, backend buffers, scheduler, memory, graph results, outputs, backend instances, partial construction, and safe application teardown.
 - [x] Enumerate every concrete `llama_memory_i` and primary `llama_memory_context_i` implementation at the pinned revision and map architecture factory decisions to no-memory, KV, iSWA, recurrent, hybrid, DSA, and DSV4 storage.
