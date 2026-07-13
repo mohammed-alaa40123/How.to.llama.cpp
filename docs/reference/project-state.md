@@ -67,15 +67,20 @@ Required deliverables:
 
 - Backend scheduler Pass A page commit: `192b2ca503015d1d06ef2913caa1b69cadfaf206`.
 - Navigation commit: `28429273f20901c2adafe1b40f41961d663a6c81`.
-- Connector-side source inspection confirmed scheduler structures, backend assignment passes, split/copy metadata, copy slots, and event ownership at the pinned revision.
-- CI and Pages verification for the final increment remain to be checked after all state commits are published.
+- README/TODO commit: `a52cfb40fb43922ada521b7bbeb56eb1928e7059`.
+- Research-log commit: `31d05ac2c50b8b251e8b45641cc83b2ee37fd9d6`.
+- Detailed-note commit: `965c0f1a2249160ea2be90b3f6c23be2fe5a5a97`.
+- Connector-side re-fetch confirmed the published page, pinned baseline, file/symbol inventory, ownership/validity table, Mermaid call chains, backend variants, truth labels, source links, and related-page routes.
+- Commit-workflow lookup for `965c0f1a2249160ea2be90b3f6c23be2fe5a5a97` returned `workflow_runs: []`; the endpoint only reliably exposes pull-request-triggered runs, so push-triggered Documentation CI, Pages, and hourly-context runs are unverified.
+- Site-specific web searches returned no indexed project page. Direct opening of the Pages root and `architecture/backend-scheduler-pass-a/` was rejected by the safe-URL gate because those exact URLs were absent from search results.
+- A local clone attempt failed with `Could not resolve host: github.com`, so project validators, tests, script syntax checks, and `mkdocs build --strict` could not run locally.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** no local repository checkout is available in this execution environment, so the full validation suite and `mkdocs build --strict` could not be executed locally.
-- **CI visibility blocker:** the available commit-workflow endpoint only exposes pull-request-triggered results reliably; push-triggered Documentation CI, Pages, and hourly-context workflows may remain unverified.
-- **Pages verification blocker:** direct opening may be rejected by the safe-URL gate or fail if the environment cannot resolve GitHub Pages. Record the exact observed result for this increment.
+- **Local validation blocker:** `git clone` failed with `Could not resolve host: github.com`; there is no usable local checkout, so the full validation suite and `mkdocs build --strict` could not execute.
+- **CI visibility blocker:** `fetch_commit_workflow_runs` returned an empty list and only exposes pull-request-triggered results reliably; this is not evidence that push-triggered workflows passed or failed.
+- **Pages verification blocker:** search did not index the project, and direct opening of the root and scheduler page was rejected by the safe-URL gate. HTTP status and rendered content remain unverified.
 - Static link validation approximates Python-Markdown IDs; built-HTML validation is still required for plugin-generated anchors.
 - Mapping, allocation, residency, validity, ownership, copy generation, and command completion are distinct states.
 - Scheduler destination-copy allocation does not prove current-generation data validity.
