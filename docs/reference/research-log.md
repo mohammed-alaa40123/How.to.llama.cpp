@@ -61,187 +61,35 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - The loader is a transactional publisher, `llama_context` is a mutable session around a borrowed model, and the scheduler is an execution planner.
 - A per-batch memory context behaves like a transaction plan.
 
-## 2026-07-13 08:50 — Model and context teardown order
+## 2026-07-13 08:50–18:51 — Teardown audits and OpenCL foundation
 
 **Verified**
 
-- Published `docs/architecture/model-context-teardown-order.md`.
-- `llama_model` retains mappings until tensor buffers and metadata are released.
-- `llama_context` reverse destruction releases owning backend wrappers before the scheduler smart pointer.
-- The context destructor contains no universal explicit synchronization call.
+- Published model/context, generic scheduler, CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
+- Published the pinned OpenCL build, kernel deployment, platform scope, and initial `cl_mem` ownership map.
 
 **Interpretation**
 
-- Applications should establish an explicit synchronization boundary before destroying a context that may have queued accelerator work.
+- Backend-before-scheduler safety depends on both resource-deleter independence and queued-work completion.
+- OpenCL buffer-local RAII does not itself prove command completion before release.
 
-## 2026-07-13 09:49 — Scheduler core teardown dependencies
+## 2026-07-13 19:51 — Line-aware generated source index
 
 **Verified**
 
-- Published `docs/architecture/scheduler-teardown-core.md`.
-- Scheduler free destroys events, graph-allocation resources, and host metadata without a generic synchronize call.
-- Event destruction dispatches through device interfaces; graph allocation frees concrete backend buffers.
+- `scripts/index_upstream.py` now emits untruncated, source-ordered `symbol_locations` records for every indexed file.
+- Each record includes approximate declaration `name`, `kind`, and 1-based `line`.
+- The legacy compact `symbols` field remains for compatibility.
+- Duplicate names remain visible in the line-aware list, and tests cover ordering, line calculation, scoped names, and conditional duplicates.
 
 **Interpretation**
 
-- Teardown safety depends on concrete backend device, queue, buffer-type, allocator, and callback lifetimes.
-
-## 2026-07-13 10:50 — Ordinary CPU backend teardown
-
-**Verified**
-
-- CPU graph execution is synchronous; the ordinary CPU backend exposes no async tensor methods, synchronize callback, or events.
-- CPU device state is static and scheduler buffers are backend-wrapper independent.
-
-**Interpretation**
-
-- Backend-before-scheduler destruction is verified safe for ordinary pinned CPU resources.
-
-## 2026-07-13 11:49 — CUDA backend teardown
-
-**Verified**
-
-- CUDA backend destruction releases context-owned streams, events, cuBLAS handles, graph state, and wrapper state.
-- Scheduler CUDA events and buffers retain device- or buffer-local state independent of the individual backend context.
-
-**Interpretation**
-
-- Backend-before-scheduler destruction is structurally independent for ordinary CUDA scheduler resources, but queued-work completion remains conditional.
-
-## 2026-07-13 12:49 — Metal backend teardown
-
-**Verified**
-
-- Metal backend free explicitly synchronizes before releasing command buffers and Objective-C resources.
-- Scheduler events and buffers retain device-level or buffer-local state.
-
-**Interpretation**
-
-- Backend-before-scheduler destruction is verified safe for ordinary pinned Metal resources.
-
-## 2026-07-13 13:52–14:50 — Vulkan command lifetime and teardown
-
-**Verified**
-
-- Vulkan command pools track reusable command buffers per context/device queue pairing.
-- Synchronous helpers wait on fences before recycling command-pool state.
-- Vulkan backend cleanup explicitly synchronizes before destroying context-owned submission resources.
-- Scheduler events use persistent registry-device state; scheduler buffers retain shared device/buffer ownership.
-
-**Interpretation**
-
-- Backend-before-scheduler destruction is verified safe for ordinary pinned Vulkan resources.
-
-**Open questions**
-
-- The optional performance query pool still needs a focused ownership/destructor audit.
-
-## 2026-07-13 15:49 — SYCL backend teardown
-
-**Verified**
-
-- Published `docs/architecture/sycl-backend-teardown.md` and linked it in Architecture navigation.
-- `ggml_backend_sycl_free()` deletes the per-backend context and generic wrapper without an explicit queue wait.
-- `ggml_backend_sycl_synchronize()` waits on `stream(device, 0)`, but backend free does not invoke it.
-- Async tensor set/get and graph execution can enqueue SYCL work and return without host completion.
-- The context borrows device-manager default-queue pointers and owns pools, scratchpads, flash-attention buffers, and optional executable graph state.
-- Scheduler events own independent `sycl::event` objects.
-- Ordinary scheduler buffers retain buffer-local device, allocation, queue, tensor-extra, and allocation-mode state.
-- SYCL buffer-type objects are function-static and outlive individual backend wrappers.
-
-**Interpretation**
-
-- Backend-before-scheduler destruction is structurally independent for ordinary SYCL scheduler events and buffers.
-- Queued-work completion remains conditional because backend free does not establish an explicit completion boundary before context-member destruction.
-- The pinned SYCL contract is closer to CUDA than to Metal or Vulkan.
+- The change removes the navigation blocker for large files such as `ggml-opencl.cpp`, but remains a regex-based aid rather than a compiler-grade call graph.
 
 **Historical**
 
-- Queue ownership, command graphs, async allocation extensions, DNNL, Level Zero, and split-buffer behavior are revision- and compiler-sensitive.
+- The previous format exposed only a deduplicated alphabetized list capped at 500 names per file.
 
 **Open questions**
 
-- Whether queue/pool/USM/command-graph destruction provides a portable implicit wait.
-- Whether queue-0 synchronization covers all multi-device and optional paths.
-- Whether immediate-context-destruction regression tests exist or should be added.
-
-## 2026-07-13 16:49 — RPC backend teardown
-
-**Verified**
-
-- Published `docs/architecture/rpc-backend-teardown.md` and linked it in Architecture navigation.
-- RPC backend free deletes only endpoint/device/name metadata and the generic wrapper; it performs no network operation or synchronization.
-- RPC buffers retain their own shared socket and remote handle, so their later free path is independent of the deleted backend wrapper.
-- Client graph compute sends a request without receiving a completion response; RPC synchronize is a no-op.
-- The server dispatches commands serially per connection, but graph handlers do not add a generic backend synchronize after remote graph submission.
-- Remaining remote buffers are released when the client session ends.
-
-**Interpretation**
-
-- Backend-before-scheduler destruction is structurally safe for ordinary pinned RPC client objects.
-- Remote work completion remains conditional on the concrete backend inside the server.
-- A following free-buffer command is ordered after graph submission but does not necessarily prove queued accelerator completion.
-
-**Historical**
-
-- Request-only graph commands, RDMA negotiation, graph reuse, and connection/error semantics are revision-sensitive.
-
-**Open questions**
-
-- Whether RPC synchronize should become a real remote command.
-- Whether graph compute needs an explicit completion response.
-- Whether shared-socket access is serialized for concurrent users.
-- Whether immediate graph-compute → teardown is covered by regression tests.
-
-## 2026-07-13 17:51 — CANN backend teardown
-
-**Verified**
-
-- Published `docs/architecture/cann-backend-teardown.md` and linked it in Architecture navigation.
-- CANN backend free performs device-wide synchronization, then resets the device, then deletes the per-backend context and wrapper.
-- The context owns lazy streams, an optional copy event, memory-pool state, rope/tensor caches, and optional ACL graph-cache state.
-- Scheduler events own independent ACL event handles and registry-device references.
-- Scheduler buffers own buffer-local device allocations and do not dereference the deleted backend context.
-- Registry devices are function-static process state.
-- Current upstream still uses the same reset-before-context-delete order as the pinned baseline.
-
-**Interpretation**
-
-- Queued work reaches an explicit device-wide completion boundary before teardown.
-- Backend-before-scheduler destruction is structurally independent for ordinary event and buffer objects.
-- Teardown order remains conditional because context and scheduler destructors call ACL destroy/free APIs after backend free has reset the device.
-
-**Historical**
-
-- The reset-before-context-delete order persists upstream as of 2026-07-13, but persistence does not prove cross-version API correctness.
-
-**Open questions**
-
-- Whether CANN permits stream, event, and allocation destruction after `aclrtResetDevice()`.
-- Whether reset invalidates resources and makes subsequent destroy/free calls redundant or invalid.
-- Whether one backend reset disrupts another backend instance on the same device.
-- Which runtime tests cover scheduler-resource release after backend free.
-
-## 2026-07-13 18:51 — OpenCL build and initial buffer lifetimes
-
-**Verified**
-
-- Published `docs/architecture/opencl-build-and-buffer-lifetimes.md` and linked it in Architecture navigation.
-- The pinned build creates `ggml-opencl` from one large host implementation plus a versioned catalog of OpenCL C kernels.
-- Kernels are either embedded through generated headers or copied beside the executable; an optional Adreno binary library can supply compatible kernels.
-- The catalog includes ordinary tensor operations, attention, quantized matrix operations, and MoE-specific reorder, sort, combine, and `MUL_MAT_ID` kernels.
-- The pinned host source defines a buffer-local RAII wrapper that releases `cl_mem` on replacement and destruction.
-
-**Interpretation**
-
-- Build/deployment lifetime for kernel artifacts is separate from runtime queue, event, program, kernel, memory, and context lifetime.
-- Buffer-local `cl_mem` ownership does not prove queued-command completion before release.
-- The complete OpenCL teardown classification remains open.
-
-**Historical**
-
-- Device support, kernel catalogs, deployment mode, compiler compatibility, and vendor binary coverage are revision-sensitive.
-
-**Open questions**
-
-- Exact backend/context free chain, queue completion, scheduler-event independence, program/kernel/context release order, binary-library handle lifetime, and optional CPU extra-buffer interactions.
+- Generate direct pinned source-line links and decide whether to add parser-assisted extraction for methods, templates, macros, and destructors.
