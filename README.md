@@ -79,16 +79,7 @@ Then group files into public API, model/GGUF loading, runtime context, memory mo
 
 ### Write layered documentation
 
-A mature topic should include:
-
-1. a five-minute explanation;
-2. an end-to-end flow;
-3. a source-level call chain;
-4. memory and concurrency notes;
-5. backend differences;
-6. figures or interactive diagrams;
-7. external references and runtime evidence;
-8. version caveats and open questions.
+A mature topic should include a five-minute explanation, end-to-end flow, source-level call chain, memory/concurrency notes, backend differences, figures or interactive diagrams, external references/runtime evidence, and version caveats/open questions.
 
 ### Validate
 
@@ -114,23 +105,21 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `logs/research/` | Detailed per-run notes |
 | `docs/reference/research-ledger.md` | External-source assessment |
 | `docs/roadmap.md` | Full implementation, file-analysis, and subsystem-synthesis plan |
-| `docs/reference/documentation-quality-roadmap.md` | Object-centred, searchable, and interactive documentation plan |
 | `docs/foundations/interactive-system-map.md` | Large clickable foundations map and tabbed explorer |
-| `docs/foundations/gguf-file-anatomy.md` | Canonical GGUF layout, metadata, descriptors, split indexing, loader entry, mmap, and ownership |
+| `docs/foundations/gguf-file-anatomy.md` | GGUF layout, metadata, descriptors, split indexing, loader entry, mmap, and ownership |
 | `docs/foundations/model-tensor-placement.md` | Layer/device assignment, buffer selection, mappings, alias/read/upload paths, synchronization, and ownership |
-| `docs/foundations/memory-lifetimes.md` | Canonical ownership and lifetime atlas for storage, mappings, page cache, model buffers, context state, graph allocations, copies, outputs, synchronization, and teardown |
-| `docs/objects/llama-model.md` | Canonical `llama_model` creation, architecture dispatch, tensor/layer schema, storage ownership, graph factory, sharing, and teardown |
-| `docs/objects/llama-context.md` | Canonical `llama_context` creation, ownership, lifetime, memory, execution, synchronization, and teardown |
+| `docs/foundations/memory-lifetimes.md` | Ownership and lifetime atlas for mappings, page cache, model buffers, context state, graph allocations, copies, outputs, and teardown |
+| `docs/objects/llama-model.md` | `llama_model` creation, architecture dispatch, tensor/layer schema, storage ownership, graph factory, sharing, and teardown |
+| `docs/objects/llama-context.md` | `llama_context` creation, ownership, lifetime, memory, execution, synchronization, and teardown |
 | `docs/ggml/graph-construction-and-moe.md` | Graph construction, MoE routing, graph reuse, router patch points, and per-layer LRU design |
-| `docs/architecture/public-api-minimal-example.md` | File-by-file Pass A map from the minimal example and public API into model/context implementation boundaries, ownership, synchronization, errors, and teardown |
-| `docs/architecture/model-gguf-loader-pass-a.md` | File-by-file Pass A inventory for GGUF parsing, split indexing, files/mappings, destination allocation, alias/read/upload paths, cancellation, and cleanup |
+| `docs/architecture/public-api-minimal-example.md` | Pass A public API/minimal-example map |
+| `docs/architecture/model-gguf-loader-pass-a.md` | Pass A model/GGUF loader inventory |
+| `docs/architecture/runtime-context-memory-pass-a.md` | Pass A runtime context and memory inventory |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
-| `data/generated/` | Generated source inventories |
 | `docs/assets/interactive/` | Interactive architecture assets |
-| `scripts/validate_interactive_links.py` | Static validation for local routes and Markdown section anchors embedded in interactive assets |
+| `scripts/validate_interactive_links.py` | Static validation for local routes and Markdown anchors in interactive assets |
 | `.github/workflows/` | CI, Pages, context, and indexing automation |
-| `scripts/` | Bootstrap, validation, indexing, and health checks |
 
 <!-- PROJECT-TODOS:START -->
 ## Living TODO list
@@ -139,46 +128,40 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Continue Pass A with runtime-context and memory files, then synthesize the public API, loader, model, and context groups into one subsystem relationship map.
-- [ ] Trace exact `llama_model` implementation members that receive retained mappings and backend buffers, including declaration and destruction order.
-- [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
+- [ ] Synthesize the completed public API, model/GGUF loader, `llama_model`, `llama_context`, and memory Pass A work into one subsystem relationship map with ownership and synchronization boundaries.
+- [ ] Enumerate every concrete `llama_memory_i` implementation at the pinned revision and map each architecture to KV, recurrent, hybrid, iSWA, or specialized memory.
+- [ ] Trace exact `llama_model` and `llama_context` member declaration/destruction order for retained mappings, backend buffers, scheduler, memory, graph results, outputs, and backend instances.
+- [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, memory-update graphs, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
-- [ ] Expand the interactive explorer with architecture-specific graph-builder sublayers, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
+- [ ] Expand the interactive explorer with architecture-specific graph builders, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/model-gguf-loader-pass-a/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/runtime-context-memory-pass-a/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
-- [ ] Extend interactive-link validation to generated routes, built HTML IDs, non-HTML assets, and MkDocs plugin-generated anchors.
+- [ ] Extend interactive-link validation to built HTML IDs, generated routes, non-HTML assets, and plugin-generated anchors.
 - [ ] Add RAII guidance or an upstream example patch for deterministic cleanup on every minimal-example error path.
-- [ ] Trace every concrete `llama_memory_i` implementation and map architectures to KV, recurrent, and hybrid memory.
-- [ ] Locate the strongest explicit public contract for model sharing, thread safety, backend teardown synchronization, and destruction order.
+- [ ] Locate the strongest public contract for model sharing, context concurrency, thread safety, backend teardown synchronization, and destruction order.
 - [ ] Prototype per-layer LRU expert-cache instrumentation using `(layer_id, expert_id)` keys and separate logical, OS-residency, and backend-copy validity fields.
 - [ ] Prototype cache-aware routing by adding selection-only bias before `ggml_argsort_top_k()`.
 - [ ] Quantify backend entry into mmap alias, mapped-copy, direct-read, synchronous-upload, and asynchronous-upload paths.
 - [ ] Trace direct-I/O alignment/fallback behavior with runtime evidence.
-- [ ] Add reusable page metadata for prerequisites, related objects, source symbols, and next pages.
 - [ ] Extend the source index with per-file, object, symbol, subsystem, and caller/callee landing pages.
-- [ ] Add dedicated mmap/page-fault, CPU-thread, backend-queue, KV-cache, MoE-routing, and scheduler-timeline visualizers.
+- [ ] Add dedicated mmap/page-fault, CPU-thread, backend-queue, KV-cache, recurrent-memory, MoE-routing, and scheduler-timeline visualizers.
 - [ ] Trace exact Metal shared/private buffer-level set/get/copy branches.
-- [ ] Measure mmap page faults, queue/fence waits, temporary RSS, and copy/compute overlap for representative prefill and decode runs.
 - [ ] Extend backend comparisons to RPC, CANN, OpenCL, Android-specific backends, and later scheduler-copy revisions.
 - [ ] Expand graph-reuse documentation with every specialized `can_reuse()` predicate.
 - [ ] Add a searchable index for detailed research logs and commit-pinned link checking.
 
 ### Completed
 
-- [x] Complete file-by-file Pass A for the model/GGUF loader group with construction order, source index, ownership transitions, population paths, synchronization, cancellation, and cleanup.
-- [x] Complete file-by-file Pass A for the public API/minimal-example group with a relationship diagram, file/symbol inventory, ownership, synchronization, backend assumptions, error paths, and teardown.
-- [x] Add CI validation for canonical local routes and section anchors embedded in interactive HTML/JavaScript assets, with valid/invalid fixture tests and actionable asset/route/anchor errors.
-- [x] Connect all eight memory-lifecycle explorer entries to the canonical atlas and add an accessible ownership/lifetime overlay with owner, backing, validity/residency, synchronization, and release fields.
-- [x] Publish the canonical memory-lifetime atlas covering GGUF storage, virtual mappings, page faults/page cache/RSS, model buffers, KV/recurrent/hybrid state, graph allocations, scheduler copies, backend staging, outputs, prefill/decode differences, synchronization, teardown, runtime measurements, and truth labels.
-- [x] Link the interactive **Model object** layer to `objects/llama-model/` with top-level navigation.
-- [x] Publish the canonical `llama_model` object page with architecture dispatch, common/architecture loading boundaries, tensor and layer schemas, persistent storage ownership, device placement, graph-builder delegation, context sharing, memory factory, teardown, source map, and truth labels.
-- [x] Add `llama_model` to top-level Objects navigation.
-- [x] Link graph-construction, graph-expansion, MoE routing, GGML graph, and graph-reuse explorer entries to the canonical graph chapter.
-- [x] Publish canonical graph-construction/MoE, model-placement, GGUF anatomy, and `llama_context` chapters.
+- [x] Complete file-by-file Pass A for runtime-context and memory files with construction, ownership, batch/microbatch memory planning, KV/recurrent/hybrid behavior, sequence mutation, state I/O, threads, synchronization, reset, and teardown.
+- [x] Complete file-by-file Pass A for the model/GGUF loader group.
+- [x] Complete file-by-file Pass A for the public API/minimal-example group.
+- [x] Add CI validation for canonical local routes and section anchors embedded in interactive assets.
+- [x] Publish the canonical memory-lifetime atlas and interactive ownership/lifetime overlay.
+- [x] Publish canonical `llama_model`, `llama_context`, graph/MoE, model-placement, and GGUF-anatomy pages with explorer integration.
 - [x] Add the six-tab foundations explorer and four-pass file-by-file/subsystem-synthesis roadmap.
 - [x] Document scheduler execution, generic copy fallback, CPU/CUDA/Metal/Vulkan/SYCL semantics, and the central buffer compatibility matrix.
 - [x] Add strict CI, Pages deployment health checking, source indexing, and durable scheduled-run context.
