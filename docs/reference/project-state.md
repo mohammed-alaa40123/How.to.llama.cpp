@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 13:52 Africa/Cairo_
+_Last updated: 2026-07-13 14:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -26,66 +26,65 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Pinned CUDA backend teardown dependency audit and conditional safety classification.
 - Pinned Metal backend teardown audit and verified-safe backend-before-scheduler classification.
 - Pinned Vulkan command-pool, command-buffer, fence, semaphore, event, and synchronous-helper completion-boundary map.
+- Pinned Vulkan backend free-chain audit and verified-safe ordinary backend-before-scheduler classification.
 
 ## Latest concrete findings
 
-- `vk_command_pool` stores a Vulkan pool, stable command-buffer records, and a borrowed queue pointer; pools exist per `(context, queue)` and `(device, queue)` pairing.
-- `ggml_vk_command_pool_cleanup()` resets a command pool only under the explicit source precondition that its command buffers are already complete.
-- Synchronous Vulkan buffer read, same-device copy, and GPU memset helpers submit work with a device fence, wait indefinitely for that fence, reset it, and only then recycle command-pool state.
-- Deferred host copies in the read path occur after the fence completion boundary.
-- Context synchronization primitives are pooled: binary semaphores, timeline semaphores, and Vulkan events are created on demand and selected through reusable indices.
-- `ggml_backend_vk_graph_compute()` is submission-oriented; return from graph computation is not by itself proof of device completion.
-- The complete Vulkan backend-before-scheduler destruction classification remains open pending the exact final free chain and scheduler event/buffer ownership audit.
+- `ggml_backend_vk_free()` calls `ggml_vk_cleanup()` before deleting the Vulkan backend context and wrapper.
+- `ggml_vk_cleanup()` discards unsubmitted compute recording, explicitly calls `ggml_vk_synchronize()` for submitted work, and only then destroys context-owned temporary buffers, events, fences, descriptor pools, command pools, and transfer synchronization state.
+- Vulkan scheduler events are device-owned resources: their free callback resolves the persistent registry device, destroys the event-owned timeline semaphore and `VkEvent` objects, and does not dereference the deleted backend context.
+- Vulkan scheduler buffers own a buffer-local context containing a shared `vk_device` and `vk_buffer`; their deleter does not require the deleted backend context.
+- The backend-device registry stores function-static device wrappers, so scheduler event destruction remains valid after individual backend-wrapper deletion.
+- Backend-before-scheduler destruction is verified safe for the ordinary pinned Vulkan resources inspected in this audit.
+- A possible cleanup gap remains: the performance query pool is created/replaced during graph compute, but no explicit `destroyQueryPool(ctx->query_pool)` appeared in the inspected backend cleanup body.
 
 ## In progress
 
-- Vulkan final free-chain audit: backend synchronization, context/device queue completion, command/descriptor/query pool release, semaphore/event destruction, allocator-backed buffers, and scheduler ordering.
 - Remaining concrete backend teardown audits for SYCL, RPC, CANN, and OpenCL.
 - Optional CPU extra-buffer teardown audit.
 - CUDA concurrent-stream synchronization coverage.
+- Vulkan performance-query-pool ownership and process-exit device teardown.
 - Architecture-specific graph-builder downcasts and exact state tensors.
 - Runtime evidence for synchronization, event waits, page faults, memory updates, and teardown.
 
 ## Immediate next task
 
-Finish the pinned Vulkan teardown classification:
+Audit the pinned SYCL backend teardown:
 
 ```text
-Vulkan backend wrapper free
-→ final queue/device synchronization
-→ context command/descriptor/query pools
-→ fences, semaphores, and events
-→ allocator-backed buffer release
-→ scheduler event and buffer lifetime
+SYCL backend wrapper free
+→ queue wait/completion behavior
+→ context and stream/queue ownership
+→ scheduler event implementation
+→ USM/device/host buffer destruction
+→ static registry/device lifetime
 → classify backend-before-scheduler ordering
 ```
 
 Required deliverables:
 
-1. exact Vulkan backend/context free chain;
-2. final compute and transfer queue completion behavior;
-3. destruction order for command, descriptor, and query pools plus fences/semaphores/events;
-4. buffer, device, and buffer-type ownership;
+1. exact SYCL backend/context free chain;
+2. queue completion behavior during free;
+3. event and buffer ownership after backend-wrapper deletion;
+4. static device/buffer-type lifetime;
 5. safety classification for the pinned context member order;
 6. truth labels and durable context updates.
 
 ## Publication and verification state
 
-- New page: `docs/architecture/vulkan-command-lifetime.md`.
-- Page commit: `a7301fcf2432dc26b768acc85e6269830e448b8a`.
-- Navigation commit: `d95410622cb9539237ef1013e29554311ed28486`.
-- README/TODO commit: `45294c11410f5ca6cc809d20d4eaca410ca4f3d4`.
-- Connector-side source inspection confirmed the command-pool topology, explicit completion precondition for pool reset, pooled synchronization objects, and fence-based completion sequence used by synchronous read/copy/memset helpers.
-- Combined-status lookup for `45294c11410f5ca6cc809d20d4eaca410ca4f3d4` returned no status records, and the commit-workflow endpoint returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
-- Direct web opening of both the Pages root and `architecture/vulkan-command-lifetime/` was rejected by the available safe-URL gate, so live HTTP status and rendered content remain unverified.
+- New page: `docs/architecture/vulkan-backend-teardown.md`.
+- Page commit: `00d82b68637722e84fd68bdd4d1d82b9d94226a8`.
+- Navigation commit: `69b0fed03e807d4fd913720258e477c10e660a8f`.
+- Connector-side source inspection confirmed the explicit cleanup synchronization boundary, context-owned destruction order, scheduler event/device independence, buffer-local shared-device ownership, and static registry lifetime.
+- GitHub Actions and Pages are checked after the durable context updates in this run; exact results or blockers are recorded below and in the README TODOs.
 - No new external secondary source was introduced; the research ledger remains unchanged.
 
 ## Known blockers and caveats
 
 - **Local validation blocker:** the execution environment cannot resolve `github.com` and has no usable repository checkout, so `validate_project_context.py`, interactive-link tests, unit tests, strict MkDocs build, and `check_site.sh` could not run locally.
-- **CI visibility blocker:** the available status endpoint returned no records and the commit workflow endpoint returned an empty run list, so push-triggered workflow results cannot be confirmed.
-- **Pages verification blocker:** the web safety gate rejected direct opening of the root and new route; HTTP response and expected rendered content could not be inspected.
-- **Vulkan scope caveat:** this increment maps command and completion lifetimes but does not yet prove the final backend-free destruction order.
+- **CI visibility blocker:** commit-scoped workflow discovery may omit push-triggered runs; exact status is recorded after the final commit check.
+- **Pages verification blocker:** direct web access must be tested after publication; if the available web gate blocks the Pages URL, HTTP response and rendered content remain unverified.
+- **Vulkan query-pool caveat:** the inspected cleanup path does not explicitly destroy the optional performance query pool; ownership or leak behavior needs a focused follow-up.
 - Mapping, allocation, residency, validity, command completion, ownership, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
