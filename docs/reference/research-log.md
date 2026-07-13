@@ -158,6 +158,34 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Runtime overlap, fallback frequency, copy bytes, event waits, and graph-reallocation frequency.
 - Exact later changes to scheduler copy validity and partial MoE transfers.
 
+## 2026-07-13 07:50 — Concrete context-memory implementations
+
+**Verified**
+
+- Published `docs/architecture/context-memory-implementations.md` and added it to Architecture navigation.
+- The pinned tree contains seven concrete persistent `llama_memory_i` implementations: ordinary KV, iSWA, DSA, DSV4, recurrent, hybrid, and hybrid-iSWA.
+- Exact recurrent architectures are Mamba, Mamba2, RWKV6, RWKV6-Qwen2, RWKV7, and ARWKV7.
+- Exact hybrid architectures are Jamba, Falcon H1, Plamo2, Granite Hybrid, LFM2/LFM2-MoE, Nemotron H variants, Qwen3-Next, Kimi Linear, and Qwen3.5 variants.
+- DeepSeek 3.2 and DeepSeek 4 use dedicated DSA and DSV4 memories; SWA attention paths use iSWA wrappers.
+- Encoder, embedding, selected audio-decoder, and diffusion architectures explicitly receive no persistent context memory.
+- DSV4 combines raw iSWA state, compressed K-only stores, and persistent compressor state rather than behaving as one ordinary KV cache.
+
+**Interpretation**
+
+- The factory acts as an architecture-to-state-machine compiler combining architecture, context type, SWA, offload, and layer-filter decisions.
+- Composite memories coordinate child plans; allocation, validity, and completion remain separate states.
+- “KV cache size” is not a universal metric for recurrent, hybrid, or compressed-cache models.
+
+**Historical**
+
+- The class family, architecture predicates, MTP exception, DSV4 layout, and rollback support are revision-sensitive.
+
+**Open questions**
+
+- Map architecture-specific graph-builder downcasts and exact state tensors read/written.
+- Measure bytes, update-graph cost, and synchronization per memory family.
+- Trace exact model/context teardown ordering and public concurrency guarantees.
+
 **Next step**
 
-- Enumerate concrete `llama_memory_i` implementations and map architectures to KV, recurrent, hybrid, iSWA, and specialized memory at the pinned revision.
+- Trace exact `llama_model` and `llama_context` member declaration and reverse-destruction order, including queued backend work and external lifetime requirements.
