@@ -72,17 +72,21 @@ Then audit optional CPU extra-buffer deleters independently.
 - Source-index documentation commit: `1e52fb4030f05586e185d48d5089added45c6556`.
 - Detailed note commit: `0d89af07dde6315a00bc2f69f0a6554ad808c097`.
 - Research-log commit: `219118453b5d1c6201bfa37790ea1071c3791159`.
+- README/TODO commit: `c7157c334888fb289980aca751c7dc164185a64e`.
 - Connector-side inspection verified the implementation, invocation, test cases, and documentation.
+- A bounded local smoke test verified URL normalization and `#L17` line-fragment generation.
 - Local clone of pinned llama.cpp still fails with `Could not resolve host: github.com`; source regeneration and full local project validation could not run.
-- GitHub Actions and Pages verification for the final commit are pending the checks below.
+- Combined status for `c7157c334888fb289980aca751c7dc164185a64e` returned no status records.
+- The commit-scoped workflow lookup returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified, not confirmed failed.
+- Direct opening of the Pages root and `reference/source-index/` route was rejected by the available safe-URL gate, so HTTP status and rendered content are unverified.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** the execution environment cannot resolve `github.com`, so the new index cannot be run against the pinned checkout here.
 - **Large upstream file blocker:** the GitHub connector could not return the oversized pinned `ggml-opencl.cpp`, so the OpenCL teardown audit could not be completed honestly in this run.
-- **Local validation blocker:** Python tests, strict MkDocs, and `check_site.sh` require a usable checkout and could not be run here.
-- **CI visibility blocker:** inspect the final commit's workflow runs and statuses; record an empty result as unverified rather than failed.
-- **Pages verification blocker:** verify the root and `reference/source-index/` route when direct live access is available.
+- **Local validation blocker:** the full Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout and could not be run here.
+- **CI visibility blocker:** combined status was empty and the available commit workflow endpoint returned no runs for the checked commit.
+- **Pages verification blocker:** the safe-URL gate rejected direct access to the root and source-index route.
 - **OpenCL completion caveat:** `cl_mem` ownership is verified, but command completion before release remains open.
 - **CANN reset-order caveat:** device-wide completion is explicit, but the validity of later ACL destroy/free calls after `aclrtResetDevice()` is unverified.
 - **RPC completion caveat:** graph compute has no completion response and RPC synchronize remains a no-op.
