@@ -118,6 +118,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/context-memory-implementations.md` | Exact concrete memory implementations and architecture factory mapping |
 | `docs/architecture/backend-scheduler-pass-a.md` | Pass A scheduler assignment, splits, copy ring, validity, events, reuse, and teardown |
 | `docs/architecture/system-ownership-and-execution-map.md` | Cross-subsystem ownership, execution, mutation, synchronization, and teardown synthesis |
+| `docs/architecture/model-context-teardown-order.md` | Exact declaration order, reverse destruction, RAII ownership, synchronization caveats, and safe teardown |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
 | `docs/assets/interactive/` | Interactive architecture assets |
@@ -131,15 +132,15 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Trace exact `llama_model` and `llama_context` member declaration/destruction order for retained mappings, backend buffers, scheduler, memory, graph results, outputs, and backend instances.
+- [ ] Trace `ggml_backend_sched_free`, scheduler event/buffer deleters, and concrete backend destruction to resolve whether the pinned context member order safely destroys owning backend wrappers before `sched`.
 - [ ] Map each architecture-specific graph builder downcast to `llama_memory_context_i` subtypes and identify exact state tensors read and written.
-- [ ] Map concrete backend implementations of async copy, events, graph submission, and synchronization across CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL.
-- [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, scheduler copy generations, event waits, memory-update graphs, first-token access, KV/recurrent growth, activation peaks, and teardown.
+- [ ] Map concrete backend implementations of async copy, events, graph submission, synchronization, and teardown across CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL.
+- [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, scheduler copy generations, event waits, memory-update graphs, first-token access, KV/recurrent growth, activation peaks, synchronization, and teardown.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
 - [ ] Expand the interactive explorer with architecture-specific graph builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/context-memory-implementations/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/model-context-teardown-order/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
@@ -159,6 +160,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Trace exact `llama_model` and `llama_context` member declaration and reverse-destruction order, including retained mappings, backend buffers, scheduler, memory, graph results, outputs, backend instances, partial construction, and safe application teardown.
 - [x] Enumerate every concrete `llama_memory_i` and primary `llama_memory_context_i` implementation at the pinned revision and map architecture factory decisions to no-memory, KV, iSWA, recurrent, hybrid, DSA, and DSV4 storage.
 - [x] Complete file-by-file Pass A for backend scheduler internals: backend assignment, split creation, copy-ring allocation, destination validity, events, asynchronous submission, fallback synchronization, graph-allocation reuse, and teardown.
 - [x] Synthesize the public API, model/GGUF loader, `llama_model`, `llama_context`, and memory Pass A work into one subsystem relationship map with ownership, mutation, synchronization, and teardown boundaries.
