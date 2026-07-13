@@ -73,12 +73,15 @@ Then audit optional CPU extra-buffer deleters independently.
 - Detailed note commit: `f4877f4793c7d3bee168271ff3f5ccf594dda07f`.
 - Connector-side inspection verified the build and initial buffer-ownership claims.
 - Local clone failed with `Could not resolve host: github.com`; project validators, tests, strict MkDocs, and `check_site.sh` could not run locally.
-- GitHub Actions and Pages verification results for this increment are recorded below after final checks.
+- Combined status for the project-state commit returned no status records, and the commit-scoped workflow endpoint returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
+- Public search returned no indexed result for the site root or new OpenCL route. Direct access was rejected by the safe-URL gate, so HTTP status and rendered content remain unverified.
 
 ## Known blockers and caveats
 
 - **Large-source extraction blocker:** `ggml-opencl.cpp` is a very large single translation unit. The connector exposed its blob but not arbitrary symbol ranges, so the complete destructor chain could not be reviewed safely in this increment.
 - **Local validation blocker:** cloning failed because the execution environment could not resolve `github.com`.
+- **CI visibility blocker:** combined status was empty and the available commit workflow endpoint returned no runs for the checked commit.
+- **Pages verification blocker:** search found no indexed result and the safe-URL gate rejected direct access to both the root and OpenCL route.
 - **OpenCL completion caveat:** `cl_mem` ownership is verified, but command completion before release is not yet established.
 - **CANN reset-order caveat:** device-wide completion is explicit, but the validity of later ACL destroy/free calls after `aclrtResetDevice()` is unverified.
 - **RPC completion caveat:** graph compute has no completion response and RPC synchronize remains a no-op.
