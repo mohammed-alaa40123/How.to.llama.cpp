@@ -207,8 +207,41 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Whether optional CPU extra-buffer implementations preserve the same backend-independent destruction property.
-- Whether a sanitizer regression test covers backend-first CPU scheduler teardown.
+- Whether a sanitizer regression test covers backend-first CPU scheduler destruction.
 
 **Next step**
 
 - Audit CUDA stream, event, graph-resource, device, buffer-type, and `cudaFree` teardown behavior.
+
+## 2026-07-13 11:49 — CUDA backend teardown
+
+**Verified**
+
+- Published `docs/architecture/cuda-backend-teardown.md` and added it to Architecture navigation.
+- `ggml_backend_cuda_free()` deletes the CUDA context and then the backend wrapper.
+- The CUDA context destructor waits for active graph capture to finish, then destroys its copy event, streams, and cuBLAS handles without an explicit general stream synchronization call.
+- CUDA graph compute returns after enqueueing kernels or launching a CUDA graph.
+- Scheduler CUDA events own their own `cudaEvent_t` and are destroyed through static device-interface state without accessing the deleted backend context.
+- Scheduler CUDA buffers own their device id and pointer and reach `cudaFree` through a buffer-local context; CUDA buffer types are static registry objects.
+- Pools, concurrent events, and CUDA graph objects unwind after the context destructor body and its explicit stream-destruction loop.
+
+**Interpretation**
+
+- Backend-before-scheduler destruction is structurally independent for ordinary CUDA scheduler events and buffers.
+- Queued-work completion remains conditional because the pinned source relies on CUDA-family runtime destruction semantics rather than explicitly synchronizing all created streams before teardown.
+- Explicit synchronization before context destruction remains the clearest portable application boundary.
+
+**Historical**
+
+- CUDA graphs, concurrent streams, VMM pools, copy-event ownership, registry lifetime, and CUDA/HIP/MUSA behavior are revision-sensitive.
+
+**Open questions**
+
+- Whether all supported CUDA-family runtimes guarantee safe destruction in the pinned order with queued work.
+- Whether the synchronize callback covers every lazily created concurrent stream.
+- Whether pools, concurrent events, and graph maps should be cleared before streams.
+- Whether immediate asynchronous-destruction regression tests exist.
+
+**Next step**
+
+- Audit Metal command queues/buffers, event/fence objects, shared/private allocations, Objective-C ownership, synchronization, and backend-before-scheduler safety.
