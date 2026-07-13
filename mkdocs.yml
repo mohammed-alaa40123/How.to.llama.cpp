@@ -80,6 +80,7 @@ nav:
       - Repository map: architecture/repository-map.md
       - Public API and minimal example: architecture/public-api-minimal-example.md
       - Model and GGUF loader Pass A: architecture/model-gguf-loader-pass-a.md
+      - Runtime context and memory Pass A: architecture/runtime-context-memory-pass-a.md
   - Inference lifecycle:
       - Brief end to end: lifecycle/end-to-end.md
       - Decode and graph reuse: lifecycle/decode-graph-reuse.md
