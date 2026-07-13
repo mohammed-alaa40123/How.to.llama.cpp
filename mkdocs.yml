@@ -97,6 +97,7 @@ nav:
       - CANN backend teardown: architecture/cann-backend-teardown.md
       - OpenCL build and buffer lifetimes: architecture/opencl-build-and-buffer-lifetimes.md
   - Inference lifecycle:
+      - Guided inference atlas: lifecycle/inference-atlas.md
       - Brief end to end: lifecycle/end-to-end.md
       - Decode and graph reuse: lifecycle/decode-graph-reuse.md
       - Backend scheduler execution: lifecycle/backend-scheduler-execution.md
