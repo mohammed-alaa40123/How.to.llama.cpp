@@ -130,6 +130,34 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Exact model/context member destruction order, public concurrency contracts, output synchronization guarantees, architecture-to-memory mapping, and scheduler copy validity across graph reuse.
 
+## 2026-07-13 06:49 — Backend scheduler Pass A
+
+**Verified**
+
+- Published `docs/architecture/backend-scheduler-pass-a.md` and added it to Architecture navigation.
+- Inventoried scheduler construction, backend assignment, split construction, cross-backend dependency copies, graph allocation, execution, synchronization, reset, and teardown.
+- `ggml_backend_sched` owns assignment metadata, split records, a temporary GGML context, graph-allocation state, per-backend/per-slot copy pointers, and backend events.
+- Copy tensors are scheduler execution storage, not persistent model weights or context sequence memory.
+- Destination allocation, current-generation data validity, and prior-consumer completion are separate states.
+- User inputs are captured under a stricter lifetime assumption; ordinary internal copies can use asynchronous peer-copy support or synchronized fallback.
+- Graph-allocation reuse preserves compatible placement/allocation structure, not input values, copy generations, outputs, or sequence state.
+
+**Interpretation**
+
+- A scheduler copy is valid only for a particular source-value generation and copy slot.
+- Backend events are reuse fences for destination storage, not merely profiling markers.
+- The pinned `MUL_MAT_ID` partial expert transfer reduces bytes but does not implement a persistent expert cache.
+
+**Historical**
+
+- PRs #20793 and #25319 provide design history but do not replace the pinned implementation.
+
+**Open questions**
+
+- Concrete async-copy and event behavior for every backend.
+- Runtime overlap, fallback frequency, copy bytes, event waits, and graph-reallocation frequency.
+- Exact later changes to scheduler copy validity and partial MoE transfers.
+
 **Next step**
 
-- Complete file-by-file Pass A for backend scheduler internals, including graph assignment, splits, copy-ring allocation, destination validity, events, asynchronous submission, fallback synchronization, reuse, and teardown.
+- Enumerate concrete `llama_memory_i` implementations and map architectures to KV, recurrent, hybrid, iSWA, and specialized memory at the pinned revision.
