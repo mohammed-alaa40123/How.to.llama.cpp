@@ -96,6 +96,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `logs/research/` | Detailed per-run notes |
 | `docs/reference/research-ledger.md` | External-source assessment |
 | `docs/roadmap.md` | Full implementation and synthesis plan |
+| `docs/lifecycle/inference-atlas.md` | Clickable end-to-end pipeline and audience-specific reading paths |
 | `docs/foundations/interactive-system-map.md` | Clickable foundations map |
 | `docs/foundations/gguf-file-anatomy.md` | GGUF layout, descriptors, mmap, and ownership |
 | `docs/foundations/model-tensor-placement.md` | Layer/device assignment, mappings, upload paths, and ownership |
@@ -139,9 +140,9 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias/upload bytes, scheduler copy generations, event waits, memory-update graphs, KV/recurrent growth, activation peaks, synchronization, and teardown.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once generated source-link checking is ready.
 - [ ] Expand the interactive explorer with architecture-specific builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime overlays.
-- [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
+- [ ] Replace curated interactive metadata with generated versioned JSON shared by the inference atlas, object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/backend-teardown-comparison/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `lifecycle/inference-atlas/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
@@ -161,6 +162,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add a guided end-to-end inference atlas with a clickable pipeline, stage/lifetime table, and audience-specific reading paths across GGUF, model/context, graph, scheduler, backends, memory, and teardown.
 - [x] Add a revision-pinned cross-backend teardown comparison matrix that separates command completion from scheduler-resource deleter independence and links each classification to its detailed audit.
 - [x] Add revision-pinned file and `#L<line>` symbol URLs to the generated source inventory, derive them from the selected llama.cpp revision, and cover URL generation with regression tests.
 - [x] Add untruncated, source-ordered symbol records with approximate declaration kind and 1-based line numbers to the generated source inventory, while retaining the legacy compact symbol list and adding regression tests.
