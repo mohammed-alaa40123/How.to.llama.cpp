@@ -72,12 +72,16 @@ Then audit optional CPU extra-buffer deleters independently.
 - Research-log commit: `778635b940b0bcf866d9727eaf7fd8d065222b0f`.
 - Connector-side inspection verified the implementation and test fixture structure.
 - Local clone of pinned llama.cpp failed with `Could not resolve host: github.com`; source regeneration and local project validation could not run.
-- GitHub Actions and Pages status for this increment are recorded below after final checks.
+- Combined status for commit `e0025784be70d6d9218fd88e1ecaf56d813b3763` returned no status records.
+- The commit-scoped workflow lookup returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified, not confirmed failed.
+- Direct opening of the Pages root and `reference/source-index/` route was rejected by the available safe-URL gate because neither URL was available from prior search results; HTTP status and rendered content are unverified.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** the execution environment cannot resolve `github.com`, so the new index could not be run against the pinned checkout in this run.
 - **Local validation blocker:** Python tests, strict MkDocs, and `check_site.sh` require a usable checkout and could not be run here.
+- **CI visibility blocker:** combined status was empty and the available commit workflow endpoint returned no runs for the checked commit.
+- **Pages verification blocker:** the safe-URL gate rejected direct access to the root and source-index route, so live HTTP and rendered content could not be inspected.
 - **OpenCL completion caveat:** `cl_mem` ownership is verified, but command completion before release remains open.
 - **CANN reset-order caveat:** device-wide completion is explicit, but the validity of later ACL destroy/free calls after `aclrtResetDevice()` is unverified.
 - **RPC completion caveat:** graph compute has no completion response and RPC synchronize remains a no-op.
