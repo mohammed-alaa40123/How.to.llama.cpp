@@ -45,9 +45,26 @@ def markdown_slug(text: str) -> str:
         return explicit.group(1)
     text = EXPLICIT_ID_RE.sub("", text)
     text = MARKDOWN_LINK_RE.sub(r"\1", text)
-    text = CODE_RE.sub(r"\1", text)
+
+    # Preserve characters that are literal inside inline-code spans while
+    # removing Markdown emphasis markers elsewhere. Python-Markdown renders
+    # ``llama_model`` as <code>llama_model</code>, and its TOC slugger keeps
+    # the underscore. Removing all underscores before slugification produced
+    # the incorrect anchor ``llamamodel``.
+    code_spans: list[str] = []
+
+    def stash_code(match: re.Match[str]) -> str:
+        token = f"ZZZCODETOKEN{len(code_spans)}ZZZ"
+        code_spans.append(match.group(1))
+        return token
+
+    text = CODE_RE.sub(stash_code, text)
     text = HTML_TAG_RE.sub("", text)
-    text = re.sub(r"[*_~]", "", text).strip().lower()
+    text = re.sub(r"[*_~]", "", text)
+    for index, code in enumerate(code_spans):
+        text = text.replace(f"ZZZCODETOKEN{index}ZZZ", code)
+
+    text = text.strip().lower()
     text = re.sub(r"[^\w\- ]", "", text, flags=re.UNICODE)
     text = re.sub(r"[\s\-]+", "-", text).strip("-")
     return text
