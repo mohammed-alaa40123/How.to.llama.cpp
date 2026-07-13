@@ -45,11 +45,29 @@ def extract_symbols(text: str) -> list[dict[str, object]]:
     return sorted(records, key=lambda item: (int(item["line"]), str(item["kind"]), str(item["name"])))
 
 
+def source_file_url(base: str | None, relative_path: str) -> str | None:
+    """Return a normalized source-file URL when a repository/ref base is supplied."""
+    if not base:
+        return None
+    return f"{base.rstrip('/')}/{relative_path}"
+
+
+def add_source_links(symbols: list[dict[str, object]], file_url: str | None) -> list[dict[str, object]]:
+    """Copy symbol records and add stable line-fragment URLs when possible."""
+    if not file_url:
+        return [dict(item) for item in symbols]
+    return [dict(item, source_url=f"{file_url}#L{int(item['line'])}") for item in symbols]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('source', type=Path)
     ap.add_argument('--out', type=Path, default=Path('data/generated/source-index.json'))
     ap.add_argument('--markdown', type=Path, default=Path('docs/reference/generated-source-inventory.md'))
+    ap.add_argument(
+        '--source-url-base',
+        help='Optional pinned blob URL prefix, for example https://github.com/ggml-org/llama.cpp/blob/<commit>',
+    )
     args = ap.parse_args()
     src = args.source.resolve()
     records = []
@@ -64,8 +82,9 @@ def main() -> int:
         except (UnicodeDecodeError, OSError):
             continue
         rel = p.relative_to(src).as_posix()
-        symbol_records = extract_symbols(text)
-        records.append({
+        file_url = source_file_url(args.source_url_base, rel)
+        symbol_records = add_source_links(extract_symbols(text), file_url)
+        record = {
             'path': rel,
             'language': language(p),
             'bytes': len(raw),
@@ -74,11 +93,15 @@ def main() -> int:
             'includes': sorted(set(INCLUDE_RE.findall(text))),
             # Preserve the original compact field for existing consumers.
             'symbols': sorted({str(item['name']) for item in symbol_records})[:500],
-            # New untruncated, source-ordered navigation records.
+            # Untruncated, source-ordered navigation records.
             'symbol_locations': symbol_records,
-        })
+        }
+        if file_url:
+            record['source_url'] = file_url
+        records.append(record)
     summary = {
         'source_root': str(src),
+        'source_url_base': args.source_url_base.rstrip('/') if args.source_url_base else None,
         'file_count': len(records),
         'total_lines': sum(r['lines'] for r in records),
         'files': records,
@@ -97,9 +120,10 @@ def main() -> int:
         bylang[r['language']][0] += 1
         bylang[r['language']][1] += r['lines']
     rows = '\n'.join(f"| {k} | {v[0]} | {v[1]:,} |" for k, v in sorted(bylang.items(), key=lambda kv: -kv[1][1]))
+    source_note = f" Source links target `{summary['source_url_base']}`." if summary['source_url_base'] else ''
     md = f"""# Generated source inventory
 
-Generated from `{src}`. This is a navigation index, not a compiler-grade call graph.
+Generated from `{src}`. This is a navigation index, not a compiler-grade call graph.{source_note}
 
 - Files: **{len(records):,}**
 - Lines: **{summary['total_lines']:,}**
@@ -108,7 +132,7 @@ Generated from `{src}`. This is a navigation index, not a compiler-grade call gr
 |---|---:|---:|
 {rows}
 
-The full per-file index is stored in `data/generated/source-index.json`. Each file now includes untruncated `symbol_locations` records with approximate declaration kind and 1-based source line, while the legacy compact `symbols` field remains for compatibility.
+The full per-file index is stored in `data/generated/source-index.json`. Each file includes untruncated `symbol_locations` records with approximate declaration kind and 1-based source line. When `--source-url-base` is supplied, file records and symbols also include pinned GitHub URLs. The legacy compact `symbols` field remains for compatibility.
 """
     args.markdown.parent.mkdir(parents=True, exist_ok=True)
     args.markdown.write_text(md)
