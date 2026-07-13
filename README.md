@@ -123,6 +123,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/cpu-backend-teardown.md` | Ordinary CPU backend free path, synchronous execution contract, event/device lifetime, and backend-before-scheduler safety classification |
 | `docs/architecture/cuda-backend-teardown.md` | CUDA context, stream, event, graph, buffer, and registry teardown dependencies plus conditional safety classification |
 | `docs/architecture/metal-backend-teardown.md` | Metal explicit synchronization, Objective-C resource release, scheduler event/buffer independence, and verified-safe backend-before-scheduler classification |
+| `docs/architecture/vulkan-command-lifetime.md` | Vulkan command-pool topology, command-buffer reuse, fences, semaphores, events, and synchronous completion boundaries |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
 | `docs/assets/interactive/` | Interactive architecture assets |
@@ -136,7 +137,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Audit Vulkan queues, fences/events, command pools/buffers, allocator-backed buffers, synchronization, and backend-before-scheduler destruction.
+- [ ] Finish the pinned Vulkan teardown audit: exact backend/context free chain, compute and transfer queue completion, command/descriptor/query pool destruction, fences/semaphores/events, allocator-backed buffers, scheduler event/buffer independence, and backend-before-scheduler classification.
 - [ ] Continue concrete teardown audits for SYCL, RPC, CANN, and OpenCL, including optional CPU extra-buffer implementations.
 - [ ] Verify whether `ggml_backend_cuda_synchronize()` covers every lazily created concurrent stream and whether context pools/events/graphs should be cleared before stream destruction.
 - [ ] Add asynchronous-destruction regression tests for CUDA-family and Metal backends; run Metal API validation for immediate context destruction.
@@ -146,7 +147,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Expand the interactive explorer with architecture-specific graph builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/metal-backend-teardown/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/vulkan-command-lifetime/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
@@ -167,6 +168,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Map pinned Vulkan command and synchronization lifetimes: per-context/device queue command pools, command-buffer reuse preconditions, pooled binary/timeline semaphores and events, and fence-based completion in synchronous read/copy/memset helpers.
 - [x] Audit pinned Metal teardown: explicit backend-free synchronization, command-buffer and Objective-C resource release, shared/private/mapped buffer ownership, residency sets, scheduler event/device independence, and verified-safe backend-before-scheduler destruction.
 - [x] Audit pinned CUDA teardown: backend/context destruction, graph-capture wait, streams and cuBLAS handles, async compute, explicit synchronize callback, scheduler event/device independence, buffer-local `cudaFree`, static buffer types, and conditional queued-work safety classification.
 - [x] Classify ordinary pinned CPU backend teardown: synchronous graph execution, no events/synchronize callback, static device lifetime, backend-independent scheduler buffers, and verified-safe backend-before-scheduler destruction.
