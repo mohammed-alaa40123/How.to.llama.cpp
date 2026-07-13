@@ -143,7 +143,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Published `docs/architecture/sycl-backend-teardown.md` and linked it in Architecture navigation.
 - `ggml_backend_sycl_free()` deletes the per-backend context and generic wrapper without an explicit queue wait.
 - `ggml_backend_sycl_synchronize()` waits on `stream(device, 0)`, but backend free does not invoke it.
-- Async tensor set/get and graph execution can enqueue work and return without host completion.
+- Async tensor set/get and graph execution can enqueue SYCL work and return without host completion.
 - The context borrows device-manager default-queue pointers and owns pools, scratchpads, flash-attention buffers, and optional executable graph state.
 - Scheduler events own independent `sycl::event` objects.
 - Ordinary scheduler buffers retain buffer-local device, allocation, queue, tensor-extra, and allocation-mode state.
@@ -164,3 +164,31 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Whether queue/pool/USM/command-graph destruction provides a portable implicit wait.
 - Whether queue-0 synchronization covers all multi-device and optional paths.
 - Whether immediate-context-destruction regression tests exist or should be added.
+
+## 2026-07-13 16:49 — RPC backend teardown
+
+**Verified**
+
+- Published `docs/architecture/rpc-backend-teardown.md` and linked it in Architecture navigation.
+- RPC backend free deletes only endpoint/device/name metadata and the generic wrapper; it performs no network operation or synchronization.
+- RPC buffers retain their own shared socket and remote handle, so their later free path is independent of the deleted backend wrapper.
+- Client graph compute sends a request without receiving a completion response; RPC synchronize is a no-op.
+- The server dispatches commands serially per connection, but graph handlers do not add a generic backend synchronize after remote graph submission.
+- Remaining remote buffers are released when the client session ends.
+
+**Interpretation**
+
+- Backend-before-scheduler destruction is structurally safe for ordinary pinned RPC client objects.
+- Remote work completion remains conditional on the concrete backend inside the server.
+- A following free-buffer command is ordered after graph submission but does not necessarily prove queued accelerator completion.
+
+**Historical**
+
+- Request-only graph commands, RDMA negotiation, graph reuse, and connection/error semantics are revision-sensitive.
+
+**Open questions**
+
+- Whether RPC synchronize should become a real remote command.
+- Whether graph compute needs an explicit completion response.
+- Whether shared-socket access is serialized for concurrent users.
+- Whether immediate graph-compute → teardown is covered by regression tests.
