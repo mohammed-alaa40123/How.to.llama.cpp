@@ -80,13 +80,17 @@ Required deliverables:
 - Navigation commit: `523599e2bdac99baab97a92e0d9915ce8feed235`.
 - Detailed note commit: `3d616805fed9f98fe0375841cf5d29f76dc56827`.
 - Research-log commit: `f038f2b4f7f491a9ef120b1acfd99b63bbeb039b`.
+- README/TODO commit: `60020db3a27157894c66d2986fe30088fbb613ab`.
 - Connector-side inspection confirmed the RPC client free path, socket ownership, buffer release protocol, server dispatch ordering, graph completion gap, session cleanup, and transport destruction.
+- Commit-scoped workflow lookup for `60020db3a27157894c66d2986fe30088fbb613ab` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
+- Direct inspection of the Pages root and `architecture/rpc-backend-teardown/` was rejected by the available safe-URL gate, so HTTP status and rendered content remain unverified.
 - No new external secondary source was introduced; the research ledger remains unchanged.
-- GitHub Actions and Pages verification results for this increment are recorded below after the final checks.
 
 ## Known blockers and caveats
 
 - **Local validation blocker:** there is no usable repository checkout in the execution environment, so project validators, tests, strict MkDocs build, and `check_site.sh` could not run locally.
+- **CI visibility blocker:** the available commit-scoped workflow endpoint returned an empty run list and currently exposes only a limited class of workflow runs.
+- **Pages verification blocker:** direct access to both the site root and new RPC route was rejected by the safe-URL gate; HTTP response and expected content could not be inspected.
 - **RPC completion caveat:** graph compute has no completion response and the no-op RPC synchronize does not invoke server-side synchronization.
 - **RPC concurrency caveat:** one socket can be shared through endpoint-level weak caching and buffer-held strong references; the inspected request helpers do not establish a per-socket request mutex.
 - **SYCL completion caveat:** backend free does not explicitly wait before destroying context-owned resources.
