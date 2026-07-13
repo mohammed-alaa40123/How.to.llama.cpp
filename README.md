@@ -112,6 +112,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/vulkan-backend-teardown.md` | Vulkan explicit synchronization and teardown |
 | `docs/architecture/sycl-backend-teardown.md` | SYCL queue, event, buffer, and teardown classification |
 | `docs/architecture/rpc-backend-teardown.md` | RPC client/server ownership, remote completion, and teardown |
+| `docs/architecture/cann-backend-teardown.md` | CANN device synchronization, reset ordering, and resource lifetimes |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `docs/assets/interactive/` | Interactive architecture assets |
 | `.github/workflows/` | CI, Pages, context, and indexing automation |
@@ -123,21 +124,21 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Audit pinned CANN teardown: backend/context free, stream synchronization, events, allocator buffers, scheduler-resource independence, and backend-before-scheduler classification.
 - [ ] Audit pinned OpenCL teardown and optional CPU extra-buffer implementations.
+- [ ] Verify CANN reset semantics with authoritative runtime documentation and a test matrix: destroy streams/events/buffers before versus after `aclrtResetDevice`, one versus two contexts, and scheduler-resource release after backend free.
 - [ ] Design and test a real RPC synchronization/completion command; verify immediate graph-compute → remote-buffer-free and graph-compute → connection-close behavior on CPU and accelerator servers.
 - [ ] Verify shared RPC socket serialization under concurrent backend/buffer users and document transport error/reconnect semantics.
 - [ ] Verify whether SYCL synchronization covers every queue used by multi-device, split-buffer, DNNL, flash-attention, command-graph, and communication paths; determine whether backend free should wait explicitly.
 - [ ] Verify whether `ggml_backend_cuda_synchronize()` covers every lazily created concurrent stream and whether context pools/events/graphs should be cleared before stream destruction.
 - [ ] Determine whether the pinned Vulkan performance query pool has an explicit owner/destructor or represents a cleanup leak; audit persistent Vulkan device/process-exit teardown.
-- [ ] Add asynchronous-destruction regression tests for CUDA-family, Metal, Vulkan, SYCL, and RPC backends.
+- [ ] Add asynchronous-destruction regression tests for CUDA-family, Metal, Vulkan, SYCL, RPC, and CANN backends.
 - [ ] Map architecture-specific graph-builder downcasts to `llama_memory_context_i` subtypes and exact state tensors.
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias/upload bytes, scheduler copy generations, event waits, memory-update graphs, KV/recurrent growth, activation peaks, synchronization, and teardown.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once generated source-link checking is ready.
 - [ ] Expand the interactive explorer with architecture-specific builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/rpc-backend-teardown/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cann-backend-teardown/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
@@ -156,6 +157,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Audit pinned CANN teardown: backend/context free, device-wide synchronization, reset ordering, events, allocator buffers, registry lifetime, scheduler-resource independence, and conditional teardown classification.
 - [x] Audit pinned RPC teardown: client/backend free, shared socket lifetime, remote buffer release, server dispatch/completion, session cleanup, and backend-before-scheduler classification.
 - [x] Audit pinned SYCL teardown: backend/context free, queue wait behavior, command graphs, context-owned pools and scratchpads, scheduler event independence, buffer-local allocation ownership, static buffer types, and conditional queued-work safety classification.
 - [x] Finish pinned Vulkan teardown and command-lifetime audits.
