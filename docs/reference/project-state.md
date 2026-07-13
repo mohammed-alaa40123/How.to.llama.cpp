@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 12:49 Africa/Cairo_
+_Last updated: 2026-07-13 13:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -25,21 +25,21 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Ordinary pinned CPU backend teardown classification.
 - Pinned CUDA backend teardown dependency audit and conditional safety classification.
 - Pinned Metal backend teardown audit and verified-safe backend-before-scheduler classification.
+- Pinned Vulkan command-pool, command-buffer, fence, semaphore, event, and synchronous-helper completion-boundary map.
 
 ## Latest concrete findings
 
-- `ggml_backend_metal_free()` explicitly calls `ggml_metal_synchronize()` before releasing the Metal context and backend wrapper.
-- Synchronization waits for `cmd_buf_last`, checks graph and extra command-buffer status, and releases completed extra command buffers.
-- `ggml_metal_free()` then releases retained graph/extra command buffers, dynamic pipelines, the encoding block, the dispatch queue, and the context-owned copy event.
-- The Metal command queue is device-owned rather than backend-context-owned in the pinned design.
-- Scheduler Metal events own independent `MTLSharedEvent` objects; their free path does not require a live `ggml_metal` context.
-- Scheduler shared/private/mapped buffers own buffer-local contexts and use static device state for residency-set removal and `MTLBuffer` release.
-- Mapped Metal buffers release wrapper views but do not own the underlying mapped host bytes.
-- Backend-before-scheduler destruction is verified safe for the ordinary pinned Metal backend because backend free establishes queued-work completion and later scheduler deleters retain valid device-level dependencies.
+- `vk_command_pool` stores a Vulkan pool, stable command-buffer records, and a borrowed queue pointer; pools exist per `(context, queue)` and `(device, queue)` pairing.
+- `ggml_vk_command_pool_cleanup()` resets a command pool only under the explicit source precondition that its command buffers are already complete.
+- Synchronous Vulkan buffer read, same-device copy, and GPU memset helpers submit work with a device fence, wait indefinitely for that fence, reset it, and only then recycle command-pool state.
+- Deferred host copies in the read path occur after the fence completion boundary.
+- Context synchronization primitives are pooled: binary semaphores, timeline semaphores, and Vulkan events are created on demand and selected through reusable indices.
+- `ggml_backend_vk_graph_compute()` is submission-oriented; return from graph computation is not by itself proof of device completion.
+- The complete Vulkan backend-before-scheduler destruction classification remains open pending the exact final free chain and scheduler event/buffer ownership audit.
 
 ## In progress
 
-- Vulkan teardown audit: queues, fences/events, command pools/buffers, allocator-backed buffers, synchronization, and scheduler ordering.
+- Vulkan final free-chain audit: backend synchronization, context/device queue completion, command/descriptor/query pool release, semaphore/event destruction, allocator-backed buffers, and scheduler ordering.
 - Remaining concrete backend teardown audits for SYCL, RPC, CANN, and OpenCL.
 - Optional CPU extra-buffer teardown audit.
 - CUDA concurrent-stream synchronization coverage.
@@ -48,13 +48,13 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Immediate next task
 
-Trace Vulkan teardown dependencies:
+Finish the pinned Vulkan teardown classification:
 
 ```text
 Vulkan backend wrapper free
-→ queue/device synchronization
-→ command-buffer and command-pool release
-→ fence/semaphore/event destruction
+→ final queue/device synchronization
+→ context command/descriptor/query pools
+→ fences, semaphores, and events
 → allocator-backed buffer release
 → scheduler event and buffer lifetime
 → classify backend-before-scheduler ordering
@@ -63,33 +63,26 @@ Vulkan backend wrapper free
 Required deliverables:
 
 1. exact Vulkan backend/context free chain;
-2. queue, command-buffer, fence/semaphore, and synchronization behavior;
-3. buffer, allocator, and buffer-type ownership;
-4. queued-work requirements during resource release;
+2. final compute and transfer queue completion behavior;
+3. destruction order for command, descriptor, and query pools plus fences/semaphores/events;
+4. buffer, device, and buffer-type ownership;
 5. safety classification for the pinned context member order;
 6. truth labels and durable context updates.
 
 ## Publication and verification state
 
-- New page: `docs/architecture/metal-backend-teardown.md`.
-- Page commit: `f74a3ca31ba9a61022f114c176a22063912aa022`.
-- Navigation commit: `322a5bc8920fde2ce7ca24dca5e05c74120e7559`.
-- README/TODO commit: `20c7404071f02da542632954ab9349b5cc4f50b7`.
-- Detailed-note commit: `ca5fcac1460e8490c681804f1e98322f8b5ebcb4`.
-- Research-log commit: `21caccb2a9721244c0e876ad8b089e360fd59941`.
-- Connector-side source inspection confirmed the explicit Metal backend-free synchronization path, command-buffer/context release sequence, scheduler event independence, shared/private/mapped buffer ownership, residency-set cleanup, and static device/registry lifetime.
-- The new page was re-fetched from `main` and contains the expected verified-safe classification, teardown graph, truth labels, and source map.
-- Commit-scoped workflow lookup for `21caccb2a9721244c0e876ad8b089e360fd59941` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
-- Site-specific searches for the project root and `architecture/metal-backend-teardown/` returned no indexed results. The available web safety gate therefore rejected direct opening of both Pages URLs, so live HTTP status and rendered content remain unverified.
-- No new external secondary source passed the verification bar; the research ledger remains unchanged.
+- New page: `docs/architecture/vulkan-command-lifetime.md`.
+- Page commit: `a7301fcf2432dc26b768acc85e6269830e448b8a`.
+- Navigation commit: `d95410622cb9539237ef1013e29554311ed28486`.
+- Connector-side source inspection confirmed the command-pool topology, explicit completion precondition for pool reset, pooled synchronization objects, and fence-based completion sequence used by synchronous read/copy/memset helpers.
+- No new external secondary source was introduced; the research ledger remains unchanged.
+- GitHub Actions and Pages checks are performed after durable context updates; exact results or blockers are recorded below and in README TODOs.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** the execution environment has no usable repository checkout, so `validate_project_context.py`, interactive-link tests, unit tests, strict MkDocs build, and `check_site.sh` could not run locally.
-- **CI visibility blocker:** the available commit workflow endpoint returned an empty run list and is limited to a subset of workflow triggers, so push-triggered results cannot be confirmed through it.
-- **Pages verification blocker:** search returned no indexed root or Metal teardown route, and the web safety gate only permits direct opening of URLs already present in search results or user content.
-- The Metal safety classification covers ordinary resources at the pinned revision, not future queue ownership, plugin unload ordering, or alternative device lifecycle designs.
-- Mapping, allocation, physical residency, data validity, queued completion, ownership, and release remain distinct states.
+- **Local validation blocker:** the execution environment cannot resolve `github.com` and has no usable repository checkout, so `validate_project_context.py`, interactive-link tests, unit tests, strict MkDocs build, and `check_site.sh` could not run locally.
+- **Vulkan scope caveat:** this increment maps command and completion lifetimes but does not yet prove the final backend-free destruction order.
+- Mapping, allocation, residency, validity, command completion, ownership, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
 
