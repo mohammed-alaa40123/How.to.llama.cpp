@@ -68,15 +68,20 @@ Required deliverables:
 
 - Runtime-context/memory page commit: `53742731207cdbc73ca9dab674a002bb02c00780`.
 - Navigation commit: `575776a9db0e2e4a05256b451cadc7f690ad36eb`.
-- Local checkout validation failed on 2026-07-13 because `github.com` DNS resolution failed.
-- CI and Pages checks remain to be completed against the final state commit for this increment.
+- README commit: `e4c69b97e5d91f3ca3976c091ba5485e03c3089f`.
+- Research-log commit: `48d2b6bba9caef3b138e28fce001e8d37387d129`.
+- Detailed-note commit checked for CI: `bc8d129a383d9a7da8d1e12b8ab120cbc04fca22`.
+- Commit-workflow lookup returned `workflow_runs: []`; the endpoint filters to pull-request-triggered runs and cannot verify these push workflows.
+- Site-specific search returned no indexed result for the root or new page.
+- Direct opening of the root and `architecture/runtime-context-memory-pass-a/` was rejected by the browser safe-URL gate because the URLs were absent from search results.
+- Local checkout failed because `github.com` DNS resolution failed.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
 
 ## Known blockers and caveats
 
 - **Local validation blocker:** the execution environment cannot resolve `github.com`, preventing a fresh checkout and full `mkdocs build --strict`.
-- **CI visibility caveat:** connector status interfaces may omit push-triggered Documentation CI, Pages, and hourly-context workflows; empty results mean unverified, not necessarily failed.
-- **Pages verification caveat:** if direct access is unavailable, record the exact HTTP/search/DNS blocker rather than claiming deployment success.
+- **CI visibility blocker:** for commit `bc8d129a383d9a7da8d1e12b8ab120cbc04fca22`, the available workflow lookup returned no runs. Because it filters to pull-request-triggered runs, Documentation CI, Pages, and hourly-context workflows are unverified rather than confirmed failed.
+- **Pages verification blocker:** search returned no indexed site result and direct opening was rejected by the safe-URL gate; the container also cannot resolve GitHub hosts. HTTP status and rendered content remain unverified.
 - Static link validation approximates Python-Markdown IDs; built-HTML validation is still required for plugin-generated anchors.
 - Mapping, allocation, residency, validity, ownership, and command completion are distinct states.
 - Mmap host-pointer wrapping is conditional; model pages and context-owned KV/recurrent memory are separate lifetimes.
