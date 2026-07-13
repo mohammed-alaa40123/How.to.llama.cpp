@@ -115,6 +115,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/public-api-minimal-example.md` | Pass A public API/minimal-example map |
 | `docs/architecture/model-gguf-loader-pass-a.md` | Pass A model/GGUF loader inventory |
 | `docs/architecture/runtime-context-memory-pass-a.md` | Pass A runtime context and memory inventory |
+| `docs/architecture/system-ownership-and-execution-map.md` | Cross-subsystem ownership, execution, mutation, synchronization, and teardown synthesis |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
 | `docs/assets/interactive/` | Interactive architecture assets |
@@ -128,7 +129,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Synthesize the completed public API, model/GGUF loader, `llama_model`, `llama_context`, and memory Pass A work into one subsystem relationship map with ownership and synchronization boundaries.
+- [ ] Complete file-by-file Pass A for backend scheduler internals: backend assignment, split creation, copy-ring allocation, destination validity, events, asynchronous submission, fallback synchronization, graph-allocation reuse, and teardown.
 - [ ] Enumerate every concrete `llama_memory_i` implementation at the pinned revision and map each architecture to KV, recurrent, hybrid, iSWA, or specialized memory.
 - [ ] Trace exact `llama_model` and `llama_context` member declaration/destruction order for retained mappings, backend buffers, scheduler, memory, graph results, outputs, and backend instances.
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, memory-update graphs, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
@@ -136,7 +137,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Expand the interactive explorer with architecture-specific graph builders, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/runtime-context-memory-pass-a/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/system-ownership-and-execution-map/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
@@ -156,6 +157,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Synthesize the public API, model/GGUF loader, `llama_model`, `llama_context`, and memory Pass A work into one subsystem relationship map with ownership, mutation, synchronization, and teardown boundaries.
 - [x] Complete file-by-file Pass A for runtime-context and memory files with construction, ownership, batch/microbatch memory planning, KV/recurrent/hybrid behavior, sequence mutation, state I/O, threads, synchronization, reset, and teardown.
 - [x] Complete file-by-file Pass A for the model/GGUF loader group.
 - [x] Complete file-by-file Pass A for the public API/minimal-example group.
