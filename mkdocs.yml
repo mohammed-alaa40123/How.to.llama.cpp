@@ -85,6 +85,7 @@ nav:
       - Backend scheduler Pass A: architecture/backend-scheduler-pass-a.md
       - System ownership and execution map: architecture/system-ownership-and-execution-map.md
       - Model and context teardown order: architecture/model-context-teardown-order.md
+      - Scheduler core teardown: architecture/scheduler-teardown-core.md
   - Inference lifecycle:
       - Brief end to end: lifecycle/end-to-end.md
       - Decode and graph reuse: lifecycle/decode-graph-reuse.md
