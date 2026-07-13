@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 20:51 Africa/Cairo_
+_Last updated: 2026-07-13 21:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -22,18 +22,21 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Pass A pages for public API, model/GGUF loading, runtime context/memory, scheduler, and concrete context-memory implementations.
 - Exact pinned declaration and reverse-destruction map for `llama_model` and `llama_context`.
 - Generic scheduler plus ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
+- Cross-backend teardown comparison matrix separating command completion from scheduler-resource independence.
 - Pinned OpenCL build composition, kernel deployment, official platform scope, and initial `cl_mem` RAII ownership map.
 - Line-aware generated source indexing with untruncated symbol records, declaration kinds, 1-based lines, and regression tests.
 - Revision-pinned file and symbol URLs derived from the exact indexed llama.cpp revision.
 
 ## Latest concrete findings
 
-- `scripts/index_upstream.py` accepts `--source-url-base` and stores its normalized value in the generated summary.
-- Indexed files receive `source_url`; symbol-location records receive pinned URLs ending in `#L<line>`.
-- `scripts/update_upstream.sh` derives the blob prefix from `LLAMA_CPP_REV`, preventing silent source-link drift.
-- Link enrichment copies records rather than mutating the extraction result.
-- Tests cover URL normalization, absent-base behavior, line fragments, and non-mutation.
-- The index remains regex based and therefore does not resolve preprocessing, dispatch, templates, or complete C++ semantics.
+- Backend-before-scheduler safety requires two independent proofs: queued commands have completed, and later scheduler deleters retain valid state without using the deleted backend context.
+- Ordinary CPU is verified safe because execution is synchronous and scheduler events are unsupported.
+- Metal and Vulkan explicitly synchronize during backend cleanup and retain independent scheduler-resource deleter state for the audited ordinary paths.
+- CUDA and SYCL ordinary scheduler events and buffers are structurally independent, but complete stream/queue completion remains conditional.
+- RPC client buffers retain transport and remote handles, but graph submission has no server completion response and RPC synchronize is a no-op.
+- CANN performs device-wide synchronization, but reset precedes later context and scheduler destructor calls.
+- OpenCL remains unclassified beyond build composition and initial `cl_mem` ownership.
+- The comparison page links each concise classification to its detailed evidence page and is now in the Architecture navigation.
 
 ## In progress
 
@@ -50,7 +53,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Immediate next task
 
-Regenerate the source inventory from the pinned checkout and use the new direct line links to finish the OpenCL teardown audit:
+Finish the OpenCL teardown audit when the pinned oversized translation unit is accessible:
 
 ```text
 OpenCL backend/context free
@@ -66,27 +69,22 @@ Then audit optional CPU extra-buffer deleters independently.
 
 ## Publication and verification state
 
-- Source-link implementation commit: `9ae07a9871474f3bc74043a8b1181940c4909a75`.
-- Regression-test commit: `08bfff550c12aa9858a962949855bd85a5a2a011`.
-- Pinned update-script commit: `ea6ef28a59b9fde358bcd7b7e45e2a5db1ba068c`.
-- Source-index documentation commit: `1e52fb4030f05586e185d48d5089added45c6556`.
-- Detailed note commit: `0d89af07dde6315a00bc2f69f0a6554ad808c097`.
-- Research-log commit: `219118453b5d1c6201bfa37790ea1071c3791159`.
-- README/TODO commit: `c7157c334888fb289980aca751c7dc164185a64e`.
-- Connector-side inspection verified the implementation, invocation, test cases, and documentation.
-- A bounded local smoke test verified URL normalization and `#L17` line-fragment generation.
-- Local clone of pinned llama.cpp still fails with `Could not resolve host: github.com`; source regeneration and full local project validation could not run.
-- Combined status for `c7157c334888fb289980aca751c7dc164185a64e` returned no status records.
-- The commit-scoped workflow lookup returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified, not confirmed failed.
-- Direct opening of the Pages root and `reference/source-index/` route was rejected by the available safe-URL gate, so HTTP status and rendered content are unverified.
+- Backend comparison page commit: `963ff8b9523e9d484063c75bef0f3f89d0c54e80`.
+- Navigation commit: `c831b301519fbb84a8b8657c82e49db9a83b554b`.
+- Detailed note commit: `121ed3bafc3c1d0a0ba218d5a37af8fde395d0ba`.
+- Research-log commit: `c9223bf0049919a334fc8b00c6b0113c16fb67d0`.
+- Repository contents API confirmed creation of the new page and navigation update.
+- Local clone of both repositories still fails with `Could not resolve host: github.com`; full local validation could not run.
+- The pinned oversized `ggml-opencl.cpp` remains inaccessible through the connector, so the OpenCL classification was not guessed.
+- CI and Pages verification results for the latest commit are recorded below when observable; absent results are treated as unverified rather than failed.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** the execution environment cannot resolve `github.com`, so the new index cannot be run against the pinned checkout here.
-- **Large upstream file blocker:** the GitHub connector could not return the oversized pinned `ggml-opencl.cpp`, so the OpenCL teardown audit could not be completed honestly in this run.
+- **Large upstream file blocker:** the GitHub connector returns no content for the oversized pinned `ggml-opencl.cpp`, so the exact OpenCL teardown audit remains blocked.
 - **Local validation blocker:** the full Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout and could not be run here.
-- **CI visibility blocker:** combined status was empty and the available commit workflow endpoint returned no runs for the checked commit.
-- **Pages verification blocker:** the safe-URL gate rejected direct access to the root and source-index route.
+- **CI visibility blocker:** commit status and workflow visibility may be empty even when Actions later run; record exact results rather than inferring failure.
+- **Pages verification blocker:** if direct HTTP inspection is rejected or unavailable, root and route status remain unverified.
 - **OpenCL completion caveat:** `cl_mem` ownership is verified, but command completion before release remains open.
 - **CANN reset-order caveat:** device-wide completion is explicit, but the validity of later ACL destroy/free calls after `aclrtResetDevice()` is unverified.
 - **RPC completion caveat:** graph compute has no completion response and RPC synchronize remains a no-op.
