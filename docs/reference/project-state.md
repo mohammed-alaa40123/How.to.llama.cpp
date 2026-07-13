@@ -75,15 +75,18 @@ Required deliverables:
 - New page: `docs/architecture/vulkan-backend-teardown.md`.
 - Page commit: `00d82b68637722e84fd68bdd4d1d82b9d94226a8`.
 - Navigation commit: `69b0fed03e807d4fd913720258e477c10e660a8f`.
-- Connector-side source inspection confirmed the explicit cleanup synchronization boundary, context-owned destruction order, scheduler event/device independence, buffer-local shared-device ownership, and static registry lifetime.
-- GitHub Actions and Pages are checked after the durable context updates in this run; exact results or blockers are recorded below and in the README TODOs.
+- README/TODO commit: `66c2769d6a702e5e77dafaef408c146ca3b4fc85`.
+- Detailed note commit: `73d5357941624060547018dbfcc8a18ca06b8de6`.
+- Connector-side re-fetch confirmed that the new page is present on `main` with the expected classification, source links, Mermaid teardown map, and truth-labelled sections.
+- Commit-scoped workflow lookup for `73d5357941624060547018dbfcc8a18ca06b8de6` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
+- Searches for the Pages root and new route returned no indexed results. The available web safety gate then rejected direct opening of both URLs, so live HTTP status and rendered content remain unverified.
 - No new external secondary source was introduced; the research ledger remains unchanged.
 
 ## Known blockers and caveats
 
 - **Local validation blocker:** the execution environment cannot resolve `github.com` and has no usable repository checkout, so `validate_project_context.py`, interactive-link tests, unit tests, strict MkDocs build, and `check_site.sh` could not run locally.
-- **CI visibility blocker:** commit-scoped workflow discovery may omit push-triggered runs; exact status is recorded after the final commit check.
-- **Pages verification blocker:** direct web access must be tested after publication; if the available web gate blocks the Pages URL, HTTP response and rendered content remain unverified.
+- **CI visibility blocker:** the available commit-scoped workflow endpoint returned an empty run list and does not expose push-triggered results reliably.
+- **Pages verification blocker:** public search did not index the Pages root or new route, and the web safety gate rejected direct opening; HTTP response and expected rendered content could not be inspected.
 - **Vulkan query-pool caveat:** the inspected cleanup path does not explicitly destroy the optional performance query pool; ownership or leak behavior needs a focused follow-up.
 - Mapping, allocation, residency, validity, command completion, ownership, and release remain distinct states.
 
