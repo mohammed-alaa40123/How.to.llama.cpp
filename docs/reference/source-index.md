@@ -40,9 +40,18 @@ This hand-reviewed index is the seed for an automatically generated full invento
 | `ggml/src/ggml-cpu/` | CPU graph compute and kernels | Pending deep read |
 | backend directories | Device-specific buffers, queues, kernels | Pending per backend |
 
+## Generated symbol locations
+
+`scripts/index_upstream.py` now emits two symbol views for every indexed source file:
+
+- `symbols`: the original compact, deduplicated name list retained for compatibility;
+- `symbol_locations`: an untruncated source-ordered list containing approximate symbol `name`, declaration `kind`, and 1-based `line`.
+
+This makes very large translation units such as `ggml-opencl.cpp` navigable by symbol and source location without pretending to provide a compiler-grade call graph. Duplicate names are intentionally retained in `symbol_locations` because overloads and conditional-compilation branches can produce several useful navigation targets.
+
 ## Generated index limitations
 
-`scripts/index_upstream.py` intentionally produces an approximate source inventory. Regex-detected symbols and include relationships are useful navigation aids, but cannot resolve:
+`scripts/index_upstream.py` intentionally produces an approximate source inventory. Regex-detected symbols, line locations, and include relationships are useful navigation aids, but cannot resolve:
 
 - preprocessor configurations;
 - overloaded functions and templates;
