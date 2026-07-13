@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 02:49 Africa/Cairo_
+_Last updated: 2026-07-14 02:58 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -63,20 +63,24 @@ Then audit optional CPU extra-buffer deleters independently.
 
 ## Publication and verification state
 
-- Work is on branch `automation/backend-teardown-audit-method`.
+- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
+- PR head after the context updates: `4a9a789f4d2f8f9a7e8c8eec69f8ae6c2c4b4f8b`; this state file adds a later branch commit.
 - Added `docs/architecture/backend-teardown-audit-method.md` and linked it before the comparison page.
 - Added detailed note `logs/research/2026-07-14/0249-backend-teardown-audit-method.md`.
-- Updated the research log; the research ledger was unchanged because no external source changed.
+- Updated README TODOs and the research log; the research ledger was unchanged because no external source changed.
+- Documentation CI run `29294594266` was `in_progress` when checked; no failure was available to inspect yet.
+- Combined commit status returned no separate status records.
 - Full local validation could not run because the execution environment could not resolve `github.com` and has no checkout.
-- CI and Pages verification must be completed against the branch/PR and recorded below when visible.
+- Direct Pages root and atlas-route opening was rejected by the web safe-URL gate, so live HTTP/rendered-content verification remained blocked.
+- The new branch page cannot appear on public Pages until the PR is merged and the main deployment completes.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** local GitHub DNS resolution failed, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector still exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
-- **CI visibility caveat:** commit-scoped checks must be inspected after the branch is published as a PR.
-- **Pages caveat:** branch content will not appear on the public site until merged and deployed.
+- **CI state:** Documentation CI was still running at final check, not failed.
+- **Pages verification blocker:** the web safe-URL gate rejected direct access; the new route is also branch-only until merge.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
