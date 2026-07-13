@@ -15,7 +15,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Interpretation**
 
 - Reuse preserves compatible topology/allocation, not token values or outputs.
-- CPU_Mapped addressability does not prove physical residency.
+- CPU-mapped addressability does not prove physical residency.
 
 ## 2026-07-12 — Documentation architecture and core objects
 
@@ -24,16 +24,15 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Added the documentation-quality roadmap and six-tab foundations explorer.
 - Published canonical `llama_context` and `llama_model` pages and linked their explorer entries.
 - The context stores a non-owning model reference while owning mutable runtime state, scheduler resources, outputs, and memory modules.
-- `llama_model` owns architecture/vocabulary state, persistent tensors, buffers, and retained mappings and dispatches architecture-specific graph construction.
+- `llama_model` owns architecture/vocabulary state, persistent tensors, buffers, retained mappings, and architecture-specific graph dispatch.
 
 ## 2026-07-12 — GGUF, model placement, graph construction, and MoE
 
 **Verified**
 
 - Published canonical GGUF anatomy and model tensor-placement chapters.
-- The loader computes absolute source offsets from the GGUF data-region offset plus tensor descriptor offset and validates bounds.
-- Population paths include mapped alias, mapped copy/upload, direct read, asynchronous staging, and synchronous fallback.
 - GGUF stores tensors and metadata, not an executable graph; architecture code rebuilds GGML operations over loaded tensors.
+- Population paths include mapped alias, mapped copy/upload, direct read, asynchronous staging, and synchronous fallback.
 
 **Interpretation**
 
@@ -44,193 +43,124 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 **Verified**
 
-- Published the memory-lifetime atlas and interactive owner/backing/validity/synchronization/release overlay.
+- Published the memory-lifetime atlas and interactive ownership overlay.
 - Mapping, allocation, residency, validity, command completion, and ownership are distinct states.
-- Added static validation for local interactive routes and Markdown anchors, fixture tests, and Documentation CI integration.
+- Added static validation for interactive routes and Markdown anchors, fixture tests, and Documentation CI integration.
 
-## 2026-07-13 01:52 — Public API and minimal example Pass A
-
-**Verified**
-
-- Published `docs/architecture/public-api-minimal-example.md`.
-- Mapped the public API, minimal example, facade, model, and context entry points.
-- Documented construction, ownership, batch views, synchronization assumptions, errors, and teardown.
-
-## 2026-07-13 02:51 — Model and GGUF loader Pass A
+## 2026-07-13 01:52–07:50 — File-by-file Pass A and subsystem synthesis
 
 **Verified**
 
-- Published `docs/architecture/model-gguf-loader-pass-a.md`.
-- GGUF parsing uses `no_alloc=true`; split descriptors are merged before destination allocation.
-- Buffer selection depends on expected operations and backend support.
-- Cancellation is distinct from exception unwinding.
-
-**Interpretation**
-
-- The loader is a transactional bridge from temporary parse/I/O state into persistent model-owned storage.
-
-## 2026-07-13 03:50 — Runtime context and memory Pass A
-
-**Verified**
-
-- Published `docs/architecture/runtime-context-memory-pass-a.md`.
-- `llama_context` references the model and owns runtime backends, scheduler state, persistent memory, output buffers, graph-result caches, and the reusable batch allocator.
-- `llama_memory_i` defines persistent memory behavior; `llama_memory_context_i` carries temporary ubatch state and `apply()` is the mutation boundary.
-- Pending KV shifts/copies may be backend memory-update graphs and require synchronization before conflicting reuse or host state I/O.
-
-**Interpretation**
-
-- A per-batch memory context behaves like a transaction plan.
-- Context memory is polymorphic, not one universal KV ring.
-
-## 2026-07-13 05:52 — System ownership and execution synthesis
-
-**Verified**
-
-- Published `docs/architecture/system-ownership-and-execution-map.md`.
-- The synthesis connects loader publication, persistent model storage, context runtime state, memory, graph construction, scheduler copies, execution, output visibility, and teardown.
-- Ownership, addressability, residency, allocation, validity, and queued completion are distinct.
-
-**Interpretation**
-
-- `llama_model_loader` is a transactional publisher, `llama_context` is a mutable session around a borrowed model, and the scheduler is an execution planner.
-
-## 2026-07-13 06:49 — Backend scheduler Pass A
-
-**Verified**
-
-- Published `docs/architecture/backend-scheduler-pass-a.md`.
-- Inventoried assignment, splits, dependency copies, allocation, execution, synchronization, reset, and teardown.
+- Published Pass A pages for the public API/minimal example, model/GGUF loader, runtime context/memory, backend scheduler, and concrete context-memory implementations.
+- Published the cross-subsystem ownership and execution map.
+- The pinned tree contains ordinary KV, iSWA, DSA, DSV4, recurrent, hybrid, and hybrid-iSWA persistent memory implementations.
 - Scheduler copy allocation, current-generation validity, and previous-consumer completion are separate states.
-- User inputs receive stricter lifetime handling; internal copies use async support or synchronized fallback.
 
 **Interpretation**
 
-- A scheduler copy is valid only for a particular source-value generation and copy slot.
-- Events are reuse fences, not merely profiling markers.
-
-## 2026-07-13 07:50 — Concrete context-memory implementations
-
-**Verified**
-
-- Published `docs/architecture/context-memory-implementations.md`.
-- The pinned tree contains seven persistent implementations: ordinary KV, iSWA, DSA, DSV4, recurrent, hybrid, and hybrid-iSWA.
-- Architecture predicates and no-memory branches are mapped exactly.
-- DSV4 combines raw iSWA state, compressed K-only stores, and persistent compressor state.
-
-**Interpretation**
-
-- `create_memory()` acts as an architecture-to-state-machine compiler.
-- “KV cache size” is not a universal metric for recurrent, hybrid, or compressed memory.
+- The loader is a transactional publisher, `llama_context` is a mutable session around a borrowed model, and the scheduler is an execution planner.
+- A per-batch memory context behaves like a transaction plan.
 
 ## 2026-07-13 08:50 — Model and context teardown order
 
 **Verified**
 
-- Published `docs/architecture/model-context-teardown-order.md` and added it to Architecture navigation.
-- `llama_model::~llama_model()` explicitly deletes registered LoRA adapters; its `pimpl` owns retained mappings, lock objects, GGML tensor contexts, and backend buffers.
-- `llama_model::impl` reverse destruction releases `ctxs_bufs`, then mapping locks, then retained mappings. Each context/buffer pair destroys backend buffers before its GGML metadata context.
-- `llama_context::~llama_context()` reports scheduler allocation sizes and calls `ggml_opt_free(opt_ctx)` but contains no explicit `synchronize()` or `sched.reset()`.
-- Reverse declaration order destroys device memory snapshots, output storage, graph results, metadata, and owning backend wrappers before the scheduler smart pointer; memory and adapters are destroyed later.
-- The model reference and attached thread pools are borrowed and are not automatically freed by context destruction.
+- Published `docs/architecture/model-context-teardown-order.md`.
+- `llama_model` retains mappings until tensor buffers and metadata are released.
+- `llama_context` reverse destruction releases owning backend wrappers before the scheduler smart pointer.
+- The context destructor contains no universal explicit synchronization call.
 
 **Interpretation**
 
-- The model `pimpl` is an RAII ownership capsule designed to keep file mappings alive until tensor buffers and metadata are gone.
-- Applications should use an explicit synchronization boundary before destroying a context that may have queued accelerator work.
-- Output pointers are borrowed views invalidated by output-buffer/context teardown.
-
-**Historical**
-
-- Declaration order, scheduler/backend deleters, and implicit synchronization behavior are revision-sensitive.
+- Applications should establish an explicit synchronization boundary before destroying a context that may have queued accelerator work.
 
 ## 2026-07-13 09:49 — Scheduler core teardown dependencies
 
 **Verified**
 
-- Published `docs/architecture/scheduler-teardown-core.md` and added it to Architecture navigation.
-- `ggml_backend_sched_free()` destroys scheduler events, then graph-allocation resources, then host scheduler metadata.
-- The generic scheduler free path does not call `ggml_backend_sched_synchronize()`.
-- `ggml_backend_event_free()` dispatches through the event's device interface.
-- `ggml_gallocr_free()` releases scheduler-owned backend buffer chunks, whose generic wrapper invokes concrete `free_buffer` callbacks.
-- The scheduler stores borrowed backend and buffer-type relationships and does not free the backend wrappers itself.
+- Published `docs/architecture/scheduler-teardown-core.md`.
+- Scheduler free destroys events, graph-allocation resources, and host metadata without a generic synchronize call.
+- Event destruction dispatches through device interfaces; graph allocation frees concrete backend buffers.
 
 **Interpretation**
 
-- Scheduler teardown requires device, buffer-type, allocator, queue, and callback state to remain valid beyond the lifetime of the scheduler struct itself.
-- Explicit synchronization is a clear completion boundary, but it cannot repair a concrete backend object-lifetime violation.
+- Teardown safety depends on concrete backend device, queue, buffer-type, allocator, and callback lifetimes.
 
 ## 2026-07-13 10:50 — Ordinary CPU backend teardown
 
 **Verified**
 
-- Published `docs/architecture/cpu-backend-teardown.md` and added it to Architecture navigation.
 - CPU graph execution is synchronous; the ordinary CPU backend exposes no async tensor methods, synchronize callback, or events.
-- The CPU device and device context are static registry objects that outlive individual backend wrappers.
+- CPU device state is static and scheduler buffers are backend-wrapper independent.
 
 **Interpretation**
 
-- Backend-before-scheduler destruction is verified safe for the ordinary pinned CPU backend.
+- Backend-before-scheduler destruction is verified safe for ordinary pinned CPU resources.
 
 ## 2026-07-13 11:49 — CUDA backend teardown
 
 **Verified**
 
-- Published `docs/architecture/cuda-backend-teardown.md` and added it to Architecture navigation.
-- CUDA backend destruction deletes context-owned streams, events, cuBLAS handles, graph state, and wrapper state.
+- CUDA backend destruction releases context-owned streams, events, cuBLAS handles, graph state, and wrapper state.
 - Scheduler CUDA events and buffers retain device- or buffer-local state independent of the individual backend context.
 
 **Interpretation**
 
-- Backend-before-scheduler destruction is structurally independent for ordinary CUDA scheduler resources.
-- Queued-work completion remains conditional because the pinned path lacks one explicit all-stream synchronization boundary before teardown.
+- Backend-before-scheduler destruction is structurally independent for ordinary CUDA scheduler resources, but queued-work completion remains conditional.
 
 ## 2026-07-13 12:49 — Metal backend teardown
 
 **Verified**
 
-- Published `docs/architecture/metal-backend-teardown.md` and added it to Architecture navigation.
-- `ggml_backend_metal_free()` explicitly synchronizes before releasing command buffers and Objective-C resources.
+- Metal backend free explicitly synchronizes before releasing command buffers and Objective-C resources.
 - Scheduler events and buffers retain device-level or buffer-local state.
 
 **Interpretation**
 
 - Backend-before-scheduler destruction is verified safe for ordinary pinned Metal resources.
 
-## 2026-07-13 13:52 — Vulkan command and synchronization lifetimes
+## 2026-07-13 13:52–14:50 — Vulkan command lifetime and teardown
 
 **Verified**
 
-- Published `docs/architecture/vulkan-command-lifetime.md` and added it to Architecture navigation.
-- Vulkan command pools are scoped per `(context, queue)` and `(device, queue)` pairing and track reusable command buffers.
-- Synchronous read, copy, and memset helpers wait on a fence before recycling command-pool state.
-- Binary semaphores, timeline semaphores, and Vulkan events are pooled.
+- Vulkan command pools track reusable command buffers per context/device queue pairing.
+- Synchronous helpers wait on fences before recycling command-pool state.
+- Vulkan backend cleanup explicitly synchronizes before destroying context-owned submission resources.
+- Scheduler events use persistent registry-device state; scheduler buffers retain shared device/buffer ownership.
 
 **Interpretation**
 
-- Command-pool reset is a reuse step after completion, not a synchronization mechanism.
-- Graph compute submission does not itself imply host completion.
-
-## 2026-07-13 14:50 — Vulkan backend teardown classification
-
-**Verified**
-
-- Published `docs/architecture/vulkan-backend-teardown.md` and added it to Architecture navigation.
-- `ggml_backend_vk_free()` calls `ggml_vk_cleanup()` before deleting the Vulkan context and wrapper.
-- Cleanup discards unsubmitted recording, explicitly calls `ggml_vk_synchronize()` for submitted work, and only then destroys graph synchronization state, temporary buffers, events, fences, descriptor pools, command pools, and transfer-queue synchronization objects.
-- Scheduler Vulkan events are destroyed through persistent backend-device registry state and do not require the deleted per-backend context.
-- Scheduler Vulkan buffers retain a buffer-local shared `vk_device` and `vk_buffer` and remain independently destructible.
-
-**Interpretation**
-
-- Backend-before-scheduler destruction is verified safe for the ordinary pinned Vulkan resources inspected in this audit.
-- The Vulkan free path provides a stronger explicit completion boundary than the pinned CUDA-family path.
-
-**Historical**
-
-- Queue topology, transfer policy, event implementation, and device-registry lifetime are revision-sensitive.
+- Backend-before-scheduler destruction is verified safe for ordinary pinned Vulkan resources.
 
 **Open questions**
 
-- The optional performance query pool is created/replaced during graph compute, but no explicit destruction call appeared in the inspected cleanup body.
-- Immediate-destruction validation tests and full process-exit Vulkan device teardown remain to be audited.
+- The optional performance query pool still needs a focused ownership/destructor audit.
+
+## 2026-07-13 15:49 — SYCL backend teardown
+
+**Verified**
+
+- Published `docs/architecture/sycl-backend-teardown.md` and linked it in Architecture navigation.
+- `ggml_backend_sycl_free()` deletes the per-backend context and generic wrapper without an explicit queue wait.
+- `ggml_backend_sycl_synchronize()` waits on `stream(device, 0)`, but backend free does not invoke it.
+- Async tensor set/get and graph execution can enqueue work and return without host completion.
+- The context borrows device-manager default-queue pointers and owns pools, scratchpads, flash-attention buffers, and optional executable graph state.
+- Scheduler events own independent `sycl::event` objects.
+- Ordinary scheduler buffers retain buffer-local device, allocation, queue, tensor-extra, and allocation-mode state.
+- SYCL buffer-type objects are function-static and outlive individual backend wrappers.
+
+**Interpretation**
+
+- Backend-before-scheduler destruction is structurally independent for ordinary SYCL scheduler events and buffers.
+- Queued-work completion remains conditional because backend free does not establish an explicit completion boundary before context-member destruction.
+- The pinned SYCL contract is closer to CUDA than to Metal or Vulkan.
+
+**Historical**
+
+- Queue ownership, command graphs, async allocation extensions, DNNL, Level Zero, and split-buffer behavior are revision- and compiler-sensitive.
+
+**Open questions**
+
+- Whether queue/pool/USM/command-graph destruction provides a portable implicit wait.
+- Whether queue-0 synchronization covers all multi-device and optional paths.
+- Whether immediate-context-destruction regression tests exist or should be added.
