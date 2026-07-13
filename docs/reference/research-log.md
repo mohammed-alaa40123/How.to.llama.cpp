@@ -93,3 +93,23 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Generate direct pinned source-line links and decide whether to add parser-assisted extraction for methods, templates, macros, and destructors.
+
+## 2026-07-13 20:51 — Revision-pinned source-line links
+
+**Verified**
+
+- Generated file and symbol records can now carry pinned GitHub URLs.
+- Symbol links include line fragments and derive from the exact revision selected by `update_upstream.sh`.
+- Regression tests cover base normalization, absent-base behavior, line-fragment generation, and non-mutation.
+
+**Interpretation**
+
+- The generated index can now take reviewers directly from approximate symbol metadata to the candidate declaration at the pinned revision.
+
+**Historical**
+
+- The previous line-aware format required callers to construct source URLs themselves.
+
+**Open questions**
+
+- Regenerate the pinned inventory when upstream access is available, validate generated links, and use them to finish the OpenCL teardown audit.
