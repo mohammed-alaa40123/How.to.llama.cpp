@@ -155,3 +155,23 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Generate shared versioned metadata for the atlas and interactive workflow, add runtime overlays, and validate Mermaid click targets in the built site.
+
+## 2026-07-14 02:49 — Backend teardown audit method
+
+**Verified**
+
+- Added a reusable ten-step audit worksheet that separates host-visible command completion from scheduler-resource deleter independence.
+- Standardized the bounded classification vocabulary already used by the CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN audits.
+- Added a minimum asynchronous-destruction runtime matrix and linked the method before the cross-backend comparison.
+
+**Interpretation**
+
+- A shared method improves consistency and reviewability without replacing backend-specific source evidence.
+
+**Historical**
+
+- The method is pinned to the current baseline and must evolve with backend interfaces, queue models, registries, and destruction order.
+
+**Open questions**
+
+- Generate worksheet evidence from source-index metadata, implement portable destruction tests, and finish the OpenCL application.
