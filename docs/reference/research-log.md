@@ -113,3 +113,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Regenerate the pinned inventory when upstream access is available, validate generated links, and use them to finish the OpenCL teardown audit.
+
+## 2026-07-13 21:49 — Cross-backend teardown comparison
+
+**Verified**
+
+- Added a pinned comparison matrix covering ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and the current OpenCL gap.
+- The matrix separates execution completion from scheduler-resource independence and links every classification to its detailed audit.
+- Ordinary CPU, Metal, and Vulkan have the strongest audited source-level completion and lifetime classifications; CUDA, SYCL, RPC, and CANN retain specific conditional boundaries.
+
+**Interpretation**
+
+- Backend-before-scheduler safety requires two independent proofs: command completion and valid later deleter state.
+- A single cross-backend table improves discoverability without replacing the backend-specific evidence pages.
+
+**Historical**
+
+- The comparison is revision-pinned and must be re-audited when queue models, registries, or destructor order change.
+
+**Open questions**
+
+- Finish OpenCL teardown, validate accelerator destruction with runtime tests, and audit optional CPU extra-buffer implementations.
