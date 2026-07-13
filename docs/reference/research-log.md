@@ -192,3 +192,32 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Whether graph compute needs an explicit completion response.
 - Whether shared-socket access is serialized for concurrent users.
 - Whether immediate graph-compute → teardown is covered by regression tests.
+
+## 2026-07-13 17:51 — CANN backend teardown
+
+**Verified**
+
+- Published `docs/architecture/cann-backend-teardown.md` and linked it in Architecture navigation.
+- CANN backend free performs device-wide synchronization, then resets the device, then deletes the per-backend context and wrapper.
+- The context owns lazy streams, an optional copy event, memory-pool state, rope/tensor caches, and optional ACL graph-cache state.
+- Scheduler events own independent ACL event handles and registry-device references.
+- Scheduler buffers own buffer-local device allocations and do not dereference the deleted backend context.
+- Registry devices are function-static process state.
+- Current upstream still uses the same reset-before-context-delete order as the pinned baseline.
+
+**Interpretation**
+
+- Queued work reaches an explicit device-wide completion boundary before teardown.
+- Backend-before-scheduler destruction is structurally independent for ordinary event and buffer objects.
+- Teardown order remains conditional because context and scheduler destructors call ACL destroy/free APIs after backend free has reset the device.
+
+**Historical**
+
+- The reset-before-context-delete order persists upstream as of 2026-07-13, but persistence does not prove cross-version API correctness.
+
+**Open questions**
+
+- Whether CANN permits stream, event, and allocation destruction after `aclrtResetDevice()`.
+- Whether reset invalidates resources and makes subsequent destroy/free calls redundant or invalid.
+- Whether one backend reset disrupts another backend instance on the same device.
+- Which runtime tests cover scheduler-resource release after backend free.
