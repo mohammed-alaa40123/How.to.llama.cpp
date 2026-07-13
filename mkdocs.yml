@@ -93,6 +93,7 @@ nav:
       - Vulkan backend teardown: architecture/vulkan-backend-teardown.md
       - SYCL backend teardown: architecture/sycl-backend-teardown.md
       - RPC backend teardown: architecture/rpc-backend-teardown.md
+      - CANN backend teardown: architecture/cann-backend-teardown.md
   - Inference lifecycle:
       - Brief end to end: lifecycle/end-to-end.md
       - Decode and graph reuse: lifecycle/decode-graph-reuse.md
