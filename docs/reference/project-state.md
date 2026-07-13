@@ -77,16 +77,18 @@ Required deliverables:
 - Page commit: `b8c8cf2cf1ea6bdb0ab384b52b12c91c0e29a6bb`.
 - Navigation commit: `c042f9f5ea140eff2f439c30138173f3cc2ff62a`.
 - Detailed note commit: `f0f78da40afa0e617bbbf0a6befb5a8436d649ce`.
-- Connector-side inspection confirmed the new page and pinned source claims.
+- Research-log commit: `728ea4afecc124d2ce5c805c7c1f01db05532aea`.
+- README/TODO commit: `a2571a586433cc086263a7bdef47fcb350617843`.
+- Connector-side inspection confirmed the pinned free path, explicit synchronize callback, asynchronous submission paths, queue-pointer ownership, event independence, and buffer-local release state.
+- Commit-scoped workflow lookup for `a2571a586433cc086263a7bdef47fcb350617843` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
+- Public searches for the Pages root and `architecture/sycl-backend-teardown/` returned no indexed results. Direct opening was rejected by the available safe-URL gate, so live HTTP status and rendered content remain unverified.
 - No new external secondary source was introduced; the research ledger remains unchanged.
-- Local validation remains blocked because cloning fails with `Could not resolve host: github.com`.
-- Latest GitHub Actions and Pages verification results are recorded below after inspection.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** the execution environment cannot resolve `github.com` and has no usable repository checkout, so project validators, tests, strict MkDocs build, and `check_site.sh` cannot run locally.
-- **CI visibility blocker:** connector commit-status and workflow data may lag or omit push-triggered runs; absence of records is treated as unverified, not as success or failure.
-- **Pages verification blocker:** if the public route cannot be opened or indexed, HTTP status and rendered content remain unverified.
+- **Local validation blocker:** cloning failed with `Could not resolve host: github.com`; there is no usable checkout, so project validators, tests, strict MkDocs build, and `check_site.sh` could not run locally.
+- **CI visibility blocker:** the available commit-scoped workflow endpoint returned an empty run list and currently exposes only a limited class of workflow runs.
+- **Pages verification blocker:** public search did not index the root or new route, and the safe-URL gate rejected direct access; HTTP response and expected content could not be inspected.
 - **SYCL completion caveat:** backend free does not explicitly wait before destroying context-owned resources.
 - **Vulkan query-pool caveat:** the optional performance query pool still needs a focused ownership audit.
 - Mapping, allocation, residency, validity, command completion, ownership, and release remain distinct states.
