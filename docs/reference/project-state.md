@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 14:50 Africa/Cairo_
+_Last updated: 2026-07-13 15:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -25,69 +25,70 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Ordinary pinned CPU backend teardown classification.
 - Pinned CUDA backend teardown dependency audit and conditional safety classification.
 - Pinned Metal backend teardown audit and verified-safe backend-before-scheduler classification.
-- Pinned Vulkan command-pool, command-buffer, fence, semaphore, event, and synchronous-helper completion-boundary map.
-- Pinned Vulkan backend free-chain audit and verified-safe ordinary backend-before-scheduler classification.
+- Pinned Vulkan command-lifetime map and verified-safe ordinary backend teardown classification.
+- Pinned SYCL backend teardown audit and conditional queued-work classification.
 
 ## Latest concrete findings
 
-- `ggml_backend_vk_free()` calls `ggml_vk_cleanup()` before deleting the Vulkan backend context and wrapper.
-- `ggml_vk_cleanup()` discards unsubmitted compute recording, explicitly calls `ggml_vk_synchronize()` for submitted work, and only then destroys context-owned temporary buffers, events, fences, descriptor pools, command pools, and transfer synchronization state.
-- Vulkan scheduler events are device-owned resources: their free callback resolves the persistent registry device, destroys the event-owned timeline semaphore and `VkEvent` objects, and does not dereference the deleted backend context.
-- Vulkan scheduler buffers own a buffer-local context containing a shared `vk_device` and `vk_buffer`; their deleter does not require the deleted backend context.
-- The backend-device registry stores function-static device wrappers, so scheduler event destruction remains valid after individual backend-wrapper deletion.
-- Backend-before-scheduler destruction is verified safe for the ordinary pinned Vulkan resources inspected in this audit.
-- A possible cleanup gap remains: the performance query pool is created/replaced during graph compute, but no explicit `destroyQueryPool(ctx->query_pool)` appeared in the inspected backend cleanup body.
+- `ggml_backend_sycl_free()` deletes the per-backend context and generic wrapper without an explicit queue wait.
+- `ggml_backend_sycl_synchronize()` waits on `stream(device, 0)`, but backend free does not call it.
+- Async tensor set/get and graph execution can enqueue SYCL work and return without host completion.
+- The SYCL context borrows device-manager default-queue pointers and owns pools, host pools, scratchpads, flash-attention buffers, and optional executable graph state through members.
+- Scheduler events own independent `sycl::event` objects; their free path does not require the deleted backend context.
+- Ordinary scheduler buffers retain buffer-local device, pointer, queue, tensor-extra, and allocation-mode state; their deleter does not use the backend context.
+- Backend-before-scheduler destruction is structurally independent for ordinary SYCL scheduler events and buffers, but queued-work completion remains conditional.
 
 ## In progress
 
-- Remaining concrete backend teardown audits for SYCL, RPC, CANN, and OpenCL.
+- Remaining concrete backend teardown audits for RPC, CANN, and OpenCL.
 - Optional CPU extra-buffer teardown audit.
 - CUDA concurrent-stream synchronization coverage.
+- SYCL all-queue completion coverage and implicit destructor semantics.
 - Vulkan performance-query-pool ownership and process-exit device teardown.
 - Architecture-specific graph-builder downcasts and exact state tensors.
 - Runtime evidence for synchronization, event waits, page faults, memory updates, and teardown.
 
 ## Immediate next task
 
-Audit the pinned SYCL backend teardown:
+Audit the pinned RPC backend teardown:
 
 ```text
-SYCL backend wrapper free
-→ queue wait/completion behavior
-→ context and stream/queue ownership
-→ scheduler event implementation
-→ USM/device/host buffer destruction
-→ static registry/device lifetime
+RPC backend wrapper free
+→ client/session/socket lifetime
+→ remote allocation and buffer destruction
+→ request completion and synchronization
+→ scheduler event/buffer behavior
+→ reconnect/error paths
 → classify backend-before-scheduler ordering
 ```
 
 Required deliverables:
 
-1. exact SYCL backend/context free chain;
-2. queue completion behavior during free;
-3. event and buffer ownership after backend-wrapper deletion;
-4. static device/buffer-type lifetime;
+1. exact RPC backend/client free chain;
+2. completion behavior for outstanding requests;
+3. remote buffer and scheduler-resource ownership after backend-wrapper deletion;
+4. transport/session lifetime and error paths;
 5. safety classification for the pinned context member order;
 6. truth labels and durable context updates.
 
 ## Publication and verification state
 
-- New page: `docs/architecture/vulkan-backend-teardown.md`.
-- Page commit: `00d82b68637722e84fd68bdd4d1d82b9d94226a8`.
-- Navigation commit: `69b0fed03e807d4fd913720258e477c10e660a8f`.
-- README/TODO commit: `66c2769d6a702e5e77dafaef408c146ca3b4fc85`.
-- Detailed note commit: `73d5357941624060547018dbfcc8a18ca06b8de6`.
-- Connector-side re-fetch confirmed that the new page is present on `main` with the expected classification, source links, Mermaid teardown map, and truth-labelled sections.
-- Commit-scoped workflow lookup for `73d5357941624060547018dbfcc8a18ca06b8de6` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
-- Searches for the Pages root and new route returned no indexed results. The available web safety gate then rejected direct opening of both URLs, so live HTTP status and rendered content remain unverified.
+- New page: `docs/architecture/sycl-backend-teardown.md`.
+- Page commit: `b8c8cf2cf1ea6bdb0ab384b52b12c91c0e29a6bb`.
+- Navigation commit: `c042f9f5ea140eff2f439c30138173f3cc2ff62a`.
+- Detailed note commit: `f0f78da40afa0e617bbbf0a6befb5a8436d649ce`.
+- Connector-side inspection confirmed the new page and pinned source claims.
 - No new external secondary source was introduced; the research ledger remains unchanged.
+- Local validation remains blocked because cloning fails with `Could not resolve host: github.com`.
+- Latest GitHub Actions and Pages verification results are recorded below after inspection.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** the execution environment cannot resolve `github.com` and has no usable repository checkout, so `validate_project_context.py`, interactive-link tests, unit tests, strict MkDocs build, and `check_site.sh` could not run locally.
-- **CI visibility blocker:** the available commit-scoped workflow endpoint returned an empty run list and does not expose push-triggered results reliably.
-- **Pages verification blocker:** public search did not index the Pages root or new route, and the web safety gate rejected direct opening; HTTP response and expected rendered content could not be inspected.
-- **Vulkan query-pool caveat:** the inspected cleanup path does not explicitly destroy the optional performance query pool; ownership or leak behavior needs a focused follow-up.
+- **Local validation blocker:** the execution environment cannot resolve `github.com` and has no usable repository checkout, so project validators, tests, strict MkDocs build, and `check_site.sh` cannot run locally.
+- **CI visibility blocker:** connector commit-status and workflow data may lag or omit push-triggered runs; absence of records is treated as unverified, not as success or failure.
+- **Pages verification blocker:** if the public route cannot be opened or indexed, HTTP status and rendered content remain unverified.
+- **SYCL completion caveat:** backend free does not explicitly wait before destroying context-owned resources.
+- **Vulkan query-pool caveat:** the optional performance query pool still needs a focused ownership audit.
 - Mapping, allocation, residency, validity, command completion, ownership, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
