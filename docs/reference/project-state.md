@@ -73,15 +73,18 @@ Required deliverables:
 - Page commit: `b7b8eb2cea00eccf5f4a7984d9639d5d1877ef48`.
 - Navigation commit: `733afe97c96798043a65d84871c128df40711752`.
 - Detailed-note commit: `d12b7772860934e4bb2a1445c085be01d63b077f`.
+- Research-log commit: `4016a5253e402edc8405d0395ec1e81804e2f36c`.
+- README/TODO commit: `5f50f3ccc623537187cf2631a8a655fbc8c3d186`.
 - Connector-side source inspection confirmed the pinned CUDA free path, context-destructor order, async interface, explicit synchronize callback, static device/buffer-type lifetime, scheduler event deleter, and buffer `cudaFree` path.
-- GitHub Actions and Pages status for this increment are checked after all state updates. If unavailable, the exact visibility blocker remains recorded below and in README TODOs.
+- Workflow lookup for `5f50f3ccc623537187cf2631a8a655fbc8c3d186` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
+- Site-specific searches for the project root and `architecture/cuda-backend-teardown/` returned no indexed result, so live HTTP status and rendered content could not be verified through the available web tooling.
 - No new external secondary source passed the verification bar; the research ledger remains unchanged.
 
 ## Known blockers and caveats
 
 - **Local validation blocker:** the execution environment cannot resolve `github.com` and has no usable checkout, so repository validation commands cannot run locally.
-- **CI visibility blocker:** the connected status endpoint may return an empty status list and does not necessarily expose push-triggered workflow runs.
-- **Pages verification blocker:** if the Pages URL is absent from search results, direct verification may be rejected by the safe-URL gate; live HTTP status and rendered content then remain unverified.
+- **CI visibility blocker:** the commit workflow lookup returned an empty run list and the available connector does not expose push-triggered runs for this commit.
+- **Pages verification blocker:** site-specific search returned no indexed root or CUDA teardown route; live HTTP status and expected rendered content remain unverified.
 - The CUDA classification proves object-path independence, not universal queued-work completion safety across CUDA, HIP, and MUSA runtimes.
 - `ggml_backend_cuda_synchronize()` appears to synchronize the current stream only; concurrent-stream coverage requires further verification.
 - Mapping, allocation, physical residency, data validity, queued completion, ownership, and release remain distinct states.
