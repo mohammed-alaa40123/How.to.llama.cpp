@@ -67,16 +67,19 @@ Required deliverables:
 - Context-memory implementation page commit: `a47a8c344bc6850a507a69617d3d6fe52923a37e`.
 - Navigation commit: `c6990a136c2b5aeda6c290397a4c0a74d3c2e528`.
 - README/TODO commit: `288c5642852ec6ab04bc74f6160d8ad8f44ca3ea`.
-- Connector-side source inspection confirmed seven concrete persistent implementations: ordinary KV, iSWA, DSA, DSV4, recurrent, hybrid, and hybrid-iSWA.
-- Pinned `llama-arch.cpp` confirms exact recurrent and hybrid architecture sets; pinned `llama-model.cpp` confirms no-memory and specialized factory branches.
-- GitHub Actions and Pages checks are performed after the final detailed-note commit; results or exact blockers are recorded below.
+- Research-log commit: `ff3fe4016b8a55877dc6159fa57b7a44b889a633`.
+- Detailed-note commit: `ffbab1a3230436c0de363c6e79d6db72f06c8146`.
+- Connector-side re-fetch confirmed the published page, pinned baseline, Mermaid map, seven persistent implementations, architecture lists, ownership/update tables, truth labels, source map, and related routes.
+- Combined status for the detailed-note commit returned no status entries.
+- Commit workflow lookup returned `workflow_runs: []`; this endpoint only reliably exposes pull-request-triggered runs, so push-triggered Documentation CI, Pages deployment, and hourly-context validation remain unverified rather than failed.
+- Site-specific searches returned no indexed project or new page. Direct opening of both the Pages root and `architecture/context-memory-implementations/` was rejected by the safe-URL gate because those exact URLs were absent from search results.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** no usable local checkout is available in this execution environment, so the full validation suite and `mkdocs build --strict` could not execute locally.
-- **CI visibility blocker:** the connector workflow endpoint only reliably exposes pull-request-triggered results; an empty result is not evidence that push-triggered workflows passed or failed.
-- **Pages verification blocker:** direct live-site verification may be limited by URL safety or DNS behavior; exact result is recorded after publication.
+- **Local validation blocker:** no usable local checkout is available in this execution environment, so project validators, unit tests, script syntax checks, and `mkdocs build --strict` could not execute locally.
+- **CI visibility blocker:** combined status was empty and `fetch_commit_workflow_runs` returned `workflow_runs: []`; the connector only reliably exposes pull-request-triggered runs. This is not evidence that push-triggered workflows passed or failed.
+- **Pages verification blocker:** site-specific search returned no indexed result, and direct opening of the root and new page was rejected by the safe-URL gate. HTTP status and rendered content remain unverified.
 - Static link validation approximates Python-Markdown IDs; built-HTML validation is still required for plugin-generated anchors.
 - Mapping, allocation, residency, validity, ownership, copy generation, and command completion are distinct states.
 - Scheduler destination-copy allocation does not prove current-generation data validity.
