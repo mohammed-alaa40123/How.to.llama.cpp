@@ -53,6 +53,31 @@ static void selected() {
         self.assertEqual([item["line"] for item in symbols], [1, 4])
         self.assertEqual([item["name"] for item in symbols], ["selected", "selected"])
 
+    def test_source_file_url_normalizes_base(self) -> None:
+        self.assertEqual(
+            index_upstream.source_file_url(
+                "https://github.com/ggml-org/llama.cpp/blob/abc123/",
+                "ggml/src/ggml-opencl/ggml-opencl.cpp",
+            ),
+            "https://github.com/ggml-org/llama.cpp/blob/abc123/ggml/src/ggml-opencl/ggml-opencl.cpp",
+        )
+        self.assertIsNone(index_upstream.source_file_url(None, "file.cpp"))
+
+    def test_add_source_links_preserves_records_and_adds_line_fragments(self) -> None:
+        symbols = [{"name": "selected", "kind": "function", "line": 17}]
+        linked = index_upstream.add_source_links(symbols, "https://example.test/repo/blob/ref/file.cpp")
+        self.assertEqual(
+            linked,
+            [{
+                "name": "selected",
+                "kind": "function",
+                "line": 17,
+                "source_url": "https://example.test/repo/blob/ref/file.cpp#L17",
+            }],
+        )
+        self.assertNotIn("source_url", symbols[0])
+        self.assertEqual(index_upstream.add_source_links(symbols, None), symbols)
+
 
 if __name__ == "__main__":
     unittest.main()
