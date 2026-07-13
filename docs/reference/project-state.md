@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 16:49 Africa/Cairo_
+_Last updated: 2026-07-13 17:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -28,21 +28,24 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Pinned Vulkan command-lifetime map and verified-safe ordinary backend teardown classification.
 - Pinned SYCL backend teardown audit and conditional queued-work classification.
 - Pinned RPC backend teardown audit and distributed completion classification.
+- Pinned CANN backend teardown audit and reset-order conditional classification.
 
 ## Latest concrete findings
 
-- `ggml_backend_rpc_free()` deletes only endpoint/device/name metadata and the generic wrapper; it neither owns a socket nor synchronizes remote work.
-- Scheduler RPC buffers retain their own `std::shared_ptr<socket_t>` and remote handle, so later remote-release commands remain possible after backend-wrapper deletion.
-- Client graph compute is request-only: it sends the command and receives no completion response.
-- RPC synchronize is a no-op.
-- The server processes commands serially per connection, but graph handlers call the selected concrete backend without a following generic synchronize.
-- The server frees explicitly released buffers and releases all remaining session buffers when the connection handler exits.
-- Backend-before-scheduler destruction is structurally safe for ordinary pinned RPC client objects, while remote completion remains conditional on the server backend.
+- `ggml_backend_cann_free()` calls `aclrtSynchronizeDevice()`, then `aclrtResetDevice()`, then deletes the backend context and wrapper.
+- Device-wide synchronization establishes an explicit queued-work completion boundary before teardown.
+- The context owns lazy streams, an optional copy event, a memory pool, rope/tensor caches, and optional ACL graph-cache state.
+- Scheduler CANN events own independent ACL event handles and registry-device references.
+- Scheduler CANN buffers own buffer-local device allocations and free them without dereferencing the backend context.
+- Registry/device objects are function-static and outlive individual backend wrappers.
+- The unresolved risk is resource validity after reset: context and scheduler destructors later call `aclrtDestroyEvent`, `aclrtDestroyStream`, and `aclrtFree`.
+- Current upstream still contains the same reset-before-context-delete order as the pinned baseline.
 
 ## In progress
 
-- Remaining concrete backend teardown audits for CANN and OpenCL.
+- Remaining concrete backend teardown audit for OpenCL.
 - Optional CPU extra-buffer teardown audit.
+- CANN reset semantics and multi-context runtime validation.
 - RPC remote synchronization/completion protocol and shared-socket concurrency.
 - CUDA concurrent-stream synchronization coverage.
 - SYCL all-queue completion coverage and implicit destructor semantics.
@@ -52,50 +55,54 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Immediate next task
 
-Audit the pinned CANN backend teardown:
+Audit pinned OpenCL teardown and optional CPU extra-buffer implementations:
 
 ```text
-CANN backend wrapper free
-→ stream/device synchronization
-→ events and graph execution completion
-→ allocator and buffer ownership
-→ static device/buffer-type lifetime
-→ scheduler resource independence
+OpenCL backend wrapper free
+→ command-queue completion and release
+→ events and scheduler-resource ownership
+→ buffer/context/program/kernel lifetime
+→ static registry and device lifetime
+→ optional CPU extra-buffer deleters
 → classify backend-before-scheduler ordering
 ```
 
 Required deliverables:
 
-1. exact CANN backend/context free chain;
-2. completion behavior for queued work;
+1. exact OpenCL backend/context free chain;
+2. completion behavior for queued commands;
 3. event and scheduler-buffer ownership after backend-wrapper deletion;
-4. allocator/device/stream error paths;
-5. safety classification for the pinned context member order;
-6. truth labels and durable context updates.
+4. program/kernel/buffer/context release order and error paths;
+5. optional CPU extra-buffer lifetime boundaries;
+6. safety classification for the pinned context member order;
+7. truth labels and durable context updates.
 
 ## Publication and verification state
 
-- New page: `docs/architecture/rpc-backend-teardown.md`.
-- Page commit: `b61b05a8d75f8220f3cb23eece5fc9f42bb53d9a`.
-- Navigation commit: `523599e2bdac99baab97a92e0d9915ce8feed235`.
-- Detailed note commit: `3d616805fed9f98fe0375841cf5d29f76dc56827`.
-- Research-log commit: `f038f2b4f7f491a9ef120b1acfd99b63bbeb039b`.
-- README/TODO commit: `60020db3a27157894c66d2986fe30088fbb613ab`.
-- Connector-side inspection confirmed the RPC client free path, socket ownership, buffer release protocol, server dispatch ordering, graph completion gap, session cleanup, and transport destruction.
-- Commit-scoped workflow lookup for `60020db3a27157894c66d2986fe30088fbb613ab` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
-- Direct inspection of the Pages root and `architecture/rpc-backend-teardown/` was rejected by the available safe-URL gate, so HTTP status and rendered content remain unverified.
-- No new external secondary source was introduced; the research ledger remains unchanged.
+- New page: `docs/architecture/cann-backend-teardown.md`.
+- Page commit: `230c8adf4a26d572e5c57c69c8f4efa86741f869`.
+- Navigation commit: `fa5491dfda8dc0121b1ef3671a971637085fba34`.
+- Detailed note commit: `3eed9cc1e331a550e9be8995b67703b0e23b51b5`.
+- README/TODO commit: `87ba63285699722ea7e414a5c125f8a70457dacd`.
+- Research-log commit: `f8faef79a7a0e7159d6a00f41efb8e754463d0ba`.
+- Connector-side inspection confirmed the CANN backend free, device synchronization/reset, context-member, event, buffer, and registry paths.
+- Local clone and validation failed with `Could not resolve host: github.com`.
+- Commit-scoped workflow lookup for `f8faef79a7a0e7159d6a00f41efb8e754463d0ba` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
+- Public search returned no indexed result for the site root or CANN route; the safe-URL gate rejected direct opening, so HTTP status and rendered content remain unverified.
+- No new external source passed the ledger verification bar; the research ledger remains unchanged.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** there is no usable repository checkout in the execution environment, so project validators, tests, strict MkDocs build, and `check_site.sh` could not run locally.
+- **Local validation blocker:** cloning failed because the execution environment could not resolve `github.com`, so project validators, tests, strict MkDocs build, and `check_site.sh` could not run locally.
 - **CI visibility blocker:** the available commit-scoped workflow endpoint returned an empty run list and currently exposes only a limited class of workflow runs.
-- **Pages verification blocker:** direct access to both the site root and new RPC route was rejected by the safe-URL gate; HTTP response and expected content could not be inspected.
+- **Pages verification blocker:** public search found no indexed site result and direct access was rejected by the safe-URL gate; HTTP response and expected CANN page content could not be inspected.
+- **CANN reset-order caveat:** device-wide completion is explicit, but the validity of later ACL destroy/free calls after `aclrtResetDevice()` is unverified.
+- **CANN shared-device caveat:** freeing one backend resets the device; impact on another backend instance using the same device remains unverified.
 - **RPC completion caveat:** graph compute has no completion response and the no-op RPC synchronize does not invoke server-side synchronization.
 - **RPC concurrency caveat:** one socket can be shared through endpoint-level weak caching and buffer-held strong references; the inspected request helpers do not establish a per-socket request mutex.
 - **SYCL completion caveat:** backend free does not explicitly wait before destroying context-owned resources.
 - **Vulkan query-pool caveat:** the optional performance query pool still needs a focused ownership audit.
-- Mapping, allocation, residency, validity, command completion, ownership, and release remain distinct states.
+- Mapping, allocation, residency, validity, command completion, ownership, reset, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
 
