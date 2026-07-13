@@ -134,3 +134,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Finish OpenCL teardown, validate accelerator destruction with runtime tests, and audit optional CPU extra-buffer implementations.
+
+## 2026-07-14 01:52 — Guided end-to-end inference atlas
+
+**Verified**
+
+- Added a clickable pipeline linking GGUF, model loading, `llama_model`, `llama_context`, graph construction, scheduler execution, backends, sampling, and decode reuse.
+- Added a stage/lifetime table and reading paths for first-pass learning, memory/page faults, graphs/scheduler, backends/synchronization, and ownership/teardown.
+- Linked the atlas first under the Inference lifecycle navigation section.
+
+**Interpretation**
+
+- The atlas is a routing layer over canonical evidence pages, not a claim that the runtime is a single linear thread.
+- Persistent state, asynchronous queues, mappings/uploads, graph splits, and copy generations cross the simplified pipeline boundaries.
+
+**Historical**
+
+- The atlas reflects the current documentation structure and the pinned baseline; both remain revision-sensitive.
+
+**Open questions**
+
+- Generate shared versioned metadata for the atlas and interactive workflow, add runtime overlays, and validate Mermaid click targets in the built site.
