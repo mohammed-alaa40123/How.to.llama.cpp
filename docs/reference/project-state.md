@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 06:49 Africa/Cairo_
+_Last updated: 2026-07-13 07:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -25,71 +25,65 @@ Reconstruct llama.cpp from the source through a clickable system map and file-by
 - Large six-tab interactive foundations explorer with canonical object, graph, GGUF/model-loading, and memory routes.
 - Static interactive-link validator, fixture tests, and Documentation CI integration.
 - Four-pass roadmap: file inventory, subsystem grouping, cross-file composition, and workflow reconstruction.
-- File-by-file Pass A public API/minimal-example inventory.
-- File-by-file Pass A model/GGUF loader inventory.
-- File-by-file Pass A runtime-context and memory inventory.
-- File-by-file Pass A backend-scheduler inventory covering assignment, splits, copy-ring resources, destination validity, events, fallback synchronization, asynchronous submission, reuse, and teardown.
-- Cross-subsystem system ownership and execution synthesis connecting loader publication, persistent model storage, context-owned mutable state, polymorphic memory, graph build/reuse, scheduler execution, output visibility, and teardown.
+- Pass A pages for public API/minimal example, model/GGUF loading, runtime context/memory, and backend scheduler.
+- Cross-subsystem system ownership and execution synthesis.
+- Exact pinned map of seven concrete `llama_memory_i` implementations, their primary context implementations, architecture predicates, special factory branches, storage composition, update semantics, and sequence/state behavior.
 
 ## In progress
 
-- Enumerate every concrete `llama_memory_i` implementation and map model architectures to KV, recurrent, hybrid, iSWA, and specialized caches.
 - Exact `llama_model` and `llama_context` member destruction ordering for retained mappings, buffers, scheduler, memory, graph results, outputs, and backends.
+- Architecture-specific graph-builder downcasts to concrete memory-context types and exact state tensors read/written.
 - Exact line-level source citations and generated source-link checking for the graph-construction chapter.
 - Runtime evidence separating parsing, mapping/prefetch, faults, reads, aliases, uploads, memory updates, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
 - Concrete backend mapping for `cpy_tensor_async`, event wait/record, graph submission, and synchronization across CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL.
 
 ## Immediate next task
 
-Enumerate concrete context-memory implementations and architecture mappings at the pinned revision:
+Trace exact declaration and destruction dependencies for `llama_model` and `llama_context`:
 
 ```text
-llama_model::create_memory()
-→ architecture-specific factory decision
-→ llama_memory_i implementation
-→ KV, recurrent, hybrid, iSWA, or specialized storage
-→ per-batch memory context
-→ update graph or direct mutation
-→ sequence operations, state I/O, reset, and teardown
+member declaration order
+→ C++ reverse destruction order
+→ custom destructors and smart-pointer cleanup
+→ queued backend work and synchronization prerequisites
+→ scheduler/memory/output/backend lifetime dependencies
+→ retained mappings and model buffers
+→ safe application teardown order
 ```
 
 Required deliverables:
 
-1. exact list of concrete `llama_memory_i` and `llama_memory_context_i` implementations;
-2. architecture-to-memory mapping with pinned factory call sites;
-3. storage ownership, allocation, update, synchronization, and sequence semantics;
-4. ordinary KV, recurrent, hybrid, iSWA, and specialized differences;
-5. Verified, Interpretation, Historical, and Open question labels;
-6. README, project-state, research-log, and detailed-note updates;
-7. CI and Pages verification after publication.
+1. declaration-order tables for model and context;
+2. reverse destruction order and explicit synchronization boundaries;
+3. borrowed versus owned members and external lifetime requirements;
+4. failure and partial-construction cleanup;
+5. CPU and accelerator teardown differences;
+6. Verified, Interpretation, Historical, and Open question labels;
+7. README, project-state, research-log, and detailed-note updates;
+8. CI and Pages verification after publication.
 
 ## Latest publication verification
 
-- Backend scheduler Pass A page commit: `192b2ca503015d1d06ef2913caa1b69cadfaf206`.
-- Navigation commit: `28429273f20901c2adafe1b40f41961d663a6c81`.
-- README/TODO commit: `a52cfb40fb43922ada521b7bbeb56eb1928e7059`.
-- Research-log commit: `31d05ac2c50b8b251e8b45641cc83b2ee37fd9d6`.
-- Detailed-note commit: `965c0f1a2249160ea2be90b3f6c23be2fe5a5a97`.
-- Connector-side re-fetch confirmed the published page, pinned baseline, file/symbol inventory, ownership/validity table, Mermaid call chains, backend variants, truth labels, source links, and related-page routes.
-- Commit-workflow lookup for `965c0f1a2249160ea2be90b3f6c23be2fe5a5a97` returned `workflow_runs: []`; the endpoint only reliably exposes pull-request-triggered runs, so push-triggered Documentation CI, Pages, and hourly-context runs are unverified.
-- Site-specific web searches returned no indexed project page. Direct opening of the Pages root and `architecture/backend-scheduler-pass-a/` was rejected by the safe-URL gate because those exact URLs were absent from search results.
-- A local clone attempt failed with `Could not resolve host: github.com`, so project validators, tests, script syntax checks, and `mkdocs build --strict` could not run locally.
+- Context-memory implementation page commit: `a47a8c344bc6850a507a69617d3d6fe52923a37e`.
+- Navigation commit: `c6990a136c2b5aeda6c290397a4c0a74d3c2e528`.
+- README/TODO commit: `288c5642852ec6ab04bc74f6160d8ad8f44ca3ea`.
+- Connector-side source inspection confirmed seven concrete persistent implementations: ordinary KV, iSWA, DSA, DSV4, recurrent, hybrid, and hybrid-iSWA.
+- Pinned `llama-arch.cpp` confirms exact recurrent and hybrid architecture sets; pinned `llama-model.cpp` confirms no-memory and specialized factory branches.
+- GitHub Actions and Pages checks are performed after the final detailed-note commit; results or exact blockers are recorded below.
 - Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** `git clone` failed with `Could not resolve host: github.com`; there is no usable local checkout, so the full validation suite and `mkdocs build --strict` could not execute.
-- **CI visibility blocker:** `fetch_commit_workflow_runs` returned an empty list and only exposes pull-request-triggered results reliably; this is not evidence that push-triggered workflows passed or failed.
-- **Pages verification blocker:** search did not index the project, and direct opening of the root and scheduler page was rejected by the safe-URL gate. HTTP status and rendered content remain unverified.
+- **Local validation blocker:** no usable local checkout is available in this execution environment, so the full validation suite and `mkdocs build --strict` could not execute locally.
+- **CI visibility blocker:** the connector workflow endpoint only reliably exposes pull-request-triggered results; an empty result is not evidence that push-triggered workflows passed or failed.
+- **Pages verification blocker:** direct live-site verification may be limited by URL safety or DNS behavior; exact result is recorded after publication.
 - Static link validation approximates Python-Markdown IDs; built-HTML validation is still required for plugin-generated anchors.
 - Mapping, allocation, residency, validity, ownership, copy generation, and command completion are distinct states.
 - Scheduler destination-copy allocation does not prove current-generation data validity.
-- Mmap host-pointer wrapping is conditional; model pages and context-owned KV/recurrent memory are separate lifetimes.
-- Shared/unified memory does not prove coherence or queue completion.
-- `async` APIs indicate submission semantics, not immediate host visibility.
 - `llama_context` references, but does not own, `llama_model`.
 - Attached thread pools are referenced resources and must outlive their use.
 - Memory implementations and architecture mappings are revision-sensitive.
+- `llama_kv_cache_dsv4` documents incomplete unified-mode support at the pinned revision.
 
 ## Definition of done for the foundations deepening phase
 
