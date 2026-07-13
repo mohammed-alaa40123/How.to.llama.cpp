@@ -119,6 +119,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/backend-scheduler-pass-a.md` | Pass A scheduler assignment, splits, copy ring, validity, events, reuse, and teardown |
 | `docs/architecture/system-ownership-and-execution-map.md` | Cross-subsystem ownership, execution, mutation, synchronization, and teardown synthesis |
 | `docs/architecture/model-context-teardown-order.md` | Exact declaration order, reverse destruction, RAII ownership, synchronization caveats, and safe teardown |
+| `docs/architecture/scheduler-teardown-core.md` | Exact scheduler free order, event and graph-buffer deleter chains, borrowed lifetime dependencies, and unresolved backend contracts |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
 | `docs/assets/interactive/` | Interactive architecture assets |
@@ -132,15 +133,14 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Trace `ggml_backend_sched_free`, scheduler event/buffer deleters, and concrete backend destruction to resolve whether the pinned context member order safely destroys owning backend wrappers before `sched`.
+- [ ] Trace concrete backend `free`, `event_free`, `free_buffer`, synchronization, and queued-work requirements across CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL; classify backend-before-scheduler destruction as verified safe, conditional, or unsafe.
 - [ ] Map each architecture-specific graph builder downcast to `llama_memory_context_i` subtypes and identify exact state tensors read and written.
-- [ ] Map concrete backend implementations of async copy, events, graph submission, synchronization, and teardown across CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL.
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, scheduler copy generations, event waits, memory-update graphs, first-token access, KV/recurrent growth, activation peaks, synchronization, and teardown.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
 - [ ] Expand the interactive explorer with architecture-specific graph builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/model-context-teardown-order/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/scheduler-teardown-core/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
@@ -160,6 +160,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Trace the pinned generic scheduler free chain: event destruction, graph allocator and backend-buffer destruction, host metadata release, borrowed backend/device/buffer-type dependencies, and the limits of the generic safety conclusion.
 - [x] Trace exact `llama_model` and `llama_context` member declaration and reverse-destruction order, including retained mappings, backend buffers, scheduler, memory, graph results, outputs, backend instances, partial construction, and safe application teardown.
 - [x] Enumerate every concrete `llama_memory_i` and primary `llama_memory_context_i` implementation at the pinned revision and map architecture factory decisions to no-memory, KV, iSWA, recurrent, hybrid, DSA, and DSV4 storage.
 - [x] Complete file-by-file Pass A for backend scheduler internals: backend assignment, split creation, copy-ring allocation, destination validity, events, asynchronous submission, fallback synchronization, graph-allocation reuse, and teardown.
