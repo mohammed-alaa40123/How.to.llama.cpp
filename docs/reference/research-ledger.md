@@ -9,6 +9,7 @@ This ledger records sources worth reading. Inclusion does not imply endorsement 
 | [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.cpp) source, examples, tests, docs | Primary source | Implementation truth and regression behavior | Active baseline |
 | [`ggml-org/ggml` GGUF specification](https://github.com/ggml-org/ggml/blob/master/docs/gguf.md) | Official specification | File layout, typed metadata, alignment, tensor descriptors, split naming, and canonical v3 diagram | Deep review completed for file-anatomy slice; implementation differences remain pinned separately |
 | [Canonical GGUF v3 diagram](https://github.com/ggerganov/ggml/assets/1991296/c3623641-3a1d-408e-bfaf-1b7c4e16aa63), attributed upstream to [@mishig25](https://github.com/mishig25) | Officially referenced figure | GGUF physical-layout explanation | Linked, not redistributed; attribution verified from specification |
+| [Pinned llama.cpp OpenCL backend guide](https://github.com/ggml-org/llama.cpp/blob/e3546c7948e3af463d0b401e6421d5a4c2faf565/docs/backend/OPENCL.md) | Official backend documentation | Intended hardware/OS scope, build paths, kernel deployment options, and known limitations | Reviewed for OpenCL build/lifetime foundation; teardown contracts still require source audit |
 | llama.cpp PRs and discussions | Design history | Rationale, regressions, alternatives, synchronization details | Ongoing |
 | Backend vendor APIs/docs | Primary technical docs | Streams, buffers, events, driver behavior | Per-backend research pending |
 
