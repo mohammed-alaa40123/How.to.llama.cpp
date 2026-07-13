@@ -73,18 +73,21 @@ Then audit optional CPU extra-buffer deleters independently.
 - Navigation commit: `c831b301519fbb84a8b8657c82e49db9a83b554b`.
 - Detailed note commit: `121ed3bafc3c1d0a0ba218d5a37af8fde395d0ba`.
 - Research-log commit: `c9223bf0049919a334fc8b00c6b0113c16fb67d0`.
-- Repository contents API confirmed creation of the new page and navigation update.
-- Local clone of both repositories still fails with `Could not resolve host: github.com`; full local validation could not run.
-- The pinned oversized `ggml-opencl.cpp` remains inaccessible through the connector, so the OpenCL classification was not guessed.
-- CI and Pages verification results for the latest commit are recorded below when observable; absent results are treated as unverified rather than failed.
+- README/TODO commit: `8efaaa8cda2bdf93251fdb3db48f1c976e8575ae`.
+- The new page was re-fetched from `main` and contains the expected matrix, truth labels, practical rule, and reading order.
+- Local clone of both repositories failed with `Could not resolve host: github.com`; full local validation could not run.
+- The pinned oversized `ggml-opencl.cpp` returned empty content through the connector, so the OpenCL classification was not guessed.
+- Combined status for `8efaaa8cda2bdf93251fdb3db48f1c976e8575ae` returned no status records.
+- Commit-scoped workflow lookup returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified, not confirmed failed.
+- Direct opening of the Pages root and `architecture/backend-teardown-comparison/` route was rejected by the safe-URL gate, so HTTP status and rendered content are unverified.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** the execution environment cannot resolve `github.com`, so the new index cannot be run against the pinned checkout here.
 - **Large upstream file blocker:** the GitHub connector returns no content for the oversized pinned `ggml-opencl.cpp`, so the exact OpenCL teardown audit remains blocked.
 - **Local validation blocker:** the full Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout and could not be run here.
-- **CI visibility blocker:** commit status and workflow visibility may be empty even when Actions later run; record exact results rather than inferring failure.
-- **Pages verification blocker:** if direct HTTP inspection is rejected or unavailable, root and route status remain unverified.
+- **CI visibility blocker:** combined status is empty and the available commit workflow endpoint returned no runs for the checked commit.
+- **Pages verification blocker:** the safe-URL gate rejected direct access to the root and new comparison route.
 - **OpenCL completion caveat:** `cl_mem` ownership is verified, but command completion before release remains open.
 - **CANN reset-order caveat:** device-wide completion is explicit, but the validity of later ACL destroy/free calls after `aclrtResetDevice()` is unverified.
 - **RPC completion caveat:** graph compute has no completion response and RPC synchronize remains a no-op.
