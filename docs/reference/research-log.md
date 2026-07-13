@@ -245,3 +245,36 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Audit Metal command queues/buffers, event/fence objects, shared/private allocations, Objective-C ownership, synchronization, and backend-before-scheduler safety.
+
+## 2026-07-13 12:49 — Metal backend teardown
+
+**Verified**
+
+- Published `docs/architecture/metal-backend-teardown.md` and added it to Architecture navigation.
+- `ggml_backend_metal_free()` explicitly calls `ggml_metal_synchronize()` before releasing the backend context and wrapper.
+- Synchronization waits for the last relevant command buffer, checks graph and extra command-buffer status, and releases completed extra command buffers.
+- Context teardown then releases retained command buffers, dynamic pipelines, the encoding block, the dispatch queue, and the context-owned copy event.
+- The Metal command queue is device-owned rather than backend-context-owned in the pinned design.
+- Scheduler events own independent `MTLSharedEvent` objects and do not require a live backend context during destruction.
+- Shared, private, and mapped scheduler buffers own buffer-local contexts and use static device state for residency-set and `MTLBuffer` cleanup.
+- Mapped buffers do not own the underlying mapped host bytes.
+
+**Interpretation**
+
+- Backend-before-scheduler destruction is verified safe for ordinary pinned Metal resources because backend free establishes queued-work completion and later scheduler deleters retain valid device-level dependencies.
+- Metal provides a stronger explicit teardown boundary than the pinned CUDA-family path.
+- Unified memory, storage mode, residency, wrapper ownership, and command completion remain separate states.
+
+**Historical**
+
+- Queue ownership, backend-free synchronization, event primitives, residency sets, storage-mode defaults, and registry lifetime are revision-sensitive.
+
+**Open questions**
+
+- Whether asynchronous Metal destruction is covered by a regression test under Metal API validation.
+- Whether final-synchronization command-buffer failures should be surfaced more explicitly during shutdown.
+- Whether unusual plugin unload ordering can invalidate static device state before scheduler cleanup.
+
+**Next step**
+
+- Audit Vulkan queue/device completion, command pools and buffers, fences/semaphores/events, allocator-backed buffers, synchronization, and backend-before-scheduler safety.
