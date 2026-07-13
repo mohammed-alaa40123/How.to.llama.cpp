@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 17:51 Africa/Cairo_
+_Last updated: 2026-07-13 18:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -21,29 +21,22 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Canonical GGUF, model placement, model/context, graph/MoE, scheduler, memory-lifetime, and system-ownership pages.
 - Pass A pages for public API, model/GGUF loading, runtime context/memory, scheduler, and concrete context-memory implementations.
 - Exact pinned declaration and reverse-destruction map for `llama_model` and `llama_context`.
-- Exact pinned generic scheduler teardown path.
-- Ordinary pinned CPU backend teardown classification.
-- Pinned CUDA backend teardown dependency audit and conditional safety classification.
-- Pinned Metal backend teardown audit and verified-safe backend-before-scheduler classification.
-- Pinned Vulkan command-lifetime map and verified-safe ordinary backend teardown classification.
-- Pinned SYCL backend teardown audit and conditional queued-work classification.
-- Pinned RPC backend teardown audit and distributed completion classification.
-- Pinned CANN backend teardown audit and reset-order conditional classification.
+- Generic scheduler plus ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
+- Pinned OpenCL build composition, kernel deployment, official platform scope, and initial `cl_mem` RAII ownership map.
 
 ## Latest concrete findings
 
-- `ggml_backend_cann_free()` calls `aclrtSynchronizeDevice()`, then `aclrtResetDevice()`, then deletes the backend context and wrapper.
-- Device-wide synchronization establishes an explicit queued-work completion boundary before teardown.
-- The context owns lazy streams, an optional copy event, a memory pool, rope/tensor caches, and optional ACL graph-cache state.
-- Scheduler CANN events own independent ACL event handles and registry-device references.
-- Scheduler CANN buffers own buffer-local device allocations and free them without dereferencing the backend context.
-- Registry/device objects are function-static and outlive individual backend wrappers.
-- The unresolved risk is resource validity after reset: context and scheduler destructors later call `aclrtDestroyEvent`, `aclrtDestroyStream`, and `aclrtFree`.
-- Current upstream still contains the same reset-before-context-delete order as the pinned baseline.
+- The pinned build registers OpenCL through `ggml_add_backend(OpenCL)` and builds `ggml-opencl` from one large host implementation plus OpenCL C kernels.
+- Embedded mode generates headers with Python; non-embedded mode copies kernel files to the runtime output directory.
+- Optional Adreno source kernels and an external binary-kernel library are separately controlled.
+- The pinned kernel list includes attention, quantized matrix operations, and MoE-specific expert sorting, reorder, combine, and `MUL_MAT_ID` paths.
+- The pinned host source defines `ggml_cl_buffer`, which releases its `cl_mem` before replacement and at destruction.
+- Buffer-local ownership does not prove completion of queued commands that still reference the memory object.
+- The full OpenCL backend-before-scheduler classification remains open.
 
 ## In progress
 
-- Remaining concrete backend teardown audit for OpenCL.
+- Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
 - Optional CPU extra-buffer teardown audit.
 - CANN reset semantics and multi-context runtime validation.
 - RPC remote synchronization/completion protocol and shared-socket concurrency.
@@ -55,51 +48,40 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Immediate next task
 
-Audit pinned OpenCL teardown and optional CPU extra-buffer implementations:
+Finish the pinned OpenCL teardown audit:
 
 ```text
-OpenCL backend wrapper free
-→ command-queue completion and release
-→ events and scheduler-resource ownership
-→ buffer/context/program/kernel lifetime
-→ static registry and device lifetime
-→ optional CPU extra-buffer deleters
-→ classify backend-before-scheduler ordering
+OpenCL backend/context free
+→ queue completion and event waits
+→ scheduler event and buffer ownership
+→ program and kernel release
+→ cl_mem and context release
+→ optional binary-library handle lifetime
+→ backend-before-scheduler classification
 ```
 
-Required deliverables:
-
-1. exact OpenCL backend/context free chain;
-2. completion behavior for queued commands;
-3. event and scheduler-buffer ownership after backend-wrapper deletion;
-4. program/kernel/buffer/context release order and error paths;
-5. optional CPU extra-buffer lifetime boundaries;
-6. safety classification for the pinned context member order;
-7. truth labels and durable context updates.
+Then audit optional CPU extra-buffer deleters independently.
 
 ## Publication and verification state
 
-- New page: `docs/architecture/cann-backend-teardown.md`.
-- Page commit: `230c8adf4a26d572e5c57c69c8f4efa86741f869`.
-- Navigation commit: `fa5491dfda8dc0121b1ef3671a971637085fba34`.
-- Detailed note commit: `3eed9cc1e331a550e9be8995b67703b0e23b51b5`.
-- README/TODO commit: `87ba63285699722ea7e414a5c125f8a70457dacd`.
-- Research-log commit: `f8faef79a7a0e7159d6a00f41efb8e754463d0ba`.
-- Connector-side inspection confirmed the CANN backend free, device synchronization/reset, context-member, event, buffer, and registry paths.
-- Local clone and validation failed with `Could not resolve host: github.com`.
-- Commit-scoped workflow lookup for `f8faef79a7a0e7159d6a00f41efb8e754463d0ba` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
-- Public search returned no indexed result for the site root or CANN route; the safe-URL gate rejected direct opening, so HTTP status and rendered content remain unverified.
-- No new external source passed the ledger verification bar; the research ledger remains unchanged.
+- New page: `docs/architecture/opencl-build-and-buffer-lifetimes.md`.
+- Page commit: `08a974873443f48ca124f40ab6eeaad7626f76ad`.
+- Navigation commit: `7a522ea7177737fd2736326e54ade3eb197745b0`.
+- README/TODO commit: `4002db9bc6da03f7dc648746e06f1e2dd9ba55d1`.
+- Ledger commit: `529f92a26d4c2298979eeb8429089f21c99d8535`.
+- Research-log commit: `511c969a3e41b81f86e13b398e083f70eb63c280`.
+- Detailed note commit: `f4877f4793c7d3bee168271ff3f5ccf594dda07f`.
+- Connector-side inspection verified the build and initial buffer-ownership claims.
+- Local clone failed with `Could not resolve host: github.com`; project validators, tests, strict MkDocs, and `check_site.sh` could not run locally.
+- GitHub Actions and Pages verification results for this increment are recorded below after final checks.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** cloning failed because the execution environment could not resolve `github.com`, so project validators, tests, strict MkDocs build, and `check_site.sh` could not run locally.
-- **CI visibility blocker:** the available commit-scoped workflow endpoint returned an empty run list and currently exposes only a limited class of workflow runs.
-- **Pages verification blocker:** public search found no indexed site result and direct access was rejected by the safe-URL gate; HTTP response and expected CANN page content could not be inspected.
+- **Large-source extraction blocker:** `ggml-opencl.cpp` is a very large single translation unit. The connector exposed its blob but not arbitrary symbol ranges, so the complete destructor chain could not be reviewed safely in this increment.
+- **Local validation blocker:** cloning failed because the execution environment could not resolve `github.com`.
+- **OpenCL completion caveat:** `cl_mem` ownership is verified, but command completion before release is not yet established.
 - **CANN reset-order caveat:** device-wide completion is explicit, but the validity of later ACL destroy/free calls after `aclrtResetDevice()` is unverified.
-- **CANN shared-device caveat:** freeing one backend resets the device; impact on another backend instance using the same device remains unverified.
-- **RPC completion caveat:** graph compute has no completion response and the no-op RPC synchronize does not invoke server-side synchronization.
-- **RPC concurrency caveat:** one socket can be shared through endpoint-level weak caching and buffer-held strong references; the inspected request helpers do not establish a per-socket request mutex.
+- **RPC completion caveat:** graph compute has no completion response and RPC synchronize remains a no-op.
 - **SYCL completion caveat:** backend free does not explicitly wait before destroying context-owned resources.
 - **Vulkan query-pool caveat:** the optional performance query pool still needs a focused ownership audit.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, and release remain distinct states.
