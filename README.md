@@ -115,6 +115,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/public-api-minimal-example.md` | Pass A public API/minimal-example map |
 | `docs/architecture/model-gguf-loader-pass-a.md` | Pass A model/GGUF loader inventory |
 | `docs/architecture/runtime-context-memory-pass-a.md` | Pass A runtime context and memory inventory |
+| `docs/architecture/backend-scheduler-pass-a.md` | Pass A scheduler assignment, splits, copy ring, validity, events, reuse, and teardown |
 | `docs/architecture/system-ownership-and-execution-map.md` | Cross-subsystem ownership, execution, mutation, synchronization, and teardown synthesis |
 | `docs/reference/source-index.md` | Human-reviewed source areas |
 | `data/upstream.json` | Pinned upstream metadata |
@@ -129,15 +130,15 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Complete file-by-file Pass A for backend scheduler internals: backend assignment, split creation, copy-ring allocation, destination validity, events, asynchronous submission, fallback synchronization, graph-allocation reuse, and teardown.
 - [ ] Enumerate every concrete `llama_memory_i` implementation at the pinned revision and map each architecture to KV, recurrent, hybrid, iSWA, or specialized memory.
 - [ ] Trace exact `llama_model` and `llama_context` member declaration/destruction order for retained mappings, backend buffers, scheduler, memory, graph results, outputs, and backend instances.
-- [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, memory-update graphs, event waits, first-token access, KV/recurrent growth, activation peaks, and teardown.
+- [ ] Map concrete backend implementations of async copy, events, graph submission, and synchronization across CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL.
+- [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias bytes, upload bytes, scheduler copy generations, event waits, memory-update graphs, first-token access, KV/recurrent growth, activation peaks, and teardown.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once the generated source-link checker is ready.
-- [ ] Expand the interactive explorer with architecture-specific graph builders, prefill/decode variants, KV/recurrent state, MoE, and runtime-measured overlays.
+- [ ] Expand the interactive explorer with architecture-specific graph builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime-measured overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/system-ownership-and-execution-map/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/backend-scheduler-pass-a/` with expected How.to.llama.cpp content.
 
 ### Future improvements
 
@@ -151,12 +152,13 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Extend the source index with per-file, object, symbol, subsystem, and caller/callee landing pages.
 - [ ] Add dedicated mmap/page-fault, CPU-thread, backend-queue, KV-cache, recurrent-memory, MoE-routing, and scheduler-timeline visualizers.
 - [ ] Trace exact Metal shared/private buffer-level set/get/copy branches.
-- [ ] Extend backend comparisons to RPC, CANN, OpenCL, Android-specific backends, and later scheduler-copy revisions.
+- [ ] Extend backend comparisons to later scheduler-copy revisions and architecture-specific accelerators.
 - [ ] Expand graph-reuse documentation with every specialized `can_reuse()` predicate.
 - [ ] Add a searchable index for detailed research logs and commit-pinned link checking.
 
 ### Completed
 
+- [x] Complete file-by-file Pass A for backend scheduler internals: backend assignment, split creation, copy-ring allocation, destination validity, events, asynchronous submission, fallback synchronization, graph-allocation reuse, and teardown.
 - [x] Synthesize the public API, model/GGUF loader, `llama_model`, `llama_context`, and memory Pass A work into one subsystem relationship map with ownership, mutation, synchronization, and teardown boundaries.
 - [x] Complete file-by-file Pass A for runtime-context and memory files with construction, ownership, batch/microbatch memory planning, KV/recurrent/hybrid behavior, sequence mutation, state I/O, threads, synchronization, reset, and teardown.
 - [x] Complete file-by-file Pass A for the model/GGUF loader group.
