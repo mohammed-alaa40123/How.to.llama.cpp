@@ -66,14 +66,18 @@ Required deliverables:
 - Page commit: `5a5178afb4d676460f1b89dc3c4def934f47bc57`.
 - Navigation commit: `8d25991a54702137a2135492205abc6fcb128a27`.
 - README/TODO commit: `ddffc257ad0d052315d1096dd437110322b3bd67`.
-- Research log and detailed note are updated in this run.
+- Research-log commit: `4df41bd1481792e174fb1ec22ea67ea482f5c07d`.
+- Detailed-note commit: `328745e192f271aca476ea5cb04b44df120b36fa`.
+- Connector-side re-fetch confirmed the page, pinned baseline, reverse-order tables, truth labels, source map, and related links.
+- Workflow lookup for `328745e192f271aca476ea5cb04b44df120b36fa` returned `workflow_runs: []`; this endpoint only reliably exposes pull-request-triggered runs, so push-triggered Documentation CI, Pages deployment, and hourly-context validation remain unverified rather than failed.
+- Site-specific searches returned no indexed project or teardown page. Direct opening of the Pages root and `architecture/model-context-teardown-order/` was rejected by the safe-URL gate because those exact URLs were absent from search results.
 - No new external secondary source was introduced; the research ledger remains unchanged.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** this environment cannot resolve `github.com`, so a checkout and local validators, tests, and strict MkDocs build cannot run.
-- **CI visibility:** must be checked against the latest commit; an empty connector response is not proof of pass or failure.
-- **Pages verification:** must check the root and `architecture/model-context-teardown-order/`; if direct access remains blocked, record the exact DNS/safe-URL limitation.
+- **Local validation blocker:** this environment cannot resolve `github.com`, so a checkout and local validators, tests, script checks, and strict MkDocs build cannot run.
+- **CI visibility blocker:** commit workflow lookup returned an empty run list and cannot verify push-triggered workflows.
+- **Pages verification blocker:** search returned no indexed result and direct open was blocked by the safe-URL gate; live HTTP status and rendered content remain unverified.
 - The observed context member order is verified C++ behavior, but scheduler safety is an open question until lower-level deleters are traced.
 - Mapping, allocation, physical residency, data validity, queued completion, ownership, and release remain distinct states.
 
