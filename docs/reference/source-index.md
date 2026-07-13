@@ -42,16 +42,29 @@ This hand-reviewed index is the seed for an automatically generated full invento
 
 ## Generated symbol locations
 
-`scripts/index_upstream.py` now emits two symbol views for every indexed source file:
+`scripts/index_upstream.py` emits two symbol views for every indexed source file:
 
 - `symbols`: the original compact, deduplicated name list retained for compatibility;
 - `symbol_locations`: an untruncated source-ordered list containing approximate symbol `name`, declaration `kind`, and 1-based `line`.
 
-This makes very large translation units such as `ggml-opencl.cpp` navigable by symbol and source location without pretending to provide a compiler-grade call graph. Duplicate names are intentionally retained in `symbol_locations` because overloads and conditional-compilation branches can produce several useful navigation targets.
+When indexing is invoked with `--source-url-base`, each file also receives `source_url` and each symbol receives a pinned `source_url` ending in a GitHub `#L<line>` fragment. `scripts/update_upstream.sh` supplies the exact pinned llama.cpp blob prefix automatically, so generated navigation does not silently drift to a newer upstream revision.
+
+Example:
+
+```json
+{
+  "name": "ggml_backend_opencl_free",
+  "kind": "function",
+  "line": 1234,
+  "source_url": "https://github.com/ggml-org/llama.cpp/blob/e3546c7948e3af463d0b401e6421d5a4c2faf565/ggml/src/ggml-opencl/ggml-opencl.cpp#L1234"
+}
+```
+
+This makes very large translation units such as `ggml-opencl.cpp` navigable by symbol and source location without pretending to provide a compiler-grade call graph. Duplicate names are intentionally retained because overloads and conditional-compilation branches can produce several useful navigation targets.
 
 ## Generated index limitations
 
-`scripts/index_upstream.py` intentionally produces an approximate source inventory. Regex-detected symbols, line locations, and include relationships are useful navigation aids, but cannot resolve:
+`scripts/index_upstream.py` intentionally produces an approximate source inventory. Regex-detected symbols, line locations, links, and include relationships are useful navigation aids, but cannot resolve:
 
 - preprocessor configurations;
 - overloaded functions and templates;
@@ -61,4 +74,4 @@ This makes very large translation units such as `ggml-opencl.cpp` navigable by s
 - platform-specific compilation;
 - runtime plugin registration.
 
-Human-reviewed call chains remain the source of documentation truth.
+Line links identify candidate declarations at the indexed revision; human-reviewed call chains remain the source of documentation truth.
