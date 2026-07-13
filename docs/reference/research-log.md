@@ -221,3 +221,27 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Whether reset invalidates resources and makes subsequent destroy/free calls redundant or invalid.
 - Whether one backend reset disrupts another backend instance on the same device.
 - Which runtime tests cover scheduler-resource release after backend free.
+
+## 2026-07-13 18:51 — OpenCL build and initial buffer lifetimes
+
+**Verified**
+
+- Published `docs/architecture/opencl-build-and-buffer-lifetimes.md` and linked it in Architecture navigation.
+- The pinned build creates `ggml-opencl` from one large host implementation plus a versioned catalog of OpenCL C kernels.
+- Kernels are either embedded through generated headers or copied beside the executable; an optional Adreno binary library can supply compatible kernels.
+- The catalog includes ordinary tensor operations, attention, quantized matrix operations, and MoE-specific reorder, sort, combine, and `MUL_MAT_ID` kernels.
+- The pinned host source defines a buffer-local RAII wrapper that releases `cl_mem` on replacement and destruction.
+
+**Interpretation**
+
+- Build/deployment lifetime for kernel artifacts is separate from runtime queue, event, program, kernel, memory, and context lifetime.
+- Buffer-local `cl_mem` ownership does not prove queued-command completion before release.
+- The complete OpenCL teardown classification remains open.
+
+**Historical**
+
+- Device support, kernel catalogs, deployment mode, compiler compatibility, and vendor binary coverage are revision-sensitive.
+
+**Open questions**
+
+- Exact backend/context free chain, queue completion, scheduler-event independence, program/kernel/context release order, binary-library handle lifetime, and optional CPU extra-buffer interactions.
