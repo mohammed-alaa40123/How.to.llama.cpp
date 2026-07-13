@@ -183,3 +183,32 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Audit concrete CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown implementations and classify the pinned backend-before-scheduler order.
+
+## 2026-07-13 10:50 — Ordinary CPU backend teardown
+
+**Verified**
+
+- Published `docs/architecture/cpu-backend-teardown.md` and added it to Architecture navigation.
+- CPU graph execution calls `ggml_graph_compute()` synchronously before returning.
+- The ordinary CPU backend exposes no async tensor methods, synchronize callback, or event record/wait callbacks.
+- The CPU device advertises `async = false` and `events = false`; its event callbacks are null.
+- The CPU device and device context are static registry objects that outlive individual backend wrappers.
+- `ggml_backend_cpu_free()` deletes only the backend work allocation, CPU context, and wrapper.
+
+**Interpretation**
+
+- Scheduler-owned ordinary CPU buffers remain independently destructible after backend-wrapper deletion.
+- Backend-before-scheduler destruction is verified safe for the ordinary pinned CPU backend.
+
+**Historical**
+
+- CPU async/event capabilities and buffer implementations are revision-sensitive.
+
+**Open questions**
+
+- Whether optional CPU extra-buffer implementations preserve the same backend-independent destruction property.
+- Whether a sanitizer regression test covers backend-first CPU scheduler teardown.
+
+**Next step**
+
+- Audit CUDA stream, event, graph-resource, device, buffer-type, and `cudaFree` teardown behavior.
