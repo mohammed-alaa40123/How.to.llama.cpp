@@ -74,13 +74,17 @@ Required deliverables:
 - New page: `docs/architecture/vulkan-command-lifetime.md`.
 - Page commit: `a7301fcf2432dc26b768acc85e6269830e448b8a`.
 - Navigation commit: `d95410622cb9539237ef1013e29554311ed28486`.
+- README/TODO commit: `45294c11410f5ca6cc809d20d4eaca410ca4f3d4`.
 - Connector-side source inspection confirmed the command-pool topology, explicit completion precondition for pool reset, pooled synchronization objects, and fence-based completion sequence used by synchronous read/copy/memset helpers.
+- Combined-status lookup for `45294c11410f5ca6cc809d20d4eaca410ca4f3d4` returned no status records, and the commit-workflow endpoint returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
+- Direct web opening of both the Pages root and `architecture/vulkan-command-lifetime/` was rejected by the available safe-URL gate, so live HTTP status and rendered content remain unverified.
 - No new external secondary source was introduced; the research ledger remains unchanged.
-- GitHub Actions and Pages checks are performed after durable context updates; exact results or blockers are recorded below and in README TODOs.
 
 ## Known blockers and caveats
 
 - **Local validation blocker:** the execution environment cannot resolve `github.com` and has no usable repository checkout, so `validate_project_context.py`, interactive-link tests, unit tests, strict MkDocs build, and `check_site.sh` could not run locally.
+- **CI visibility blocker:** the available status endpoint returned no records and the commit workflow endpoint returned an empty run list, so push-triggered workflow results cannot be confirmed.
+- **Pages verification blocker:** the web safety gate rejected direct opening of the root and new route; HTTP response and expected rendered content could not be inspected.
 - **Vulkan scope caveat:** this increment maps command and completion lifetimes but does not yet prove the final backend-free destruction order.
 - Mapping, allocation, residency, validity, command completion, ownership, and release remain distinct states.
 
