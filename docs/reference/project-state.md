@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-13 15:49 Africa/Cairo_
+_Last updated: 2026-07-13 16:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -27,21 +27,23 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Pinned Metal backend teardown audit and verified-safe backend-before-scheduler classification.
 - Pinned Vulkan command-lifetime map and verified-safe ordinary backend teardown classification.
 - Pinned SYCL backend teardown audit and conditional queued-work classification.
+- Pinned RPC backend teardown audit and distributed completion classification.
 
 ## Latest concrete findings
 
-- `ggml_backend_sycl_free()` deletes the per-backend context and generic wrapper without an explicit queue wait.
-- `ggml_backend_sycl_synchronize()` waits on `stream(device, 0)`, but backend free does not call it.
-- Async tensor set/get and graph execution can enqueue SYCL work and return without host completion.
-- The SYCL context borrows device-manager default-queue pointers and owns pools, host pools, scratchpads, flash-attention buffers, and optional executable graph state through members.
-- Scheduler events own independent `sycl::event` objects; their free path does not require the deleted backend context.
-- Ordinary scheduler buffers retain buffer-local device, pointer, queue, tensor-extra, and allocation-mode state; their deleter does not use the backend context.
-- Backend-before-scheduler destruction is structurally independent for ordinary SYCL scheduler events and buffers, but queued-work completion remains conditional.
+- `ggml_backend_rpc_free()` deletes only endpoint/device/name metadata and the generic wrapper; it neither owns a socket nor synchronizes remote work.
+- Scheduler RPC buffers retain their own `std::shared_ptr<socket_t>` and remote handle, so later remote-release commands remain possible after backend-wrapper deletion.
+- Client graph compute is request-only: it sends the command and receives no completion response.
+- RPC synchronize is a no-op.
+- The server processes commands serially per connection, but graph handlers call the selected concrete backend without a following generic synchronize.
+- The server frees explicitly released buffers and releases all remaining session buffers when the connection handler exits.
+- Backend-before-scheduler destruction is structurally safe for ordinary pinned RPC client objects, while remote completion remains conditional on the server backend.
 
 ## In progress
 
-- Remaining concrete backend teardown audits for RPC, CANN, and OpenCL.
+- Remaining concrete backend teardown audits for CANN and OpenCL.
 - Optional CPU extra-buffer teardown audit.
+- RPC remote synchronization/completion protocol and shared-socket concurrency.
 - CUDA concurrent-stream synchronization coverage.
 - SYCL all-queue completion coverage and implicit destructor semantics.
 - Vulkan performance-query-pool ownership and process-exit device teardown.
@@ -50,45 +52,43 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Immediate next task
 
-Audit the pinned RPC backend teardown:
+Audit the pinned CANN backend teardown:
 
 ```text
-RPC backend wrapper free
-→ client/session/socket lifetime
-→ remote allocation and buffer destruction
-→ request completion and synchronization
-→ scheduler event/buffer behavior
-→ reconnect/error paths
+CANN backend wrapper free
+→ stream/device synchronization
+→ events and graph execution completion
+→ allocator and buffer ownership
+→ static device/buffer-type lifetime
+→ scheduler resource independence
 → classify backend-before-scheduler ordering
 ```
 
 Required deliverables:
 
-1. exact RPC backend/client free chain;
-2. completion behavior for outstanding requests;
-3. remote buffer and scheduler-resource ownership after backend-wrapper deletion;
-4. transport/session lifetime and error paths;
+1. exact CANN backend/context free chain;
+2. completion behavior for queued work;
+3. event and scheduler-buffer ownership after backend-wrapper deletion;
+4. allocator/device/stream error paths;
 5. safety classification for the pinned context member order;
 6. truth labels and durable context updates.
 
 ## Publication and verification state
 
-- New page: `docs/architecture/sycl-backend-teardown.md`.
-- Page commit: `b8c8cf2cf1ea6bdb0ab384b52b12c91c0e29a6bb`.
-- Navigation commit: `c042f9f5ea140eff2f439c30138173f3cc2ff62a`.
-- Detailed note commit: `f0f78da40afa0e617bbbf0a6befb5a8436d649ce`.
-- Research-log commit: `728ea4afecc124d2ce5c805c7c1f01db05532aea`.
-- README/TODO commit: `a2571a586433cc086263a7bdef47fcb350617843`.
-- Connector-side inspection confirmed the pinned free path, explicit synchronize callback, asynchronous submission paths, queue-pointer ownership, event independence, and buffer-local release state.
-- Commit-scoped workflow lookup for `a2571a586433cc086263a7bdef47fcb350617843` returned `workflow_runs: []`; Documentation CI, Pages deployment, and hourly-context validation are unverified rather than confirmed failed.
-- Public searches for the Pages root and `architecture/sycl-backend-teardown/` returned no indexed results. Direct opening was rejected by the available safe-URL gate, so live HTTP status and rendered content remain unverified.
+- New page: `docs/architecture/rpc-backend-teardown.md`.
+- Page commit: `b61b05a8d75f8220f3cb23eece5fc9f42bb53d9a`.
+- Navigation commit: `523599e2bdac99baab97a92e0d9915ce8feed235`.
+- Detailed note commit: `3d616805fed9f98fe0375841cf5d29f76dc56827`.
+- Research-log commit: `f038f2b4f7f491a9ef120b1acfd99b63bbeb039b`.
+- Connector-side inspection confirmed the RPC client free path, socket ownership, buffer release protocol, server dispatch ordering, graph completion gap, session cleanup, and transport destruction.
 - No new external secondary source was introduced; the research ledger remains unchanged.
+- GitHub Actions and Pages verification results for this increment are recorded below after the final checks.
 
 ## Known blockers and caveats
 
-- **Local validation blocker:** cloning failed with `Could not resolve host: github.com`; there is no usable checkout, so project validators, tests, strict MkDocs build, and `check_site.sh` could not run locally.
-- **CI visibility blocker:** the available commit-scoped workflow endpoint returned an empty run list and currently exposes only a limited class of workflow runs.
-- **Pages verification blocker:** public search did not index the root or new route, and the safe-URL gate rejected direct access; HTTP response and expected content could not be inspected.
+- **Local validation blocker:** there is no usable repository checkout in the execution environment, so project validators, tests, strict MkDocs build, and `check_site.sh` could not run locally.
+- **RPC completion caveat:** graph compute has no completion response and the no-op RPC synchronize does not invoke server-side synchronization.
+- **RPC concurrency caveat:** one socket can be shared through endpoint-level weak caching and buffer-held strong references; the inspected request helpers do not establish a per-socket request mutex.
 - **SYCL completion caveat:** backend free does not explicitly wait before destroying context-owned resources.
 - **Vulkan query-pool caveat:** the optional performance query pool still needs a focused ownership audit.
 - Mapping, allocation, residency, validity, command completion, ownership, and release remain distinct states.
