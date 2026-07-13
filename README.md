@@ -107,6 +107,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/system-ownership-and-execution-map.md` | Cross-subsystem ownership/execution synthesis |
 | `docs/architecture/model-context-teardown-order.md` | Exact model/context destruction order |
 | `docs/architecture/scheduler-teardown-core.md` | Generic scheduler free chain and dependencies |
+| `docs/architecture/backend-teardown-audit-method.md` | Reusable completion/ownership audit worksheet and runtime matrix |
 | `docs/architecture/backend-teardown-comparison.md` | Cross-backend completion, resource-independence, and safety matrix |
 | `docs/architecture/cpu-backend-teardown.md` | Ordinary CPU teardown classification |
 | `docs/architecture/cuda-backend-teardown.md` | CUDA teardown and conditional completion |
@@ -127,7 +128,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then use it to finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
+- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then use the backend teardown audit worksheet to finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
 - [ ] Audit optional CPU extra-buffer implementations and classify their deleter independence from ordinary CPU backend wrappers.
 - [ ] Verify CANN reset semantics with authoritative runtime documentation and a test matrix: destroy streams/events/buffers before versus after `aclrtResetDevice`, one versus two contexts, and scheduler-resource release after backend free.
 - [ ] Design and test a real RPC synchronization/completion command; verify immediate graph-compute → remote-buffer-free and graph-compute → connection-close behavior on CPU and accelerator servers.
@@ -135,14 +136,14 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Verify whether SYCL synchronization covers every queue used by multi-device, split-buffer, DNNL, flash-attention, command-graph, and communication paths; determine whether backend free should wait explicitly.
 - [ ] Verify whether `ggml_backend_cuda_synchronize()` covers every lazily created concurrent stream and whether context pools/events/graphs should be cleared before stream destruction.
 - [ ] Determine whether the pinned Vulkan performance query pool has an explicit owner/destructor or represents a cleanup leak; audit persistent Vulkan device/process-exit teardown.
-- [ ] Add asynchronous-destruction regression tests for CUDA-family, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL backends.
+- [ ] Add asynchronous-destruction regression tests for CUDA-family, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL backends using the minimum runtime matrix.
 - [ ] Map architecture-specific graph-builder downcasts to `llama_memory_context_i` subtypes and exact state tensors.
 - [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias/upload bytes, scheduler copy generations, event waits, memory-update graphs, KV/recurrent growth, activation peaks, synchronization, and teardown.
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once generated source-link checking is ready.
 - [ ] Expand the interactive explorer with architecture-specific builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by the inference atlas, object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `lifecycle/inference-atlas/` with expected How.to.llama.cpp content.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/backend-teardown-audit-method/` with expected How.to.llama.cpp content after merge.
 
 ### Future improvements
 
@@ -162,6 +163,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add a reusable backend teardown audit method that separates command completion from scheduler-resource deleter independence, standardizes classifications, and defines a minimum asynchronous-destruction runtime matrix.
 - [x] Add a guided end-to-end inference atlas with a clickable pipeline, stage/lifetime table, and audience-specific reading paths across GGUF, model/context, graph, scheduler, backends, memory, and teardown.
 - [x] Add a revision-pinned cross-backend teardown comparison matrix that separates command completion from scheduler-resource deleter independence and links each classification to its detailed audit.
 - [x] Add revision-pinned file and `#L<line>` symbol URLs to the generated source inventory, derive them from the selected llama.cpp revision, and cover URL generation with regression tests.
