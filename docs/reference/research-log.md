@@ -153,3 +153,33 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Next step**
 
 - Trace `ggml_backend_sched_free`, events, buffers, and concrete backend deleters to resolve the observed backend-before-scheduler member order.
+
+## 2026-07-13 09:49 — Scheduler core teardown dependencies
+
+**Verified**
+
+- Published `docs/architecture/scheduler-teardown-core.md` and added it to Architecture navigation.
+- `ggml_backend_sched_free()` destroys scheduler events, then graph-allocation resources, then host scheduler metadata.
+- The generic scheduler free path does not call `ggml_backend_sched_synchronize()`.
+- `ggml_backend_event_free()` dispatches through the event's device interface.
+- `ggml_gallocr_free()` releases scheduler-owned backend buffer chunks, whose generic wrapper invokes concrete `free_buffer` callbacks.
+- The scheduler stores borrowed backend and buffer-type relationships and does not free the backend wrappers itself.
+
+**Interpretation**
+
+- Scheduler teardown requires device, buffer-type, allocator, queue, and callback state to remain valid beyond the lifetime of the scheduler struct itself.
+- Explicit synchronization is a clear completion boundary, but it cannot repair a concrete backend object-lifetime violation.
+
+**Historical**
+
+- Event ownership, copy-slot count, graph allocator structure, and teardown order are revision-sensitive.
+
+**Open questions**
+
+- Whether each concrete backend keeps device and buffer-deleter state valid after its backend wrapper is freed.
+- Which event and buffer destructors require live streams, queues, allocators, or backend contexts.
+- Whether backend wrapper free synchronizes or invalidates scheduler-owned resources.
+
+**Next step**
+
+- Audit concrete CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown implementations and classify the pinned backend-before-scheduler order.
