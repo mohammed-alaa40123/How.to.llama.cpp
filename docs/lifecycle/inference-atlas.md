@@ -18,15 +18,15 @@ flowchart LR
     H --> I[Next decode step]
     I --> E
 
-    click A "../foundations/gguf-file-anatomy/" "GGUF layout, descriptors, alignment, and mappings"
-    click B "../architecture/model-gguf-loader-pass-a/" "Loader call chain and publication"
-    click C "../objects/llama-model/" "Persistent model ownership"
-    click D "../objects/llama-context/" "Mutable runtime session state"
-    click E "../ggml/graph-construction-and-moe/" "Graph construction, reuse, and MoE"
-    click F "../lifecycle/backend-scheduler-execution/" "Splits, copies, events, and execution"
-    click G "../architecture/backend-teardown-comparison/" "Backend completion and lifetime comparison"
-    click H "../architecture/public-api-minimal-example/" "Minimal public API loop"
-    click I "../lifecycle/decode-graph-reuse/" "Decode and graph reuse"
+    click A "../../foundations/gguf-file-anatomy/" "GGUF layout, descriptors, alignment, and mappings"
+    click B "../../architecture/model-gguf-loader-pass-a/" "Loader call chain and publication"
+    click C "../../objects/llama-model/" "Persistent model ownership"
+    click D "../../objects/llama-context/" "Mutable runtime session state"
+    click E "../../ggml/graph-construction-and-moe/" "Graph construction, reuse, and MoE"
+    click F "../backend-scheduler-execution/" "Splits, copies, events, and execution"
+    click G "../../architecture/backend-teardown-comparison/" "Backend completion and lifetime comparison"
+    click H "../../architecture/public-api-minimal-example/" "Minimal public API loop"
+    click I "../decode-graph-reuse/" "Decode and graph reuse"
 ```
 
 The loop back from the next decode step to graph construction does **not** mean every object is recreated. The graph may reuse compatible topology and allocation state, while token-dependent values and outputs change.
