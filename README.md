@@ -150,8 +150,9 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once generated source-link checking is ready.
 - [ ] Expand the interactive explorer with architecture-specific builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by the inference atlas, object pages, source maps, and visualizers.
-- [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-spacemit-ime-extra-buffer-lifetime/` with expected How.to.llama.cpp content after merge.
+- [ ] Fix Documentation CI run `29304828892`: `Validate project context, interactive links, and scripts` failed and the decoded log was truncated before the exact validator message; dependency installation and strict MkDocs build were skipped.
+- [ ] Verify the latest **Deploy documentation** and **Hourly research context check** runs after CI is repaired.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-spacemit-ime-extra-buffer-lifetime/` after merge; direct URL access is currently rejected by the available web safe-URL gate.
 
 ### Future improvements
 
