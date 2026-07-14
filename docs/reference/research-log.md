@@ -250,3 +250,25 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Verify the focused test and strict MkDocs through Documentation CI, then evaluate additional syntax only from observed pinned-tree needs.
+
+## 2026-07-14 15:50 — Trailing-return C++ function indexing
+
+**Verified**
+
+- Documentation CI run `29330951186` completed successfully for the preceding attributed-function increment.
+- The function pattern previously stopped after optional `const` and `noexcept`, so a same-line `-> return_type` clause prevented definition matching.
+- The updated pattern accepts one bounded same-line trailing-return clause while excluding newlines, semicolons, and braces.
+- A focused test covers a free function and an attributed namespace-qualified `const noexcept` method at physical lines 1 and 5.
+- Type extraction, duplicate retention, source ordering, and pinned URL construction are unchanged.
+
+**Interpretation**
+
+- Same-line trailing-return definitions are a useful bounded navigation expansion. Multiline returns, requires clauses, macros, operators, lambdas, and complex declarators remain explicit scanner limitations.
+
+**Historical**
+
+- This increment follows the source-line repair and same-line attribute support and closes one limitation recorded by the preceding run.
+
+**Open questions**
+
+- Verify the focused regression and strict MkDocs through Documentation CI, then return to pinned OpenCL source recovery or the CPU repack destruction fixture.
