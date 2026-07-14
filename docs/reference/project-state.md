@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 16:51 Africa/Cairo_
+_Last updated: 2026-07-14 17:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -38,18 +38,18 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Same-line trailing-return function definitions recognized with focused free-function and attributed qualified-method coverage.
 - Function return-type matching restricted to horizontal whitespace so preceding template lines cannot steal the source location.
 - Bounded same-line C++20 `requires` clauses recognized after ordinary or trailing-return signatures.
-- Successful full Documentation CI runs through the trailing-return expansion.
+- Bounded qualified operator definitions recognized for symbolic, call, subscript, allocation, deletion, and single-token conversion forms.
+- Successful full Documentation CI runs through the constrained-function expansion.
 
 ## Latest concrete findings
 
-- Documentation CI run `29334576467` completed successfully for trailing-return commit `b98965bdd75839669de4e4d7ffd9e81a36cdb0cc`.
-- The previous function return-type character class included Python regex `\s`, which includes newline.
-- A constrained definition immediately after `template <...>` could therefore be matched from the template line, producing the wrong 1-based source location.
-- Return-type whitespace now uses only tabs and spaces, preserving the function definition line.
-- `FUNC_RE` now accepts one bounded same-line `requires` clause after optional `const`, `noexcept`, and trailing-return syntax.
-- The focused test covers an ordinary constrained function and an attributed namespace-qualified `const noexcept` trailing-return method at lines 2 and 7.
-- Constraint matching excludes newlines, semicolons, and braces; multiline requires-expressions remain unsupported.
-- The pinned OpenCL blob remains retrievable but connector output is truncated before the backend teardown section; no hidden behavior was inferred.
+- Documentation CI run `29339261751` completed successfully for constrained-function head `49aab1a3e520f530c532427bad67c04183080252`.
+- The ordinary function-name pattern cannot index operator definitions because it accepts only identifier components.
+- Conversion operators require a dedicated pattern because they do not have a return type before `operator`.
+- `OPERATOR_RE` now recognizes qualified same-line symbolic, call, subscript, `new`/`delete`, and single-token conversion operators.
+- A focused test requires exact lines for `tensor_view::operator==`, `tensor_view::operator()`, `tensor_view::operator[]`, and `resource::operator bool`.
+- The pinned OpenCL CMake target compiles `ggml-opencl.cpp`, whose blob SHA is `f283f65690af7790e163092207647d16dac9fb3e`.
+- The connector can expose the beginning of that 24k-line blob and confirms buffer-local `cl_mem` RAII, but output remains truncated before backend teardown symbols; no hidden teardown behavior was inferred.
 
 ## In progress
 
@@ -76,22 +76,22 @@ B. implement the admitted CPU repack MUL_MAT fixture
 
 ## Publication and verification state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the final recheck reports the PR open and mergeable.
-- Added detailed note `logs/research/2026-07-14/1651-requires-function-indexing.md`.
-- Added focused tests for constrained function definitions and exact lines after template declarations.
-- The preceding trailing-return increment passed Documentation CI and strict MkDocs in run `29334576467`.
-- No pull-request workflow run was visible yet for final head `7a04c5439a4248efb35112d45c714d68004fda71`; constrained-function CI is therefore pending, not confirmed failed.
+- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
+- Added detailed note `logs/research/2026-07-14/1749-operator-function-indexing.md`.
+- Added focused operator-definition tests and a dedicated bounded scanner pattern.
+- The preceding constrained-function increment passed Documentation CI and strict MkDocs in run `29339261751`.
+- The operator-indexing head requires a new commit-scoped Documentation CI result before the increment is fully validated.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
-- Direct Pages root and source-index route checks were rejected by the available safe-URL mechanism; branch-only content also cannot deploy until PR #1 merges.
+- Direct Pages checks remain unavailable, and branch-only content cannot deploy until PR #1 merges.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
-- **Current-head CI blocker:** no PR workflow run was returned yet for final head `7a04c5439a4248efb35112d45c714d68004fda71`.
-- **Pages verification blocker:** direct live-site checks were rejected by the safe-URL mechanism, and branch-only documentation cannot deploy until PR #1 merges.
-- **Source-index caveat:** same-line standard attributes, trailing-return definitions, and bounded same-line constraints are recognized; multiline attributes/returns/constraints, arbitrary declaration macros, operators, and generated syntax remain approximate or unresolved.
+- **Current-head CI blocker:** the new operator-indexing commits still require a completed commit-scoped Documentation CI run.
+- **Pages verification blocker:** direct live-site checks are unavailable, and branch-only documentation cannot deploy until PR #1 merges.
+- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, and bounded operator definitions are recognized; multiline attributes/returns/constraints/operators, constructors, destructors, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
