@@ -206,6 +206,22 @@ nested::resource::resource(int value) : value_(value) {
             ],
         )
 
+    def test_extract_symbols_handles_same_line_delegating_constructors(self) -> None:
+        source = """\
+backend_state::backend_state(int device) : backend_state(device, nullptr) {
+}
+
+nested::resource::resource() noexcept : resource(default_value()) {
+}
+"""
+        self.assertEqual(
+            index_upstream.extract_symbols(source),
+            [
+                {"name": "backend_state::backend_state", "kind": "function", "line": 1},
+                {"name": "nested::resource::resource", "kind": "function", "line": 4},
+            ],
+        )
+
     def test_extract_symbols_retains_duplicate_names(self) -> None:
         source = """\
 static void selected() {
