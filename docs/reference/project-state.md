@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 03:51 Africa/Cairo_
+_Last updated: 2026-07-14 04:08 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -64,18 +64,22 @@ AMX buffer type and registration
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
+- Current PR head: `398de8ba1dae0d1c1c0ce56feb14cd62eded44b6`.
 - Added `docs/architecture/cpu-repack-extra-buffer-lifetime.md` and linked it after the ordinary CPU teardown page.
 - Added detailed note `logs/research/2026-07-14/0351-cpu-repack-extra-buffer-lifetime.md`.
 - Updated README TODOs and the research log; the research ledger was unchanged because no external source changed.
 - Local cloning still failed with `Could not resolve host: github.com`, so local Python tests, strict MkDocs build, and `check_site.sh` could not run.
-- GitHub Actions and Pages status are recorded below after final checks.
+- The earlier Documentation CI run `29294594266` completed with failure in the `Validate project context, interactive links, and scripts` step; later install/build steps were skipped. The available truncated job log did not expose the exact validator message, so the failure could not be safely patched in this run.
+- The commit-scoped workflow lookup for the current head returned `workflow_runs: []`, and combined status returned no status records. Current-head CI is therefore unverified, not confirmed successful.
+- Public search returned no indexed result for either the Pages root or the new route. Direct opening was rejected by the safe-URL gate, and the new route is branch-only until merge; HTTP status and rendered content remain unverified.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** local GitHub DNS resolution failed, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector still exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
-- **Pages verification caveat:** the new route is branch-only until PR #1 is merged and main Pages redeploys.
+- **CI blocker:** the latest visible completed run failed during validation, but the exact validator output was not available in the truncated log; the current head exposes no commit-scoped runs or statuses.
+- **Pages verification blocker:** safe-URL access failed and the new route is not deployable until PR #1 merges.
 - **Scope caveat:** repack does not stand in for AMX, KleidiAI, SpacemiT IME, HBM, or future CPU extra-buffer implementations.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, and release remain distinct states.
 
