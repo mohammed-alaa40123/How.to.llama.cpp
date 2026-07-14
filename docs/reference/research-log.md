@@ -143,3 +143,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Which named step fails on the updated workflow head, and does strict MkDocs reveal a second independent issue once validation passes?
+
+## 2026-07-14 10:52 — Python unit-test suite isolation
+
+**Verified**
+
+- Documentation CI run `29312885959` passed durable project-context and interactive-link validation, then failed in the aggregate Python unit-test step.
+- Shell syntax, Python compilation, asset checks, dependency installation, and strict MkDocs building were skipped after that failure.
+- The repository currently contains two unit-test modules: source-index tests and interactive-link validator tests.
+- CI now runs those modules in separate named steps and retains full discovery as a final guard.
+
+**Interpretation**
+
+- The remaining ambiguity is limited to the exact unit-test module and assertion; isolating suites preserves coverage while avoiding speculative implementation changes.
+
+**Historical**
+
+- Run and job identifiers describe PR #1 as observed on 2026-07-14.
+
+**Open questions**
+
+- Which isolated suite fails, what is the exact traceback, and does strict MkDocs expose a later independent defect?
