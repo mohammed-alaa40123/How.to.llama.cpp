@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 04:50 Africa/Cairo_
+_Last updated: 2026-07-14 05:03 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -68,16 +68,18 @@ KleidiAI buffer type and registration
 - Added `docs/architecture/cpu-amx-extra-buffer-lifetime.md` and linked it after the CPU repack audit.
 - Added detailed note `logs/research/2026-07-14/0450-cpu-amx-extra-buffer-lifetime.md`.
 - Updated README TODOs, project state, and research log; the research ledger was unchanged because no external source changed.
-- Local cloning still fails with `Could not resolve host: github.com`, so local Python tests, strict MkDocs build, and `check_site.sh` could not run.
-- GitHub Actions and Pages results for the new branch head must be checked after the final context commit; exact status is recorded below or as a blocker when unavailable.
+- Local cloning failed with `Could not resolve host: github.com`, so local Python tests, strict MkDocs build, and `check_site.sh` could not run.
+- Documentation CI run `29299858341` for commit `135ae6134f638342853d1ef89480119443a3b728` completed with failure. Job `86981164561` failed specifically in `Validate project context, interactive links, and scripts`; dependency installation and strict MkDocs build were skipped.
+- The connector's decoded job-log response was truncated before the failing command's stderr, so the exact validator/test assertion could not be identified or safely fixed in this run.
+- Public search returned no indexed result for the Pages root. Direct opening was rejected by the safe-URL gate, and the AMX route is branch-only until PR #1 merges; HTTP status and rendered content remain unverified.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** local GitHub DNS resolution failed, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
-- **CI blocker:** the latest branch-head workflow result must be verified; earlier visible CI failed in the validation step without a complete exposed error log.
-- **Pages verification blocker:** the new AMX route is branch-only until PR #1 merges; live rendering cannot be expected before deployment.
+- **CI blocker:** run `29299858341` fails in the combined validation/test shell step, but the available decoded log truncates before the command output that names the exact failing validator or assertion.
+- **Pages verification blocker:** public search has no indexed site result, direct safe-URL access is rejected, and the new AMX route cannot deploy until PR #1 merges.
 - **AMX allocator caveat:** verify that the aligned allocation/release pair is correct on every supported platform.
 - **Scope caveat:** AMX and repack do not stand in for KleidiAI, SpacemiT IME, HBM, or future CPU extra-buffer implementations.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, and release remain distinct states.
