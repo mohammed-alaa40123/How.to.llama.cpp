@@ -137,7 +137,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Evaluate multiline attributes, multiline constraints/returns, in-class special members, constructor initializer lists, defaulted/deleted definitions, literals, complex conversion operators, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
+- [ ] Evaluate multiline attributes, multiline constraints/returns, in-class special members, braced or multiline constructor initializer lists, delegating constructors, function-try-blocks, defaulted/deleted definitions, literals, complex conversion operators, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
 - [ ] Upload or preserve validator output as Actions artifacts if isolated suites and verbose unittest output are still insufficient.
 - [ ] Validate generated pinned blob URLs and line fragments during Documentation CI.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
@@ -153,6 +153,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Recognize bounded same-line out-of-class constructor initializer lists without weakening exact definition-line indexing.
 - [x] Recognize bounded same-line qualified out-of-class constructor and destructor definitions while preserving exact definition lines.
 - [x] Recognize bounded same-line C++ operator definitions, including qualified symbolic, call, subscript, and single-token conversion operators, while preserving exact definition lines.
 - [x] Preserve exact function definition lines across preceding template lines and recognize bounded same-line C++20 `requires` clauses.
