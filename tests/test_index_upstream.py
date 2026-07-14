@@ -84,6 +84,24 @@ struct [[gnu::packed]] attributed_after_keyword {
             ],
         )
 
+    def test_extract_symbols_handles_same_line_function_attributes(self) -> None:
+        source = """\
+[[nodiscard]] static int attributed_function(int value) {
+    return value;
+}
+
+[[gnu::always_inline]] int namespace_name::attributed_method() const noexcept {
+    return 0;
+}
+"""
+        self.assertEqual(
+            index_upstream.extract_symbols(source),
+            [
+                {"name": "attributed_function", "kind": "function", "line": 1},
+                {"name": "namespace_name::attributed_method", "kind": "function", "line": 5},
+            ],
+        )
+
     def test_extract_symbols_retains_duplicate_names(self) -> None:
         source = """\
 static void selected() {
