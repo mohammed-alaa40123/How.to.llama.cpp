@@ -48,12 +48,16 @@ OPERATOR_RE = re.compile(
 # Qualified constructor and destructor definitions have no return type. The
 # backreference requires the function name to equal the immediately preceding
 # class name, preventing ordinary qualified methods from becoming duplicates.
+# A bounded same-line initializer list is accepted for constructors. It excludes
+# braces, semicolons, and newlines, so braced or multiline initializers still need
+# a stateful scanner rather than weakening physical-line accuracy.
 SPECIAL_MEMBER_RE = re.compile(
     r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
     r'((?:[A-Za-z_]\w*::)*([A-Za-z_]\w*)::~?\2)'
     r'\s*\([^;{}]*\)\s*'
     r'(?:noexcept[\t ]*)?'
-    r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?\{'
+    r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?'
+    r'(?::[\t ]*[^;{}\n]+?[\t ]*)?\{'
 )
 # C++ attributes may precede a type declaration on the same physical line.
 # Keep every whitespace matcher horizontal so source locations cannot drift to a
