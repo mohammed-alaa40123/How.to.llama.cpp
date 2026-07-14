@@ -45,13 +45,12 @@ OPERATOR_RE = re.compile(
     r'(?:->[\t ]*[^;{}\n]+?[\t ]*)?'
     r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?\{'
 )
-# Qualified constructor and destructor definitions have no return type. Requiring
-# at least one scope qualifier avoids confusing ordinary free functions with
-# special members while still indexing the common out-of-class definitions used
-# by RAII-heavy backend code.
+# Qualified constructor and destructor definitions have no return type. The
+# backreference requires the function name to equal the immediately preceding
+# class name, preventing ordinary qualified methods from becoming duplicates.
 SPECIAL_MEMBER_RE = re.compile(
     r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
-    r'((?:[A-Za-z_]\w*::)+(?:~?[A-Za-z_]\w*))'
+    r'((?:[A-Za-z_]\w*::)*([A-Za-z_]\w*)::~?\2)'
     r'\s*\([^;{}]*\)\s*'
     r'(?:noexcept[\t ]*)?'
     r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?\{'
