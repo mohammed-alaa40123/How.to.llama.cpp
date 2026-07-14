@@ -104,28 +104,13 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/objects/llama-model.md` | `llama_model` construction, storage, graph factory, and teardown |
 | `docs/objects/llama-context.md` | `llama_context` runtime state and lifetime |
 | `docs/ggml/graph-construction-and-moe.md` | Graph construction, reuse, MoE routing, and cache design |
-| `docs/architecture/system-ownership-and-execution-map.md` | Cross-subsystem ownership/execution synthesis |
-| `docs/architecture/model-context-teardown-order.md` | Exact model/context destruction order |
-| `docs/architecture/scheduler-teardown-core.md` | Generic scheduler free chain and dependencies |
 | `docs/architecture/backend-teardown-audit-method.md` | Reusable completion/ownership audit worksheet and runtime matrix |
 | `docs/architecture/backend-teardown-comparison.md` | Cross-backend completion, resource-independence, and safety matrix |
-| `docs/architecture/cpu-backend-teardown.md` | Ordinary CPU teardown classification |
-| `docs/architecture/cpu-repack-extra-buffer-lifetime.md` | CPU repack extra-buffer ownership and backend-wrapper independence |
-| `docs/architecture/cpu-amx-extra-buffer-lifetime.md` | AMX feature admission, aligned allocation ownership, static traits, and teardown |
-| `docs/architecture/cpu-kleidiai-extra-buffer-lifetime.md` | KleidiAI packed weights, static traits, ordinary CPU allocation ownership, and teardown |
-| `docs/architecture/cpu-spacemit-ime-extra-buffer-lifetime.md` | SpacemiT pooled weight allocation, static traits, thread-local TCM coordination, and teardown |
 | `docs/architecture/cpu-extra-buffer-comparison.md` | Cross-implementation ownership comparison and portable destruction-test matrix |
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
-| `docs/architecture/cuda-backend-teardown.md` | CUDA teardown and conditional completion |
-| `docs/architecture/metal-backend-teardown.md` | Metal explicit synchronization and teardown |
-| `docs/architecture/vulkan-backend-teardown.md` | Vulkan explicit synchronization and teardown |
-| `docs/architecture/sycl-backend-teardown.md` | SYCL queue, event, buffer, and teardown classification |
-| `docs/architecture/rpc-backend-teardown.md` | RPC client/server ownership, remote completion, and teardown |
-| `docs/architecture/cann-backend-teardown.md` | CANN device synchronization, reset ordering, and resource lifetimes |
 | `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build composition, kernel deployment, and initial buffer ownership |
 | `docs/reference/source-index.md` | Human-reviewed source areas and generated symbol-location/link format |
-| `docs/assets/interactive/` | Interactive architecture assets |
-| `.github/workflows/` | CI, Pages, context, and indexing automation |
+| `.github/workflows/docs-ci.yml` | Named validation steps, strict build, and actionable failure reporting |
 
 <!-- PROJECT-TODOS:START -->
 ## Living TODO list
@@ -134,30 +119,26 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then use the backend teardown audit worksheet to finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
+- [ ] Inspect the first Documentation CI run using the new named validation steps; fix the exact failing validator or test, then repair any independent strict MkDocs failure.
+- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
 - [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
-- [ ] Verify SpacemiT worker cleanup: every TCM-acquiring path must call the clear-affinity hook; audit process-level Spine pool, huge-page mapping, device-fd, and TCM synchronization shutdown.
-- [ ] Validate KleidiAI null readback/copy callbacks, concurrent initialization, packed-layout portability, and one-versus-two-slot memory expansion.
-- [ ] Validate AMX allocator pairing (`ggml_aligned_malloc()` with the current `free()` callback) on supported platforms, repeated tile-permission initialization, and disabled readback/copy paths.
-- [ ] Verify CANN reset semantics with authoritative runtime documentation and a test matrix: destroy streams/events/buffers before versus after `aclrtResetDevice`, one versus two contexts, and scheduler-resource release after backend free.
-- [ ] Design and test a real RPC synchronization/completion command; verify immediate graph-compute → remote-buffer-free and graph-compute → connection-close behavior on CPU and accelerator servers.
-- [ ] Verify shared RPC socket serialization under concurrent backend/buffer users and document transport error/reconnect semantics.
-- [ ] Verify whether SYCL synchronization covers every queue used by multi-device, split-buffer, DNNL, flash-attention, command-graph, and communication paths; determine whether backend free should wait explicitly.
-- [ ] Verify whether `ggml_backend_cuda_synchronize()` covers every lazily created concurrent stream and whether context pools/events/graphs should be cleared before stream destruction.
-- [ ] Determine whether the pinned Vulkan performance query pool has an explicit owner/destructor or represents a cleanup leak; audit persistent Vulkan device/process-exit teardown.
-- [ ] Add asynchronous-destruction regression tests for CUDA-family, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL backends using the minimum runtime matrix.
+- [ ] Verify SpacemiT worker cleanup and process-level Spine pool, huge-page mapping, device-fd, and TCM synchronization shutdown.
+- [ ] Validate KleidiAI null readback/copy callbacks, concurrent initialization, packed-layout portability, and packed-slot memory expansion.
+- [ ] Validate AMX allocator pairing, repeated tile-permission initialization, and disabled readback/copy paths.
+- [ ] Verify CANN reset semantics with authoritative runtime documentation and a destruction-order test matrix.
+- [ ] Design and test a real RPC synchronization/completion command and shared-socket serialization.
+- [ ] Verify SYCL all-queue and CUDA all-stream synchronization coverage.
+- [ ] Determine Vulkan performance-query-pool ownership and persistent device teardown.
+- [ ] Add asynchronous-destruction regression tests for accelerator and RPC backends.
 - [ ] Map architecture-specific graph-builder downcasts to `llama_memory_context_i` subtypes and exact state tensors.
-- [ ] Add runtime evidence separating parsing, mapping/prefetch, page faults, direct reads, alias/upload bytes, scheduler copy generations, event waits, memory-update graphs, KV/recurrent growth, activation peaks, synchronization, and teardown.
-- [ ] Add exact pinned line-level source citations to the graph-construction chapter once generated source-link checking is ready.
-- [ ] Expand the interactive explorer with architecture-specific builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime overlays.
-- [ ] Replace curated interactive metadata with generated versioned JSON shared by the inference atlas, object pages, source maps, and visualizers.
-- [ ] Fix Documentation CI run `29307346854`: `Validate project context, interactive links, and scripts` failed; dependency installation and strict MkDocs build were skipped, and the connector log remained truncated before the final assertion.
-- [ ] Verify the latest **Deploy documentation** and **Hourly research context check** runs after CI is repaired.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-extra-buffer-destruction-harness/` after merge; the route is branch-only until PR #1 merges.
+- [ ] Add runtime evidence for parsing, mapping, page faults, copies, event waits, KV/recurrent growth, activation peaks, synchronization, and teardown.
+- [ ] Verify the latest **Deploy documentation** and **Hourly research context check** runs after Documentation CI is repaired.
+- [ ] Verify the public Pages site returns HTTP 200 and renders branch-added architecture pages after PR #1 merges.
 
 ### Future improvements
 
+- [ ] Upload or preserve validator output as Actions artifacts if named steps and verbose unittest output are still insufficient.
 - [ ] Validate generated pinned blob URLs and line fragments during Documentation CI.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
 - [ ] Extend interactive-link validation to built HTML IDs, generated routes, assets, and plugin-generated anchors.
@@ -166,33 +147,22 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Prototype per-layer LRU expert-cache instrumentation with separate logical, OS-residency, and backend-copy validity.
 - [ ] Prototype cache-aware routing before `ggml_argsort_top_k()`.
 - [ ] Quantify mmap alias, mapped-copy, direct-read, synchronous-upload, and asynchronous-upload paths.
-- [ ] Trace direct-I/O alignment/fallback behavior with runtime evidence.
 - [ ] Extend the source index with file, object, symbol, subsystem, and caller/callee landing pages.
 - [ ] Add dedicated mmap/page-fault, CPU-thread, backend-queue, KV-cache, recurrent-memory, MoE-routing, and scheduler-timeline visualizers.
-- [ ] Expand graph-reuse documentation with every specialized `can_reuse()` predicate.
 - [ ] Add a searchable detailed-research-log index and commit-pinned link checking.
 
 ### Completed
 
-- [x] Specify an implementation-ready CPU optional-buffer destruction harness with exact admission, correctness, completion, backend-free-before-buffer-free, sanitizer, negative-test, and implementation-ladder requirements.
-- [x] Synthesize CPU repack, AMX, KleidiAI, and SpacemiT IME into one ownership/completion comparison and portable destruction-test matrix.
-- [x] Audit the pinned SpacemiT IME extra-buffer path: dedicated Spine pool allocation/free ownership, static IME/RVV traits and buffer metadata, synchronous threadpool execution, thread-local TCM coordination, backend-wrapper-independent buffer destruction, and conditional complete-worker teardown.
-- [x] Audit the pinned KleidiAI extra-buffer path: critical-section initialization, feature-selected kernel chains, ordinary CPU allocation/free ownership, versioned packed slots, static traits/type metadata, synchronous CPU execution, and backend-wrapper independence.
-- [x] Audit the pinned AMX extra-buffer path: compile/runtime admission, dedicated aligned host allocation, buffer-local destruction, static traits/type metadata, synchronous CPU execution, and backend-wrapper independence.
-- [x] Audit the pinned `GGML_USE_CPU_REPACK` extra-buffer path: static registration and tensor traits, ordinary CPU allocation delegation, synchronous execution, and buffer-deleter independence from `ggml_backend_cpu_context`.
-- [x] Add a reusable backend teardown audit method that separates command completion from scheduler-resource deleter independence, standardizes classifications, and defines a minimum asynchronous-destruction runtime matrix.
-- [x] Add a guided end-to-end inference atlas with a clickable pipeline, stage/lifetime table, and audience-specific reading paths across GGUF, model/context, graph, scheduler, backends, memory, and teardown.
-- [x] Add a revision-pinned cross-backend teardown comparison matrix that separates command completion from scheduler-resource deleter independence and links each classification to its detailed audit.
-- [x] Add revision-pinned file and `#L<line>` symbol URLs to the generated source inventory, derive them from the selected llama.cpp revision, and cover URL generation with regression tests.
-- [x] Add untruncated, source-ordered symbol records with approximate declaration kind and 1-based line numbers to the generated source inventory, while retaining the legacy compact symbol list and adding regression tests.
-- [x] Map pinned OpenCL build composition, kernel deployment modes, official platform scope, and the initial `cl_mem` RAII ownership path.
-- [x] Audit pinned CANN teardown: backend/context free, device-wide synchronization, reset ordering, events, allocator buffers, registry lifetime, and post-reset destruction uncertainty.
-- [x] Audit pinned RPC teardown: client/backend ownership, remote buffer/session release, transport lifetime, command ordering, and conditional remote completion.
-- [x] Finish pinned SYCL teardown and queue/event/buffer lifetime audits.
-- [x] Finish pinned Vulkan teardown and command-lifetime audits.
-- [x] Audit pinned Metal, CUDA, ordinary CPU, and generic scheduler teardown.
+- [x] Split Documentation CI validation into named steps and enable verbose unittest output so future failures identify the exact subsystem.
+- [x] Specify an implementation-ready CPU optional-buffer destruction harness.
+- [x] Synthesize CPU repack, AMX, KleidiAI, and SpacemiT IME into one ownership/completion comparison and portable test matrix.
+- [x] Audit the pinned CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer paths.
+- [x] Add a reusable backend teardown audit method and cross-backend comparison matrix.
+- [x] Add a guided end-to-end inference atlas.
+- [x] Add line-aware, revision-pinned source-index links and tests.
+- [x] Map pinned OpenCL build composition and initial `cl_mem` ownership.
+- [x] Audit pinned CANN, RPC, SYCL, Vulkan, Metal, CUDA, ordinary CPU, and generic scheduler teardown.
 - [x] Trace exact `llama_model` and `llama_context` declaration and reverse-destruction order.
-- [x] Enumerate concrete context-memory implementations and architecture factory decisions.
 - [x] Complete Pass A for public API, model/GGUF loading, runtime context/memory, and scheduler internals.
 - [x] Publish canonical GGUF, model placement, model/context, graph/MoE, memory-lifetime, and system-ownership pages.
 - [x] Add interactive explorers, validation, strict CI, Pages deployment, source indexing, and durable run context.
