@@ -174,3 +174,23 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Audit worker error paths, process-level pool shutdown, null transfer callbacks, repacked memory expansion, and repeated buffer/threadpool teardown under sanitizers on supported hardware.
+
+## 2026-07-14 07:49 — CPU optional extra-buffer comparison
+
+**Verified**
+
+- Added a single comparison covering allocation/free ownership, static `tensor->extra` traits, synchronous completion, backend-wrapper independence, and residual teardown risks for repack, AMX, KleidiAI, and SpacemiT IME.
+- Repack and KleidiAI form an ordinary-CPU-allocation overlay family; AMX and SpacemiT own dedicated implementation-specific allocations.
+- Added a portable destruction-test matrix spanning backend-free-before-buffer-free ordering, unsupported transfer callbacks, initialization races, sanitizers, and memory-expansion measurement.
+
+**Interpretation**
+
+- Weight-buffer destruction is independent of `ggml_backend_cpu_context` across all four audited paths, but complete implementation shutdown remains path-specific because AMX has platform allocator/tile state and SpacemiT has worker-local TCM and process-pool state.
+
+**Historical**
+
+- Admission rules, callback tables, packed layouts, allocator APIs, and worker hooks remain revision-sensitive.
+
+**Open questions**
+
+- Implement the matrix under ASan/LSan/TSan and prove SpacemiT cleanup across every worker/error/threadpool-destruction path.
