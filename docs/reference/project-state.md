@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 21:49 Africa/Cairo_
+_Last updated: 2026-07-14 22:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -42,17 +42,17 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Bounded qualified out-of-class constructor and destructor definitions recognized with exact source lines.
 - Bounded same-line constructor initializer lists recognized for out-of-class constructors without weakening exact source-line accuracy.
 - Same-line delegating constructors verified as accepted by the bounded initializer-list rule and protected by an explicit exact-line regression fixture.
-- Successful full Documentation CI through the initializer-list expansion.
+- Negative regression coverage now protects the documented constructor-initializer boundary: braced and multiline forms must not be partially indexed.
+- Successful full Documentation CI through the delegating-constructor expansion.
 
 ## Latest concrete findings
 
-- Added `test_extract_symbols_handles_same_line_delegating_constructors` to `tests/test_index_upstream.py`.
-- The fixture covers ordinary and nested qualified constructors, including a `noexcept` delegating constructor.
-- Expected records require `backend_state::backend_state` at line 1 and `nested::resource::resource` at line 4.
-- The production scanner was not broadened; the increment converts already verified behavior into a compatibility regression.
-- Parenthesized same-line delegation is now tested, while multiline delegation and brace-containing arguments remain outside the regex contract.
-- The pinned OpenCL CMake target compiles `ggml-opencl.cpp`, whose blob SHA is `f283f65690af7790e163092207647d16dac9fb3e`.
-- The connector can expose the beginning of that 24k-line blob and confirms buffer-local `cl_mem` RAII, but output remains truncated before backend teardown symbols; no hidden teardown behavior was inferred.
+- Added `tests/test_index_upstream_initializer_boundaries.py`.
+- A same-line parenthesized initializer remains indexed at the constructor definition line.
+- Same-line braced initializers and multiline initializer lists must produce no partial symbol record.
+- The production scanner was not broadened; this increment protects the documented precision boundary against misleading false positives.
+- The preceding branch head passed Documentation CI run `29359626167`.
+- The pinned OpenCL blob SHA remains `f283f65690af7790e163092207647d16dac9fb3e`; line-ranged connector reads still did not expose the hidden teardown region, so no unseen release behavior was inferred.
 
 ## In progress
 
@@ -80,9 +80,9 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Added detailed note `logs/research/2026-07-14/2149-delegating-constructor-regression.md`.
-- The preceding initializer-list implementation passed Documentation CI and strict MkDocs in run `29352222406`.
-- This run added a source-index regression fixture and durable context updates; commit-scoped Documentation CI must confirm the focused test and strict build.
+- Added detailed note `logs/research/2026-07-14/2249-initializer-boundary-regression.md`.
+- The preceding branch head passed Documentation CI and strict MkDocs in run `29359626167`.
+- This run added a focused negative-boundary test module; commit-scoped Documentation CI must confirm full discovery and strict build.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Direct Pages checks remain unavailable, and branch-only content cannot deploy until PR #1 merges.
 
@@ -92,7 +92,7 @@ B. implement the admitted CPU repack MUL_MAT fixture
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
 - **Pages verification blocker:** direct live-site checks are unavailable, and branch-only documentation cannot deploy until PR #1 merges.
-- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized; multiline forms, braced initializer lists, function-try-blocks, in-class special members, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
+- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized; negative tests require braced and multiline constructor initializers not to be partially indexed. Multiline forms, function-try-blocks, in-class special members, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
