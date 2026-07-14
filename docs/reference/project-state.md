@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 10:52 Africa/Cairo_
+_Last updated: 2026-07-14 11:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -31,18 +31,19 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Implementation-ready CPU optional-buffer destruction-harness specification with admission, correctness, lifetime-ordering, and sanitizer assertions.
 - Documentation CI validation commands split into named steps with verbose unittest output.
 - Python unit tests split into source-index and interactive-link suites, followed by a full discovery guard.
+- Source-index type-declaration line locations corrected so blank lines are not consumed as leading whitespace.
 
 ## Latest concrete findings
 
-- Documentation CI run `29312885959` completed with failure in the aggregate Python unit-test step.
-- Durable project-context validation and interactive-link validation both passed.
-- Shell syntax, Python compilation, asset checks, dependency installation, and strict MkDocs building were skipped after the unit-test failure.
-- The available decoded job log remained truncated before the failing unittest name and traceback.
-- The workflow now executes `tests.test_index_upstream` and `tests.test_validate_interactive_links` as separate named steps, then runs full test discovery as a coverage guard.
+- Documentation CI run `29316377253` passed durable project-context and interactive-link validation, then failed specifically in `Test source indexing`.
+- The failing test expects `enum class second_type` on source line 8.
+- `CLASS_RE` used `^\s*`; Python `\s` includes newline, so the match began on the preceding blank line and `line_number()` returned line 7.
+- Replacing leading and separating whitespace with horizontal `[\t ]*` and `[\t ]+` preserves the declaration start and returns line 8.
+- A bounded local regex reproduction confirmed the old result of 7 and corrected result of 8.
 
 ## In progress
 
-- Exact identification and repair of the isolated Documentation CI unit-test failure.
+- Full Documentation CI verification after the source-index regex fix, followed by repair of any later failing step.
 - Regeneration of the pinned source inventory with line-aware records and pinned source links.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -53,7 +54,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Immediate next task
 
-Inspect the Documentation CI run created by the suite-isolation workflow and patch the exact failing test or implementation. Once the unit tests pass, continue through shell, compilation, asset, dependency, and strict MkDocs validation, then resume the portable CPU repack lifetime fixture:
+Inspect the branch-head Documentation CI run. If both isolated suites, discovery, shell, compilation, assets, dependency installation, and strict MkDocs pass, resume the portable CPU repack lifetime fixture:
 
 ```text
 create CPU backend
@@ -69,18 +70,18 @@ create CPU backend
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Documentation CI run `29312885959` identified Python unit tests as the failing subsystem while both context validators passed.
-- Updated `.github/workflows/docs-ci.yml` to isolate the two current test modules and retain full discovery coverage.
-- Added detailed note `logs/research/2026-07-14/1052-unit-test-suite-isolation.md`.
-- Local cloning again failed with `Could not resolve host: github.com`, so checkout-based test reproduction, strict MkDocs build, and `check_site.sh` remain unavailable.
+- Documentation CI run `29316377253` isolated the failure to `Test source indexing`.
+- Updated `scripts/index_upstream.py` to prevent type patterns from consuming preceding newlines.
+- Added detailed note `logs/research/2026-07-14/1151-source-index-line-number-fix.md`.
+- A local regex reproduction passed; full checkout-based tests remain unavailable because `gh` is not installed and direct cloning has previously failed DNS resolution in this runtime.
 - The public Pages route for branch-only artifacts cannot deploy until PR #1 merges; live verification remains pending.
 
 ## Known blockers and caveats
 
-- **Current CI diagnosis:** the failing subsystem is Python unit tests, but the prior aggregate step and truncated log did not expose the exact module or traceback. The new suite-isolation run must complete before a precise fix can be applied.
+- **Current CI verification:** the exact source-index defect is fixed, but the new branch-head workflow must confirm both test suites and reveal any later strict MkDocs issue.
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
-- **Local validation blocker:** cloning failed with `Could not resolve host: github.com`; Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
+- **Local validation blocker:** `gh` is not installed and prior cloning failed with `Could not resolve host: github.com`; full Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
 - **Pages verification blocker:** branch-only documentation cannot deploy until PR #1 merges; live HTTP and rendered-content checks remain pending.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
