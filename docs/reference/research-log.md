@@ -210,6 +210,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Requiring at least one scope qualifier limits false positives and targets common RAII definitions.
 - Focused tests require exact lines for an ordinary constructor, destructor, and attributed constrained nested constructor.
 - Ordinary functions, operators, and type extraction remain separate.
+- Documentation CI run `29348084640` passed the complete suite and strict MkDocs for the final special-member head.
 
 **Interpretation**
 
@@ -222,4 +223,25 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - In-class special members, initializer lists, multiline signatures, defaulted/deleted definitions, literals, and generated declarations remain unsupported.
-- The new head still requires commit-scoped Documentation CI and strict MkDocs validation.
+
+## 2026-07-14 19:53 — Constructor initializer-list indexing
+
+**Verified**
+
+- The previous special-member matcher required `{` immediately after optional `noexcept` and `requires`, so constructors with `: member(value)` initializer lists were absent from the index.
+- Added one bounded same-line initializer-list clause excluding newlines, semicolons, and braces.
+- Focused tests require exact lines for ordinary parenthesized initializer lists on qualified constructors.
+- Destructor behavior and ordinary-function, operator, and type extraction were not broadened.
+
+**Interpretation**
+
+- Constructor initializer lists are valuable navigation targets because backend resource ownership and synchronization state are often established there.
+
+**Historical**
+
+- This extends the bounded qualified special-member scanner while preserving exact physical-line priority.
+
+**Open questions**
+
+- Braced and multiline initializer lists, delegating constructors, function-try-blocks, in-class special members, and macro-generated definitions remain unsupported.
+- Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
