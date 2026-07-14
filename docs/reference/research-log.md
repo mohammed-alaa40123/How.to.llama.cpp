@@ -359,3 +359,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Regenerate the pinned tree and use actual counts to decide whether stateful extraction is justified and whether a future link should target the signature or `try` line.
 - Complete pinned OpenCL teardown still requires searchable access to the hidden portion of `ggml-opencl.cpp` or a regenerated local inventory.
+
+## 2026-07-15 02:51 — OpenCL lifecycle-call extractor
+
+**Verified**
+
+- Added `scripts/extract_opencl_lifecycle_calls.py` as a bounded exact-line inventory for selected OpenCL completion and release APIs.
+- Added focused tests covering `clFinish`, `clFlush`, `clWaitForEvents`, queue/context/program/kernel/event/buffer release, source order, exact lines, and similar non-call identifiers.
+- The extractor emits JSON call records plus per-name counts and remains separate from approximate declaration indexing.
+- The pinned blob SHA remains `f283f65690af7790e163092207647d16dac9fb3e`; visible blob content confirms the already-audited `ggml_cl_buffer` destructor releases its `cl_mem` with `clReleaseMemObject`.
+
+**Interpretation**
+
+- A call-site inventory narrows the teardown audit but does not establish ownership, error-path cleanup, release ordering, or queued-work completion.
+
+**Historical**
+
+- Repeated line-ranged connector reads could not expose hidden portions of the large OpenCL translation unit. The new tool can operate on the complete pinned file in a checkout or CI workspace instead of depending on connector rendering.
+
+**Open questions**
+
+- Run the extractor against the complete pinned file and inspect each result in context.
+- Determine whether backend teardown explicitly finishes or waits before queue/context/program/kernel release.
+- Pair release calls with creation/retention sites if ownership remains ambiguous.
