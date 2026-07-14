@@ -138,6 +138,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Future improvements
 
 - [ ] Evaluate multiline attributes, multiline constraints/returns, in-class special members, braced or multiline constructor initializer lists, function-try-blocks, defaulted/deleted definitions, literals, complex conversion operators, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
+- [ ] Add unsupported-syntax counters to source-index generation so braced/multiline initializers and other scanner misses can be prioritized from the pinned tree.
 - [ ] Upload or preserve validator output as Actions artifacts if isolated suites and verbose unittest output are still insufficient.
 - [ ] Validate generated pinned blob URLs and line fragments during Documentation CI.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
@@ -153,6 +154,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Protect the constructor-initializer scanner boundary with negative tests proving braced and multiline forms are not partially indexed.
 - [x] Add explicit regression coverage for bounded same-line qualified delegating constructors with exact source lines.
 - [x] Verify that the bounded same-line initializer-list rule already recognizes delegating constructors and remove the false unsupported-capability TODO.
 - [x] Recognize bounded same-line out-of-class constructor initializer lists without weakening exact definition-line indexing.
