@@ -29,10 +29,11 @@ FUNC_RE = re.compile(
     r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?\{'
 )
 # Operators need a dedicated bounded pattern because conversion operators do not
-# have a return type before the name. Support qualified symbolic/call/subscript
-# operators and single-token conversion targets on one physical line.
+# have a return type before the name. The optional horizontal-only prefix admits
+# ordinary symbolic/call/subscript operators while still allowing conversions.
 OPERATOR_RE = re.compile(
     r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
+    r'(?:(?:[A-Za-z_][\w:<>,~*&\t ]+?)[\t ]+)?'
     r'((?:[A-Za-z_]\w*::)*operator[\t ]*'
     r'(?:\(\)|\[\]|(?:new|delete)(?:[\t ]*\[\])?|'
     r'[=!<>+\-*/%&|^~]+|[A-Za-z_]\w*(?:::\w+)*))'
