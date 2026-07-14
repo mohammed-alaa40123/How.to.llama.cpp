@@ -16,12 +16,15 @@ SKIP = {'.git','build','site','__pycache__','.venv'}
 INCLUDE_RE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
 # C++ attributes may precede a function declaration on the same physical line.
 # Bounded trailing-return and requires clauses are accepted after qualifiers.
+# Operator lines are reserved for OPERATOR_RE so ordinary extraction cannot emit
+# partial duplicate names such as `operator` or a conversion target such as bool.
 # Every return-type whitespace matcher is horizontal so the match cannot begin on
 # a preceding template or blank line. This remains deliberately approximate and
 # does not attempt to parse multiline attributes/returns, macros, or every legal
 # declarator form.
 FUNC_RE = re.compile(
     r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
+    r'(?![^\n;{}]*\boperator\b)'
     r'(?:[A-Za-z_][\w:<>,~*&\t ]+?)[\t ]+'
     r'([A-Za-z_]\w*(?:::\w+)*)\s*\([^;{}]*\)\s*'
     r'(?:const[\t ]*)?(?:noexcept[\t ]*)?'
