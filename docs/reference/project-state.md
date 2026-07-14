@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 08:49 Africa/Cairo_
+_Last updated: 2026-07-14 09:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -29,17 +29,18 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Bounded CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer lifetime audits.
 - Cross-implementation CPU optional-buffer comparison and portable destruction-test matrix.
 - Implementation-ready CPU optional-buffer destruction-harness specification with admission, correctness, lifetime-ordering, and sanitizer assertions.
+- Documentation CI validation commands split into named steps with verbose unittest output so the exact failing subsystem is visible.
 
 ## Latest concrete findings
 
-- CPU repack is the first portable destruction-fixture target because it uses ordinary CPU allocation/free ownership, process-static traits, and synchronous execution.
-- A valid regression must prove exact optional-buffer admission and supported dispatch; ordinary CPU fallback would be a false positive.
-- Output correctness and later buffer-deleter independence are separate assertions.
-- The fixture should use a tiny deterministic supported `MUL_MAT`, free the CPU backend wrapper before the optional buffer, and repeat under ASan/LSan.
-- KleidiAI, AMX, and SpacemiT can reuse the ordering contract but require feature admission and implementation-specific auxiliary checks.
+- Documentation CI run `29309938483` failed after startup-context reading, inside the former compound validation step.
+- The decoded log was truncated before the failing command or assertion, making the old compound step non-actionable.
+- Splitting context validation, interactive-link validation, unit tests, shell syntax, Python compilation, and asset checks into named steps preserves validation semantics while exposing the exact failure in the job summary.
+- The workflow change is an observability fix; it does not yet prove that the underlying validator bug is repaired.
 
 ## In progress
 
+- Exact identification and repair of the named Documentation CI failure on the new workflow head.
 - Regeneration of the pinned source inventory with line-aware records and pinned source links.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -50,7 +51,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Immediate next task
 
-Implement the first portable repack regression fixture from the new harness specification:
+Inspect the Documentation CI run created by the named-step workflow and fix the exact failing validator or test. Once CI reaches the strict MkDocs step, repair any independent build issue, then continue with the portable CPU repack lifetime fixture:
 
 ```text
 create CPU backend
@@ -65,22 +66,20 @@ create CPU backend
 
 ## Publication and verification state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the checked branch head after the harness note was `8c4953e245642229a85edaa26f0530c0b82ed8d9`, and the PR remained open and mergeable before final state updates.
-- Added `docs/architecture/cpu-extra-buffer-destruction-harness.md` and linked it after the CPU comparison page.
-- Added detailed note `logs/research/2026-07-14/0849-cpu-extra-buffer-destruction-harness.md`.
-- Updated README TODOs, project state, and research log; the research ledger is unchanged because no external source changed.
+- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the branch remained open and mergeable after the CI observability commits.
+- Updated `.github/workflows/docs-ci.yml` so each validator is a separately named Actions step and unittest runs verbosely.
+- Added detailed note `logs/research/2026-07-14/0949-docs-ci-validation-observability.md`.
 - Local cloning again failed with `Could not resolve host: github.com`, so checkout-based Python tests, strict MkDocs build, and `check_site.sh` could not run.
-- Documentation CI run `29307346854` completed with failure in `Validate project context, interactive links, and scripts`; checkout and startup-context reading succeeded, while dependency installation and strict MkDocs build were skipped.
-- The connector-decoded job log remained truncated before the final failing assertion, so no speculative fix was applied.
-- The public Pages route for the new artifact is branch-only until PR #1 merges; live verification is recorded as pending.
+- The previously checked Documentation CI run `29309938483` failed in the old compound validation step; a new run is expected on the updated PR head.
+- The public Pages route for branch-only artifacts cannot deploy until PR #1 merges; live verification remains pending.
 
 ## Known blockers and caveats
 
+- **Current CI diagnosis:** the old workflow exposed only a compound validation-step failure. The new named-step workflow must complete before the exact failing validator can be fixed.
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** cloning failed with `Could not resolve host: github.com`; Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
-- **Current CI failure:** Documentation CI run `29307346854` failed at `Validate project context, interactive links, and scripts`; the decoded log was truncated before the exact error, and later dependency/build steps were skipped.
-- **Pages verification blocker:** the destruction-harness page cannot deploy until PR #1 merges; live HTTP and rendered-content checks remain pending.
+- **Pages verification blocker:** branch-only documentation cannot deploy until PR #1 merges; live HTTP and rendered-content checks remain pending.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
