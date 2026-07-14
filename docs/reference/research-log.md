@@ -194,3 +194,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Implement the matrix under ASan/LSan/TSan and prove SpacemiT cleanup across every worker/error/threadpool-destruction path.
+
+## 2026-07-14 08:49 — CPU optional extra-buffer destruction harness
+
+**Verified**
+
+- Added an implementation-ready regression-harness specification centered on a tiny admitted optional-buffer `MUL_MAT` fixture.
+- The fixture separates admission, output correctness, synchronous completion, backend-free-before-buffer-free ordering, and final sanitizer-clean destruction.
+- CPU repack is the first portable target; KleidiAI, AMX, and SpacemiT reuse the ordering contract behind explicit feature and hardware gates.
+- A skipped hardware-gated path is not evidence that the ownership claim passed.
+
+**Interpretation**
+
+- A tiny deterministic graph is stronger than a full model for this ownership question because fallback placement, allocation owners, and destruction order remain visible.
+
+**Historical**
+
+- Test helpers, optional-buffer admission, callback tables, and supported quantized layouts are revision-sensitive.
+
+**Open questions**
+
+- Select the smallest upstream graph/test helper, place the fixture in the appropriate test target, define LSan treatment for intentional static metadata, and add explicit SpacemiT pool shutdown coverage.
