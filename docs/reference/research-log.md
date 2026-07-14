@@ -312,3 +312,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Add unsupported-syntax counters if pinned-tree regeneration shows enough missed constructor initializers to justify a stateful scanner.
 - Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
+
+## 2026-07-14 23:51 — Unsupported source-index syntax telemetry
+
+**Verified**
+
+- Added bounded per-file counters for braced and multiline constructor initializer candidates.
+- Added aggregate `unsupported_syntax_counts` to the generated JSON summary and both totals to the generated Markdown inventory.
+- Added focused tests for positive counts, zero counts on supported parenthesized same-line initialization, and continued omission of unsupported candidates from symbol records.
+- Symbol extraction was not broadened; telemetry remains separate from navigation records.
+
+**Interpretation**
+
+- Measurable false-negative telemetry can prioritize future scanner work without weakening the current guarantee against partial or misleading pinned links.
+
+**Historical**
+
+- This closes the observability gap identified after the constructor-initializer negative-boundary regression.
+
+**Open questions**
+
+- Regenerate the pinned tree to determine whether the candidate volume justifies a stateful constructor scanner.
+- Extend counters only when pinned-tree evidence identifies another high-value unsupported form.
+- Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
