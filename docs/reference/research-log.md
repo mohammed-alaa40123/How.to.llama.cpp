@@ -228,3 +228,25 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Determine from the pinned tree whether multiline attributes or export/declaration macros justify a stateful scanner or targeted additional rules.
+
+## 2026-07-14 14:52 — Attributed C++ function indexing
+
+**Verified**
+
+- The function index previously required the return type to be the first non-horizontal-whitespace token, so a leading same-line `[[...]]` attribute prevented indexing.
+- The updated function pattern accepts one or more same-line attribute groups before the return type.
+- A focused test covers an attributed free function and namespace-qualified `const noexcept` method at physical lines 1 and 5.
+- Type extraction, duplicate retention, source ordering, and pinned link construction are unchanged.
+- The pinned OpenCL blob was retrieved, but connector output remained truncated before the teardown section; no hidden teardown behavior was inferred.
+
+**Interpretation**
+
+- Leading same-line function attributes are a bounded navigation improvement. Multiline attributes, trailing-return syntax, requires clauses, declaration macros, and complex declarators remain explicit scanner limitations.
+
+**Historical**
+
+- This increment applies the previous run's bounded same-line attribute policy to function definitions.
+
+**Open questions**
+
+- Verify the focused test and strict MkDocs through Documentation CI, then evaluate additional syntax only from observed pinned-tree needs.
