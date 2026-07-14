@@ -63,6 +63,27 @@ namespace nested {
             ],
         )
 
+    def test_extract_symbols_handles_same_line_cpp_attributes(self) -> None:
+        source = """\
+[[nodiscard]] struct attributed_before_keyword {
+};
+
+struct [[gnu::packed]] attributed_after_keyword {
+};
+
+[[deprecated("use replacement")]] enum class [[nodiscard]] attributed_enum {
+    value,
+};
+"""
+        self.assertEqual(
+            index_upstream.extract_symbols(source),
+            [
+                {"name": "attributed_before_keyword", "kind": "type", "line": 1},
+                {"name": "attributed_after_keyword", "kind": "type", "line": 4},
+                {"name": "attributed_enum", "kind": "type", "line": 7},
+            ],
+        )
+
     def test_extract_symbols_retains_duplicate_names(self) -> None:
         source = """\
 static void selected() {
