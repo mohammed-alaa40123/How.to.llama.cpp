@@ -113,6 +113,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/cpu-repack-extra-buffer-lifetime.md` | CPU repack extra-buffer ownership and backend-wrapper independence |
 | `docs/architecture/cpu-amx-extra-buffer-lifetime.md` | AMX feature admission, aligned allocation ownership, static traits, and teardown |
 | `docs/architecture/cpu-kleidiai-extra-buffer-lifetime.md` | KleidiAI packed weights, static traits, ordinary CPU allocation ownership, and teardown |
+| `docs/architecture/cpu-spacemit-ime-extra-buffer-lifetime.md` | SpacemiT pooled weight allocation, static traits, thread-local TCM coordination, and teardown |
 | `docs/architecture/cuda-backend-teardown.md` | CUDA teardown and conditional completion |
 | `docs/architecture/metal-backend-teardown.md` | Metal explicit synchronization and teardown |
 | `docs/architecture/vulkan-backend-teardown.md` | Vulkan explicit synchronization and teardown |
@@ -132,10 +133,11 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Highest priority
 
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then use the backend teardown audit worksheet to finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
-- [ ] Finish the optional CPU extra-buffer audit for SpacemiT IME; compare its allocation/free callbacks and `tensor->extra` ownership against the completed CPU repack, AMX, and KleidiAI audits.
+- [ ] Synthesize the completed CPU optional-buffer audits into one comparison and portable destruction-test matrix covering repack, AMX, KleidiAI, and SpacemiT IME.
+- [ ] Verify SpacemiT worker cleanup: every TCM-acquiring path must call the clear-affinity hook; audit process-level Spine pool, huge-page mapping, device-fd, and TCM synchronization shutdown.
 - [ ] Validate KleidiAI null readback/copy callbacks, concurrent initialization, packed-layout portability, and one-versus-two-slot memory expansion.
 - [ ] Validate AMX allocator pairing (`ggml_aligned_malloc()` with the current `free()` callback) on supported platforms, repeated tile-permission initialization, and disabled readback/copy paths.
-- [ ] Add CPU repack, AMX, and KleidiAI destruction regression tests: compute → CPU backend free → extra buffer free, under ASan/LSan.
+- [ ] Add CPU repack, AMX, KleidiAI, and SpacemiT destruction regression tests: compute → CPU backend free → extra buffer free, under ASan/LSan; add repeated SpacemiT threadpool/TCM teardown on supported hardware.
 - [ ] Verify CANN reset semantics with authoritative runtime documentation and a test matrix: destroy streams/events/buffers before versus after `aclrtResetDevice`, one versus two contexts, and scheduler-resource release after backend free.
 - [ ] Design and test a real RPC synchronization/completion command; verify immediate graph-compute → remote-buffer-free and graph-compute → connection-close behavior on CPU and accelerator servers.
 - [ ] Verify shared RPC socket serialization under concurrent backend/buffer users and document transport error/reconnect semantics.
@@ -149,7 +151,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Expand the interactive explorer with architecture-specific builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by the inference atlas, object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-kleidiai-extra-buffer-lifetime/` with expected How.to.llama.cpp content after merge.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-spacemit-ime-extra-buffer-lifetime/` with expected How.to.llama.cpp content after merge.
 
 ### Future improvements
 
@@ -169,6 +171,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Audit the pinned SpacemiT IME extra-buffer path: dedicated Spine pool allocation/free ownership, static IME/RVV traits and buffer metadata, synchronous threadpool execution, thread-local TCM coordination, backend-wrapper-independent buffer destruction, and conditional complete-worker teardown.
 - [x] Audit the pinned KleidiAI extra-buffer path: critical-section initialization, feature-selected kernel chains, ordinary CPU allocation/free ownership, versioned packed slots, static traits/type metadata, synchronous CPU execution, and backend-wrapper independence.
 - [x] Audit the pinned AMX extra-buffer path: compile/runtime admission, dedicated aligned host allocation, buffer-local destruction, static traits/type metadata, synchronous CPU execution, and backend-wrapper independence.
 - [x] Audit the pinned `GGML_USE_CPU_REPACK` extra-buffer path: static registration and tensor traits, ordinary CPU allocation delegation, synchronous execution, and buffer-deleter independence from `ggml_backend_cpu_context`.
