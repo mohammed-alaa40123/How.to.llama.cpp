@@ -189,6 +189,23 @@ backend_state::~backend_state() noexcept {
             ],
         )
 
+    def test_extract_symbols_handles_same_line_constructor_initializer_lists(self) -> None:
+        source = """\
+backend_state::backend_state(int device) noexcept : device(device), handle(nullptr) {
+    initialize();
+}
+
+nested::resource::resource(int value) : value_(value) {
+}
+"""
+        self.assertEqual(
+            index_upstream.extract_symbols(source),
+            [
+                {"name": "backend_state::backend_state", "kind": "function", "line": 1},
+                {"name": "nested::resource::resource", "kind": "function", "line": 5},
+            ],
+        )
+
     def test_extract_symbols_retains_duplicate_names(self) -> None:
         source = """\
 static void selected() {
