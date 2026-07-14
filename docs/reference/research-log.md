@@ -289,3 +289,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Multiline delegation, braced arguments, function-try-blocks, and in-class definitions remain unsupported.
 - Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
+
+## 2026-07-14 22:49 — Constructor initializer boundary regression
+
+**Verified**
+
+- Added `tests/test_index_upstream_initializer_boundaries.py`.
+- Same-line parenthesized constructor initialization remains indexed at the exact definition line.
+- Same-line braced initializers and multiline initializer lists are required to produce no partial symbol record.
+- The production scanner was not broadened.
+- The preceding branch head passed complete Documentation CI run `29359626167`.
+
+**Interpretation**
+
+- For an approximate navigation index, explicit false negatives on unsupported syntax are safer than misleading partial matches and incorrect pinned links.
+
+**Historical**
+
+- Braced and multiline initializer lists were documented as unsupported after the bounded initializer-list rule, but that boundary lacked negative regression coverage.
+
+**Open questions**
+
+- Add unsupported-syntax counters if pinned-tree regeneration shows enough missed constructor initializers to justify a stateful scanner.
+- Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
