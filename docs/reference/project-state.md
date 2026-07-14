@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 23:51 Africa/Cairo_
+_Last updated: 2026-07-15 00:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -44,14 +44,16 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Same-line delegating constructors verified as accepted by the bounded initializer-list rule and protected by an explicit exact-line regression fixture.
 - Negative regression coverage protects the documented constructor-initializer boundary: braced and multiline forms must not be partially indexed.
 - Bounded per-file and aggregate unsupported-syntax telemetry now counts braced and multiline constructor initializer candidates without adding partial symbols.
-- Successful full Documentation CI through the delegating-constructor expansion; current telemetry increment is awaiting commit-scoped validation.
+- Constructor function-try-block behavior audited: it is intentionally omitted from symbol records and is not yet measured by unsupported-syntax telemetry.
 
 ## Latest concrete findings
 
-- `scripts/index_upstream.py` now exposes `count_unsupported_syntax()` separately from `extract_symbols()`.
+- `scripts/index_upstream.py` exposes `count_unsupported_syntax()` separately from `extract_symbols()`.
 - Every indexed file carries `unsupported_syntax` counts for braced and multiline constructor initializer candidates.
 - The root JSON summary carries aggregate `unsupported_syntax_counts`, and the generated Markdown inventory displays both totals.
 - `tests/test_index_upstream_unsupported_syntax.py` verifies positive counts, zero counts for supported parenthesized same-line initialization, and continued omission of unsupported candidates from symbol records.
+- Constructor function-try-blocks contain a `try` token where `SPECIAL_MEMBER_RE` expects qualifiers, an initializer list, or the body brace, so they do not produce a navigation record.
+- The existing unsupported-syntax counters do not count function-try-blocks; adding bounded telemetry is the next candidate implementation, contingent on pinned-tree evidence.
 - The counters are bounded triage telemetry, not complete C++ parser diagnostics.
 - Line-ranged connector reads of the pinned OpenCL translation unit still returned no hidden content; the blob SHA remains `f283f65690af7790e163092207647d16dac9fb3e`, so no unseen teardown behavior was inferred.
 
@@ -71,7 +73,7 @@ Resume one of the two highest-value implementation tracks:
 
 ```text
 A. regenerate pinned symbol locations and use unsupported-syntax counts
-   → prioritize scanner gaps
+   → prioritize scanner gaps, including whether function-try-block telemetry is warranted
    → finish OpenCL teardown
 B. implement the admitted CPU repack MUL_MAT fixture
    → reference comparison
@@ -83,9 +85,9 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Added detailed note `logs/research/2026-07-14/2351-unsupported-syntax-counters.md`.
-- The preceding branch head passed Documentation CI and strict MkDocs in run `29359626167`.
-- This run added unsupported-syntax telemetry and focused tests; commit-scoped Documentation CI must confirm the new output schema, full discovery, and strict build.
+- Added detailed note `logs/research/2026-07-15/0052-function-try-block-boundary-audit.md`.
+- The preceding telemetry head passed Documentation CI and strict MkDocs in run `29367894344`.
+- This run is documentation-only; commit-scoped Documentation CI must confirm context validation and strict MkDocs.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Direct Pages checks remain unavailable, and branch-only content cannot deploy until PR #1 merges.
 
@@ -95,7 +97,7 @@ B. implement the admitted CPU repack MUL_MAT fixture
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output; line-ranged reads returned empty content and exact hidden symbols remain unavailable.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
 - **Pages verification blocker:** direct live-site checks are unavailable, and branch-only documentation cannot deploy until PR #1 merges.
-- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers remain intentionally omitted but are now counted as bounded candidates. Multiline forms, function-try-blocks, in-class special members, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
+- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers remain intentionally omitted but are counted as bounded candidates. Function-try-blocks are omitted and currently uncounted. Multiline forms, in-class special members, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
 - **Telemetry caveat:** unsupported-syntax counts are prioritization signals, not parser-completeness metrics, and may undercount or overcount unusual C++ forms.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
