@@ -40,15 +40,16 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Bounded same-line C++20 `requires` clauses recognized after ordinary or trailing-return signatures.
 - Bounded qualified operator definitions recognized for symbolic, call, subscript, allocation, deletion, and single-token conversion forms.
 - Bounded qualified out-of-class constructor and destructor definitions recognized with exact source lines.
-- Successful full Documentation CI through the operator-function expansion.
+- Successful full Documentation CI through the special-member expansion.
 
 ## Latest concrete findings
 
 - Documentation CI run `29343666640` completed successfully for operator-indexing head `c815b11fa0caddb846d60e4489a08f06592aa06f`.
 - Constructors and destructors have no return type, so the ordinary function pattern cannot reliably index them.
-- `SPECIAL_MEMBER_RE` now recognizes same-line qualified constructors and destructors, including attributes, `noexcept`, and one bounded same-line `requires` clause.
-- Requiring at least one `::` qualifier avoids broad free-function false positives and targets common out-of-class RAII definitions.
+- `SPECIAL_MEMBER_RE` recognizes same-line qualified constructors and destructors, including attributes, `noexcept`, and one bounded same-line `requires` clause.
+- A class-name backreference requires the function name to match the immediately preceding class name, preventing ordinary qualified methods from being indexed twice.
 - Focused tests require exact lines for `backend_state::backend_state`, `backend_state::~backend_state`, and `nested::resource::resource`.
+- Documentation CI run `29347964831` completed successfully for final head `4402c482d2c3251edb69f83c7cbd8195751a611e`, including isolated tests, full discovery, and strict MkDocs.
 - The pinned OpenCL CMake target compiles `ggml-opencl.cpp`, whose blob SHA is `f283f65690af7790e163092207647d16dac9fb3e`.
 - The connector can expose the beginning of that 24k-line blob and confirms buffer-local `cl_mem` RAII, but output remains truncated before backend teardown symbols; no hidden teardown behavior was inferred.
 
@@ -80,8 +81,7 @@ B. implement the admitted CPU repack MUL_MAT fixture
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
 - Added detailed note `logs/research/2026-07-14/1851-special-member-indexing.md`.
 - Added focused constructor/destructor tests and a dedicated bounded scanner pattern.
-- The preceding operator-function increment passed Documentation CI and strict MkDocs in run `29343666640`.
-- The special-member-indexing head requires a new commit-scoped Documentation CI result before the increment is fully validated.
+- Documentation CI and strict MkDocs passed for final implementation head `4402c482d2c3251edb69f83c7cbd8195751a611e` in run `29347964831`.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Direct Pages checks remain unavailable, and branch-only content cannot deploy until PR #1 merges.
 
@@ -90,7 +90,6 @@ B. implement the admitted CPU repack MUL_MAT fixture
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
-- **Current-head CI blocker:** the new special-member-indexing commits still require a completed commit-scoped Documentation CI run.
 - **Pages verification blocker:** direct live-site checks are unavailable, and branch-only documentation cannot deploy until PR #1 merges.
 - **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, and qualified out-of-class special members are recognized; multiline forms, in-class special members, constructor initializer lists, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
