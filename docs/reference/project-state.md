@@ -76,12 +76,11 @@ B. implement the admitted CPU repack MUL_MAT fixture
 
 ## Publication and verification state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
+- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the final recheck reports the PR open and mergeable.
 - Added detailed note `logs/research/2026-07-14/1651-requires-function-indexing.md`.
 - Added focused tests for constrained function definitions and exact lines after template declarations.
 - The preceding trailing-return increment passed Documentation CI and strict MkDocs in run `29334576467`.
-- No pull-request workflow run was visible yet for final head `da10ea19c481d1f22f72f995341410d856eb241f`; constrained-function CI is therefore pending, not confirmed failed.
-- The connector reported PR #1 as temporarily non-mergeable for the final head; no conflict details were exposed, so mergeability needs rechecking after GitHub finishes recomputation.
+- No pull-request workflow run was visible yet for final head `7a04c5439a4248efb35112d45c714d68004fda71`; constrained-function CI is therefore pending, not confirmed failed.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Direct Pages root and source-index route checks were rejected by the available safe-URL mechanism; branch-only content also cannot deploy until PR #1 merges.
 
@@ -90,9 +89,8 @@ B. implement the admitted CPU repack MUL_MAT fixture
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
-- **Current-head CI blocker:** no PR workflow run was returned yet for final head `da10ea19c481d1f22f72f995341410d856eb241f`.
+- **Current-head CI blocker:** no PR workflow run was returned yet for final head `7a04c5439a4248efb35112d45c714d68004fda71`.
 - **Pages verification blocker:** direct live-site checks were rejected by the safe-URL mechanism, and branch-only documentation cannot deploy until PR #1 merges.
-- **Mergeability blocker:** the connector returned `mergeable: false` without conflict detail for the final head; recheck after GitHub recomputes PR state.
 - **Source-index caveat:** same-line standard attributes, trailing-return definitions, and bounded same-line constraints are recognized; multiline attributes/returns/constraints, arbitrary declaration macros, operators, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
