@@ -121,7 +121,6 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
 - [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
-- [ ] Add an explicit same-line delegating-constructor regression fixture before treating the currently verified regex behavior as a permanent source-index compatibility promise.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
 - [ ] Verify SpacemiT worker cleanup and process-level Spine pool, huge-page mapping, device-fd, and TCM synchronization shutdown.
 - [ ] Validate KleidiAI null readback/copy callbacks, concurrent initialization, packed-layout portability, and packed-slot memory expansion.
@@ -154,6 +153,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add explicit regression coverage for bounded same-line qualified delegating constructors with exact source lines.
 - [x] Verify that the bounded same-line initializer-list rule already recognizes delegating constructors and remove the false unsupported-capability TODO.
 - [x] Recognize bounded same-line out-of-class constructor initializer lists without weakening exact definition-line indexing.
 - [x] Recognize bounded same-line qualified out-of-class constructor and destructor definitions while preserving exact definition lines.
