@@ -89,6 +89,7 @@ nav:
       - Backend teardown audit method: architecture/backend-teardown-audit-method.md
       - Backend teardown comparison: architecture/backend-teardown-comparison.md
       - CPU backend teardown: architecture/cpu-backend-teardown.md
+      - CPU repack extra-buffer lifetime: architecture/cpu-repack-extra-buffer-lifetime.md
       - CUDA backend teardown: architecture/cuda-backend-teardown.md
       - Metal backend teardown: architecture/metal-backend-teardown.md
       - Vulkan command lifetimes: architecture/vulkan-command-lifetime.md
