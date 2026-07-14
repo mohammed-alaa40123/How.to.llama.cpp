@@ -15,7 +15,15 @@ TEXT_SUFFIXES = {'.c','.cc','.cpp','.cxx','.h','.hh','.hpp','.m','.mm','.cu','.c
 SKIP = {'.git','build','site','__pycache__','.venv'}
 INCLUDE_RE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
 FUNC_RE = re.compile(r'(?m)^[\t ]*(?:[A-Za-z_][\w:<>,~*&\s]+?)[\t ]+([A-Za-z_]\w*(?:::\w+)*)\s*\([^;{}]*\)\s*(?:const\s*)?(?:noexcept\s*)?\{')
-CLASS_RE = re.compile(r'(?m)^[\t ]*(?:class|struct|enum(?:\s+class)?)[\t ]+([A-Za-z_]\w*)')
+# C++ attributes may precede a type declaration on the same physical line.
+# Keep every whitespace matcher horizontal so source locations cannot drift to a
+# preceding blank line. This remains deliberately approximate: macros and
+# multiline attributes still require human review.
+CLASS_RE = re.compile(
+    r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
+    r'(?:class|struct|enum(?:[\t ]+class)?)[\t ]+'
+    r'(?:\[\[[^\]\n]+\]\][\t ]*)*([A-Za-z_]\w*)'
+)
 
 
 def language(p: Path) -> str:
