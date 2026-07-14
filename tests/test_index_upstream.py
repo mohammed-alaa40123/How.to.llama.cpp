@@ -40,6 +40,29 @@ int namespace_name::second_function(int value) const {
             ],
         )
 
+    def test_extract_symbols_handles_multiple_blank_lines_and_namespace_indentation(self) -> None:
+        source = """\
+namespace nested {
+
+
+    struct indented_type {
+        int value;
+    };
+
+
+        enum class more_indented_type {
+            value,
+        };
+}
+"""
+        self.assertEqual(
+            index_upstream.extract_symbols(source),
+            [
+                {"name": "indented_type", "kind": "type", "line": 4},
+                {"name": "more_indented_type", "kind": "type", "line": 9},
+            ],
+        )
+
     def test_extract_symbols_retains_duplicate_names(self) -> None:
         source = """\
 static void selected() {
