@@ -17,6 +17,8 @@ Updated `scripts/index_upstream.py` to emit per-file and aggregate candidate cou
 
 Added `tests/test_index_upstream_unsupported_syntax.py` to verify positive counts, zero counts for supported parenthesized same-line initialization, and continued absence of unsupported candidates from `symbol_locations`.
 
+The increment also repaired the constructor matcher exposed by the preceding CI run: it now requires horizontal same-line whitespace and an explicitly parenthesized initializer target before the function body brace.
+
 ## Verified
 
 - Unsupported-syntax telemetry is separate from symbol extraction.
@@ -25,14 +27,17 @@ Added `tests/test_index_upstream_unsupported_syntax.py` to verify positive count
 - The root JSON summary now carries `unsupported_syntax_counts` totals.
 - The generated Markdown summary reports both totals.
 - The new counters are explicitly documented as bounded triage candidates, not complete C++ parser diagnostics.
+- Documentation CI run `29363583865` passed both isolated suites but failed full discovery at the constructor-initializer boundary test.
+- Reproduction showed that the old `SPECIAL_MEMBER_RE` used newline-capable `\s*` and accepted the opening brace of `options_{...}` as the function body.
+- The repaired matcher accepts supported parenthesized member/delegating initialization while rejecting braced and multiline forms.
 
 ## Interpretation
 
-The counters turn a known false-negative boundary into measurable backlog data. Pinned-tree regeneration can now show whether a stateful scanner is justified, while preserving the safer current behavior of omitting unsupported declarations instead of emitting malformed links.
+The counters turn a known false-negative boundary into measurable backlog data. Tightening the matcher at the same time preserves the safer behavior: unsupported forms are counted for triage but never emitted as partial navigation links.
 
 ## Historical
 
-The previous increment added negative tests proving braced and multiline constructor initializers were intentionally unsupported. This increment adds observability for those omissions without broadening the grammar.
+The previous increment added negative tests proving braced and multiline constructor initializers were intentionally unsupported. Those tests exposed that the implementation did not actually enforce the documented boundary. This increment repairs that mismatch and adds observability for the omitted forms.
 
 ## Open questions
 
@@ -43,8 +48,8 @@ The previous increment added negative tests proving braced and multiline constru
 
 ## Validation and CI
 
-The implementation and focused tests were committed to the active PR branch. GitHub-hosted Documentation CI is the authoritative full validation path because local cloning remains blocked by DNS resolution.
+The focused regex reproduction now returns supported parenthesized constructors and rejects the braced and multiline examples. GitHub-hosted Documentation CI remains the authoritative full validation path because local cloning is blocked by DNS resolution. A commit-scoped run for the final repair head is pending.
 
 ## Next priority
 
-Run the regenerated pinned inventory when source access is available and use the new telemetry to prioritize scanner work; continue the OpenCL teardown audit or implement the admitted CPU repack lifetime fixture if regeneration remains blocked.
+Inspect the final Documentation CI run, then regenerate the pinned inventory and use the new telemetry to prioritize scanner work; continue the OpenCL teardown audit or implement the admitted CPU repack lifetime fixture if regeneration remains blocked.
