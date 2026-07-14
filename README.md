@@ -110,7 +110,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
 | `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build composition, kernel deployment, and initial buffer ownership |
 | `docs/reference/source-index.md` | Human-reviewed source areas and generated symbol-location/link format |
-| `.github/workflows/docs-ci.yml` | Named validation steps, strict build, and actionable failure reporting |
+| `.github/workflows/docs-ci.yml` | Named validators, isolated unit-test suites, discovery guard, strict build, and actionable failure reporting |
 
 <!-- PROJECT-TODOS:START -->
 ## Living TODO list
@@ -119,7 +119,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Inspect the first Documentation CI run using the new named validation steps; fix the exact failing validator or test, then repair any independent strict MkDocs failure.
+- [ ] Inspect the first Documentation CI run using isolated source-index and interactive-link test suites; fix the exact failing test or implementation, then repair any later shell, compilation, asset, dependency, or strict MkDocs failure.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
 - [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
@@ -138,7 +138,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Upload or preserve validator output as Actions artifacts if named steps and verbose unittest output are still insufficient.
+- [ ] Upload or preserve validator output as Actions artifacts if isolated suites and verbose unittest output are still insufficient.
 - [ ] Validate generated pinned blob URLs and line fragments during Documentation CI.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
 - [ ] Extend interactive-link validation to built HTML IDs, generated routes, assets, and plugin-generated anchors.
@@ -153,7 +153,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
-- [x] Split Documentation CI validation into named steps and enable verbose unittest output so future failures identify the exact subsystem.
+- [x] Split Python unit tests into source-index and interactive-link suites while retaining full discovery coverage.
+- [x] Split Documentation CI validation into named steps and enable verbose unittest output so failures identify the subsystem.
 - [x] Specify an implementation-ready CPU optional-buffer destruction harness.
 - [x] Synthesize CPU repack, AMX, KleidiAI, and SpacemiT IME into one ownership/completion comparison and portable test matrix.
 - [x] Audit the pinned CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer paths.
