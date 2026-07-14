@@ -335,3 +335,27 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Regenerate the pinned tree to determine whether the candidate volume justifies a stateful constructor scanner.
 - Extend counters only when pinned-tree evidence identifies another high-value unsupported form.
 - Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
+
+## 2026-07-15 01:50 — Constructor function-try-block telemetry
+
+**Verified**
+
+- Added a bounded counter for qualified constructor function-try-block candidates with same-line or next-line `try`.
+- Both `try : initializer(...) {` and `try {` forms are counted.
+- Ordinary function function-try-blocks are excluded by the constructor-name backreference.
+- Function-try-block constructors remain intentionally absent from `extract_symbols()` and therefore cannot produce partial navigation links.
+- Per-file JSON, aggregate JSON, and generated Markdown reporting now include `constructor_function_try_blocks`.
+- Focused regression coverage protects the positive, negative, and no-symbol contracts.
+
+**Interpretation**
+
+- The new counter closes an observability gap without claiming parser completeness or changing navigation semantics.
+
+**Historical**
+
+- The preceding boundary audit established that function-try-blocks were invisible to both extraction and telemetry; this increment implements the narrower telemetry step proposed there.
+
+**Open questions**
+
+- Regenerate the pinned tree and use actual counts to decide whether stateful extraction is justified and whether a future link should target the signature or `try` line.
+- Complete pinned OpenCL teardown still requires searchable access to the hidden portion of `ggml-opencl.cpp` or a regenerated local inventory.
