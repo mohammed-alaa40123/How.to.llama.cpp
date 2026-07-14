@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 01:50 Africa/Cairo_
+_Last updated: 2026-07-15 02:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -31,34 +31,22 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Implementation-ready CPU optional-buffer destruction-harness specification with admission, correctness, lifetime-ordering, and sanitizer assertions.
 - Documentation CI validation commands split into named steps with verbose unittest output.
 - Python unit tests split into source-index and interactive-link suites, followed by a full discovery guard.
-- Source-index type-declaration line locations corrected so blank lines are not consumed as leading whitespace.
-- Regression coverage for multiple blank lines and namespace-indented type declarations.
-- Same-line C++ attributes before and after type keywords recognized without weakening physical-line accuracy.
-- Same-line C++ attributes before function return types recognized with focused free-function and qualified-method coverage.
-- Same-line trailing-return function definitions recognized with focused free-function and attributed qualified-method coverage.
-- Function return-type matching restricted to horizontal whitespace so preceding template lines cannot steal the source location.
-- Bounded same-line C++20 `requires` clauses recognized after ordinary or trailing-return signatures.
-- Bounded qualified operator definitions recognized for symbolic, call, subscript, allocation, deletion, and single-token conversion forms.
-- Bounded qualified out-of-class constructor and destructor definitions recognized with exact source lines.
-- Bounded same-line constructor initializer lists recognized for out-of-class constructors without weakening exact source-line accuracy.
-- Same-line delegating constructors verified as accepted by the bounded initializer-list rule and protected by an explicit exact-line regression fixture.
-- Negative regression coverage protects the documented constructor-initializer boundary: braced and multiline forms must not be partially indexed.
-- Bounded per-file and aggregate unsupported-syntax telemetry counts braced and multiline constructor initializer candidates without adding partial symbols.
-- Constructor function-try-block behavior audited and now measured by bounded telemetry while remaining intentionally absent from navigation records.
+- Source-index exact-line support for attributes, trailing returns, bounded constraints, operators, qualified special members, parenthesized initializer lists, and delegating constructors.
+- Negative boundary tests plus bounded telemetry for braced/multiline constructor initializers and constructor function-try-blocks.
+- Bounded OpenCL lifecycle-call extractor for completion/wait and queue/context/program/kernel/event/buffer release calls.
 
 ## Latest concrete findings
 
-- `scripts/index_upstream.py` exposes `count_unsupported_syntax()` separately from `extract_symbols()`.
-- Every indexed file now carries unsupported-syntax counts for braced constructor initializers, multiline constructor initializers, and constructor function-try-blocks.
-- The root JSON summary aggregates all three counters, and the generated Markdown inventory displays all three totals.
-- `CONSTRUCTOR_FUNCTION_TRY_BLOCK_RE` requires a qualified constructor backreference and accepts same-line or next-line `try` forms.
-- Focused tests verify `try : initializer(...) {` and `try {` candidates, reject ordinary function function-try-blocks, and preserve omission from `extract_symbols()`.
-- The counters remain bounded triage telemetry, not complete C++ parser diagnostics.
-- Line-ranged connector reads of the pinned OpenCL translation unit still returned no hidden content; the blob SHA remains `f283f65690af7790e163092207647d16dac9fb3e`, so no unseen teardown behavior was inferred.
+- `scripts/extract_opencl_lifecycle_calls.py` emits source-ordered exact-line records for `clFinish`, `clFlush`, `clWaitForEvents`, `clReleaseCommandQueue`, `clReleaseContext`, `clReleaseProgram`, `clReleaseKernel`, `clReleaseEvent`, and `clReleaseMemObject`.
+- The extractor reports per-name totals as JSON and remains separate from approximate C++ declaration indexing.
+- Focused tests cover ordering, exact lines, release/completion API coverage, and similar non-call identifiers.
+- The pinned OpenCL blob remains `f283f65690af7790e163092207647d16dac9fb3e`.
+- Full blob retrieval exposes the already-audited `ggml_cl_buffer` destructor and its `clReleaseMemObject` call, but connector rendering still truncates before hidden teardown sections and line-ranged file reads return empty content.
+- A lifecycle call inventory narrows the audit target but does not prove ownership or queued-work completion.
 
 ## In progress
 
-- Regeneration of the pinned source inventory with line-aware records, pinned source links, and all three unsupported-syntax counters.
+- Regeneration of the pinned source inventory with line-aware records, pinned source links, unsupported-syntax counts, and the OpenCL lifecycle-call report.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
 - CPU extra-buffer destruction tests for KleidiAI, AMX, and SpacemiT plus TSan and hardware-specific cleanup coverage.
@@ -71,10 +59,10 @@ Read this file after the root README on every run. It is the compact checkpoint 
 Resume one of the two highest-value implementation tracks:
 
 ```text
-A. regenerate pinned symbol locations and unsupported-syntax counts
-   → measure braced, multiline, and function-try-block candidates
-   → prioritize any stateful scanner work
-   → finish OpenCL teardown
+A. obtain the complete pinned ggml-opencl.cpp in CI or a checkout
+   → run extract_opencl_lifecycle_calls.py
+   → inspect every completion/release site in context
+   → finish OpenCL teardown and update the backend matrix
 B. implement the admitted CPU repack MUL_MAT fixture
    → reference comparison
    → CPU backend wrapper free
@@ -85,22 +73,22 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Added detailed note `logs/research/2026-07-15/0150-function-try-block-telemetry.md`.
-- The preceding documentation-only head passed Documentation CI in run `29371216857` if confirmed by the latest workflow query; this increment requires its own commit-scoped run.
+- Added detailed note `logs/research/2026-07-15/0251-opencl-lifecycle-call-extractor.md`.
+- This increment requires its own commit-scoped Documentation CI run.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Direct Pages checks remain unavailable, and branch-only content cannot deploy until PR #1 merges.
 
 ## Known blockers and caveats
 
-- **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
-- **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output; line-ranged reads returned empty content and exact hidden symbols remain unavailable.
+- **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index and OpenCL lifecycle report could not be regenerated here.
+- **Large upstream file blocker:** connector blob rendering truncates the pinned OpenCL file; line-ranged reads return empty content and exact hidden teardown functions remain unavailable.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
 - **Pages verification blocker:** direct live-site checks are unavailable, and branch-only documentation cannot deploy until PR #1 merges.
-- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers and constructor function-try-blocks remain intentionally omitted from navigation but are counted as bounded candidates. Multiline forms, in-class special members, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
+- **Lifecycle-extractor caveat:** selected direct API calls are navigation evidence only; comments/macros/wrappers, ownership, error paths, and semantic ordering still require human source review.
+- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers and constructor function-try-blocks remain intentionally omitted from navigation but are counted as bounded candidates.
 - **Telemetry caveat:** unsupported-syntax counts are prioritization signals, not parser-completeness metrics, and may undercount or overcount unusual C++ forms.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
-- **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, thread-local leases, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
