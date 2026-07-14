@@ -120,6 +120,26 @@ auto trailing_function(int value) -> int {
             ],
         )
 
+    def test_extract_symbols_handles_requires_without_consuming_template_line(self) -> None:
+        source = """\
+template <typename T>
+int constrained_function(T value) requires Integral<T> {
+    return value;
+}
+
+template <typename T>
+[[nodiscard]] auto namespace_name::constrained_method(T value) const noexcept -> T requires Serializable<T> {
+    return value;
+}
+"""
+        self.assertEqual(
+            index_upstream.extract_symbols(source),
+            [
+                {"name": "constrained_function", "kind": "function", "line": 2},
+                {"name": "namespace_name::constrained_method", "kind": "function", "line": 7},
+            ],
+        )
+
     def test_extract_symbols_retains_duplicate_names(self) -> None:
         source = """\
 static void selected() {
