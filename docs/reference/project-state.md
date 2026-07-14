@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 05:03 Africa/Cairo_
+_Last updated: 2026-07-14 05:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -26,35 +26,34 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Pinned OpenCL build composition and initial `cl_mem` ownership map.
 - Line-aware generated source indexing with pinned file and symbol links.
 - Guided end-to-end inference atlas with clickable reading paths.
-- Bounded CPU repack extra-buffer audit.
-- Bounded CPU AMX extra-buffer audit covering feature admission, aligned allocation ownership, static traits, synchronous execution, and backend-wrapper-independent buffer destruction.
+- Bounded CPU repack, AMX, and KleidiAI extra-buffer lifetime audits.
 
 ## Latest concrete findings
 
-- AMX is compile-time gated by `__AMX_INT8__` and `__AVX512VNNI__`, and buffer-type publication also depends on runtime tile-permission initialization.
-- Unlike CPU repack, AMX allocates a dedicated aligned host buffer and stores the allocation pointer in `buffer->context`.
-- The AMX buffer interface independently owns base lookup, tensor initialization, weight conversion/set, clear, and allocation release.
-- `tensor->extra` points to one function-static AMX `tensor_traits` instance; the buffer type and `extra_buffer_type` context are function-static/process-lifetime state.
-- AMX adds no queue, event, or asynchronous completion path; it inherits ordinary synchronous CPU graph completion.
-- Therefore audited AMX buffer destruction is independent of `ggml_backend_cpu_context`.
-- The `ggml_aligned_malloc()` plus `free()` pairing remains an explicit platform-validation question, especially on Windows.
+- KleidiAI initialization is guarded by the GGML critical section and process-static state containing feature selection, Q4/Q8 kernel chains, SME limits, and tuning hints.
+- Its buffer allocator delegates to the ordinary CPU buffer type, then changes the buffer type and only the tensor initialization/upload callbacks; the ordinary CPU free callback remains the allocation owner.
+- `tensor->extra` points to a function-static KleidiAI trait object, and the extra-buffer type plus buffer-type metadata are function-static.
+- Q4_0/Q8_0 uploads synchronously build versioned packed slots and fall back to the original representation when no compatible packed slot exists.
+- KleidiAI supports bounded `MUL_MAT` and `GET_ROWS` cases and introduces no independent queue or scheduler event.
+- Therefore audited KleidiAI buffer destruction is independent of `ggml_backend_cpu_context`.
+- Null `get_tensor`/`cpy_tensor`, concurrent initialization, packed-layout portability, and packed-slot memory expansion remain validation questions.
 
 ## In progress
 
 - Regeneration of the pinned source inventory with line-aware records and pinned source links.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
-- Remaining optional CPU extra-buffer audits: KleidiAI and SpacemiT IME.
-- CPU repack and AMX destruction regression tests under ASan/LSan.
+- Remaining optional CPU extra-buffer audit: SpacemiT IME.
+- CPU repack, AMX, and KleidiAI destruction regression tests under ASan/LSan.
 - Shared generated metadata for the static inference atlas and interactive workflow.
 - Runtime overlays for page faults, scheduler copies, event waits, KV/recurrent growth, and backend queues.
 - CANN reset semantics, RPC completion, CUDA all-stream coverage, SYCL all-queue coverage, and Vulkan query-pool ownership.
 
 ## Immediate next task
 
-Finish the OpenCL teardown audit when the complete pinned source is searchable. If that source-access blocker persists, continue the optional CPU series with KleidiAI:
+Finish the OpenCL teardown audit when the complete pinned source is searchable. If that source-access blocker persists, finish the optional CPU series with SpacemiT IME:
 
 ```text
-KleidiAI buffer type and registration
+SpacemiT IME buffer type and registration
 → allocation/free callbacks
 → tensor->extra ownership
 → execution and thread synchronization
@@ -65,23 +64,22 @@ KleidiAI buffer type and registration
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added `docs/architecture/cpu-amx-extra-buffer-lifetime.md` and linked it after the CPU repack audit.
-- Added detailed note `logs/research/2026-07-14/0450-cpu-amx-extra-buffer-lifetime.md`.
-- Updated README TODOs, project state, and research log; the research ledger was unchanged because no external source changed.
+- Added `docs/architecture/cpu-kleidiai-extra-buffer-lifetime.md` and linked it after the CPU AMX audit.
+- Added detailed note `logs/research/2026-07-14/0550-cpu-kleidiai-extra-buffer-lifetime.md`.
+- Updated README TODOs, project state, and research log; the research ledger is unchanged because no external source changed.
 - Local cloning failed with `Could not resolve host: github.com`, so local Python tests, strict MkDocs build, and `check_site.sh` could not run.
-- Documentation CI run `29299858341` for commit `135ae6134f638342853d1ef89480119443a3b728` completed with failure. Job `86981164561` failed specifically in `Validate project context, interactive links, and scripts`; dependency installation and strict MkDocs build were skipped.
-- The connector's decoded job-log response was truncated before the failing command's stderr, so the exact validator/test assertion could not be identified or safely fixed in this run.
-- Public search returned no indexed result for the Pages root. Direct opening was rejected by the safe-URL gate, and the AMX route is branch-only until PR #1 merges; HTTP status and rendered content remain unverified.
+- GitHub Actions and Pages status must be checked against the final branch head after the durable updates in this run.
+- The new KleidiAI route is branch-only until PR #1 merges; deployed HTTP status and rendered content cannot be expected before merge.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** local GitHub DNS resolution failed, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
-- **CI blocker:** run `29299858341` fails in the combined validation/test shell step, but the available decoded log truncates before the command output that names the exact failing validator or assertion.
-- **Pages verification blocker:** public search has no indexed site result, direct safe-URL access is rejected, and the new AMX route cannot deploy until PR #1 merges.
-- **AMX allocator caveat:** verify that the aligned allocation/release pair is correct on every supported platform.
-- **Scope caveat:** AMX and repack do not stand in for KleidiAI, SpacemiT IME, HBM, or future CPU extra-buffer implementations.
+- **CI blocker:** an earlier run failed in the combined validation/test shell step, but the available decoded log truncated before the exact validator output.
+- **Pages verification blocker:** the new KleidiAI route cannot deploy until PR #1 merges; direct live verification remains subject to available URL access.
+- **KleidiAI caveats:** validate null readback/copy callbacks, concurrent global initialization, packed-layout portability, and one-versus-two-slot memory expansion.
+- **Scope caveat:** repack, AMX, and KleidiAI do not stand in for SpacemiT IME, HBM, or future CPU extra-buffer implementations.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
