@@ -14,7 +14,15 @@ from pathlib import Path
 TEXT_SUFFIXES = {'.c','.cc','.cpp','.cxx','.h','.hh','.hpp','.m','.mm','.cu','.cuh','.metal','.comp','.vert','.frag','.py','.sh','.cmake','.md','.yml','.yaml','.json','.toml','.txt'}
 SKIP = {'.git','build','site','__pycache__','.venv'}
 INCLUDE_RE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
-FUNC_RE = re.compile(r'(?m)^[\t ]*(?:[A-Za-z_][\w:<>,~*&\s]+?)[\t ]+([A-Za-z_]\w*(?:::\w+)*)\s*\([^;{}]*\)\s*(?:const\s*)?(?:noexcept\s*)?\{')
+# C++ attributes may precede a function declaration on the same physical line.
+# This remains deliberately approximate and does not attempt to parse multiline
+# attributes, macros, trailing-return syntax, or every legal declarator form.
+FUNC_RE = re.compile(
+    r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
+    r'(?:[A-Za-z_][\w:<>,~*&\s]+?)[\t ]+'
+    r'([A-Za-z_]\w*(?:::\w+)*)\s*\([^;{}]*\)\s*'
+    r'(?:const\s*)?(?:noexcept\s*)?\{'
+)
 # C++ attributes may precede a type declaration on the same physical line.
 # Keep every whitespace matcher horizontal so source locations cannot drift to a
 # preceding blank line. This remains deliberately approximate: macros and
