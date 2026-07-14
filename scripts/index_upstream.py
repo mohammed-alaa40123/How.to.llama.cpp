@@ -48,16 +48,16 @@ OPERATOR_RE = re.compile(
 # Qualified constructor and destructor definitions have no return type. The
 # backreference requires the function name to equal the immediately preceding
 # class name, preventing ordinary qualified methods from becoming duplicates.
-# A bounded same-line initializer list is accepted for constructors. It excludes
-# braces, semicolons, and newlines, so braced or multiline initializers still need
-# a stateful scanner rather than weakening physical-line accuracy.
+# Only a bounded same-line parenthesized initializer list is accepted. Horizontal
+# whitespace and explicit parenthesized initializer syntax prevent the opening
+# brace of a braced initializer from being mistaken for the function body.
 SPECIAL_MEMBER_RE = re.compile(
     r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
     r'((?:[A-Za-z_]\w*::)*([A-Za-z_]\w*)::~?\2)'
-    r'\s*\([^;{}]*\)\s*'
+    r'[\t ]*\([^;{}\n]*\)[\t ]*'
     r'(?:noexcept[\t ]*)?'
     r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?'
-    r'(?::[\t ]*[^;{}\n]+?[\t ]*)?\{'
+    r'(?::[\t ]*[A-Za-z_]\w*(?:::\w+)*[\t ]*\([^;{}\n]*\)[\t ]*)?\{'
 )
 # Unsupported-syntax telemetry is intentionally separate from symbol extraction.
 # These candidate counters identify constructor forms that the bounded scanner
