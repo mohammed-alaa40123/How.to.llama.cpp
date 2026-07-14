@@ -119,178 +119,83 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - A tiny deterministic graph is stronger than a full model for this ownership question because fallback placement, allocation owners, and destruction order remain visible.
 
-**Open questions**
-
-- Select the smallest stable upstream helper, define LSan treatment for intentional static metadata, and add explicit SpacemiT pool shutdown coverage.
-
-## 2026-07-14 09:49 — Documentation CI validation observability
+## 2026-07-14 09:49–10:52 — Documentation CI observability and suite isolation
 
 **Verified**
 
-- Documentation CI run `29309938483` failed after startup-context reading inside the compound `Validate project context, interactive links, and scripts` step.
-- Checkout and Python setup succeeded; dependency installation and strict MkDocs building were skipped.
-- The connector-decoded log was truncated before the failing command or assertion.
-- `.github/workflows/docs-ci.yml` now runs durable-context validation, interactive-link validation, verbose unit tests, shell syntax, Python compilation, and asset checks as separately named steps.
+- The compound documentation validation step was split into named context, link, test, shell, compilation, asset, dependency, and strict-build steps.
+- Source-index and interactive-link unit suites now run independently before full discovery.
+- This isolated the remaining failure to source-index tests without reducing coverage.
 
 **Interpretation**
 
-- This is an observability fix, not proof that the underlying validation defect is repaired. The next run should identify the exact failing subsystem without speculative edits.
+- Observability changes identified the defect but did not themselves prove a repair.
 
-**Historical**
-
-- Workflow step names and run IDs describe PR #1 as observed on 2026-07-14.
-
-**Open questions**
-
-- Which named step fails on the updated workflow head, and does strict MkDocs reveal a second independent issue once validation passes?
-
-## 2026-07-14 10:52 — Python unit-test suite isolation
+## 2026-07-14 11:51–12:50 — Source-index line repair and whitespace regression
 
 **Verified**
 
-- Documentation CI run `29312885959` passed durable project-context and interactive-link validation, then failed in the aggregate Python unit-test step.
-- Shell syntax, Python compilation, asset checks, dependency installation, and strict MkDocs building were skipped after that failure.
-- The repository currently contains two unit-test modules: source-index tests and interactive-link validator tests.
-- CI now runs those modules in separate named steps and retains full discovery as a final guard.
+- `CLASS_RE` used `^\s*`; because `\s` includes newline, a declaration following a blank line could report the previous line.
+- Horizontal-only whitespace corrected the declaration location.
+- Regression coverage verifies multiple blank lines and namespace indentation.
+- Documentation CI runs `29319949484` and `29323751656` passed all tests and strict MkDocs.
 
 **Interpretation**
 
-- The remaining ambiguity is limited to the exact unit-test module and assertion; isolating suites preserves coverage while avoiding speculative implementation changes.
+- The implementation was wrong, not the expected line: generated links should target declarations rather than adjacent whitespace.
 
-**Historical**
-
-- Run and job identifiers describe PR #1 as observed on July 14, 2026.
-
-**Open questions**
-
-- Which isolated suite fails, what is the exact traceback, and does strict MkDocs expose a later independent defect?
-
-## 2026-07-14 11:51 — Source-index type line-number repair
+## 2026-07-14 13:51–15:50 — Attributed and trailing-return indexing
 
 **Verified**
 
-- Documentation CI run `29316377253` failed specifically in the isolated `Test source indexing` step after both context validators passed.
-- `CLASS_RE` used `^\s*`; because `\s` includes newline, a type declaration following a blank line could be matched from the preceding line.
-- The test fixture expected `enum class second_type` on line 8, while the old regex produced line 7.
-- Replacing leading and separating whitespace with horizontal `[\t ]*` and `[\t ]+` reports the actual declaration line.
-- A bounded local regex reproduction confirmed the corrected line result.
+- Type indexing recognizes same-line attributes before and after type keywords.
+- Function indexing recognizes same-line leading attributes and bounded same-line trailing-return clauses.
+- Horizontal whitespace preserves exact physical lines.
+- Complete Documentation CI passed through run `29334576467`.
 
 **Interpretation**
 
-- The implementation was wrong, not the test: generated source links should point to the declaration, not the blank line before it.
-
-**Historical**
-
-- The defect was introduced with line-aware source indexing on the current branch and is fixed in the branch implementation.
-
-**Open questions**
-
-- Does the next Documentation CI run pass both isolated suites, discovery, and strict MkDocs, and should coverage be expanded to multiple blank lines and nested indentation?
-
-## 2026-07-14 12:50 — Source-index whitespace regression coverage
-
-**Verified**
-
-- Documentation CI run `29319949484` completed successfully for commit `0e486859740650a998ee07531389dccc19e88e00`.
-- The successful run confirms the type-line repair passes both isolated suites, full unittest discovery, shell and Python validation, asset checks, dependency installation, and strict MkDocs.
-- Added a focused regression with two type declarations after multiple blank lines and at different indentation depths inside a namespace.
-- The expected symbol locations are the physical declaration lines: line 4 and line 9.
-
-**Interpretation**
-
-- The original defect is closed. The new test hardens the invariant that vertical whitespace must never shift a declaration's source location while horizontal indentation remains accepted.
-
-**Historical**
-
-- This coverage follows the branch's repair from multiline `\s*` to horizontal `[\t ]*` matching.
-
-**Open questions**
-
-- Verify the new test on its own commit-scoped CI run, then consider nested classes, attributes, and templates only if the approximate regex index expands.
-
-## 2026-07-14 13:51 — Attributed C++ type indexing
-
-**Verified**
-
-- The type index previously required `class`, `struct`, `enum`, or `enum class` to be the first non-horizontal-whitespace token on the declaration line.
-- The type pattern now recognizes same-line C++ `[[...]]` attributes before the type keyword and between the keyword and declared name.
-- A focused test covers attributed `struct` and `enum class` declarations and requires their physical declaration lines to remain unchanged.
-- All whitespace matching remains horizontal, so the preceding-blank-line defect cannot be reintroduced by this extension.
-
-**Interpretation**
-
-- Same-line attributes are a useful bounded expansion for a navigation index. Multiline attributes, arbitrary declaration macros, and generated syntax should remain explicit limitations rather than encouraging a regex to impersonate a parser.
-
-**Historical**
-
-- This increment builds on the earlier line-number repair and whitespace regression coverage.
-
-**Open questions**
-
-- Determine from the pinned tree whether multiline attributes or export/declaration macros justify a stateful scanner or targeted additional rules.
-
-## 2026-07-14 14:52 — Attributed C++ function indexing
-
-**Verified**
-
-- The function index previously required the return type to be the first non-horizontal-whitespace token, so a leading same-line `[[...]]` attribute prevented indexing.
-- The updated function pattern accepts one or more same-line attribute groups before the return type.
-- A focused test covers an attributed free function and namespace-qualified `const noexcept` method at physical lines 1 and 5.
-- Type extraction, duplicate retention, source ordering, and pinned link construction are unchanged.
-- The pinned OpenCL blob was retrieved, but connector output remained truncated before the teardown section; no hidden teardown behavior was inferred.
-
-**Interpretation**
-
-- Leading same-line function attributes are a bounded navigation improvement. Multiline attributes, trailing-return syntax, requires clauses, declaration macros, and complex declarators remain explicit scanner limitations.
-
-**Historical**
-
-- This increment applies the previous run's bounded same-line attribute policy to function definitions.
-
-**Open questions**
-
-- Verify the focused test and strict MkDocs through Documentation CI, then evaluate additional syntax only from observed pinned-tree needs.
-
-## 2026-07-14 15:50 — Trailing-return C++ function indexing
-
-**Verified**
-
-- Documentation CI run `29330951186` completed successfully for the preceding attributed-function increment.
-- The function pattern previously stopped after optional `const` and `noexcept`, so a same-line `-> return_type` clause prevented definition matching.
-- The updated pattern accepts one bounded same-line trailing-return clause while excluding newlines, semicolons, and braces.
-- A focused test covers a free function and an attributed namespace-qualified `const noexcept` method at physical lines 1 and 5.
-- Type extraction, duplicate retention, source ordering, and pinned URL construction are unchanged.
-
-**Interpretation**
-
-- Same-line trailing-return definitions are a useful bounded navigation expansion. Multiline returns, requires clauses, macros, operators, lambdas, and complex declarators remain explicit scanner limitations.
-
-**Historical**
-
-- This increment follows the source-line repair and same-line attribute support and closes one limitation recorded by the preceding run.
-
-**Open questions**
-
-- Verify the focused regression and strict MkDocs through Documentation CI, then return to pinned OpenCL source recovery or the CPU repack destruction fixture.
+- These are bounded navigation improvements, not a claim to parse the full C++ grammar.
 
 ## 2026-07-14 16:51 — Constrained C++ function indexing and line accuracy
 
 **Verified**
 
-- `FUNC_RE` still used `\s` inside its return-type character class, allowing a match to begin on a preceding template line.
-- Return-type whitespace is now horizontal-only, preserving the physical function definition line.
-- The scanner accepts one bounded same-line C++20 `requires` clause after optional qualifiers and trailing-return syntax.
-- A focused test covers an ordinary constrained function and an attributed namespace-qualified `const noexcept` trailing-return method at physical lines 2 and 7.
-- The constraint matcher excludes newlines, semicolons, and braces.
+- Return-type matching still included `\s`, allowing a match to begin on a preceding template line.
+- Return-type whitespace is now horizontal-only.
+- One bounded same-line C++20 `requires` clause is accepted after ordinary or trailing-return signatures.
+- Focused tests preserve physical definition lines after template declarations.
+- Documentation CI run `29339261751` passed the complete suite and strict MkDocs.
 
 **Interpretation**
 
-- Exact navigation lines are more valuable than broad but line-shifting grammar acceptance. Common same-line constraints can be supported without treating the regex as a complete C++ parser.
-
-**Historical**
-
-- This increment applies the horizontal-whitespace invariant from type declarations to function return types and closes the previously listed same-line `requires` gap.
+- Exact navigation lines are more valuable than broad syntax acceptance with shifted locations.
 
 **Open questions**
 
-- Evaluate multiline constraints, operators, and declaration/export macros only after regenerating and inspecting the pinned tree; then return to OpenCL teardown or the CPU repack destruction fixture.
+- Multiline constraints and complex requires-expressions remain candidates only if the pinned tree demonstrates sufficient need.
+
+## 2026-07-14 17:49 — Bounded C++ operator-function indexing
+
+**Verified**
+
+- Ordinary function-name extraction cannot represent `operator` names because it accepts only identifier components.
+- Conversion operators have no return type before `operator`, requiring a dedicated bounded pattern.
+- Added qualified same-line support for symbolic, call, subscript, `new`/`delete`, and single-token conversion operators.
+- Focused tests require exact lines for `tensor_view::operator==`, `tensor_view::operator()`, `tensor_view::operator[]`, and `resource::operator bool`.
+- The existing ordinary-function and type patterns were not broadened.
+- The pinned OpenCL target compiles `ggml-opencl.cpp`; its pinned blob SHA is `f283f65690af7790e163092207647d16dac9fb3e`.
+- Large-blob connector output still truncates before OpenCL backend teardown symbols, so no unseen cleanup behavior was inferred.
+
+**Interpretation**
+
+- Operator definitions are valuable navigation targets for backend RAII and ownership code. A separate pattern is safer than allowing arbitrary punctuation in the ordinary function-name rule.
+
+**Historical**
+
+- This closes the operator-definition scanner gap recorded after the constrained-function increment.
+
+**Open questions**
+
+- Multiline operator signatures, constructors, destructors, literals, complex conversion targets, and macro-generated definitions remain unsupported.
+- Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
