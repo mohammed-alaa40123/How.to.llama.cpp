@@ -15,7 +15,7 @@ TEXT_SUFFIXES = {'.c','.cc','.cpp','.cxx','.h','.hh','.hpp','.m','.mm','.cu','.c
 SKIP = {'.git','build','site','__pycache__','.venv'}
 INCLUDE_RE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
 FUNC_RE = re.compile(r'(?m)^[\t ]*(?:[A-Za-z_][\w:<>,~*&\s]+?)[\t ]+([A-Za-z_]\w*(?:::\w+)*)\s*\([^;{}]*\)\s*(?:const\s*)?(?:noexcept\s*)?\{')
-CLASS_RE = re.compile(r'(?m)^\s*(?:class|struct|enum(?:\s+class)?)\s+([A-Za-z_]\w*)')
+CLASS_RE = re.compile(r'(?m)^[\t ]*(?:class|struct|enum(?:\s+class)?)[\t ]+([A-Za-z_]\w*)')
 
 
 def language(p: Path) -> str:
