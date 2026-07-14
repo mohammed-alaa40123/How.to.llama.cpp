@@ -186,6 +186,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - The existing ordinary-function and type patterns were not broadened.
 - The pinned OpenCL target compiles `ggml-opencl.cpp`; its pinned blob SHA is `f283f65690af7790e163092207647d16dac9fb3e`.
 - Large-blob connector output still truncates before OpenCL backend teardown symbols, so no unseen cleanup behavior was inferred.
+- Documentation CI run `29343666640` passed the complete suite and strict MkDocs for the final operator-indexing head.
 
 **Interpretation**
 
@@ -197,5 +198,28 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 **Open questions**
 
-- Multiline operator signatures, constructors, destructors, literals, complex conversion targets, and macro-generated definitions remain unsupported.
+- Multiline operator signatures, literals, complex conversion targets, and macro-generated definitions remain unsupported.
 - Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
+
+## 2026-07-14 18:51 — Qualified constructor and destructor indexing
+
+**Verified**
+
+- Constructors and destructors have no return type, so they require a dedicated bounded scanner pattern.
+- `SPECIAL_MEMBER_RE` recognizes same-line qualified out-of-class constructors and destructors with optional attributes, `noexcept`, and one bounded same-line `requires` clause.
+- Requiring at least one scope qualifier limits false positives and targets common RAII definitions.
+- Focused tests require exact lines for an ordinary constructor, destructor, and attributed constrained nested constructor.
+- Ordinary functions, operators, and type extraction remain separate.
+
+**Interpretation**
+
+- Special members are high-value source-index targets because backend acquisition and release logic commonly lives in constructors and destructors. Making the ordinary return-type pattern optional would be less precise.
+
+**Historical**
+
+- This closes the common out-of-class special-member gap after the operator increment.
+
+**Open questions**
+
+- In-class special members, initializer lists, multiline signatures, defaulted/deleted definitions, literals, and generated declarations remain unsupported.
+- The new head still requires commit-scoped Documentation CI and strict MkDocs validation.
