@@ -112,6 +112,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/cpu-backend-teardown.md` | Ordinary CPU teardown classification |
 | `docs/architecture/cpu-repack-extra-buffer-lifetime.md` | CPU repack extra-buffer ownership and backend-wrapper independence |
 | `docs/architecture/cpu-amx-extra-buffer-lifetime.md` | AMX feature admission, aligned allocation ownership, static traits, and teardown |
+| `docs/architecture/cpu-kleidiai-extra-buffer-lifetime.md` | KleidiAI packed weights, static traits, ordinary CPU allocation ownership, and teardown |
 | `docs/architecture/cuda-backend-teardown.md` | CUDA teardown and conditional completion |
 | `docs/architecture/metal-backend-teardown.md` | Metal explicit synchronization and teardown |
 | `docs/architecture/vulkan-backend-teardown.md` | Vulkan explicit synchronization and teardown |
@@ -131,9 +132,10 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Highest priority
 
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then use the backend teardown audit worksheet to finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
-- [ ] Finish optional CPU extra-buffer audits for KleidiAI and SpacemiT IME; compare their allocation/free callbacks and `tensor->extra` ownership against the completed CPU repack and AMX audits.
+- [ ] Finish the optional CPU extra-buffer audit for SpacemiT IME; compare its allocation/free callbacks and `tensor->extra` ownership against the completed CPU repack, AMX, and KleidiAI audits.
+- [ ] Validate KleidiAI null readback/copy callbacks, concurrent initialization, packed-layout portability, and one-versus-two-slot memory expansion.
 - [ ] Validate AMX allocator pairing (`ggml_aligned_malloc()` with the current `free()` callback) on supported platforms, repeated tile-permission initialization, and disabled readback/copy paths.
-- [ ] Add CPU repack and AMX destruction regression tests: compute → CPU backend free → extra buffer free, under ASan/LSan.
+- [ ] Add CPU repack, AMX, and KleidiAI destruction regression tests: compute → CPU backend free → extra buffer free, under ASan/LSan.
 - [ ] Verify CANN reset semantics with authoritative runtime documentation and a test matrix: destroy streams/events/buffers before versus after `aclrtResetDevice`, one versus two contexts, and scheduler-resource release after backend free.
 - [ ] Design and test a real RPC synchronization/completion command; verify immediate graph-compute → remote-buffer-free and graph-compute → connection-close behavior on CPU and accelerator servers.
 - [ ] Verify shared RPC socket serialization under concurrent backend/buffer users and document transport error/reconnect semantics.
@@ -147,7 +149,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Expand the interactive explorer with architecture-specific builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by the inference atlas, object pages, source maps, and visualizers.
 - [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after this increment.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-amx-extra-buffer-lifetime/` with expected How.to.llama.cpp content after merge.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-kleidiai-extra-buffer-lifetime/` with expected How.to.llama.cpp content after merge.
 
 ### Future improvements
 
@@ -167,6 +169,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Audit the pinned KleidiAI extra-buffer path: critical-section initialization, feature-selected kernel chains, ordinary CPU allocation/free ownership, versioned packed slots, static traits/type metadata, synchronous CPU execution, and backend-wrapper independence.
 - [x] Audit the pinned AMX extra-buffer path: compile/runtime admission, dedicated aligned host allocation, buffer-local destruction, static traits/type metadata, synchronous CPU execution, and backend-wrapper independence.
 - [x] Audit the pinned `GGML_USE_CPU_REPACK` extra-buffer path: static registration and tensor traits, ordinary CPU allocation delegation, synchronous execution, and buffer-deleter independence from `ggml_backend_cpu_context`.
 - [x] Add a reusable backend teardown audit method that separates command completion from scheduler-resource deleter independence, standardizes classifications, and defines a minimum asynchronous-destruction runtime matrix.
