@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 17:49 Africa/Cairo_
+_Last updated: 2026-07-14 18:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -39,15 +39,16 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Function return-type matching restricted to horizontal whitespace so preceding template lines cannot steal the source location.
 - Bounded same-line C++20 `requires` clauses recognized after ordinary or trailing-return signatures.
 - Bounded qualified operator definitions recognized for symbolic, call, subscript, allocation, deletion, and single-token conversion forms.
-- Successful full Documentation CI runs through the constrained-function expansion.
+- Bounded qualified out-of-class constructor and destructor definitions recognized with exact source lines.
+- Successful full Documentation CI through the operator-function expansion.
 
 ## Latest concrete findings
 
-- Documentation CI run `29339261751` completed successfully for constrained-function head `49aab1a3e520f530c532427bad67c04183080252`.
-- The ordinary function-name pattern cannot index operator definitions because it accepts only identifier components.
-- Conversion operators require a dedicated pattern because they do not have a return type before `operator`.
-- `OPERATOR_RE` now recognizes qualified same-line symbolic, call, subscript, `new`/`delete`, and single-token conversion operators.
-- A focused test requires exact lines for `tensor_view::operator==`, `tensor_view::operator()`, `tensor_view::operator[]`, and `resource::operator bool`.
+- Documentation CI run `29343666640` completed successfully for operator-indexing head `c815b11fa0caddb846d60e4489a08f06592aa06f`.
+- Constructors and destructors have no return type, so the ordinary function pattern cannot reliably index them.
+- `SPECIAL_MEMBER_RE` now recognizes same-line qualified constructors and destructors, including attributes, `noexcept`, and one bounded same-line `requires` clause.
+- Requiring at least one `::` qualifier avoids broad free-function false positives and targets common out-of-class RAII definitions.
+- Focused tests require exact lines for `backend_state::backend_state`, `backend_state::~backend_state`, and `nested::resource::resource`.
 - The pinned OpenCL CMake target compiles `ggml-opencl.cpp`, whose blob SHA is `f283f65690af7790e163092207647d16dac9fb3e`.
 - The connector can expose the beginning of that 24k-line blob and confirms buffer-local `cl_mem` RAII, but output remains truncated before backend teardown symbols; no hidden teardown behavior was inferred.
 
@@ -77,10 +78,10 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Added detailed note `logs/research/2026-07-14/1749-operator-function-indexing.md`.
-- Added focused operator-definition tests and a dedicated bounded scanner pattern.
-- The preceding constrained-function increment passed Documentation CI and strict MkDocs in run `29339261751`.
-- The operator-indexing head requires a new commit-scoped Documentation CI result before the increment is fully validated.
+- Added detailed note `logs/research/2026-07-14/1851-special-member-indexing.md`.
+- Added focused constructor/destructor tests and a dedicated bounded scanner pattern.
+- The preceding operator-function increment passed Documentation CI and strict MkDocs in run `29343666640`.
+- The special-member-indexing head requires a new commit-scoped Documentation CI result before the increment is fully validated.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Direct Pages checks remain unavailable, and branch-only content cannot deploy until PR #1 merges.
 
@@ -89,9 +90,9 @@ B. implement the admitted CPU repack MUL_MAT fixture
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
-- **Current-head CI blocker:** the new operator-indexing commits still require a completed commit-scoped Documentation CI run.
+- **Current-head CI blocker:** the new special-member-indexing commits still require a completed commit-scoped Documentation CI run.
 - **Pages verification blocker:** direct live-site checks are unavailable, and branch-only documentation cannot deploy until PR #1 merges.
-- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, and bounded operator definitions are recognized; multiline attributes/returns/constraints/operators, constructors, destructors, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
+- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, and qualified out-of-class special members are recognized; multiline forms, in-class special members, constructor initializer lists, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
