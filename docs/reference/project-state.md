@@ -63,20 +63,23 @@ create CPU backend
 
 ## Publication and verification state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
+- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; current checked head before this state-only commit was `b47a582d69bc931abad752e23e0a712bf445ed14`, and the PR was open and mergeable.
 - Added `docs/architecture/cpu-extra-buffer-comparison.md` and linked it after the four implementation-specific CPU pages.
 - Added detailed note `logs/research/2026-07-14/0749-cpu-extra-buffer-comparison.md`.
 - Updated README TODOs, project state, and research log; the research ledger is unchanged because no external source changed.
-- Local checkout-based Python tests, strict MkDocs build, and `check_site.sh` remain unavailable in this runtime.
-- GitHub Actions and Pages verification for the current head are recorded below after the final checks.
+- Repository read-back confirmed the comparison table, ownership diagram, truth labels, portable destruction-test matrix, and detailed-audit links.
+- A local clone attempt failed with `Could not resolve host: github.com`, so checkout-based Python tests, strict MkDocs build, and `check_site.sh` could not run.
+- Documentation CI run `29307248750` completed with failure. The failing job was `build`, specifically step `Validate project context, interactive links, and scripts`; dependency installation and strict MkDocs build were skipped.
+- The connector-decoded job log was truncated before the validator/test stderr, so the exact assertion could not be identified safely and no speculative patch was applied.
+- Public search returned no indexed result for the site or new route. Direct opening of the Pages root and `architecture/cpu-extra-buffer-comparison/` was rejected by the web safe-URL gate; the new route is also branch-only until PR #1 merges.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
-- **Local validation blocker:** Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
-- **CI history:** run `29304828892` failed specifically at `Validate project context, interactive links, and scripts`; the available decoded log was truncated before the exact validator message, and later build steps were skipped.
-- **Pages verification blocker:** the new comparison page is branch-only until PR #1 merges.
+- **Local validation blocker:** cloning failed with `Could not resolve host: github.com`; Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
+- **Current CI failure:** Documentation CI run `29307248750` failed at `Validate project context, interactive links, and scripts`; the decoded log was truncated before the exact error, and later dependency/build steps were skipped.
+- **Pages verification blocker:** public search returned no indexed result and direct URL access was rejected by the safe-URL gate; the comparison page cannot deploy until PR #1 merges.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, thread-local leases, and release remain distinct states.
