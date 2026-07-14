@@ -66,7 +66,7 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, and optional revision-pinned file and symbol links for large translation units.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts for large translation units.
 
 ### Write layered documentation
 
@@ -119,7 +119,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
+- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned source links, and unsupported-syntax counts, then finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
 - [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
 - [ ] Verify SpacemiT worker cleanup and process-level Spine pool, huge-page mapping, device-fd, and TCM synchronization shutdown.
@@ -138,7 +138,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Future improvements
 
 - [ ] Evaluate multiline attributes, multiline constraints/returns, in-class special members, braced or multiline constructor initializer lists, function-try-blocks, defaulted/deleted definitions, literals, complex conversion operators, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
-- [ ] Add unsupported-syntax counters to source-index generation so braced/multiline initializers and other scanner misses can be prioritized from the pinned tree.
+- [ ] Extend unsupported-syntax telemetry only after pinned-tree evidence identifies additional high-value missed forms.
 - [ ] Upload or preserve validator output as Actions artifacts if isolated suites and verbose unittest output are still insufficient.
 - [ ] Validate generated pinned blob URLs and line fragments during Documentation CI.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
@@ -154,6 +154,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add bounded per-file and aggregate unsupported-syntax counters for braced and multiline constructor initializer candidates without emitting partial symbol records.
 - [x] Protect the constructor-initializer scanner boundary with negative tests proving braced and multiline forms are not partially indexed.
 - [x] Add explicit regression coverage for bounded same-line qualified delegating constructors with exact source lines.
 - [x] Verify that the bounded same-line initializer-list rule already recognizes delegating constructors and remove the false unsupported-capability TODO.
