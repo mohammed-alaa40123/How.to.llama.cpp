@@ -196,3 +196,25 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Audit AMX, KleidiAI, and SpacemiT IME, and add ASan/LSan tests for backend-free-before-buffer-free ordering.
+
+## 2026-07-14 04:50 — CPU AMX extra-buffer lifetime
+
+**Verified**
+
+- The pinned AMX path publishes a buffer type only after compile-time feature gating and runtime tile-permission initialization.
+- AMX owns a dedicated aligned host allocation through `buffer->context` and an AMX-specific buffer interface.
+- `tensor->extra` points to a function-static AMX trait object; the AMX buffer type and extra-buffer context are process-static.
+- Weight conversion, memset, clear, and CPU graph execution are synchronous host work with no AMX-specific queue or event.
+- AMX buffer destruction does not require `ggml_backend_cpu_context`.
+
+**Interpretation**
+
+- AMX differs from the repack overlay by owning a dedicated allocation, but remains backend-wrapper-independent because ownership is buffer-local and metadata is static.
+
+**Historical**
+
+- AMX feature admission, tile permissions, supported formats, and allocator behavior are revision- and platform-sensitive.
+
+**Open questions**
+
+- Validate the `ggml_aligned_malloc()`/`free()` pairing on supported platforms, repeated tile-permission initialization, disabled readback/copy paths, and backend-free-before-buffer-free ordering under sanitizers.
