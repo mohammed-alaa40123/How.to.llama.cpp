@@ -38,10 +38,11 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Same-line trailing-return function definitions recognized with focused free-function and attributed qualified-method coverage.
 - Function return-type matching restricted to horizontal whitespace so preceding template lines cannot steal the source location.
 - Bounded same-line C++20 `requires` clauses recognized after ordinary or trailing-return signatures.
-- Successful full Documentation CI runs through the attributed-function expansion.
+- Successful full Documentation CI runs through the trailing-return expansion.
 
 ## Latest concrete findings
 
+- Documentation CI run `29334576467` completed successfully for trailing-return commit `b98965bdd75839669de4e4d7ffd9e81a36cdb0cc`.
 - The previous function return-type character class included Python regex `\s`, which includes newline.
 - A constrained definition immediately after `template <...>` could therefore be matched from the template line, producing the wrong 1-based source location.
 - Return-type whitespace now uses only tabs and spaces, preserving the function definition line.
@@ -75,20 +76,23 @@ B. implement the admitted CPU repack MUL_MAT fixture
 
 ## Publication and verification state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
+- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
 - Added detailed note `logs/research/2026-07-14/1651-requires-function-indexing.md`.
 - Added focused tests for constrained function definitions and exact lines after template declarations.
-- The preceding trailing-return increment's final Documentation CI result must be checked together with the new branch-head run.
-- GitHub-hosted Documentation CI is pending for the constrained-function branch head.
+- The preceding trailing-return increment passed Documentation CI and strict MkDocs in run `29334576467`.
+- No pull-request workflow run was visible yet for final head `da10ea19c481d1f22f72f995341410d856eb241f`; constrained-function CI is therefore pending, not confirmed failed.
+- The connector reported PR #1 as temporarily non-mergeable for the final head; no conflict details were exposed, so mergeability needs rechecking after GitHub finishes recomputation.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
-- The public Pages route for branch-only artifacts cannot deploy until PR #1 merges; live verification remains pending.
+- Direct Pages root and source-index route checks were rejected by the available safe-URL mechanism; branch-only content also cannot deploy until PR #1 merges.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
-- **Pages verification blocker:** branch-only documentation cannot deploy until PR #1 merges; live HTTP and rendered-content checks remain pending.
+- **Current-head CI blocker:** no PR workflow run was returned yet for final head `da10ea19c481d1f22f72f995341410d856eb241f`.
+- **Pages verification blocker:** direct live-site checks were rejected by the safe-URL mechanism, and branch-only documentation cannot deploy until PR #1 merges.
+- **Mergeability blocker:** the connector returned `mergeable: false` without conflict detail for the final head; recheck after GitHub recomputes PR state.
 - **Source-index caveat:** same-line standard attributes, trailing-return definitions, and bounded same-line constraints are recognized; multiline attributes/returns/constraints, arbitrary declaration macros, operators, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
