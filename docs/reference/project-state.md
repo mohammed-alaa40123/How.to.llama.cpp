@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 14:52 Africa/Cairo_
+_Last updated: 2026-07-14 15:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -35,15 +35,17 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Regression coverage for multiple blank lines and namespace-indented type declarations.
 - Same-line C++ attributes before and after type keywords recognized without weakening physical-line accuracy.
 - Same-line C++ attributes before function return types recognized with focused free-function and qualified-method coverage.
-- Successful full Documentation CI runs for the line-number repair, whitespace regression, and attributed-type expansion.
+- Same-line trailing-return function definitions recognized with focused free-function and attributed qualified-method coverage.
+- Successful full Documentation CI runs through the attributed-function expansion.
 
 ## Latest concrete findings
 
-- The previous function pattern required the return type to be the first non-horizontal-whitespace token, so a leading `[[...]]` attribute prevented indexing.
-- The updated pattern accepts one or more same-line attribute groups before the function return type.
-- The focused test covers a free function and namespace-qualified `const noexcept` method at lines 1 and 5.
-- Type extraction, duplicate retention, source ordering, and pinned link construction are unchanged.
-- The pinned OpenCL blob can be retrieved, but the connector still truncates it before the backend teardown section; no hidden teardown behavior was inferred.
+- Documentation CI run `29330951186` completed successfully for commit `ec146483edf0cb6e3bfd942c0f1e1b0cdf73917c`.
+- The previous function pattern stopped after optional `const` and `noexcept`, so a same-line `-> return_type` clause prevented the opening brace from matching.
+- The updated pattern accepts one bounded same-line trailing-return clause and excludes newlines, semicolons, and braces.
+- The focused test covers `auto trailing_function(...) -> int` and an attributed namespace-qualified `const noexcept` method returning `long long` at lines 1 and 5.
+- Type extraction, duplicate retention, source ordering, and pinned URL construction are unchanged.
+- The pinned OpenCL blob remains retrievable but connector output is truncated before the backend teardown section; no hidden behavior was inferred.
 
 ## In progress
 
@@ -71,10 +73,10 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Added detailed note `logs/research/2026-07-14/1452-attributed-function-indexing.md`.
-- Added focused tests for leading same-line attributes on function definitions.
-- A bounded local regular-expression reproduction returned the expected names and declaration lines.
-- GitHub-hosted Documentation CI is pending for the final branch head.
+- Added detailed note `logs/research/2026-07-14/1550-trailing-return-function-indexing.md`.
+- Added focused tests for same-line trailing-return function definitions.
+- The preceding attributed-function increment passed full Documentation CI and strict MkDocs.
+- GitHub-hosted Documentation CI is pending for the final trailing-return branch head.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - The public Pages route for branch-only artifacts cannot deploy until PR #1 merges; live verification remains pending.
 
@@ -84,7 +86,7 @@ B. implement the admitted CPU repack MUL_MAT fixture
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
 - **Pages verification blocker:** branch-only documentation cannot deploy until PR #1 merges; live HTTP and rendered-content checks remain pending.
-- **Source-index caveat:** same-line standard attributes are recognized for types and leading function definitions; multiline attributes, trailing-return syntax, requires clauses, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
+- **Source-index caveat:** same-line standard attributes and same-line trailing-return definitions are recognized; multiline attributes/returns, requires clauses, arbitrary declaration macros, operators, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
