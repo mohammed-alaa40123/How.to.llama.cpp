@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 00:52 Africa/Cairo_
+_Last updated: 2026-07-15 01:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -43,23 +43,22 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Bounded same-line constructor initializer lists recognized for out-of-class constructors without weakening exact source-line accuracy.
 - Same-line delegating constructors verified as accepted by the bounded initializer-list rule and protected by an explicit exact-line regression fixture.
 - Negative regression coverage protects the documented constructor-initializer boundary: braced and multiline forms must not be partially indexed.
-- Bounded per-file and aggregate unsupported-syntax telemetry now counts braced and multiline constructor initializer candidates without adding partial symbols.
-- Constructor function-try-block behavior audited: it is intentionally omitted from symbol records and is not yet measured by unsupported-syntax telemetry.
+- Bounded per-file and aggregate unsupported-syntax telemetry counts braced and multiline constructor initializer candidates without adding partial symbols.
+- Constructor function-try-block behavior audited and now measured by bounded telemetry while remaining intentionally absent from navigation records.
 
 ## Latest concrete findings
 
 - `scripts/index_upstream.py` exposes `count_unsupported_syntax()` separately from `extract_symbols()`.
-- Every indexed file carries `unsupported_syntax` counts for braced and multiline constructor initializer candidates.
-- The root JSON summary carries aggregate `unsupported_syntax_counts`, and the generated Markdown inventory displays both totals.
-- `tests/test_index_upstream_unsupported_syntax.py` verifies positive counts, zero counts for supported parenthesized same-line initialization, and continued omission of unsupported candidates from symbol records.
-- Constructor function-try-blocks contain a `try` token where `SPECIAL_MEMBER_RE` expects qualifiers, an initializer list, or the body brace, so they do not produce a navigation record.
-- The existing unsupported-syntax counters do not count function-try-blocks; adding bounded telemetry is the next candidate implementation, contingent on pinned-tree evidence.
-- The counters are bounded triage telemetry, not complete C++ parser diagnostics.
+- Every indexed file now carries unsupported-syntax counts for braced constructor initializers, multiline constructor initializers, and constructor function-try-blocks.
+- The root JSON summary aggregates all three counters, and the generated Markdown inventory displays all three totals.
+- `CONSTRUCTOR_FUNCTION_TRY_BLOCK_RE` requires a qualified constructor backreference and accepts same-line or next-line `try` forms.
+- Focused tests verify `try : initializer(...) {` and `try {` candidates, reject ordinary function function-try-blocks, and preserve omission from `extract_symbols()`.
+- The counters remain bounded triage telemetry, not complete C++ parser diagnostics.
 - Line-ranged connector reads of the pinned OpenCL translation unit still returned no hidden content; the blob SHA remains `f283f65690af7790e163092207647d16dac9fb3e`, so no unseen teardown behavior was inferred.
 
 ## In progress
 
-- Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax telemetry.
+- Regeneration of the pinned source inventory with line-aware records, pinned source links, and all three unsupported-syntax counters.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
 - CPU extra-buffer destruction tests for KleidiAI, AMX, and SpacemiT plus TSan and hardware-specific cleanup coverage.
@@ -72,8 +71,9 @@ Read this file after the root README on every run. It is the compact checkpoint 
 Resume one of the two highest-value implementation tracks:
 
 ```text
-A. regenerate pinned symbol locations and use unsupported-syntax counts
-   → prioritize scanner gaps, including whether function-try-block telemetry is warranted
+A. regenerate pinned symbol locations and unsupported-syntax counts
+   → measure braced, multiline, and function-try-block candidates
+   → prioritize any stateful scanner work
    → finish OpenCL teardown
 B. implement the admitted CPU repack MUL_MAT fixture
    → reference comparison
@@ -85,9 +85,8 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Added detailed note `logs/research/2026-07-15/0052-function-try-block-boundary-audit.md`.
-- The preceding telemetry head passed Documentation CI and strict MkDocs in run `29367894344`.
-- This run is documentation-only; commit-scoped Documentation CI must confirm context validation and strict MkDocs.
+- Added detailed note `logs/research/2026-07-15/0150-function-try-block-telemetry.md`.
+- The preceding documentation-only head passed Documentation CI in run `29371216857` if confirmed by the latest workflow query; this increment requires its own commit-scoped run.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Direct Pages checks remain unavailable, and branch-only content cannot deploy until PR #1 merges.
 
@@ -97,7 +96,7 @@ B. implement the admitted CPU repack MUL_MAT fixture
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output; line-ranged reads returned empty content and exact hidden symbols remain unavailable.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
 - **Pages verification blocker:** direct live-site checks are unavailable, and branch-only documentation cannot deploy until PR #1 merges.
-- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers remain intentionally omitted but are counted as bounded candidates. Function-try-blocks are omitted and currently uncounted. Multiline forms, in-class special members, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
+- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers and constructor function-try-blocks remain intentionally omitted from navigation but are counted as bounded candidates. Multiline forms, in-class special members, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
 - **Telemetry caveat:** unsupported-syntax counts are prioritization signals, not parser-completeness metrics, and may undercount or overcount unusual C++ forms.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
