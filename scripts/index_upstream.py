@@ -78,6 +78,18 @@ MULTILINE_CONSTRUCTOR_INITIALIZER_RE = re.compile(
     r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?'
     r'\n[\t ]*:'
 )
+# Count qualified constructor function-try-blocks without indexing them. The
+# bounded form accepts optional same-line attributes/qualifiers and either a
+# same-line or next-line `try`, but it stops before parsing initializer or catch
+# bodies. Ordinary function try-blocks are excluded by the constructor backreference.
+CONSTRUCTOR_FUNCTION_TRY_BLOCK_RE = re.compile(
+    r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
+    r'((?:[A-Za-z_]\w*::)*([A-Za-z_]\w*)::\2)'
+    r'[\t ]*\([^;{}\n]*\)[\t ]*'
+    r'(?:noexcept[\t ]*)?'
+    r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?'
+    r'(?:\n[\t ]*)?try(?:[\t ]*:|[\t ]*\{)'
+)
 # C++ attributes may precede a type declaration on the same physical line.
 # Keep every whitespace matcher horizontal so source locations cannot drift to a
 # preceding blank line. This remains deliberately approximate: macros and
@@ -130,6 +142,7 @@ def count_unsupported_syntax(text: str) -> dict[str, int]:
     return {
         "braced_constructor_initializers": len(BRACED_CONSTRUCTOR_INITIALIZER_RE.findall(text)),
         "multiline_constructor_initializers": len(MULTILINE_CONSTRUCTOR_INITIALIZER_RE.findall(text)),
+        "constructor_function_try_blocks": len(CONSTRUCTOR_FUNCTION_TRY_BLOCK_RE.findall(text)),
     }
 
 
@@ -190,9 +203,14 @@ def main() -> int:
         if file_url:
             record['source_url'] = file_url
         records.append(record)
+    unsupported_keys = (
+        'braced_constructor_initializers',
+        'multiline_constructor_initializers',
+        'constructor_function_try_blocks',
+    )
     unsupported_totals = {
         key: sum(int(r['unsupported_syntax'][key]) for r in records)
-        for key in ('braced_constructor_initializers', 'multiline_constructor_initializers')
+        for key in unsupported_keys
     }
     summary = {
         'source_root': str(src),
@@ -226,6 +244,7 @@ Generated from `{src}`. This is a navigation index, not a compiler-grade call gr
 - Lines: **{summary['total_lines']:,}**
 - Braced constructor-initializer candidates skipped: **{unsupported_totals['braced_constructor_initializers']:,}**
 - Multiline constructor-initializer candidates skipped: **{unsupported_totals['multiline_constructor_initializers']:,}**
+- Constructor function-try-block candidates skipped: **{unsupported_totals['constructor_function_try_blocks']:,}**
 
 | Language | Files | Lines |
 |---|---:|---:|
