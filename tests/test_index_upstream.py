@@ -102,6 +102,24 @@ struct [[gnu::packed]] attributed_after_keyword {
             ],
         )
 
+    def test_extract_symbols_handles_same_line_trailing_return_definitions(self) -> None:
+        source = """\
+auto trailing_function(int value) -> int {
+    return value;
+}
+
+[[nodiscard]] auto namespace_name::trailing_method() const noexcept -> long long {
+    return 0;
+}
+"""
+        self.assertEqual(
+            index_upstream.extract_symbols(source),
+            [
+                {"name": "trailing_function", "kind": "function", "line": 1},
+                {"name": "namespace_name::trailing_method", "kind": "function", "line": 5},
+            ],
+        )
+
     def test_extract_symbols_retains_duplicate_names(self) -> None:
         source = """\
 static void selected() {
