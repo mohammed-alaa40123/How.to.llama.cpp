@@ -40,7 +40,13 @@ jobs:
       - name: Validate interactive links
         run: python3 scripts/validate_interactive_links.py
 
-      - name: Run Python unit tests
+      - name: Test source indexing
+        run: python3 -m unittest -v tests.test_index_upstream
+
+      - name: Test interactive-link validation
+        run: python3 -m unittest -v tests.test_validate_interactive_links
+
+      - name: Guard unit-test discovery
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Validate shell syntax
