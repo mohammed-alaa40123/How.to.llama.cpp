@@ -114,6 +114,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/cpu-amx-extra-buffer-lifetime.md` | AMX feature admission, aligned allocation ownership, static traits, and teardown |
 | `docs/architecture/cpu-kleidiai-extra-buffer-lifetime.md` | KleidiAI packed weights, static traits, ordinary CPU allocation ownership, and teardown |
 | `docs/architecture/cpu-spacemit-ime-extra-buffer-lifetime.md` | SpacemiT pooled weight allocation, static traits, thread-local TCM coordination, and teardown |
+| `docs/architecture/cpu-extra-buffer-comparison.md` | Cross-implementation ownership comparison and portable destruction-test matrix |
 | `docs/architecture/cuda-backend-teardown.md` | CUDA teardown and conditional completion |
 | `docs/architecture/metal-backend-teardown.md` | Metal explicit synchronization and teardown |
 | `docs/architecture/vulkan-backend-teardown.md` | Vulkan explicit synchronization and teardown |
@@ -133,7 +134,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Highest priority
 
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then use the backend teardown audit worksheet to finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
-- [ ] Synthesize the completed CPU optional-buffer audits into one comparison and portable destruction-test matrix covering repack, AMX, KleidiAI, and SpacemiT IME.
+- [ ] Implement the first portable CPU optional-buffer destruction regression harness from the comparison matrix: supported compute → CPU backend free → extra buffer free under ASan/LSan, then extend it to AMX, KleidiAI, and SpacemiT hardware paths.
 - [ ] Verify SpacemiT worker cleanup: every TCM-acquiring path must call the clear-affinity hook; audit process-level Spine pool, huge-page mapping, device-fd, and TCM synchronization shutdown.
 - [ ] Validate KleidiAI null readback/copy callbacks, concurrent initialization, packed-layout portability, and one-versus-two-slot memory expansion.
 - [ ] Validate AMX allocator pairing (`ggml_aligned_malloc()` with the current `free()` callback) on supported platforms, repeated tile-permission initialization, and disabled readback/copy paths.
@@ -152,7 +153,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by the inference atlas, object pages, source maps, and visualizers.
 - [ ] Fix Documentation CI run `29304828892`: `Validate project context, interactive links, and scripts` failed and the decoded log was truncated before the exact validator message; dependency installation and strict MkDocs build were skipped.
 - [ ] Verify the latest **Deploy documentation** and **Hourly research context check** runs after CI is repaired.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-spacemit-ime-extra-buffer-lifetime/` after merge; direct URL access is currently rejected by the available web safe-URL gate.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-extra-buffer-comparison/` after merge; the route is branch-only until PR #1 merges.
 
 ### Future improvements
 
@@ -172,6 +173,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Synthesize CPU repack, AMX, KleidiAI, and SpacemiT IME into one ownership/completion comparison and portable destruction-test matrix.
 - [x] Audit the pinned SpacemiT IME extra-buffer path: dedicated Spine pool allocation/free ownership, static IME/RVV traits and buffer metadata, synchronous threadpool execution, thread-local TCM coordination, backend-wrapper-independent buffer destruction, and conditional complete-worker teardown.
 - [x] Audit the pinned KleidiAI extra-buffer path: critical-section initialization, feature-selected kernel chains, ordinary CPU allocation/free ownership, versioned packed slots, static traits/type metadata, synchronous CPU execution, and backend-wrapper independence.
 - [x] Audit the pinned AMX extra-buffer path: compile/runtime admission, dedicated aligned host allocation, buffer-local destruction, static traits/type metadata, synchronous CPU execution, and backend-wrapper independence.
@@ -182,9 +184,9 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [x] Add revision-pinned file and `#L<line>` symbol URLs to the generated source inventory, derive them from the selected llama.cpp revision, and cover URL generation with regression tests.
 - [x] Add untruncated, source-ordered symbol records with approximate declaration kind and 1-based line numbers to the generated source inventory, while retaining the legacy compact symbol list and adding regression tests.
 - [x] Map pinned OpenCL build composition, kernel deployment modes, official platform scope, and the initial `cl_mem` RAII ownership path.
-- [x] Audit pinned CANN teardown: backend/context free, device-wide synchronization, reset ordering, events, allocator buffers, registry lifetime, scheduler-resource independence, and conditional teardown classification.
-- [x] Audit pinned RPC teardown: client/backend free, shared socket lifetime, remote buffer release, server dispatch/completion, session cleanup, and backend-before-scheduler classification.
-- [x] Audit pinned SYCL teardown: backend/context free, queue wait behavior, command graphs, context-owned pools and scratchpads, scheduler event independence, buffer-local allocation ownership, static buffer types, and conditional queued-work safety classification.
+- [x] Audit pinned CANN teardown: backend/context free, device-wide synchronization, reset ordering, events, allocator buffers, registry lifetime, and post-reset destruction uncertainty.
+- [x] Audit pinned RPC teardown: client/backend ownership, remote buffer/session release, transport lifetime, command ordering, and conditional remote completion.
+- [x] Finish pinned SYCL teardown and queue/event/buffer lifetime audits.
 - [x] Finish pinned Vulkan teardown and command-lifetime audits.
 - [x] Audit pinned Metal, CUDA, ordinary CPU, and generic scheduler teardown.
 - [x] Trace exact `llama_model` and `llama_context` declaration and reverse-destruction order.
