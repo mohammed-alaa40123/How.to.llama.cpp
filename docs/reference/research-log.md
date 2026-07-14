@@ -65,10 +65,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Generated file and symbol records can carry revision-pinned GitHub URLs with `#L<line>` fragments derived from the selected revision.
 - The legacy compact symbol list remains for compatibility and regression tests cover ordering and link generation.
 
-**Interpretation**
-
-- The index is a high-value navigation aid for large files, not a compiler-grade call graph.
-
 **Open question**
 
 - Regenerate the pinned inventory when upstream access is available and use it to finish OpenCL teardown.
@@ -80,138 +76,70 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Added a pinned comparison matrix covering ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and the OpenCL gap.
 - The matrix separates execution completion from scheduler-resource independence and links each classification to its detailed audit.
 
-**Interpretation**
-
-- Backend-before-scheduler safety requires independent proofs for command completion and valid later deleter state.
-
-## 2026-07-14 01:52 — Guided end-to-end inference atlas
+## 2026-07-14 01:52–02:49 — Inference atlas and teardown method
 
 **Verified**
 
-- Added a clickable pipeline linking GGUF, model loading, `llama_model`, `llama_context`, graph construction, scheduler execution, backends, sampling, and decode reuse.
-- Added stage/lifetime and audience-specific reading paths.
+- Added a clickable inference pipeline linking GGUF, model loading, `llama_model`, `llama_context`, graph construction, scheduler execution, backends, sampling, and decode reuse.
+- Added a reusable ten-step teardown worksheet separating host-visible completion from scheduler-resource deleter independence.
+- Standardized bounded classifications and a minimum asynchronous-destruction runtime matrix.
 
-**Interpretation**
-
-- The atlas is a routing layer over canonical evidence pages, not a claim that runtime is a single linear thread.
-
-## 2026-07-14 02:49 — Backend teardown audit method
+## 2026-07-14 03:51–06:50 — CPU optional extra-buffer audits
 
 **Verified**
 
-- Added a reusable ten-step worksheet separating host-visible command completion from scheduler-resource deleter independence.
-- Standardized bounded classifications and added a minimum asynchronous-destruction runtime matrix.
-
-**Open question**
-
-- Generate worksheet evidence from source-index metadata and implement portable destruction tests.
-
-## 2026-07-14 03:51 — CPU repack extra-buffer lifetime
-
-**Verified**
-
-- Repack buffer type and tensor traits are process-static.
-- Allocation delegates to the ordinary CPU buffer and does not replace its free callback.
-- Execution follows the synchronous CPU graph path.
-
-**Interpretation**
-
-- Repack buffers remain destructible after the CPU backend wrapper is deleted.
-
-## 2026-07-14 04:50 — CPU AMX extra-buffer lifetime
-
-**Verified**
-
-- AMX publication is compile/runtime gated.
+- CPU repack delegates allocation/free to ordinary CPU buffers and uses process-static traits.
 - AMX owns a dedicated aligned host allocation and complete buffer interface.
-- Traits and type metadata are process-static, and execution remains synchronous.
-- AMX buffer destruction does not require `ggml_backend_cpu_context`.
-
-**Open questions**
-
-- Validate allocator pairing, repeated tile-permission initialization, null readback/copy paths, and sanitizer teardown tests.
-
-## 2026-07-14 05:50 — CPU KleidiAI extra-buffer lifetime
-
-**Verified**
-
-- KleidiAI initialization is protected by the GGML critical section and process-static feature/kernel state.
-- Allocation delegates to the ordinary CPU buffer; KleidiAI changes the buffer type plus `init_tensor` and `set_tensor` but retains ordinary CPU allocation/free ownership.
-- `tensor->extra`, the extra-buffer type, and buffer-type metadata are process-static.
-- Q4_0/Q8_0 upload synchronously builds versioned packed slots and falls back to the original representation when no compatible slot exists.
-- Supported `MUL_MAT`/`GET_ROWS` execution remains in synchronous CPU graph computation with no independent queue or event.
-- KleidiAI buffer destruction is independent of `ggml_backend_cpu_context` for the audited resources.
+- KleidiAI retains ordinary CPU allocation/free ownership while publishing process-static feature/kernel state and packed slots.
+- SpacemiT owns pooled weight allocations and uses process-static IME/RVV traits while adding worker-local TCM coordination.
+- All four execute synchronously through ordinary CPU graph computation and do not introduce scheduler events or accelerator queues.
 
 **Interpretation**
 
-- KleidiAI is teardown-equivalent to the CPU repack overlay for backend-wrapper ownership, while adding richer feature-selected kernel chains, SME policy, and multi-slot packed representations.
+- Weight-buffer destruction is independent of `ggml_backend_cpu_context` for all four audited paths, while AMX and SpacemiT retain platform- or process-level cleanup questions.
 
 **Historical**
 
-- Feature detection, SME policy, kernel chains, packed-header format, fallback behavior, and callback ownership are revision-sensitive.
+- Admission rules, callback tables, packed layouts, allocator APIs, and worker hooks are revision-sensitive.
 
 **Open questions**
 
-- Validate null readback/copy behavior, concurrent initialization, packed-layout portability, packed-slot memory expansion, and backend-free-before-buffer-free ordering under ASan/LSan.
+- Validate AMX allocator pairing, KleidiAI initialization/readback behavior, SpacemiT TCM/process-pool shutdown, and sanitizer ordering tests.
 
-## 2026-07-14 06:50 — CPU SpacemiT IME extra-buffer lifetime
-
-**Verified**
-
-- SpacemiT owns a dedicated 64-byte-aligned allocation through the mutex-protected Spine memory pool, and its free callback returns the allocation through the matching pool API without using `ggml_backend_cpu_context`.
-- `tensor->extra` points to process-static IME1, IME2, or RVV trait objects; the extra-buffer type and buffer-type metadata are function-static.
-- Repacking and execution are synchronous CPU work using the threadpool and barriers, with no scheduler event or accelerator command queue.
-- Worker setup can acquire thread-local TCM state and the paired clear-affinity hook releases that lease.
-
-**Interpretation**
-
-- Weight-buffer destruction is backend-wrapper-independent, but complete SpacemiT worker/process teardown remains conditional on all TCM cleanup hooks and pool-manager shutdown paths executing correctly.
-
-**Historical**
-
-- IME admission, pool chunking, huge-page/TCM devices, thread binding, supported layouts, and callback ownership are revision-sensitive.
-
-**Open questions**
-
-- Audit worker error paths, process-level pool shutdown, null transfer callbacks, repacked memory expansion, and repeated buffer/threadpool teardown under sanitizers on supported hardware.
-
-## 2026-07-14 07:49 — CPU optional extra-buffer comparison
+## 2026-07-14 07:49–08:49 — CPU comparison and destruction harness
 
 **Verified**
 
-- Added a single comparison covering allocation/free ownership, static `tensor->extra` traits, synchronous completion, backend-wrapper independence, and residual teardown risks for repack, AMX, KleidiAI, and SpacemiT IME.
-- Repack and KleidiAI form an ordinary-CPU-allocation overlay family; AMX and SpacemiT own dedicated implementation-specific allocations.
-- Added a portable destruction-test matrix spanning backend-free-before-buffer-free ordering, unsupported transfer callbacks, initialization races, sanitizers, and memory-expansion measurement.
-
-**Interpretation**
-
-- Weight-buffer destruction is independent of `ggml_backend_cpu_context` across all four audited paths, but complete implementation shutdown remains path-specific because AMX has platform allocator/tile state and SpacemiT has worker-local TCM and process-pool state.
-
-**Historical**
-
-- Admission rules, callback tables, packed layouts, allocator APIs, and worker hooks remain revision-sensitive.
-
-**Open questions**
-
-- Implement the matrix under ASan/LSan/TSan and prove SpacemiT cleanup across every worker/error/threadpool-destruction path.
-
-## 2026-07-14 08:49 — CPU optional extra-buffer destruction harness
-
-**Verified**
-
-- Added an implementation-ready regression-harness specification centered on a tiny admitted optional-buffer `MUL_MAT` fixture.
-- The fixture separates admission, output correctness, synchronous completion, backend-free-before-buffer-free ordering, and final sanitizer-clean destruction.
-- CPU repack is the first portable target; KleidiAI, AMX, and SpacemiT reuse the ordering contract behind explicit feature and hardware gates.
-- A skipped hardware-gated path is not evidence that the ownership claim passed.
+- Added one ownership/completion comparison for repack, AMX, KleidiAI, and SpacemiT IME.
+- Added a portable destruction-test matrix and an implementation-ready tiny admitted `MUL_MAT` fixture specification.
+- The fixture separates admission, output correctness, synchronous completion, backend-free-before-buffer-free ordering, and sanitizer-clean final destruction.
+- CPU repack is the first portable target; hardware-gated skips are not evidence that a lifetime claim passed.
 
 **Interpretation**
 
 - A tiny deterministic graph is stronger than a full model for this ownership question because fallback placement, allocation owners, and destruction order remain visible.
 
+**Open questions**
+
+- Select the smallest stable upstream helper, define LSan treatment for intentional static metadata, and add explicit SpacemiT pool shutdown coverage.
+
+## 2026-07-14 09:49 — Documentation CI validation observability
+
+**Verified**
+
+- Documentation CI run `29309938483` failed after startup-context reading inside the compound `Validate project context, interactive links, and scripts` step.
+- Checkout and Python setup succeeded; dependency installation and strict MkDocs building were skipped.
+- The connector-decoded log was truncated before the failing command or assertion.
+- `.github/workflows/docs-ci.yml` now runs durable-context validation, interactive-link validation, verbose unit tests, shell syntax, Python compilation, and asset checks as separately named steps.
+
+**Interpretation**
+
+- This is an observability fix, not proof that the underlying validation defect is repaired. The next run should identify the exact failing subsystem without speculative edits.
+
 **Historical**
 
-- Test helpers, optional-buffer admission, callback tables, and supported quantized layouts are revision-sensitive.
+- Workflow step names and run IDs describe PR #1 as observed on 2026-07-14.
 
 **Open questions**
 
-- Select the smallest upstream graph/test helper, place the fixture in the appropriate test target, define LSan treatment for intentional static metadata, and add explicit SpacemiT pool shutdown coverage.
+- Which named step fails on the updated workflow head, and does strict MkDocs reveal a second independent issue once validation passes?
