@@ -15,15 +15,18 @@ TEXT_SUFFIXES = {'.c','.cc','.cpp','.cxx','.h','.hh','.hpp','.m','.mm','.cu','.c
 SKIP = {'.git','build','site','__pycache__','.venv'}
 INCLUDE_RE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
 # C++ attributes may precede a function declaration on the same physical line.
-# A bounded trailing-return clause is also accepted after const/noexcept qualifiers.
-# This remains deliberately approximate and does not attempt to parse multiline
-# attributes, macros, requires clauses, or every legal declarator form.
+# Bounded trailing-return and requires clauses are accepted after qualifiers.
+# Every return-type whitespace matcher is horizontal so the match cannot begin on
+# a preceding template or blank line. This remains deliberately approximate and
+# does not attempt to parse multiline attributes/returns, macros, or every legal
+# declarator form.
 FUNC_RE = re.compile(
     r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
-    r'(?:[A-Za-z_][\w:<>,~*&\s]+?)[\t ]+'
+    r'(?:[A-Za-z_][\w:<>,~*&\t ]+?)[\t ]+'
     r'([A-Za-z_]\w*(?:::\w+)*)\s*\([^;{}]*\)\s*'
-    r'(?:const\s*)?(?:noexcept\s*)?'
-    r'(?:->[\t ]*[^;{}\n]+?[\t ]*)?\{'
+    r'(?:const[\t ]*)?(?:noexcept[\t ]*)?'
+    r'(?:->[\t ]*[^;{}\n]+?[\t ]*)?'
+    r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?\{'
 )
 # C++ attributes may precede a type declaration on the same physical line.
 # Keep every whitespace matcher horizontal so source locations cannot drift to a
