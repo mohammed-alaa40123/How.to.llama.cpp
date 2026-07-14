@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 06:50 Africa/Cairo_
+_Last updated: 2026-07-14 07:05 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -63,20 +63,22 @@ repack / AMX / KleidiAI / SpacemiT
 
 ## Publication and verification state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
+- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; checked head `f86b8c67c959f47d01a5574b65f0c471b3eb9353` was mergeable before the final state-only commit.
 - Added `docs/architecture/cpu-spacemit-ime-extra-buffer-lifetime.md` and linked it after the KleidiAI audit.
 - Added detailed note `logs/research/2026-07-14/0650-cpu-spacemit-ime-extra-buffer-lifetime.md`.
 - Updated README TODOs, project state, and research log; the research ledger is unchanged because no external source changed.
 - Local cloning again failed with `Could not resolve host: github.com`, so local Python tests, strict MkDocs build, and `check_site.sh` could not run.
-- GitHub Actions and Pages status for the final branch head are checked after durable context updates; exact results are recorded below before this run finishes.
+- Documentation CI run `29304828892` completed with failure. Checkout, Python setup, and context reading succeeded; step 5, `Validate project context, interactive links, and scripts`, failed, so dependency installation and strict MkDocs build were skipped.
+- The decoded job log exposed the failing step but was truncated before the validator stderr/assertion, so no evidence-backed fix could be applied in this run.
+- Direct opening of the Pages root and the existing KleidiAI route was rejected by the web safe-URL gate. The new SpacemiT route is branch-only until PR #1 merges, so its deployed HTTP response cannot yet be checked.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** local GitHub DNS resolution failed, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
-- **CI status:** final-head status must be read from GitHub Actions after the last context commit.
-- **Pages verification:** the SpacemiT route is branch-only until PR #1 merges; the current public main site and expected existing content still require an HTTP check.
+- **CI failure:** run `29304828892` failed specifically at `Validate project context, interactive links, and scripts`; the available decoded log was truncated before the exact validator message, and later build steps were skipped.
+- **Pages verification blocker:** direct URL access was rejected; the SpacemiT page cannot deploy until PR #1 merges.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, thread-local leases, and release remain distinct states.
