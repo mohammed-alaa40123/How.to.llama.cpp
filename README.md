@@ -137,7 +137,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Evaluate multiline attributes, trailing-return functions, requires clauses, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
+- [ ] Evaluate multiline attributes, requires clauses, operators, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
 - [ ] Upload or preserve validator output as Actions artifacts if isolated suites and verbose unittest output are still insufficient.
 - [ ] Validate generated pinned blob URLs and line fragments during Documentation CI.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
@@ -153,6 +153,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Recognize same-line C++ trailing-return function definitions while preserving exact definition lines.
 - [x] Recognize same-line C++ attributes before function return types while preserving exact definition lines.
 - [x] Recognize same-line C++ attributes before or after type keywords while preserving exact declaration lines.
 - [x] Confirm the source-index type line-number fix and multiple-blank-line/namespace-indentation regression through successful full Documentation CI runs.
