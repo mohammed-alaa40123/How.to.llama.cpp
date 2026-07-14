@@ -153,3 +153,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Validate null readback/copy behavior, concurrent initialization, packed-layout portability, packed-slot memory expansion, and backend-free-before-buffer-free ordering under ASan/LSan.
+
+## 2026-07-14 06:50 — CPU SpacemiT IME extra-buffer lifetime
+
+**Verified**
+
+- SpacemiT owns a dedicated 64-byte-aligned allocation through the mutex-protected Spine memory pool, and its free callback returns the allocation through the matching pool API without using `ggml_backend_cpu_context`.
+- `tensor->extra` points to process-static IME1, IME2, or RVV trait objects; the extra-buffer type and buffer-type metadata are function-static.
+- Repacking and execution are synchronous CPU work using the threadpool and barriers, with no scheduler event or accelerator command queue.
+- Worker setup can acquire thread-local TCM state and the paired clear-affinity hook releases that lease.
+
+**Interpretation**
+
+- Weight-buffer destruction is backend-wrapper-independent, but complete SpacemiT worker/process teardown remains conditional on all TCM cleanup hooks and pool-manager shutdown paths executing correctly.
+
+**Historical**
+
+- IME admission, pool chunking, huge-page/TCM devices, thread binding, supported layouts, and callback ownership are revision-sensitive.
+
+**Open questions**
+
+- Audit worker error paths, process-level pool shutdown, null transfer callbacks, repacked memory expansion, and repeated buffer/threadpool teardown under sanitizers on supported hardware.
