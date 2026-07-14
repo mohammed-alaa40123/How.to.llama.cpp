@@ -207,3 +207,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Verify the new test on its own commit-scoped CI run, then consider nested classes, attributes, and templates only if the approximate regex index expands.
+
+## 2026-07-14 13:51 — Attributed C++ type indexing
+
+**Verified**
+
+- The type index previously required `class`, `struct`, `enum`, or `enum class` to be the first non-horizontal-whitespace token on the declaration line.
+- The type pattern now recognizes same-line C++ `[[...]]` attributes before the type keyword and between the keyword and declared name.
+- A focused test covers attributed `struct` and `enum class` declarations and requires their physical declaration lines to remain unchanged.
+- All whitespace matching remains horizontal, so the preceding-blank-line defect cannot be reintroduced by this extension.
+
+**Interpretation**
+
+- Same-line attributes are a useful bounded expansion for a navigation index. Multiline attributes, arbitrary declaration macros, and generated syntax should remain explicit limitations rather than encouraging a regex to impersonate a parser.
+
+**Historical**
+
+- This increment builds on the earlier line-number repair and whitespace regression coverage.
+
+**Open questions**
+
+- Determine from the pinned tree whether multiline attributes or export/declaration macros justify a stateful scanner or targeted additional rules.
