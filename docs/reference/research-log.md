@@ -175,3 +175,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Generate worksheet evidence from source-index metadata, implement portable destruction tests, and finish the OpenCL application.
+
+## 2026-07-14 03:51 — CPU repack extra-buffer lifetime
+
+**Verified**
+
+- The pinned CPU repack buffer type and tensor traits are function-static process-lifetime state.
+- Repack allocation delegates to the ordinary CPU buffer type and overrides selected tensor callbacks without replacing the ordinary buffer free callback.
+- `tensor->extra` points to static trait objects, while `ggml_backend_cpu_free()` owns only backend work data, the CPU context, and wrapper.
+- Repack execution follows the synchronous CPU graph path with no extra queue or event lifetime.
+
+**Interpretation**
+
+- Audited repack buffers remain destructible after the ordinary CPU backend wrapper is deleted; the path is an alternate layout/kernel layer rather than a separate asynchronous backend.
+
+**Historical**
+
+- This classification is revision-pinned and does not automatically apply to newer repack code or other CPU extra-buffer implementations.
+
+**Open questions**
+
+- Audit AMX, KleidiAI, and SpacemiT IME, and add ASan/LSan tests for backend-free-before-buffer-free ordering.
