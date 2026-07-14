@@ -159,8 +159,30 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 **Historical**
 
-- Run and job identifiers describe PR #1 as observed on 2026-07-14.
+- Run and job identifiers describe PR #1 as observed on July 14, 2026.
 
 **Open questions**
 
 - Which isolated suite fails, what is the exact traceback, and does strict MkDocs expose a later independent defect?
+
+## 2026-07-14 11:51 — Source-index type line-number repair
+
+**Verified**
+
+- Documentation CI run `29316377253` failed specifically in the isolated `Test source indexing` step after both context validators passed.
+- `CLASS_RE` used `^\s*`; because `\s` includes newline, a type declaration following a blank line could be matched from the preceding line.
+- The test fixture expected `enum class second_type` on line 8, while the old regex produced line 7.
+- Replacing leading and separating whitespace with horizontal `[\t ]*` and `[\t ]+` reports the actual declaration line.
+- A bounded local regex reproduction confirmed the corrected line result.
+
+**Interpretation**
+
+- The implementation was wrong, not the test: generated source links should point to the declaration, not the blank line before it.
+
+**Historical**
+
+- The defect was introduced with line-aware source indexing on the current branch and is fixed in the branch implementation.
+
+**Open questions**
+
+- Does the next Documentation CI run pass both isolated suites, discovery, and strict MkDocs, and should coverage be expanded to multiple blank lines and nested indentation?
