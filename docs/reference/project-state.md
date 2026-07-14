@@ -34,7 +34,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Source-index type-declaration line locations corrected so blank lines are not consumed as leading whitespace.
 - Regression coverage for multiple blank lines and namespace-indented type declarations.
 - Same-line C++ attributes before and after type keywords recognized without weakening physical-line accuracy.
-- Successful full Documentation CI runs for both the line-number repair and expanded whitespace regression.
+- Successful full Documentation CI runs for the line-number repair, whitespace regression, and attributed-type expansion.
 
 ## Latest concrete findings
 
@@ -43,10 +43,10 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - The focused test covers attributed `struct` and `enum class` declarations at lines 1, 4, and 7.
 - All whitespace matching remains horizontal, so the earlier preceding-blank-line defect is not reintroduced.
 - Function extraction, duplicate retention, source ordering, and pinned link construction are unchanged.
+- Documentation CI run `29327245157` completed successfully for final commit `c5cc2f629097a1d19ce1b5f7b273714aa7951f08`.
 
 ## In progress
 
-- GitHub-hosted validation of the attributed-type source-index test and strict MkDocs build.
 - Regeneration of the pinned source inventory with line-aware records and pinned source links.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -57,7 +57,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Immediate next task
 
-Inspect the commit-scoped Documentation CI run. If it is green, resume one of the two highest-value implementation tracks:
+Resume one of the two highest-value implementation tracks:
 
 ```text
 A. regenerate pinned symbol locations and finish OpenCL teardown
@@ -71,10 +71,9 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Documentation CI runs `29319949484` and `29323559012` were green before this increment.
+- Documentation CI run `29327245157` is green for this increment, including isolated source-index tests, full discovery, and strict MkDocs.
 - Added detailed note `logs/research/2026-07-14/1351-attributed-type-indexing.md`.
 - Added focused tests for attributes before and after C++ type keywords.
-- The new commit-scoped Documentation CI result is pending verification.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - The public Pages route for branch-only artifacts cannot deploy until PR #1 merges; live verification remains pending.
 
@@ -82,8 +81,8 @@ B. implement the admitted CPU repack MUL_MAT fixture
 
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
-- **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the available validation path.
-- **Pages verification blocker:** branch-only documentation cannot deploy until PR #1 merges; live HTTP and rendered-content checks remain pending. Public search previously returned no indexed result for the site.
+- **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is green.
+- **Pages verification blocker:** branch-only documentation cannot deploy until PR #1 merges; live HTTP and rendered-content checks remain pending. Public search returned no indexed result for the site during this run.
 - **Source-index caveat:** same-line standard attributes are recognized; multiline attributes, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
