@@ -186,3 +186,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Does the next Documentation CI run pass both isolated suites, discovery, and strict MkDocs, and should coverage be expanded to multiple blank lines and nested indentation?
+
+## 2026-07-14 12:50 — Source-index whitespace regression coverage
+
+**Verified**
+
+- Documentation CI run `29319949484` completed successfully for commit `0e486859740650a998ee07531389dccc19e88e00`.
+- The successful run confirms the type-line repair passes both isolated suites, full unittest discovery, shell and Python validation, asset checks, dependency installation, and strict MkDocs.
+- Added a focused regression with two type declarations after multiple blank lines and at different indentation depths inside a namespace.
+- The expected symbol locations are the physical declaration lines: line 4 and line 9.
+
+**Interpretation**
+
+- The original defect is closed. The new test hardens the invariant that vertical whitespace must never shift a declaration's source location while horizontal indentation remains accepted.
+
+**Historical**
+
+- This coverage follows the branch's repair from multiline `\s*` to horizontal `[\t ]*` matching.
+
+**Open questions**
+
+- Verify the new test on its own commit-scoped CI run, then consider nested classes, attributes, and templates only if the approximate regex index expands.
