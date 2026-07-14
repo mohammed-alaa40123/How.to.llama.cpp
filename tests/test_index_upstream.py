@@ -140,6 +140,33 @@ template <typename T>
             ],
         )
 
+    def test_extract_symbols_handles_bounded_operator_definitions(self) -> None:
+        source = """\
+bool tensor_view::operator==(const tensor_view & other) const noexcept {
+    return data == other.data;
+}
+
+void tensor_view::operator()(int index) const {
+}
+
+int & tensor_view::operator[](int index) {
+    return data[index];
+}
+
+resource::operator bool() const noexcept {
+    return handle != nullptr;
+}
+"""
+        self.assertEqual(
+            index_upstream.extract_symbols(source),
+            [
+                {"name": "tensor_view::operator==", "kind": "function", "line": 1},
+                {"name": "tensor_view::operator()", "kind": "function", "line": 5},
+                {"name": "tensor_view::operator[]", "kind": "function", "line": 8},
+                {"name": "resource::operator bool", "kind": "function", "line": 12},
+            ],
+        )
+
     def test_extract_symbols_retains_duplicate_names(self) -> None:
         source = """\
 static void selected() {
