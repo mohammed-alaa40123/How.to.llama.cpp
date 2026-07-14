@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 07:05 Africa/Cairo_
+_Last updated: 2026-07-14 07:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -27,58 +27,56 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Line-aware generated source indexing with pinned file and symbol links.
 - Guided end-to-end inference atlas with clickable reading paths.
 - Bounded CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer lifetime audits.
+- Cross-implementation CPU optional-buffer comparison and portable destruction-test matrix.
 
 ## Latest concrete findings
 
-- SpacemiT owns a dedicated 64-byte-aligned weight allocation through `spine_mem_pool_alloc()` and returns it through `spine_mem_pool_free()`.
-- The Spine pool serializes allocation/free with a mutex, tracks live allocations, returns ranges to chunks, and can release empty chunks independently of `ggml_backend_cpu_context`.
-- `tensor->extra` points to process-static IME1, IME2, or RVV traits; the extra-buffer type and buffer-type metadata are function-static.
-- Upload/repacking and graph execution remain synchronous CPU work using the threadpool and explicit barriers, with no scheduler event or accelerator queue.
-- Worker setup may acquire thread-local TCM state; the paired clear-affinity hook releases it through `spine_mem_pool_tcm_mem_release()`.
-- Therefore audited weight-buffer destruction is independent of the ordinary CPU backend wrapper, while complete worker/process teardown remains conditional on TCM cleanup and pool-manager shutdown.
+- Repack and KleidiAI retain ordinary CPU allocation/free ownership while installing alternate packed layouts and static dispatch traits.
+- AMX owns a dedicated aligned allocation through the buffer context; SpacemiT owns a dedicated Spine pool allocation through the buffer context.
+- All four audited paths store process-static traits in `tensor->extra`, execute synchronously through CPU graph computation, and introduce no scheduler event or independent accelerator queue.
+- Therefore the audited weight-buffer free paths do not require `ggml_backend_cpu_context`.
+- Complete implementation shutdown remains path-specific: AMX retains allocator/tile-permission questions, while SpacemiT retains worker-local TCM and process-pool shutdown obligations.
+- A portable test matrix now covers normal free, backend-free-before-buffer-free, unsupported transfer callbacks, threaded initialization, sanitizers, and memory-expansion measurement.
 
 ## In progress
 
 - Regeneration of the pinned source inventory with line-aware records and pinned source links.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
-- Cross-implementation CPU extra-buffer comparison and destruction tests for repack, AMX, KleidiAI, and SpacemiT.
-- CPU extra-buffer destruction regression tests under ASan/LSan and SpacemiT TCM/threadpool teardown tests on supported hardware.
+- CPU extra-buffer destruction regression tests under ASan/LSan/TSan and SpacemiT TCM/threadpool teardown tests on supported hardware.
 - Shared generated metadata for the static inference atlas and interactive workflow.
 - Runtime overlays for page faults, scheduler copies, event waits, KV/recurrent growth, and backend queues.
 - CANN reset semantics, RPC completion, CUDA all-stream coverage, SYCL all-queue coverage, and Vulkan query-pool ownership.
 
 ## Immediate next task
 
-Finish the OpenCL teardown audit when the complete pinned source is searchable. Otherwise synthesize the completed CPU optional-buffer series:
+Finish the OpenCL teardown audit when the complete pinned source is searchable. Otherwise implement the first portable CPU optional-buffer regression increment from the comparison matrix:
 
 ```text
-repack / AMX / KleidiAI / SpacemiT
-→ allocation and free owner
-→ tensor->extra lifetime
-→ synchronous/thread-local state
-→ unsupported transfer callbacks
-→ backend-wrapper independence
-→ portable destruction test matrix
+create CPU backend
+→ obtain admitted optional buffer type
+→ allocate/populate supported tensor
+→ run one supported operation
+→ free CPU backend wrapper
+→ free tensor metadata and buffer
+→ repeat under ASan/LSan
 ```
 
 ## Publication and verification state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; checked head `f86b8c67c959f47d01a5574b65f0c471b3eb9353` was mergeable before the final state-only commit.
-- Added `docs/architecture/cpu-spacemit-ime-extra-buffer-lifetime.md` and linked it after the KleidiAI audit.
-- Added detailed note `logs/research/2026-07-14/0650-cpu-spacemit-ime-extra-buffer-lifetime.md`.
+- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
+- Added `docs/architecture/cpu-extra-buffer-comparison.md` and linked it after the four implementation-specific CPU pages.
+- Added detailed note `logs/research/2026-07-14/0749-cpu-extra-buffer-comparison.md`.
 - Updated README TODOs, project state, and research log; the research ledger is unchanged because no external source changed.
-- Local cloning again failed with `Could not resolve host: github.com`, so local Python tests, strict MkDocs build, and `check_site.sh` could not run.
-- Documentation CI run `29304828892` completed with failure. Checkout, Python setup, and context reading succeeded; step 5, `Validate project context, interactive links, and scripts`, failed, so dependency installation and strict MkDocs build were skipped.
-- The decoded job log exposed the failing step but was truncated before the validator stderr/assertion, so no evidence-backed fix could be applied in this run.
-- Direct opening of the Pages root and the existing KleidiAI route was rejected by the web safe-URL gate. The new SpacemiT route is branch-only until PR #1 merges, so its deployed HTTP response cannot yet be checked.
+- Local checkout-based Python tests, strict MkDocs build, and `check_site.sh` remain unavailable in this runtime.
+- GitHub Actions and Pages verification for the current head are recorded below after the final checks.
 
 ## Known blockers and caveats
 
-- **Pinned regeneration blocker:** local GitHub DNS resolution failed, so the source index could not be regenerated here.
+- **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
-- **CI failure:** run `29304828892` failed specifically at `Validate project context, interactive links, and scripts`; the available decoded log was truncated before the exact validator message, and later build steps were skipped.
-- **Pages verification blocker:** direct URL access was rejected; the SpacemiT page cannot deploy until PR #1 merges.
+- **CI history:** run `29304828892` failed specifically at `Validate project context, interactive links, and scripts`; the available decoded log was truncated before the exact validator message, and later build steps were skipped.
+- **Pages verification blocker:** the new comparison page is branch-only until PR #1 merges.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, thread-local leases, and release remain distinct states.
