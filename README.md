@@ -119,7 +119,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned source links, and unsupported-syntax counts, then finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
+- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned source links, and unsupported-syntax counts for braced initializers, multiline initializers, and constructor function-try-blocks; use actual candidate volume to prioritize scanner work and finish the OpenCL teardown audit.
 - [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
 - [ ] Verify SpacemiT worker cleanup and process-level Spine pool, huge-page mapping, device-fd, and TCM synchronization shutdown.
@@ -137,7 +137,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Add bounded constructor function-try-block telemetry only if pinned-tree evidence shows enough candidates to justify it; keep navigation extraction unchanged until line-target semantics are defined.
+- [ ] Define constructor function-try-block navigation line semantics and consider stateful extraction only if regenerated pinned-tree counts justify it.
 - [ ] Evaluate multiline attributes, multiline constraints/returns, in-class special members, braced or multiline constructor initializer lists, defaulted/deleted definitions, literals, complex conversion operators, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
 - [ ] Extend unsupported-syntax telemetry only after pinned-tree evidence identifies additional high-value missed forms.
 - [ ] Upload or preserve validator output as Actions artifacts if isolated suites and verbose unittest output are still insufficient.
@@ -155,6 +155,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add bounded constructor function-try-block telemetry for same-line and next-line `try` forms while keeping navigation extraction unchanged.
 - [x] Audit constructor function-try-block behavior and confirm it produces neither a partial symbol record nor current unsupported-syntax telemetry.
 - [x] Add bounded per-file and aggregate unsupported-syntax counters for braced and multiline constructor initializer candidates without emitting partial symbol records.
 - [x] Protect the constructor-initializer scanner boundary with negative tests proving braced and multiline forms are not partially indexed.
