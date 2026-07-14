@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 19:53 Africa/Cairo_
+_Last updated: 2026-07-14 20:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -19,7 +19,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 - MkDocs Material site, strict documentation CI, Pages deployment, health checks, source indexing, and durable run context.
 - Canonical GGUF, model placement, model/context, graph/MoE, scheduler, memory-lifetime, and system-ownership pages.
-- Pass A pages for public API, model/GGUF loading, runtime context/memory, scheduler, and concrete context-memory implementations.
+- Pass A pages for the public API/minimal example, model/GGUF loading, runtime context/memory, scheduler, and concrete context-memory implementations.
 - Exact pinned declaration and reverse-destruction map for `llama_model` and `llama_context`.
 - Generic scheduler plus ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
 - Cross-backend teardown comparison matrix and reusable teardown audit method.
@@ -41,15 +41,16 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Bounded qualified operator definitions recognized for symbolic, call, subscript, allocation, deletion, and single-token conversion forms.
 - Bounded qualified out-of-class constructor and destructor definitions recognized with exact source lines.
 - Bounded same-line constructor initializer lists recognized for out-of-class constructors without weakening exact source-line accuracy.
-- Successful full Documentation CI through the preceding special-member expansion.
+- Same-line delegating constructors verified as already accepted by the bounded initializer-list rule; the false unsupported-capability TODO was removed.
+- Successful full Documentation CI through the initializer-list expansion.
 
 ## Latest concrete findings
 
-- Documentation CI run `29348084640` completed successfully for special-member head `ef071688c7bca95fd3011e72d8f776bd84a98f0e`.
-- The previous `SPECIAL_MEMBER_RE` required the opening body brace immediately after optional `noexcept` and `requires`, so constructors with `: member(value)` initializer lists were absent from `symbol_locations`.
-- The new bounded initializer-list clause excludes newlines, semicolons, and braces, preserving the physical definition line and explicitly leaving multiline and braced initializers unsupported.
-- Focused tests require exact lines for `backend_state::backend_state` and `nested::resource::resource` with ordinary parenthesized member initializers.
-- Destructor behavior and ordinary function, operator, and type extraction remain unchanged.
+- Documentation CI run `29352222406` completed successfully for initializer-list head `f427ab95f3a9147acfc58a7248ebc2bd312f1a24`.
+- The current `SPECIAL_MEMBER_RE` initializer-list clause accepts both member initialization and constructor delegation when the entire list and opening body brace occur on one physical line.
+- A focused reproduction using the exact branch regex indexed `backend_state::backend_state` at line 1 and `nested::resource::resource` at line 4 for delegating-constructor examples.
+- The class-name backreference continues to constrain extraction to qualified constructors/destructors, while newlines, semicolons, and braces remain excluded from the initializer-list body.
+- No scanner implementation change was required; an explicit regression fixture remains needed before treating the behavior as a permanent compatibility guarantee.
 - The pinned OpenCL CMake target compiles `ggml-opencl.cpp`, whose blob SHA is `f283f65690af7790e163092207647d16dac9fb3e`.
 - The connector can expose the beginning of that 24k-line blob and confirms buffer-local `cl_mem` RAII, but output remains truncated before backend teardown symbols; no hidden teardown behavior was inferred.
 
@@ -57,6 +58,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 - Regeneration of the pinned source inventory with line-aware records and pinned source links.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
+- Explicit delegating-constructor regression coverage for the source index.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
 - CPU extra-buffer destruction tests for KleidiAI, AMX, and SpacemiT plus TSan and hardware-specific cleanup coverage.
 - Shared generated metadata for the static inference atlas and interactive workflow.
@@ -68,7 +70,8 @@ Read this file after the root README on every run. It is the compact checkpoint 
 Resume one of the two highest-value implementation tracks:
 
 ```text
-A. regenerate pinned symbol locations and finish OpenCL teardown
+A. add the explicit same-line delegating-constructor regression,
+   then regenerate pinned symbol locations and finish OpenCL teardown
 B. implement the admitted CPU repack MUL_MAT fixture
    → reference comparison
    → CPU backend wrapper free
@@ -79,10 +82,9 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Added detailed note `logs/research/2026-07-14/1953-constructor-initializer-indexing.md`.
-- Added focused initializer-list tests and a bounded same-line scanner clause.
-- The preceding special-member implementation passed Documentation CI and strict MkDocs in run `29348084640`.
-- The new initializer-list head requires commit-scoped Documentation CI and strict MkDocs validation.
+- Added detailed note `logs/research/2026-07-14/2052-delegating-constructor-indexing-audit.md`.
+- The preceding initializer-list implementation passed Documentation CI and strict MkDocs in run `29352222406`.
+- This run changed durable documentation only; the newly documented delegating-constructor behavior was reproduced with the exact current regex.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Direct Pages checks remain unavailable, and branch-only content cannot deploy until PR #1 merges.
 
@@ -92,7 +94,7 @@ B. implement the admitted CPU repack MUL_MAT fixture
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
 - **Pages verification blocker:** direct live-site checks are unavailable, and branch-only documentation cannot deploy until PR #1 merges.
-- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized constructor initializer lists are recognized; multiline forms, braced initializer lists, delegating constructors, function-try-blocks, in-class special members, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
+- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized; multiline forms, braced initializer lists, function-try-blocks, in-class special members, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
