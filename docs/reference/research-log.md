@@ -268,3 +268,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Add an explicit regression fixture before treating this behavior as a permanent compatibility guarantee.
 - Multiline delegation, braced arguments, function-try-blocks, and in-class definitions remain unsupported.
+
+## 2026-07-14 21:49 — Delegating constructor regression
+
+**Verified**
+
+- Added explicit source-index regression coverage for two bounded same-line qualified delegating constructors.
+- The fixture covers ordinary and nested qualified names, including `noexcept`, and requires exact physical lines 1 and 4.
+- The production scanner was not broadened; this converts previously verified behavior into a tested compatibility promise.
+
+**Interpretation**
+
+- Parenthesized same-line delegation is now protected, while multiline delegation and brace-containing arguments remain outside the approximate scanner contract.
+
+**Historical**
+
+- This closes the missing-test gap identified in the preceding delegating-constructor behavior audit.
+
+**Open questions**
+
+- Multiline delegation, braced arguments, function-try-blocks, and in-class definitions remain unsupported.
+- Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
