@@ -232,6 +232,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Added one bounded same-line initializer-list clause excluding newlines, semicolons, and braces.
 - Focused tests require exact lines for ordinary parenthesized initializer lists on qualified constructors.
 - Destructor behavior and ordinary-function, operator, and type extraction were not broadened.
+- Documentation CI run `29352222406` passed the complete suite and strict MkDocs for initializer-list head `f427ab95f3a9147acfc58a7248ebc2bd312f1a24`.
 
 **Interpretation**
 
@@ -243,5 +244,27 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 **Open questions**
 
-- Braced and multiline initializer lists, delegating constructors, function-try-blocks, in-class special members, and macro-generated definitions remain unsupported.
+- Braced and multiline initializer lists, function-try-blocks, in-class special members, and macro-generated definitions remain unsupported.
 - Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
+
+## 2026-07-14 20:52 — Delegating constructor indexing audit
+
+**Verified**
+
+- The current same-line initializer-list rule already recognizes constructor delegation such as `backend_state::backend_state(int device) : backend_state(device, nullptr) {`.
+- A focused reproduction using the exact branch regex returned the correct constructor names and physical lines for two delegating-constructor examples.
+- The class-name backreference remains in force, and the initializer-list body still excludes newlines, semicolons, and braces.
+- No scanner implementation change was required.
+
+**Interpretation**
+
+- Delegation was a falsely recorded gap: the real unresolved boundary is multiline or brace-containing initialization.
+
+**Historical**
+
+- Delegating-constructor support arrived implicitly with the preceding initializer-list clause but was not documented or tested.
+
+**Open questions**
+
+- Add an explicit regression fixture before treating this behavior as a permanent compatibility guarantee.
+- Multiline delegation, braced arguments, function-try-blocks, and in-class definitions remain unsupported.
