@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 11:51 Africa/Cairo_
+_Last updated: 2026-07-14 12:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -32,18 +32,19 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Documentation CI validation commands split into named steps with verbose unittest output.
 - Python unit tests split into source-index and interactive-link suites, followed by a full discovery guard.
 - Source-index type-declaration line locations corrected so blank lines are not consumed as leading whitespace.
+- Full Documentation CI success after the type-line repair.
+- Regression coverage for multiple blank lines and namespace-indented type declarations.
 
 ## Latest concrete findings
 
-- Documentation CI run `29316377253` passed durable project-context and interactive-link validation, then failed specifically in `Test source indexing`.
-- The failing test expects `enum class second_type` on source line 8.
-- `CLASS_RE` used `^\s*`; Python `\s` includes newline, so the match began on the preceding blank line and `line_number()` returned line 7.
-- Replacing leading and separating whitespace with horizontal `[\t ]*` and `[\t ]+` preserves the declaration start and returns line 8.
-- A bounded local regex reproduction confirmed the old result of 7 and corrected result of 8.
+- Documentation CI run `29319949484` completed successfully for commit `0e486859740650a998ee07531389dccc19e88e00`.
+- The successful run confirms the repaired `CLASS_RE` passes isolated source-index tests, interactive-link tests, full discovery, shell and Python checks, assets, dependencies, and strict MkDocs.
+- The new source-index test places declarations after multiple blank lines and at different indentation depths inside a namespace.
+- The expected locations remain the physical declaration lines: `indented_type` at line 4 and `more_indented_type` at line 9.
 
 ## In progress
 
-- Full Documentation CI verification after the source-index regex fix, followed by repair of any later failing step.
+- Verification of the new whitespace-regression test on the branch head.
 - Regeneration of the pinned source inventory with line-aware records and pinned source links.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -54,34 +55,32 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Immediate next task
 
-Inspect the branch-head Documentation CI run. If both isolated suites, discovery, shell, compilation, assets, dependency installation, and strict MkDocs pass, resume the portable CPU repack lifetime fixture:
+Inspect the commit-scoped Documentation CI run for the new source-index regression. If green, resume one of the two highest-value implementation tracks:
 
 ```text
-create CPU backend
-→ select the admitted repack buffer type
-→ allocate/populate a supported quantized weight tensor
-→ run one deterministic supported MUL_MAT
-→ compare against an ordinary CPU reference
-→ free CPU backend wrapper
-→ free graph/tensor metadata and repack buffer
-→ repeat under ASan/LSan
+A. pinned OpenCL teardown source recovery and classification
+B. admitted CPU repack MUL_MAT fixture
+   → reference comparison
+   → CPU backend wrapper free
+   → repack buffer free
+   → ASan/LSan repetition
 ```
 
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Documentation CI run `29316377253` isolated the failure to `Test source indexing`.
-- Updated `scripts/index_upstream.py` to prevent type patterns from consuming preceding newlines.
-- Added detailed note `logs/research/2026-07-14/1151-source-index-line-number-fix.md`.
-- A local regex reproduction passed; full checkout-based tests remain unavailable because `gh` is not installed and direct cloning has previously failed DNS resolution in this runtime.
+- Documentation CI run `29319949484` is green for the prior branch head.
+- Added detailed note `logs/research/2026-07-14/1250-source-index-whitespace-regression.md`.
+- Added focused tests for multiple vertical blank lines and namespace indentation.
+- Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - The public Pages route for branch-only artifacts cannot deploy until PR #1 merges; live verification remains pending.
 
 ## Known blockers and caveats
 
-- **Current CI verification:** the exact source-index defect is fixed, but the new branch-head workflow must confirm both test suites and reveal any later strict MkDocs issue.
+- **Current CI verification:** the prior head is green; the new regression commit still needs its own workflow result.
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
-- **Local validation blocker:** `gh` is not installed and prior cloning failed with `Could not resolve host: github.com`; full Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
+- **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
 - **Pages verification blocker:** branch-only documentation cannot deploy until PR #1 merges; live HTTP and rendered-content checks remain pending.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
