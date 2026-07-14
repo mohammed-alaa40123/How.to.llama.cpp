@@ -16,8 +16,8 @@ SKIP = {'.git','build','site','__pycache__','.venv'}
 INCLUDE_RE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
 # C++ attributes may precede a function declaration on the same physical line.
 # Bounded trailing-return and requires clauses are accepted after qualifiers.
-# Operator lines are reserved for OPERATOR_RE so ordinary extraction cannot emit
-# partial duplicate names such as `operator` or a conversion target such as bool.
+# Operator and qualified constructor/destructor lines are reserved for dedicated
+# patterns so ordinary extraction cannot emit partial or misleading names.
 # Every return-type whitespace matcher is horizontal so the match cannot begin on
 # a preceding template or blank line. This remains deliberately approximate and
 # does not attempt to parse multiline attributes/returns, macros, or every legal
@@ -25,6 +25,7 @@ INCLUDE_RE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
 FUNC_RE = re.compile(
     r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
     r'(?![^\n;{}]*\boperator\b)'
+    r'(?![^\n;{}]*(?:^|::)~?[A-Za-z_]\w*\s*\()'
     r'(?:[A-Za-z_][\w:<>,~*&\t ]+?)[\t ]+'
     r'([A-Za-z_]\w*(?:::\w+)*)\s*\([^;{}]*\)\s*'
     r'(?:const[\t ]*)?(?:noexcept[\t ]*)?'
@@ -43,6 +44,17 @@ OPERATOR_RE = re.compile(
     r'\s*\([^;{}]*\)\s*'
     r'(?:const[\t ]*)?(?:noexcept[\t ]*)?'
     r'(?:->[\t ]*[^;{}\n]+?[\t ]*)?'
+    r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?\{'
+)
+# Qualified constructor and destructor definitions have no return type. Requiring
+# at least one scope qualifier avoids confusing ordinary free functions with
+# special members while still indexing the common out-of-class definitions used
+# by RAII-heavy backend code.
+SPECIAL_MEMBER_RE = re.compile(
+    r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
+    r'((?:[A-Za-z_]\w*::)+(?:~?[A-Za-z_]\w*))'
+    r'\s*\([^;{}]*\)\s*'
+    r'(?:noexcept[\t ]*)?'
     r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?\{'
 )
 # C++ attributes may precede a type declaration on the same physical line.
@@ -73,7 +85,12 @@ def extract_symbols(text: str) -> list[dict[str, object]]:
     conditional branches are useful navigation targets. Results are source-ordered.
     """
     records: list[dict[str, object]] = []
-    for kind, pattern in (("function", FUNC_RE), ("function", OPERATOR_RE), ("type", CLASS_RE)):
+    for kind, pattern in (
+        ("function", FUNC_RE),
+        ("function", OPERATOR_RE),
+        ("function", SPECIAL_MEMBER_RE),
+        ("type", CLASS_RE),
+    ):
         for match in pattern.finditer(text):
             records.append({
                 "name": match.group(1),
