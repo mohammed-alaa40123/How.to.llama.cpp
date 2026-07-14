@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 02:58 Africa/Cairo_
+_Last updated: 2026-07-14 03:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -22,65 +22,61 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Pass A pages for public API, model/GGUF loading, runtime context/memory, scheduler, and concrete context-memory implementations.
 - Exact pinned declaration and reverse-destruction map for `llama_model` and `llama_context`.
 - Generic scheduler plus ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
-- Cross-backend teardown comparison matrix separating command completion from scheduler-resource independence.
-- Reusable backend teardown audit method with a ten-step worksheet, classification vocabulary, and minimum runtime test matrix.
-- Pinned OpenCL build composition, kernel deployment, official platform scope, and initial `cl_mem` RAII ownership map.
+- Cross-backend teardown comparison matrix and reusable teardown audit method.
+- Pinned OpenCL build composition and initial `cl_mem` ownership map.
 - Line-aware generated source indexing with pinned file and symbol links.
 - Guided end-to-end inference atlas with clickable reading paths.
+- Bounded `GGML_USE_CPU_REPACK` extra-buffer audit covering static registration/traits, ordinary CPU allocation delegation, synchronous execution, and backend-wrapper-independent buffer destruction.
 
 ## Latest concrete findings
 
-- Backend teardown requires two independent proofs: queued commands reached a host-visible completion boundary, and later scheduler deleters retain valid state without the deleted backend context.
-- The reusable audit method now makes entry points, queue coverage, context ownership, scheduler events/buffers, registry lifetime, reverse destruction, optional paths, and runtime tests explicit.
-- A backend result must name its resource scope; ordinary buffers do not automatically cover graph capture, profiling, communication, extra buffers, or vendor binary paths.
-- The project classification vocabulary now distinguishes verified safe, completion conditional, lifetime conditional, remote completion conditional, and open-question states.
-- OpenCL remains unclassified beyond build composition and initial `cl_mem` ownership.
+- CPU extra-buffer types are exposed through function-static registries.
+- The pinned repack buffer type retains a process-lifetime `extra_buffer_type` context, and its selected tensor traits are function-static objects stored through `tensor->extra`.
+- Repack allocation delegates to `ggml_backend_cpu_buffer_type()`, then overrides selected tensor callbacks without replacing the ordinary CPU buffer free callback.
+- `ggml_backend_cpu_free()` does not own the repack buffer type, trait objects, or existing buffers.
+- CPU graph execution is synchronous and exposes no async tensor, synchronization, or event callbacks; the repack path adds no separate queue.
+- Therefore audited repack buffers are independent of the ordinary CPU backend wrapper after command completion.
+- This result does not yet classify AMX, KleidiAI, or SpacemiT IME.
 
 ## In progress
 
 - Regeneration of the pinned source inventory with line-aware records and pinned source links.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
-- Optional CPU extra-buffer teardown audit.
+- Remaining optional CPU extra-buffer audits: AMX, KleidiAI, and SpacemiT IME.
+- CPU repack destruction regression test under ASan/LSan.
 - Shared generated metadata for the static inference atlas and interactive workflow.
 - Runtime overlays for page faults, scheduler copies, event waits, KV/recurrent growth, and backend queues.
 - CANN reset semantics, RPC completion, CUDA all-stream coverage, SYCL all-queue coverage, and Vulkan query-pool ownership.
 
 ## Immediate next task
 
-Apply the new audit method to the complete pinned OpenCL backend:
+Finish the OpenCL teardown audit when the complete pinned source is searchable. If that source-access blocker persists, continue the optional CPU series with AMX:
 
 ```text
-backend free entry
-→ submission and queue model
-→ host-visible completion boundary
-→ scheduler event/buffer deleter independence
-→ program/kernel/context release
-→ optional binary-library lifetime
-→ bounded teardown classification
+AMX buffer type and registration
+→ allocation/free callbacks
+→ tensor->extra ownership
+→ execution and thread synchronization
+→ backend-wrapper deleter independence
+→ bounded classification
 ```
-
-Then audit optional CPU extra-buffer deleters independently.
 
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- PR head after the context updates: `4a9a789f4d2f8f9a7e8c8eec69f8ae6c2c4b4f8b`; this state file adds a later branch commit.
-- Added `docs/architecture/backend-teardown-audit-method.md` and linked it before the comparison page.
-- Added detailed note `logs/research/2026-07-14/0249-backend-teardown-audit-method.md`.
+- Added `docs/architecture/cpu-repack-extra-buffer-lifetime.md` and linked it after the ordinary CPU teardown page.
+- Added detailed note `logs/research/2026-07-14/0351-cpu-repack-extra-buffer-lifetime.md`.
 - Updated README TODOs and the research log; the research ledger was unchanged because no external source changed.
-- Documentation CI run `29294594266` was `in_progress` when checked; no failure was available to inspect yet.
-- Combined commit status returned no separate status records.
-- Full local validation could not run because the execution environment could not resolve `github.com` and has no checkout.
-- Direct Pages root and atlas-route opening was rejected by the web safe-URL gate, so live HTTP/rendered-content verification remained blocked.
-- The new branch page cannot appear on public Pages until the PR is merged and the main deployment completes.
+- Local cloning still failed with `Could not resolve host: github.com`, so local Python tests, strict MkDocs build, and `check_site.sh` could not run.
+- GitHub Actions and Pages status are recorded below after final checks.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** local GitHub DNS resolution failed, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector still exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
-- **CI state:** Documentation CI was still running at final check, not failed.
-- **Pages verification blocker:** the web safe-URL gate rejected direct access; the new route is also branch-only until merge.
+- **Pages verification caveat:** the new route is branch-only until PR #1 is merged and main Pages redeploys.
+- **Scope caveat:** repack does not stand in for AMX, KleidiAI, SpacemiT IME, HBM, or future CPU extra-buffer implementations.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
