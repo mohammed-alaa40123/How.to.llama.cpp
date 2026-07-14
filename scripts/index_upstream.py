@@ -28,6 +28,19 @@ FUNC_RE = re.compile(
     r'(?:->[\t ]*[^;{}\n]+?[\t ]*)?'
     r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?\{'
 )
+# Operators need a dedicated bounded pattern because conversion operators do not
+# have a return type before the name. Support qualified symbolic/call/subscript
+# operators and single-token conversion targets on one physical line.
+OPERATOR_RE = re.compile(
+    r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
+    r'((?:[A-Za-z_]\w*::)*operator[\t ]*'
+    r'(?:\(\)|\[\]|(?:new|delete)(?:[\t ]*\[\])?|'
+    r'[=!<>+\-*/%&|^~]+|[A-Za-z_]\w*(?:::\w+)*))'
+    r'\s*\([^;{}]*\)\s*'
+    r'(?:const[\t ]*)?(?:noexcept[\t ]*)?'
+    r'(?:->[\t ]*[^;{}\n]+?[\t ]*)?'
+    r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?\{'
+)
 # C++ attributes may precede a type declaration on the same physical line.
 # Keep every whitespace matcher horizontal so source locations cannot drift to a
 # preceding blank line. This remains deliberately approximate: macros and
@@ -56,7 +69,7 @@ def extract_symbols(text: str) -> list[dict[str, object]]:
     conditional branches are useful navigation targets. Results are source-ordered.
     """
     records: list[dict[str, object]] = []
-    for kind, pattern in (("function", FUNC_RE), ("type", CLASS_RE)):
+    for kind, pattern in (("function", FUNC_RE), ("function", OPERATOR_RE), ("type", CLASS_RE)):
         for match in pattern.finditer(text):
             records.append({
                 "name": match.group(1),
