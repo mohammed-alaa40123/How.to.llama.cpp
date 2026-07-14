@@ -30,6 +30,7 @@ backend_state::backend_state(int device) : device(device) {
             {
                 "braced_constructor_initializers": 1,
                 "multiline_constructor_initializers": 1,
+                "constructor_function_try_blocks": 0,
             },
         )
 
@@ -43,6 +44,7 @@ backend_state::backend_state(int device) : device(device) {
             {
                 "braced_constructor_initializers": 0,
                 "multiline_constructor_initializers": 0,
+                "constructor_function_try_blocks": 0,
             },
         )
 
