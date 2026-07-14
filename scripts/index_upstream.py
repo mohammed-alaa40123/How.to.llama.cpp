@@ -59,6 +59,25 @@ SPECIAL_MEMBER_RE = re.compile(
     r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?'
     r'(?::[\t ]*[^;{}\n]+?[\t ]*)?\{'
 )
+# Unsupported-syntax telemetry is intentionally separate from symbol extraction.
+# These candidate counters identify constructor forms that the bounded scanner
+# skips, without emitting partial or misleading symbol records.
+BRACED_CONSTRUCTOR_INITIALIZER_RE = re.compile(
+    r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
+    r'((?:[A-Za-z_]\w*::)*([A-Za-z_]\w*)::\2)'
+    r'[\t ]*\([^;{}\n]*\)[\t ]*'
+    r'(?:noexcept[\t ]*)?'
+    r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?'
+    r':[\t ]*[^;\n]*\b[A-Za-z_]\w*[\t ]*\{[^}\n]*\}[^;\n]*\{'
+)
+MULTILINE_CONSTRUCTOR_INITIALIZER_RE = re.compile(
+    r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
+    r'((?:[A-Za-z_]\w*::)*([A-Za-z_]\w*)::\2)'
+    r'[\t ]*\([^;{}\n]*\)[\t ]*'
+    r'(?:noexcept[\t ]*)?'
+    r'(?:requires[\t ]+[^;{}\n]+?[\t ]*)?'
+    r'\n[\t ]*:'
+)
 # C++ attributes may precede a type declaration on the same physical line.
 # Keep every whitespace matcher horizontal so source locations cannot drift to a
 # preceding blank line. This remains deliberately approximate: macros and
@@ -102,6 +121,18 @@ def extract_symbols(text: str) -> list[dict[str, object]]:
     return sorted(records, key=lambda item: (int(item["line"]), str(item["kind"]), str(item["name"])))
 
 
+def count_unsupported_syntax(text: str) -> dict[str, int]:
+    """Count bounded candidates intentionally skipped by symbol extraction.
+
+    The counts are triage telemetry, not a claim to parse every C++ form. Keeping
+    them separate ensures unsupported syntax never becomes a partial symbol link.
+    """
+    return {
+        "braced_constructor_initializers": len(BRACED_CONSTRUCTOR_INITIALIZER_RE.findall(text)),
+        "multiline_constructor_initializers": len(MULTILINE_CONSTRUCTOR_INITIALIZER_RE.findall(text)),
+    }
+
+
 def source_file_url(base: str | None, relative_path: str) -> str | None:
     """Return a normalized source-file URL when a repository/ref base is supplied."""
     if not base:
@@ -141,6 +172,7 @@ def main() -> int:
         rel = p.relative_to(src).as_posix()
         file_url = source_file_url(args.source_url_base, rel)
         symbol_records = add_source_links(extract_symbols(text), file_url)
+        unsupported_syntax = count_unsupported_syntax(text)
         record = {
             'path': rel,
             'language': language(p),
@@ -152,18 +184,26 @@ def main() -> int:
             'symbols': sorted({str(item['name']) for item in symbol_records})[:500],
             # Untruncated, source-ordered navigation records.
             'symbol_locations': symbol_records,
+            # Candidate counts for deliberately unsupported scanner forms.
+            'unsupported_syntax': unsupported_syntax,
         }
         if file_url:
             record['source_url'] = file_url
         records.append(record)
+    unsupported_totals = {
+        key: sum(int(r['unsupported_syntax'][key]) for r in records)
+        for key in ('braced_constructor_initializers', 'multiline_constructor_initializers')
+    }
     summary = {
         'source_root': str(src),
         'source_url_base': args.source_url_base.rstrip('/') if args.source_url_base else None,
         'file_count': len(records),
         'total_lines': sum(r['lines'] for r in records),
+        'unsupported_syntax_counts': unsupported_totals,
         'files': records,
         'limitations': [
             'Regex symbols are approximate.',
+            'Unsupported-syntax counts are bounded triage candidates, not complete C++ parser diagnostics.',
             'Conditional compilation is unresolved.',
             'Overloads and repeated conditional declarations may share names.',
             'Virtual calls/function pointers/backend registration require human review.',
@@ -184,12 +224,14 @@ Generated from `{src}`. This is a navigation index, not a compiler-grade call gr
 
 - Files: **{len(records):,}**
 - Lines: **{summary['total_lines']:,}**
+- Braced constructor-initializer candidates skipped: **{unsupported_totals['braced_constructor_initializers']:,}**
+- Multiline constructor-initializer candidates skipped: **{unsupported_totals['multiline_constructor_initializers']:,}**
 
 | Language | Files | Lines |
 |---|---:|---:|
 {rows}
 
-The full per-file index is stored in `data/generated/source-index.json`. Each file includes untruncated `symbol_locations` records with approximate declaration kind and 1-based source line. When `--source-url-base` is supplied, file records and symbols also include pinned GitHub URLs. The legacy compact `symbols` field remains for compatibility.
+The full per-file index is stored in `data/generated/source-index.json`. Each file includes untruncated `symbol_locations` records with approximate declaration kind and 1-based source line. When `--source-url-base` is supplied, file records and symbols also include pinned GitHub URLs. The legacy compact `symbols` field remains for compatibility. `unsupported_syntax` records bounded candidate counts for forms deliberately omitted from symbol extraction; these counts prioritize human review and must not be treated as complete parser diagnostics.
 """
     args.markdown.parent.mkdir(parents=True, exist_ok=True)
     args.markdown.write_text(md)
