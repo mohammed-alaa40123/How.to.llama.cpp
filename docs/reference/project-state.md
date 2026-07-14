@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 05:50 Africa/Cairo_
+_Last updated: 2026-07-14 05:57 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -68,16 +68,16 @@ SpacemiT IME buffer type and registration
 - Added detailed note `logs/research/2026-07-14/0550-cpu-kleidiai-extra-buffer-lifetime.md`.
 - Updated README TODOs, project state, and research log; the research ledger is unchanged because no external source changed.
 - Local cloning failed with `Could not resolve host: github.com`, so local Python tests, strict MkDocs build, and `check_site.sh` could not run.
-- GitHub Actions and Pages status must be checked against the final branch head after the durable updates in this run.
-- The new KleidiAI route is branch-only until PR #1 merges; deployed HTTP status and rendered content cannot be expected before merge.
+- Documentation CI run `29302275409` for final checked head `503b780dafcf1c4ce34936ee67c8f930afdbfeda` was still `in_progress`; no failure was available to inspect or fix.
+- Direct opening of both the Pages root and the KleidiAI route was rejected by the available safe-URL gate. The new route is also branch-only until PR #1 merges, so deployed HTTP status and rendered content remain unverified.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** local GitHub DNS resolution failed, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout.
-- **CI blocker:** an earlier run failed in the combined validation/test shell step, but the available decoded log truncated before the exact validator output.
-- **Pages verification blocker:** the new KleidiAI route cannot deploy until PR #1 merges; direct live verification remains subject to available URL access.
+- **CI status:** run `29302275409` was still in progress at the final check, so current-head success or failure is not yet known.
+- **Pages verification blocker:** direct URL access was rejected and the KleidiAI route cannot deploy until PR #1 merges.
 - **KleidiAI caveats:** validate null readback/copy callbacks, concurrent global initialization, packed-layout portability, and one-versus-two-slot memory expansion.
 - **Scope caveat:** repack, AMX, and KleidiAI do not stand in for SpacemiT IME, HBM, or future CPU extra-buffer implementations.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, and release remain distinct states.
