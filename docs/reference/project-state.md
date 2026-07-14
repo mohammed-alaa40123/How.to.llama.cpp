@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 13:51 Africa/Cairo_
+_Last updated: 2026-07-14 14:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -34,16 +34,16 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Source-index type-declaration line locations corrected so blank lines are not consumed as leading whitespace.
 - Regression coverage for multiple blank lines and namespace-indented type declarations.
 - Same-line C++ attributes before and after type keywords recognized without weakening physical-line accuracy.
+- Same-line C++ attributes before function return types recognized with focused free-function and qualified-method coverage.
 - Successful full Documentation CI runs for the line-number repair, whitespace regression, and attributed-type expansion.
 
 ## Latest concrete findings
 
-- The previous type pattern required the type keyword to be the first non-horizontal-whitespace token.
-- The updated pattern accepts one or more same-line `[[...]]` attribute groups before the type keyword and between the keyword and declared name.
-- The focused test covers attributed `struct` and `enum class` declarations at lines 1, 4, and 7.
-- All whitespace matching remains horizontal, so the earlier preceding-blank-line defect is not reintroduced.
-- Function extraction, duplicate retention, source ordering, and pinned link construction are unchanged.
-- Documentation CI run `29327245157` completed successfully for final commit `c5cc2f629097a1d19ce1b5f7b273714aa7951f08`.
+- The previous function pattern required the return type to be the first non-horizontal-whitespace token, so a leading `[[...]]` attribute prevented indexing.
+- The updated pattern accepts one or more same-line attribute groups before the function return type.
+- The focused test covers a free function and namespace-qualified `const noexcept` method at lines 1 and 5.
+- Type extraction, duplicate retention, source ordering, and pinned link construction are unchanged.
+- The pinned OpenCL blob can be retrieved, but the connector still truncates it before the backend teardown section; no hidden teardown behavior was inferred.
 
 ## In progress
 
@@ -71,9 +71,10 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Documentation CI run `29327245157` is green for this increment, including isolated source-index tests, full discovery, and strict MkDocs.
-- Added detailed note `logs/research/2026-07-14/1351-attributed-type-indexing.md`.
-- Added focused tests for attributes before and after C++ type keywords.
+- Added detailed note `logs/research/2026-07-14/1452-attributed-function-indexing.md`.
+- Added focused tests for leading same-line attributes on function definitions.
+- A bounded local regular-expression reproduction returned the expected names and declaration lines.
+- GitHub-hosted Documentation CI is pending for the final branch head.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - The public Pages route for branch-only artifacts cannot deploy until PR #1 merges; live verification remains pending.
 
@@ -81,9 +82,9 @@ B. implement the admitted CPU repack MUL_MAT fixture
 
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index could not be regenerated here.
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
-- **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is green.
-- **Pages verification blocker:** branch-only documentation cannot deploy until PR #1 merges; live HTTP and rendered-content checks remain pending. Public search returned no indexed result for the site during this run.
-- **Source-index caveat:** same-line standard attributes are recognized; multiline attributes, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
+- **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
+- **Pages verification blocker:** branch-only documentation cannot deploy until PR #1 merges; live HTTP and rendered-content checks remain pending.
+- **Source-index caveat:** same-line standard attributes are recognized for types and leading function definitions; multiline attributes, trailing-return syntax, requires clauses, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
