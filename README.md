@@ -119,7 +119,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Inspect the Documentation CI run after the type-declaration line-number fix; repair any later interactive-link, discovery, shell, compilation, asset, dependency, or strict MkDocs failure.
+- [ ] Inspect the Documentation CI run after adding multiple-blank-line and namespace-indentation source-index coverage; repair any newly exposed failure.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
 - [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
@@ -138,7 +138,6 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Add source-index tests for multiple blank lines and indented declarations inside namespaces.
 - [ ] Upload or preserve validator output as Actions artifacts if isolated suites and verbose unittest output are still insufficient.
 - [ ] Validate generated pinned blob URLs and line fragments during Documentation CI.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
@@ -154,6 +153,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Confirm the source-index type line-number fix through a successful full Documentation CI run.
+- [x] Add source-index regression coverage for multiple blank lines and namespace-indented type declarations.
 - [x] Diagnose and fix source-index type declarations reporting the preceding blank line instead of the declaration line.
 - [x] Split Python unit tests into source-index and interactive-link suites while retaining full discovery coverage.
 - [x] Split Documentation CI validation into named steps and enable verbose unittest output so failures identify the subsystem.
