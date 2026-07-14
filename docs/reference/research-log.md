@@ -272,3 +272,25 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Verify the focused regression and strict MkDocs through Documentation CI, then return to pinned OpenCL source recovery or the CPU repack destruction fixture.
+
+## 2026-07-14 16:51 — Constrained C++ function indexing and line accuracy
+
+**Verified**
+
+- `FUNC_RE` still used `\s` inside its return-type character class, allowing a match to begin on a preceding template line.
+- Return-type whitespace is now horizontal-only, preserving the physical function definition line.
+- The scanner accepts one bounded same-line C++20 `requires` clause after optional qualifiers and trailing-return syntax.
+- A focused test covers an ordinary constrained function and an attributed namespace-qualified `const noexcept` trailing-return method at physical lines 2 and 7.
+- The constraint matcher excludes newlines, semicolons, and braces.
+
+**Interpretation**
+
+- Exact navigation lines are more valuable than broad but line-shifting grammar acceptance. Common same-line constraints can be supported without treating the regex as a complete C++ parser.
+
+**Historical**
+
+- This increment applies the horizontal-whitespace invariant from type declarations to function return types and closes the previously listed same-line `requires` gap.
+
+**Open questions**
+
+- Evaluate multiline constraints, operators, and declaration/export macros only after regenerating and inspecting the pinned tree; then return to OpenCL teardown or the CPU repack destruction fixture.
