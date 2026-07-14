@@ -115,6 +115,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/cpu-kleidiai-extra-buffer-lifetime.md` | KleidiAI packed weights, static traits, ordinary CPU allocation ownership, and teardown |
 | `docs/architecture/cpu-spacemit-ime-extra-buffer-lifetime.md` | SpacemiT pooled weight allocation, static traits, thread-local TCM coordination, and teardown |
 | `docs/architecture/cpu-extra-buffer-comparison.md` | Cross-implementation ownership comparison and portable destruction-test matrix |
+| `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
 | `docs/architecture/cuda-backend-teardown.md` | CUDA teardown and conditional completion |
 | `docs/architecture/metal-backend-teardown.md` | Metal explicit synchronization and teardown |
 | `docs/architecture/vulkan-backend-teardown.md` | Vulkan explicit synchronization and teardown |
@@ -134,11 +135,11 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Highest priority
 
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations` and pinned source links, then use the backend teardown audit worksheet to finish the OpenCL backend/context free, queue completion, scheduler-resource, program/kernel/context, and binary-library teardown audit.
-- [ ] Implement the first portable CPU optional-buffer destruction regression harness from the comparison matrix: supported compute → CPU backend free → extra buffer free under ASan/LSan, then extend it to AMX, KleidiAI, and SpacemiT hardware paths.
+- [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
+- [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
 - [ ] Verify SpacemiT worker cleanup: every TCM-acquiring path must call the clear-affinity hook; audit process-level Spine pool, huge-page mapping, device-fd, and TCM synchronization shutdown.
 - [ ] Validate KleidiAI null readback/copy callbacks, concurrent initialization, packed-layout portability, and one-versus-two-slot memory expansion.
 - [ ] Validate AMX allocator pairing (`ggml_aligned_malloc()` with the current `free()` callback) on supported platforms, repeated tile-permission initialization, and disabled readback/copy paths.
-- [ ] Add CPU repack, AMX, KleidiAI, and SpacemiT destruction regression tests: compute → CPU backend free → extra buffer free, under ASan/LSan; add repeated SpacemiT threadpool/TCM teardown on supported hardware.
 - [ ] Verify CANN reset semantics with authoritative runtime documentation and a test matrix: destroy streams/events/buffers before versus after `aclrtResetDevice`, one versus two contexts, and scheduler-resource release after backend free.
 - [ ] Design and test a real RPC synchronization/completion command; verify immediate graph-compute → remote-buffer-free and graph-compute → connection-close behavior on CPU and accelerator servers.
 - [ ] Verify shared RPC socket serialization under concurrent backend/buffer users and document transport error/reconnect semantics.
@@ -151,9 +152,9 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Add exact pinned line-level source citations to the graph-construction chapter once generated source-link checking is ready.
 - [ ] Expand the interactive explorer with architecture-specific builders, prefill/decode variants, KV/recurrent state, MoE, scheduler splits/copies, and runtime overlays.
 - [ ] Replace curated interactive metadata with generated versioned JSON shared by the inference atlas, object pages, source maps, and visualizers.
-- [ ] Fix Documentation CI run `29304828892`: `Validate project context, interactive links, and scripts` failed and the decoded log was truncated before the exact validator message; dependency installation and strict MkDocs build were skipped.
+- [ ] Fix Documentation CI run `29307346854`: `Validate project context, interactive links, and scripts` failed; dependency installation and strict MkDocs build were skipped, and the connector log remained truncated before the final assertion.
 - [ ] Verify the latest **Deploy documentation** and **Hourly research context check** runs after CI is repaired.
-- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-extra-buffer-comparison/` after merge; the route is branch-only until PR #1 merges.
+- [ ] Verify the public Pages site returns HTTP 200 and renders `architecture/cpu-extra-buffer-destruction-harness/` after merge; the route is branch-only until PR #1 merges.
 
 ### Future improvements
 
@@ -173,6 +174,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Specify an implementation-ready CPU optional-buffer destruction harness with exact admission, correctness, completion, backend-free-before-buffer-free, sanitizer, negative-test, and implementation-ladder requirements.
 - [x] Synthesize CPU repack, AMX, KleidiAI, and SpacemiT IME into one ownership/completion comparison and portable destruction-test matrix.
 - [x] Audit the pinned SpacemiT IME extra-buffer path: dedicated Spine pool allocation/free ownership, static IME/RVV traits and buffer metadata, synchronous threadpool execution, thread-local TCM coordination, backend-wrapper-independent buffer destruction, and conditional complete-worker teardown.
 - [x] Audit the pinned KleidiAI extra-buffer path: critical-section initialization, feature-selected kernel chains, ordinary CPU allocation/free ownership, versioned packed slots, static traits/type metadata, synchronous CPU execution, and backend-wrapper independence.
