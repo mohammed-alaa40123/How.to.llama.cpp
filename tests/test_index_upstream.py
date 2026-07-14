@@ -167,6 +167,28 @@ resource::operator bool() const noexcept {
             ],
         )
 
+    def test_extract_symbols_handles_qualified_constructors_and_destructors(self) -> None:
+        source = """\
+backend_state::backend_state(int device) noexcept {
+    initialize(device);
+}
+
+backend_state::~backend_state() noexcept {
+    release();
+}
+
+[[deprecated("use factory")]] nested::resource::resource() requires Enabled<nested::resource> {
+}
+"""
+        self.assertEqual(
+            index_upstream.extract_symbols(source),
+            [
+                {"name": "backend_state::backend_state", "kind": "function", "line": 1},
+                {"name": "backend_state::~backend_state", "kind": "function", "line": 5},
+                {"name": "nested::resource::resource", "kind": "function", "line": 9},
+            ],
+        )
+
     def test_extract_symbols_retains_duplicate_names(self) -> None:
         source = """\
 static void selected() {
