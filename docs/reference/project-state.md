@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-14 18:51 Africa/Cairo_
+_Last updated: 2026-07-14 19:53 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -40,16 +40,16 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Bounded same-line C++20 `requires` clauses recognized after ordinary or trailing-return signatures.
 - Bounded qualified operator definitions recognized for symbolic, call, subscript, allocation, deletion, and single-token conversion forms.
 - Bounded qualified out-of-class constructor and destructor definitions recognized with exact source lines.
-- Successful full Documentation CI through the special-member expansion.
+- Bounded same-line constructor initializer lists recognized for out-of-class constructors without weakening exact source-line accuracy.
+- Successful full Documentation CI through the preceding special-member expansion.
 
 ## Latest concrete findings
 
-- Documentation CI run `29343666640` completed successfully for operator-indexing head `c815b11fa0caddb846d60e4489a08f06592aa06f`.
-- Constructors and destructors have no return type, so the ordinary function pattern cannot reliably index them.
-- `SPECIAL_MEMBER_RE` recognizes same-line qualified constructors and destructors, including attributes, `noexcept`, and one bounded same-line `requires` clause.
-- A class-name backreference requires the function name to match the immediately preceding class name, preventing ordinary qualified methods from being indexed twice.
-- Focused tests require exact lines for `backend_state::backend_state`, `backend_state::~backend_state`, and `nested::resource::resource`.
-- Documentation CI run `29347964831` completed successfully for final head `4402c482d2c3251edb69f83c7cbd8195751a611e`, including isolated tests, full discovery, and strict MkDocs.
+- Documentation CI run `29348084640` completed successfully for special-member head `ef071688c7bca95fd3011e72d8f776bd84a98f0e`.
+- The previous `SPECIAL_MEMBER_RE` required the opening body brace immediately after optional `noexcept` and `requires`, so constructors with `: member(value)` initializer lists were absent from `symbol_locations`.
+- The new bounded initializer-list clause excludes newlines, semicolons, and braces, preserving the physical definition line and explicitly leaving multiline and braced initializers unsupported.
+- Focused tests require exact lines for `backend_state::backend_state` and `nested::resource::resource` with ordinary parenthesized member initializers.
+- Destructor behavior and ordinary function, operator, and type extraction remain unchanged.
 - The pinned OpenCL CMake target compiles `ggml-opencl.cpp`, whose blob SHA is `f283f65690af7790e163092207647d16dac9fb3e`.
 - The connector can expose the beginning of that 24k-line blob and confirms buffer-local `cl_mem` RAII, but output remains truncated before backend teardown symbols; no hidden teardown behavior was inferred.
 
@@ -79,9 +79,10 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Added detailed note `logs/research/2026-07-14/1851-special-member-indexing.md`.
-- Added focused constructor/destructor tests and a dedicated bounded scanner pattern.
-- Documentation CI and strict MkDocs passed for final implementation head `4402c482d2c3251edb69f83c7cbd8195751a611e` in run `29347964831`.
+- Added detailed note `logs/research/2026-07-14/1953-constructor-initializer-indexing.md`.
+- Added focused initializer-list tests and a bounded same-line scanner clause.
+- The preceding special-member implementation passed Documentation CI and strict MkDocs in run `29348084640`.
+- The new initializer-list head requires commit-scoped Documentation CI and strict MkDocs validation.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Direct Pages checks remain unavailable, and branch-only content cannot deploy until PR #1 merges.
 
@@ -91,7 +92,7 @@ B. implement the admitted CPU repack MUL_MAT fixture
 - **Large upstream file blocker:** the connector exposes the pinned OpenCL blob as truncated output and exact hidden symbols remain difficult to search.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
 - **Pages verification blocker:** direct live-site checks are unavailable, and branch-only documentation cannot deploy until PR #1 merges.
-- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, and qualified out-of-class special members are recognized; multiline forms, in-class special members, constructor initializer lists, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
+- **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized constructor initializer lists are recognized; multiline forms, braced initializer lists, delegating constructors, function-try-blocks, in-class special members, defaulted/deleted definitions, literals, arbitrary declaration macros, and generated syntax remain approximate or unresolved.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - **Scope caveat:** optional CPU extra-buffer audits do not prove behavior for HBM or future implementations.
