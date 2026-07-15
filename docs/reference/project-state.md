@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 09:51 Africa/Cairo_
+_Last updated: 2026-07-15 10:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -21,7 +21,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Canonical GGUF, model placement, model/context, graph/MoE, scheduler, memory-lifetime, and system-ownership pages.
 - Pass A pages for the public API/minimal example, model/GGUF loader, runtime context/memory, backend scheduler, and concrete context-memory implementations.
 - Exact pinned declaration and reverse-destruction map for `llama_model` and `llama_context`.
-- Generic scheduler plus ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
+- Generic scheduler plus ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown audits.
 - Cross-backend teardown comparison matrix and reusable teardown audit method.
 - Pinned OpenCL build composition, exact lifecycle inventory, source-backed queue/context ownership, and Adreno binary-library lifetime classification.
 - Line-aware generated source indexing with pinned file and symbol links.
@@ -41,12 +41,16 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Verified OpenCL backend-wrapper order: queue completion occurs before wrapper reference drop, while the actual device/backend context remains process-lifetime.
 - Verified OpenCL scheduler events are unsupported and buffer deleters use buffer-local `cl_mem` ownership rather than the destroyed wrapper.
 - Resolved optional Adreno binary-library lifetime: the raw loader handle is not retained or closed, so the library, exported lookup function, and accepted binary-kernel path remain process-lifetime.
+- Portable OpenCL evidence manifest: artifact-root basenames, pre-upload `sha256sum -c`, and an exact-filename guard make the downloaded artifact directly verifiable after extraction.
 
 ## Latest concrete findings
 
-- Workflow run `29392658206` succeeded and uploaded artifact `8333854723`, expiring on 2026-08-14.
-- The artifact contains the exact pinned source, the 558-call JSON report, and a two-entry SHA-256 manifest.
-- Recomputed hashes matched the manifest: report `31b708767b506629ef1bdf9aebfa18c54d56554cd15745f1be77d35eac0d26ba`; source `8e2f6fdd532de1b78dbfe14d14921df05d1b37c5b73d415d620a787f635fde6d`.
+- The previous checksum manifest used repository-relative `build/reports/...` paths even though uploaded files appear at the artifact root.
+- The workflow now generates checksums from inside `build/reports`, so the manifest stores only `opencl-lifecycle-pinned-e3546c7.json` and `ggml-opencl-pinned-e3546c7.cpp`.
+- The workflow verifies the manifest with `sha256sum -c` before upload.
+- A Python guard requires exactly two manifest entries and exact equality with the two artifact-root filenames.
+- The evidence content, pinned revision verification, minimum source-size guard, non-empty lifecycle report check, and 30-day retention remain unchanged.
+- After download and extraction into one directory, verification is now a single command: `sha256sum -c opencl-lifecycle-pinned-e3546c7.sha256`.
 - Device registration creates one `shared_context` and copies it into each supported `ggml_backend_opencl_device_context`.
 - Device contexts are held by static `g_ggml_backend_opencl_dev_ctxs`; the source explicitly states those devices and contexts live as long as the process.
 - `ggml_cl_init()` lazily allocates one `ggml_backend_opencl_context` per device, stores it in `dev_ctx->backend_ctx`, copies the shared context, and creates one command queue.
@@ -57,13 +61,12 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Under `GGML_OPENCL_USE_ADRENO_BIN_KERNELS`, `kernel_lib_handle` is a block-local raw handle. `libdl.h` provides a deleter, but the loader neither owns nor closes the handle.
 - Only `get_adreno_bin_kernel_func` is retained in the process-lifetime backend context. A successfully loaded library and a loaded library with a missing symbol both remain mapped until process teardown.
 - Five pinned paths consume library-provided bytes through `clCreateProgramWithBinary()`, create a kernel, and release the temporary program reference.
-- Pinned classification is now **backend-wrapper order supported; deterministic process-exit release omitted; Adreno binary library process-lifetime by leaked handle**.
+- Pinned classification remains **backend-wrapper order supported; deterministic process-exit release omitted; Adreno binary library process-lifetime by leaked handle**.
 
 ## In progress
 
 - Classification of enqueue-then-release groups that rely on OpenCL retention semantics rather than explicit waits.
 - Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
-- Fixing checksum-manifest paths to use artifact-root basenames for direct `sha256sum -c` verification.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
 - CPU extra-buffer destruction tests for KleidiAI, AMX, and SpacemiT plus TSan and hardware-specific cleanup coverage.
@@ -86,10 +89,9 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/0951-opencl-adreno-library-lifetime.md`.
-- Pinned lifecycle/source workflow run `29392658206` completed successfully for the source-preservation increment.
-- The generated artifact was downloaded and its report/source hashes were verified.
-- Documentation CI and the pinned OpenCL workflow for the final durable-state head must be checked before the run closes.
+- Added detailed note `logs/research/2026-07-15/1050-opencl-artifact-manifest-basename-fix.md`.
+- The workflow implementation commit is `64dfba1a11b124d6a7a15b65b49b1f5ed65adf6e`.
+- Final-head Documentation CI and pinned OpenCL workflow results must be checked before the run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
@@ -97,7 +99,6 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 
 - **Deterministic-release gap:** the pinned translation unit intentionally keeps device/backend contexts process-lifetime and contains no explicit queue/context release or per-device backend-context deletion path.
 - **Adreno library lifetime:** the optional binary-kernel loader loses its raw `dl_handle`. This prevents early unload but omits deterministic release and also retains invalid-symbol loads until process exit.
-- **Checksum usability caveat:** the manifest hashes are correct, but entries include `build/reports/...` paths, so direct `sha256sum -c` from the artifact root needs path adjustment.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Actions are the authoritative validation path for this branch.
 - **Pages verification blocker:** branch-added content cannot deploy until PR #1 merges; live response verification remains unavailable independently of strict-build success.
 - **Lifecycle-extractor caveat:** selected direct APIs and bounded context are navigation evidence only; wrapper constructors, ownership, error paths, macro wrappers, disabled code, raw strings, and semantic ordering still require human source review.
