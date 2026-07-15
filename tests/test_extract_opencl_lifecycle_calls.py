@@ -13,23 +13,40 @@ SPEC.loader.exec_module(extractor)
 
 
 class OpenCLLifecycleCallExtractorTests(unittest.TestCase):
-    def test_extracts_completion_and_release_calls_in_source_order(self) -> None:
+    def test_extracts_creation_retention_completion_and_release_in_source_order(self) -> None:
         source = """\
+cl_context = clCreateContext(properties, 1, &device, nullptr, nullptr, &error);
+queue = clCreateCommandQueue(cl_context, device, 0, &error);
+queue2 = clCreateCommandQueueWithProperties(cl_context, device, properties, &error);
+clRetainContext(cl_context);
+clRetainCommandQueue(queue);
 CL_CHECK(clFinish(queue));
 clReleaseKernel(kernel);
 clReleaseProgram(program);
 clReleaseCommandQueue(queue);
-clReleaseContext(context);
+clReleaseContext(cl_context);
 """
         self.assertEqual(
             extractor.extract_opencl_lifecycle_calls(source),
             [
-                {"name": "clFinish", "line": 1},
-                {"name": "clReleaseKernel", "line": 2},
-                {"name": "clReleaseProgram", "line": 3},
-                {"name": "clReleaseCommandQueue", "line": 4},
-                {"name": "clReleaseContext", "line": 5},
+                {"name": "clCreateContext", "line": 1},
+                {"name": "clCreateCommandQueue", "line": 2},
+                {"name": "clCreateCommandQueueWithProperties", "line": 3},
+                {"name": "clRetainContext", "line": 4},
+                {"name": "clRetainCommandQueue", "line": 5},
+                {"name": "clFinish", "line": 6},
+                {"name": "clReleaseKernel", "line": 7},
+                {"name": "clReleaseProgram", "line": 8},
+                {"name": "clReleaseCommandQueue", "line": 9},
+                {"name": "clReleaseContext", "line": 10},
             ],
+        )
+
+    def test_extracts_context_from_type(self) -> None:
+        source = "context = clCreateContextFromType(properties, CL_DEVICE_TYPE_GPU, nullptr, nullptr, &error);\n"
+        self.assertEqual(
+            extractor.extract_opencl_lifecycle_calls(source),
+            [{"name": "clCreateContextFromType", "line": 1}],
         )
 
     def test_ignores_similar_identifiers_without_a_call(self) -> None:
@@ -37,15 +54,16 @@ clReleaseContext(context);
 auto clFinishStatus = 0;
 const char * name = "clReleaseContext";
 release_clReleaseProgram(program);
+create_clCreateContext(properties);
 """
         self.assertEqual(extractor.extract_opencl_lifecycle_calls(source), [])
 
     def test_ignores_calls_inside_comments_and_literals(self) -> None:
         source = """\
-// clFinish(queue);
+// clCreateCommandQueue(context, device, 0, &error);
 /* clReleaseContext(context);
    clReleaseProgram(program); */
-const char * text = "clReleaseKernel(kernel)";
+const char * text = "clRetainContext(context)";
 const char escaped = '\\'';
 clFlush(queue);
 """
