@@ -287,3 +287,30 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Audit every remaining local event passed to `clWaitForEvents()` and pair it with release or ownership transfer.
 - Determine whether a bounded wait-without-release diagnostic can be added without overstating C++ scope semantics.
 - Review `CL_CHECK` failure behavior for event and temporary-buffer cleanup.
+
+## 2026-07-15 14:52 — Complete OpenCL waited-event pairing audit
+
+**Verified**
+
+- Downloaded the exact source-bearing artifact from successful workflow run `29410050891`, artifact `8340693497`.
+- Paired all 51 direct `clWaitForEvents()` sites with their producer and local ownership path.
+- Five waited events are released: profiling, blocking transpose copy, backend synchronization barrier, BF16 upload conversion, and BF16 readback conversion.
+- Forty-six locally returned command events are waited but never released or transferred.
+- The unmatched waits span eleven quantized tensor-type groups; `Q5_0` has 6, `Q5_1`, `Q5_K`, and `Q6_K` have 5 each, five groups have 4 each, `Q1_0` has 3, and `IQ4_NL` has 2.
+- The sixth direct event release in the file belongs to cross-device marker events consumed by a barrier wait list, not a direct host wait.
+
+**Interpretation**
+
+- The event leak is systematic across tensor conversion, upload, and readback helpers rather than isolated to Q4_0.
+- A successful-path mechanical release patch is possible, but RAII or scope guards may be required for correct cleanup when `CL_CHECK` fails.
+- Some explicit waits may be redundant where the next same-queue command is already blocking and ordered.
+
+**Historical**
+
+- The Q4_0 audit established two concrete leaks; the complete pairing table expands that result to 46 unmatched waited references.
+
+**Open questions**
+
+- Determine `CL_CHECK` failure behavior.
+- Separate necessary waits from waits made redundant by following same-queue blocking operations.
+- Prepare a focused upstream-ready correction and regression strategy.
