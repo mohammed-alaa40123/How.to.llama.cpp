@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 09:10 Africa/Cairo_
+_Last updated: 2026-07-15 09:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -23,7 +23,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Exact pinned declaration and reverse-destruction map for `llama_model` and `llama_context`.
 - Generic scheduler plus ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
 - Cross-backend teardown comparison matrix and reusable teardown audit method.
-- Pinned OpenCL build composition, exact lifecycle inventory, and source-backed queue/context ownership classification.
+- Pinned OpenCL build composition, exact lifecycle inventory, source-backed queue/context ownership, and Adreno binary-library lifetime classification.
 - Line-aware generated source indexing with pinned file and symbol links.
 - Guided end-to-end inference atlas with clickable reading paths.
 - Bounded CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer lifetime audits.
@@ -40,6 +40,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - GitHub-hosted pinned OpenCL workflow that verifies the exact baseline checkout and preserves the complete source, generated report, and SHA-256 manifest.
 - Verified OpenCL backend-wrapper order: queue completion occurs before wrapper reference drop, while the actual device/backend context remains process-lifetime.
 - Verified OpenCL scheduler events are unsupported and buffer deleters use buffer-local `cl_mem` ownership rather than the destroyed wrapper.
+- Resolved optional Adreno binary-library lifetime: the raw loader handle is not retained or closed, so the library, exported lookup function, and accepted binary-kernel path remain process-lifetime.
 
 ## Latest concrete findings
 
@@ -53,11 +54,13 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Final-wrapper cleanup releases pooled image/sub-buffer views but does not delete the per-device backend context or release the command queue/context.
 - Backend capabilities advertise `events = false`, and event callbacks are null; there is no scheduler-owned OpenCL event deleter that can outlive the wrapper.
 - Buffer-local `cl_mem` deleters do not require the deleted `ggml_backend` wrapper.
-- Pinned classification is now **backend-wrapper order supported; deterministic process-exit release omitted**.
+- Under `GGML_OPENCL_USE_ADRENO_BIN_KERNELS`, `kernel_lib_handle` is a block-local raw handle. `libdl.h` provides a deleter, but the loader neither owns nor closes the handle.
+- Only `get_adreno_bin_kernel_func` is retained in the process-lifetime backend context. A successfully loaded library and a loaded library with a missing symbol both remain mapped until process teardown.
+- Five pinned paths consume library-provided bytes through `clCreateProgramWithBinary()`, create a kernel, and release the temporary program reference.
+- Pinned classification is now **backend-wrapper order supported; deterministic process-exit release omitted; Adreno binary library process-lifetime by leaked handle**.
 
 ## In progress
 
-- Optional Adreno binary-library handle lifetime and kernel-destruction ordering.
 - Classification of enqueue-then-release groups that rely on OpenCL retention semantics rather than explicit waits.
 - Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
 - Fixing checksum-manifest paths to use artifact-root basenames for direct `sha256sum -c` verification.
@@ -72,9 +75,9 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ```text
 Inspect preserved pinned OpenCL source
-  → trace optional Adreno dl_handle ownership and close path
-  → order dynamic-library lifetime against program/kernel lifetime
-  → classify retention-only enqueue/release groups
+  → classify temporary cl_mem release immediately after enqueue
+  → separate retention-only-safe paths from host-storage lifetime hazards
+  → document any site requiring an explicit wait or event
   → update OpenCL teardown page and comparison matrix
 ```
 
@@ -83,17 +86,17 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed notes `logs/research/2026-07-15/0850-opencl-source-evidence-artifact.md` and `logs/research/2026-07-15/0910-opencl-process-lifetime-ownership.md`.
+- Added detailed note `logs/research/2026-07-15/0951-opencl-adreno-library-lifetime.md`.
 - Pinned lifecycle/source workflow run `29392658206` completed successfully for the source-preservation increment.
 - The generated artifact was downloaded and its report/source hashes were verified.
-- Documentation CI for the final durable-state head must be checked before the run closes.
+- Documentation CI and the pinned OpenCL workflow for the final durable-state head must be checked before the run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
 ## Known blockers and caveats
 
 - **Deterministic-release gap:** the pinned translation unit intentionally keeps device/backend contexts process-lifetime and contains no explicit queue/context release or per-device backend-context deletion path.
-- **Adreno library blocker:** the optional binary-kernel loader obtains a `dl_handle`; its retained ownership and close ordering remain unresolved.
+- **Adreno library lifetime:** the optional binary-kernel loader loses its raw `dl_handle`. This prevents early unload but omits deterministic release and also retains invalid-symbol loads until process exit.
 - **Checksum usability caveat:** the manifest hashes are correct, but entries include `build/reports/...` paths, so direct `sha256sum -c` from the artifact root needs path adjustment.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Actions are the authoritative validation path for this branch.
 - **Pages verification blocker:** branch-added content cannot deploy until PR #1 merges; live response verification remains unavailable independently of strict-build success.
