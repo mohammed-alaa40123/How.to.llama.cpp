@@ -40,6 +40,32 @@ release_clReleaseProgram(program);
 """
         self.assertEqual(extractor.extract_opencl_lifecycle_calls(source), [])
 
+    def test_ignores_calls_inside_comments_and_literals(self) -> None:
+        source = """\
+// clFinish(queue);
+/* clReleaseContext(context);
+   clReleaseProgram(program); */
+const char * text = "clReleaseKernel(kernel)";
+const char escaped = '\\'';
+clFlush(queue);
+"""
+        self.assertEqual(
+            extractor.extract_opencl_lifecycle_calls(source),
+            [{"name": "clFlush", "line": 6}],
+        )
+
+    def test_preserves_lines_across_multiline_comments_and_literals(self) -> None:
+        source = """\
+/* hidden clWaitForEvents(1, &event);
+   hidden clReleaseEvent(event); */
+const char * text = "ignored clReleaseMemObject(buffer)";
+clReleaseMemObject(buffer);
+"""
+        self.assertEqual(
+            extractor.extract_opencl_lifecycle_calls(source),
+            [{"name": "clReleaseMemObject", "line": 4}],
+        )
+
     def test_covers_event_buffer_flush_and_wait_calls(self) -> None:
         source = """\
 clFlush(queue);
