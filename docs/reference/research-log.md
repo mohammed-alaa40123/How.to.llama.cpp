@@ -238,3 +238,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Trace every `transpose_2d(..., false)` caller to its next synchronization or same-queue consumer.
 - Classify temporary quantization image/sub-buffer groups and cross-queue release paths.
+
+## 2026-07-15 12:49 — OpenCL transpose call-site audit
+
+**Verified**
+
+- Downloaded the exact source-bearing artifact from successful workflow run `29402771146` and scanned balanced call expressions in the complete pinned translation unit.
+- Found 8 calls to `transpose_2d_as_8b()`, 42 to `transpose_2d_as_16b()`, and 3 to `transpose_2d_as_32b()`.
+- All 53 typed-wrapper calls omit the final argument and therefore use `blocking=true`; no pinned call passes `false`.
+- Every reachable caller waits for the copy event before the helper releases the temporary sub-buffer and returns.
+
+**Interpretation**
+
+- The nonblocking branch is dormant capability in the pinned revision. Its local retention-safety classification remains valid, but it is not part of live baseline execution.
+- Caller synchronization tracing is closed for the baseline; the next useful slice is a temporary quantization image/sub-buffer group.
+
+**Historical**
+
+- The preceding function-local audit left nonblocking callers open. Complete-source call-site enumeration proves there are none.
+
+**Open questions**
+
+- Determine whether historical or newer revisions ever select `blocking=false`.
+- Classify one temporary quantization image/sub-buffer release group and distinguish wait-before-release, same-queue retention, host-storage lifetime, pooled reuse, and cross-queue dependencies.
