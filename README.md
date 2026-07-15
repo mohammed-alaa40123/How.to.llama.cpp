@@ -120,7 +120,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Classify the 46 pinned OpenCL waits as required completion versus redundant before a same-queue blocking operation, then prepare a minimal release-only upstream patch using the new simple-local ownership regression.
+- [ ] Prepare a minimal release-only upstream patch for all 46 pinned OpenCL event leaks, keeping synchronization unchanged and validating that `unmatched_in_scope` reaches zero.
+- [ ] Classify the remaining 24 unmatched OpenCL waits that are not immediately followed by a same-queue blocking read; establish the backend `set_tensor` completion contract before removing any wait.
 - [ ] Decide whether a move-only OpenCL event owner is worthwhile for maintainability even though pinned `CL_CHECK` failures abort without stack unwinding.
 - [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; include explicit Adreno handle ownership, invalid-symbol cleanup, repeated registration, and shared-library unload behavior.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts; use actual candidate volume to prioritize scanner work.
@@ -141,7 +142,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Extend the simple waited-event diagnostic only for evidence-backed patterns such as event arrays, helper-owned releases, or a bounded next-blocking-command hint.
+- [ ] Add a bounded `followed_by_same_queue_blocking_read` hint to the waited-event report while keeping synchronization hints separate from event ownership status.
 - [ ] Search historical and newer pinned llama.cpp revisions for actual `transpose_2d(..., false)` use; remove the dormant branch or add a regression guard if it remains unused.
 - [ ] Add a machine-readable metadata file containing the pinned commit and extractor version to the OpenCL evidence artifact.
 - [ ] Add enclosing-function metadata only for lifecycle groups that remain ambiguous after source review.
@@ -158,6 +159,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Classify 22 of the 46 unmatched OpenCL waits as redundant before an immediate same-queue `clEnqueueReadBuffer(..., CL_TRUE, ...)`; retain 24 waits for separate contract and consumer-order analysis.
 - [x] Add a bounded simple-local OpenCL wait/release diagnostic and pin the source-evidence workflow to the audited 51 total, 5 released, and 46 unmatched counts.
 - [x] Resolve pinned `CL_CHECK` failure semantics: OpenCL errors log, assert, invoke `ggml_abort()`, and unconditionally terminate with `abort()`; successful-path event releases do not need recoverable-error cleanup.
 - [x] Audit all 51 pinned direct `clWaitForEvents()` sites: 5 waited events are released, while 46 local command-event references have no release or ownership transfer.
