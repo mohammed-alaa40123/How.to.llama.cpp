@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 03:51 Africa/Cairo_
+_Last updated: 2026-07-15 04:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -36,22 +36,20 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Bounded OpenCL lifecycle-call extractor for completion/wait and queue/context/program/kernel/event/buffer release calls.
 - C/C++ comment and quoted-literal masking for lifecycle extraction while preserving exact source offsets and line numbers.
 - Function-try initializer-line guard preventing `try : member(...) {` from becoming a false ordinary-function symbol.
+- Optional bounded original-source context for every lifecycle record, with exact clamped line ranges and backward-compatible default output.
 
 ## Latest concrete findings
 
-- The original direct lifecycle-call regex could classify call-shaped text inside comments or strings as teardown evidence.
-- `mask_comments_and_literals()` replaces line comments, block comments, string literals, and character literals with spaces while preserving newlines and source length.
-- Direct code calls remain available to the bounded OpenCL API regex; focused regression coverage checks comments, strings, escaped character literals, multiline comments, and exact post-mask lines.
-- A local focused reproduction returned only the real `clFlush` call on line 6 after several masked false-positive candidates.
-- Dedicated CI proved the OpenCL lifecycle suite passes independently.
-- The full-discovery failure was isolated to constructor function-try-block coverage: `FUNC_RE` treated `try : device(device) {` as a function definition named `device`.
-- A bounded `(?!try[\t ]*:)` guard prevents that partial record while preserving constructor function-try telemetry.
-- Documentation CI run `29380673982` passed the complete suite and strict MkDocs for implementation head `540add358890507fb04f48f4a8e239e1a060971a`.
+- `extract_opencl_lifecycle_calls()` now accepts `context_lines`; zero preserves the original `{name, line}` record shape.
+- `--context-lines N` adds original-source `start_line`, `end_line`, and `text` around each true-positive lifecycle call.
+- Context is sliced from unmasked source, so comments, wrappers, adjacent releases, and ownership clues remain visible while detection still uses masked source.
+- Context ranges clamp at the beginning and end of the file, and negative radii fail explicitly.
+- The lifecycle matcher and API set were not broadened; this increment improves reviewability rather than claiming additional parser coverage.
 - The pinned OpenCL blob remains `f283f65690af7790e163092207647d16dac9fb3e`.
 
 ## In progress
 
-- Regeneration of the pinned source inventory with line-aware records, pinned source links, unsupported-syntax counts, and the masked OpenCL lifecycle-call report.
+- Regeneration of the pinned source inventory with line-aware records, pinned source links, unsupported-syntax counts, and the masked, context-bearing OpenCL lifecycle-call report.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
 - CPU extra-buffer destruction tests for KleidiAI, AMX, and SpacemiT plus TSan and hardware-specific cleanup coverage.
@@ -65,7 +63,7 @@ Resume one of the two highest-value implementation tracks:
 
 ```text
 A. obtain the complete pinned ggml-opencl.cpp in CI or a checkout
-   → run the masked extract_opencl_lifecycle_calls.py
+   → run extract_opencl_lifecycle_calls.py with a small context radius
    → inspect every completion/release site in context
    → finish OpenCL teardown and update the backend matrix
 B. implement the admitted CPU repack MUL_MAT fixture
@@ -78,19 +76,19 @@ B. implement the admitted CPU repack MUL_MAT fixture
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/0351-opencl-lifecycle-lexical-masking.md`.
-- Documentation CI run `29380673982` passed completely for the implementation head.
-- Later durable-state commits require their own commit-scoped CI run, but they do not alter the validated scanner logic or fixtures.
+- Added detailed note `logs/research/2026-07-15/0449-opencl-lifecycle-context-windows.md`.
+- Focused context-window tests were added; the current commit-scoped Documentation CI conclusion must be checked before this run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
-- Public search returned no indexed Pages result, direct safe-URL access remained unavailable, and branch-only content cannot deploy until PR #1 merges.
+- Public search/direct live verification remains unavailable, and branch-only content cannot deploy until PR #1 merges.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index and OpenCL lifecycle report could not be regenerated here.
-- **Large upstream file blocker:** connector blob rendering truncates the pinned OpenCL file; line-ranged reads return empty content and exact hidden teardown functions remain unavailable.
+- **Large upstream file blocker:** connector blob rendering truncates the pinned OpenCL file; exact hidden teardown functions remain unavailable.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Documentation CI is the authoritative validation path for this branch.
 - **Pages verification blocker:** branch-added content cannot deploy until PR #1 merges; live response verification remains unavailable independently of strict-build success.
-- **Lifecycle-extractor caveat:** selected direct API calls are navigation evidence only; ownership, error paths, macro wrappers, preprocessor-disabled code, raw strings, and semantic ordering still require human source review.
+- **Lifecycle-extractor caveat:** selected direct API calls and bounded context are navigation evidence only; ownership, error paths, macro wrappers, preprocessor-disabled code, raw strings, and semantic ordering still require human source review.
+- **Context-window caveat:** a local source window may omit the enclosing owner or completion guarantee; increase the radius or inspect the function when classification remains ambiguous.
 - **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers and constructor function-try-blocks remain intentionally omitted from navigation but are counted as bounded candidates.
 - **Telemetry caveat:** unsupported-syntax counts are prioritization signals, not parser-completeness metrics, and may undercount or overcount unusual C++ forms.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
