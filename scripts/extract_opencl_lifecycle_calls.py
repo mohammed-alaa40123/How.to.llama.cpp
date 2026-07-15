@@ -3,7 +3,8 @@
 
 This is a teardown-audit aid, not a C/C++ parser. It reports selected direct
 OpenCL completion and release calls after masking comments and string/character
-literals while preserving source length and newline positions.
+literals while preserving source length and newline positions. Optional bounded
+source context makes generated reports reviewable without changing call matching.
 """
 from __future__ import annotations
 
@@ -86,25 +87,62 @@ def line_number(text: str, offset: int) -> int:
     return text.count("\n", 0, offset) + 1
 
 
-def extract_opencl_lifecycle_calls(text: str) -> list[dict[str, object]]:
+def source_context(text: str, line: int, radius: int) -> dict[str, object]:
+    """Return bounded original-source context around a 1-based line."""
+    if radius < 0:
+        raise ValueError("context radius must be non-negative")
+
+    lines = text.splitlines()
+    if not lines:
+        return {"start_line": 1, "end_line": 1, "text": ""}
+
+    start_line = max(1, line - radius)
+    end_line = min(len(lines), line + radius)
+    return {
+        "start_line": start_line,
+        "end_line": end_line,
+        "text": "\n".join(lines[start_line - 1 : end_line]),
+    }
+
+
+def extract_opencl_lifecycle_calls(
+    text: str, context_lines: int = 0
+) -> list[dict[str, object]]:
     """Return source-ordered selected OpenCL lifecycle call sites."""
+    if context_lines < 0:
+        raise ValueError("context_lines must be non-negative")
+
     masked = mask_comments_and_literals(text)
-    return [
-        {"name": match.group(1), "line": line_number(masked, match.start())}
-        for match in OPENCL_LIFECYCLE_CALL_RE.finditer(masked)
-    ]
+    calls: list[dict[str, object]] = []
+    for match in OPENCL_LIFECYCLE_CALL_RE.finditer(masked):
+        line = line_number(masked, match.start())
+        record: dict[str, object] = {"name": match.group(1), "line": line}
+        if context_lines:
+            record["context"] = source_context(text, line, context_lines)
+        calls.append(record)
+    return calls
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
     parser.add_argument("--out", type=Path)
+    parser.add_argument(
+        "--context-lines",
+        type=int,
+        default=0,
+        help="include this many original-source lines before and after each call",
+    )
     args = parser.parse_args()
 
+    if args.context_lines < 0:
+        parser.error("--context-lines must be non-negative")
+
     text = args.source.read_text(encoding="utf-8")
-    calls = extract_opencl_lifecycle_calls(text)
+    calls = extract_opencl_lifecycle_calls(text, context_lines=args.context_lines)
     summary = {
         "source": str(args.source),
+        "context_lines": args.context_lines,
         "calls": calls,
         "counts": {
             name: sum(1 for call in calls if call["name"] == name)
