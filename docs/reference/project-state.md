@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 02:51 Africa/Cairo_
+_Last updated: 2026-07-15 03:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -34,18 +34,20 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Source-index exact-line support for attributes, trailing returns, bounded constraints, operators, qualified special members, parenthesized initializer lists, and delegating constructors.
 - Negative boundary tests plus bounded telemetry for braced/multiline constructor initializers and constructor function-try-blocks.
 - Bounded OpenCL lifecycle-call extractor for completion/wait and queue/context/program/kernel/event/buffer release calls.
+- C/C++ comment and quoted-literal masking for lifecycle extraction while preserving exact source offsets and line numbers.
 
 ## Latest concrete findings
 
-- `scripts/extract_opencl_lifecycle_calls.py` emits source-ordered exact-line records for `clFinish`, `clFlush`, `clWaitForEvents`, `clReleaseCommandQueue`, `clReleaseContext`, `clReleaseProgram`, `clReleaseKernel`, `clReleaseEvent`, and `clReleaseMemObject`.
-- The extractor reports per-name totals as JSON and remains separate from approximate C++ declaration indexing.
-- Focused tests cover ordering, exact lines, release/completion API coverage, and similar non-call identifiers.
+- The original direct lifecycle-call regex could classify call-shaped text inside comments or strings as teardown evidence.
+- `mask_comments_and_literals()` now replaces line comments, block comments, string literals, and character literals with spaces while preserving newlines and source length.
+- Direct code calls remain available to the bounded OpenCL API regex; focused regression coverage checks comments, strings, escaped character literals, multiline comments, and exact post-mask lines.
+- A local focused reproduction returned only the real `clFlush` call on line 6 after several masked false-positive candidates.
+- Documentation CI run `29377620068` failed only at full unittest discovery after dedicated source-index and interactive-link suites passed; connector-rendered logs did not expose the exact failing assertion.
 - The pinned OpenCL blob remains `f283f65690af7790e163092207647d16dac9fb3e`.
-- Full blob retrieval exposes the already-audited `ggml_cl_buffer` destructor and its `clReleaseMemObject` call, but connector rendering still truncates before hidden teardown sections and line-ranged file reads return empty content.
-- A lifecycle call inventory narrows the audit target but does not prove ownership or queued-work completion.
 
 ## In progress
 
+- Commit-scoped Documentation CI verification for the lexical-masking increment.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, unsupported-syntax counts, and the OpenCL lifecycle-call report.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -59,7 +61,8 @@ Read this file after the root README on every run. It is the compact checkpoint 
 Resume one of the two highest-value implementation tracks:
 
 ```text
-A. obtain the complete pinned ggml-opencl.cpp in CI or a checkout
+A. verify the lexical-masking Documentation CI run
+   → obtain the complete pinned ggml-opencl.cpp in CI or a checkout
    → run extract_opencl_lifecycle_calls.py
    → inspect every completion/release site in context
    → finish OpenCL teardown and update the backend matrix
@@ -72,19 +75,21 @@ B. implement the admitted CPU repack MUL_MAT fixture
 
 ## Publication and verification state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR remains open and mergeable.
-- Added detailed note `logs/research/2026-07-15/0251-opencl-lifecycle-call-extractor.md`.
-- This increment requires its own commit-scoped Documentation CI run.
+- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`; the PR was open and mergeable before this increment.
+- Added detailed note `logs/research/2026-07-15/0351-opencl-lifecycle-lexical-masking.md`.
+- The prior head's Documentation CI run `29377620068` completed with failure isolated to the full discovery guard.
+- The lexical-masking head requires its own commit-scoped Documentation CI result.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
-- Direct Pages checks remain unavailable, and branch-only content cannot deploy until PR #1 merges.
+- Direct Pages checks remain unavailable through the local script, and branch-only content cannot deploy until PR #1 merges.
 
 ## Known blockers and caveats
 
 - **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index and OpenCL lifecycle report could not be regenerated here.
 - **Large upstream file blocker:** connector blob rendering truncates the pinned OpenCL file; line-ranged reads return empty content and exact hidden teardown functions remain unavailable.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; full local Python tests, strict MkDocs build, and `check_site.sh` require a usable checkout. GitHub-hosted Documentation CI is the authoritative validation path for this branch.
-- **Pages verification blocker:** direct live-site checks are unavailable, and branch-only documentation cannot deploy until PR #1 merges.
-- **Lifecycle-extractor caveat:** selected direct API calls are navigation evidence only; comments/macros/wrappers, ownership, error paths, and semantic ordering still require human source review.
+- **CI blocker:** run `29377620068` failed in full unittest discovery, but the exact assertion was absent from the available decoded-log rendering. The new masking tests and commit-scoped run are the next diagnostic signal.
+- **Pages verification blocker:** branch-added content cannot deploy until PR #1 merges; live response verification must be recorded separately from strict-build success.
+- **Lifecycle-extractor caveat:** selected direct API calls are navigation evidence only; ownership, error paths, macro wrappers, preprocessor-disabled code, raw strings, and semantic ordering still require human source review.
 - **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers and constructor function-try-blocks remain intentionally omitted from navigation but are counted as bounded candidates.
 - **Telemetry caveat:** unsupported-syntax counts are prioritization signals, not parser-completeness metrics, and may undercount or overcount unusual C++ forms.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
