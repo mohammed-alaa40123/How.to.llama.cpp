@@ -33,7 +33,7 @@ flowchart LR
 | SYCL | Graphs and copies can be asynchronous; backend free does not explicitly wait, and the public synchronize path has limited queue scope | Ordinary events and buffers retain independent `sycl::event`, queue, device, and allocation state | **Structurally independent; completion conditional** | [SYCL teardown](sycl-backend-teardown.md) |
 | RPC | Client graph submission has no completion response and RPC synchronize is a no-op; remote completion depends on the concrete server backend | RPC buffers retain a shared socket and remote handle after client backend deletion | **Locally independent; remote completion conditional** | [RPC teardown](rpc-backend-teardown.md) |
 | CANN | Backend free performs device-wide synchronization | Device reset occurs before later context and scheduler resource destruction, leaving post-reset validity unresolved | **Completion-safe; teardown-order conditional** | [CANN teardown](cann-backend-teardown.md) |
-| OpenCL | Full queue-completion and destructor chain not yet established | Buffer-local `cl_mem` ownership is mapped, but complete scheduler/program/kernel/context independence is unfinished | **Open question** | [OpenCL build and buffer lifetimes](opencl-build-and-buffer-lifetimes.md) |
+| OpenCL | Every backend-wrapper free calls `clFinish(queue)` before dropping the per-device reference count | Events are unsupported; the queue, context, programs, kernels, and per-device backend context persist in process-lifetime device state, while buffers own their `cl_mem` references | **Backend-wrapper order supported; explicit process-exit handle release omitted** | [OpenCL build and buffer lifetimes](opencl-build-and-buffer-lifetimes.md) |
 
 ## Cross-backend patterns
 
@@ -44,6 +44,8 @@ flowchart LR
 - CUDA and SYCL scheduler resource deleters are structurally independent of the deleted per-backend wrapper in the audited ordinary paths.
 - RPC client buffers preserve the transport and remote allocation handle needed for later release.
 - CANN explicitly completes device work before reset.
+- Pinned OpenCL backend wrappers share one lazily created per-device context. Wrapper free finishes its queue and decrements a reference count; the context and queue remain reachable from static process-lifetime device state rather than being destroyed with the wrapper.
+- Pinned OpenCL advertises no backend events, so there is no scheduler-owned OpenCL event deleter that can outlive the wrapper.
 
 ### Interpretation
 
@@ -51,6 +53,7 @@ flowchart LR
 - CUDA and SYCL are not classified unsafe; their source-level completion proof is incomplete for every queue/stream and destruction state.
 - RPC extends the same distinction across a process and network boundary: command transmission and server dispatch do not necessarily mean accelerator completion.
 - CANN demonstrates that completion and resource validity can diverge: work may be complete while post-reset destructor calls remain questionable.
+- OpenCL's process-lifetime design makes backend-wrapper-before-buffer destruction structurally workable, but omitting `clReleaseCommandQueue()` and `clReleaseContext()` leaves deterministic process-exit cleanup unimplemented in the pinned translation unit.
 
 ### Historical
 
@@ -58,7 +61,8 @@ Backend queue counts, graph-capture implementations, event types, allocation poo
 
 ### Open questions
 
-- Complete the OpenCL backend/context free, queue completion, event, program, kernel, context, and optional binary-library teardown chain.
+- Resolve optional OpenCL Adreno binary-library handle lifetime and kernel-destruction ordering.
+- Classify OpenCL enqueue-then-release groups that rely only on OpenCL object-retention semantics.
 - Test immediate asynchronous graph submission followed by context destruction for every accelerator backend.
 - Verify CUDA all-stream and SYCL all-queue synchronization coverage.
 - Validate CANN stream/event/buffer destruction before and after device reset.
