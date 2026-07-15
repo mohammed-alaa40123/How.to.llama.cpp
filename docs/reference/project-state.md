@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 13:52 Africa/Cairo_
+_Last updated: 2026-07-15 14:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -45,20 +45,21 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Classified the pinned `transpose_2d()` nonblocking sub-buffer release as locally safe under the official OpenCL memory-object lifetime contract.
 - Audited every pinned `transpose_2d*()` call site: all 53 typed-wrapper calls omit the final argument and use `blocking=true`; no caller selects the nonblocking branch.
 - Classified the pinned Q4_0 conversion group: both conversion branches explicitly wait before releasing temporary `data_device`, but both retain the returned command event indefinitely by omitting `clReleaseEvent(evt)`.
+- Completed the full direct-wait pairing audit: 5 of 51 waited events are released, while 46 local command-event references have no release or ownership transfer.
 
 ## Latest concrete findings
 
-- The complete source-bearing artifact from successful workflow run `29406303147`, artifact `8339175662`, was inspected.
-- Both `GGML_TYPE_Q4_0` conversion branches perform a blocking write, enqueue a conversion kernel with a locally declared event, wait for that event, and only then release temporary `data_device`.
-- The explicit wait proves the temporary input buffer, produced quant/scale sub-buffers, host input data, and same-queue ordering are safe for this group.
-- Neither branch calls `clReleaseEvent(evt)` after waiting.
-- The OpenCL specification states that commands returning events implicitly retain them, while `clReleaseEvent()` is the operation that decrements the event reference count.
-- Each successful Q4_0 conversion therefore leaks one event reference even though command completion and memory-object release ordering are correct.
-- The 51-wait versus 6-event-release lifecycle totals now have at least two confirmed locally leaked event instances rather than only an aggregate mismatch.
+- The complete source-bearing artifact from successful workflow run `29410050891`, artifact `8340693497`, was inspected.
+- All 51 direct `clWaitForEvents()` sites were paired with their producer and local event ownership path.
+- Five waits correctly release their events: profiling, blocking transpose copy, backend synchronization barrier, BF16 upload conversion, and BF16 readback conversion.
+- Forty-six waits use a local `cl_event evt`, wait successfully, and leave the branch without `clReleaseEvent()` or ownership transfer.
+- The unmatched waits span `Q1_0`, `Q4_0`, `Q4_1`, `Q5_0`, `Q5_1`, `Q8_0`, `IQ4_NL`, `Q4_K`, `Q5_K`, `Q6_K`, and `MXFP4` paths.
+- The sixth direct `clReleaseEvent()` in the translation unit releases cross-device marker events that are consumed by a barrier wait list rather than host-waited directly.
+- The pinned event issue is therefore systematic across tensor conversion/upload/readback helpers, not isolated to Q4_0.
 
 ## In progress
 
-- Full pairing audit of locally declared OpenCL events passed to `clWaitForEvents()`.
+- Preparing an error-safe correction strategy for the 46 unmatched waited events and identifying waits made redundant by a following same-queue blocking operation.
 - Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -70,12 +71,12 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Enumerate each local cl_event passed to clWaitForEvents()
-  → locate the command that created or retained it
-  → locate matching clReleaseEvent or ownership transfer
-  → classify completed-and-released, transferred, process-lifetime, or leaked
-  → separate simple lexical pairs from wrapper/container ownership
-  → add a focused extractor/test only if it can avoid misleading semantic claims
+Design an upstream-safe OpenCL event fix
+  → classify waits followed by same-queue blocking operations
+  → remove redundant event creation/waits where completion is already guaranteed
+  → use RAII or scope-guard ownership for events that must remain
+  → add focused regression coverage for simple local wait/release paths
+  → review CL_CHECK failure behavior before proposing the patch
 ```
 
 In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
@@ -83,15 +84,16 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/1352-opencl-q4-0-conversion-event-lifetime.md`.
-- The preceding head `07d68c5c84a375536b263729e4542ada77c364e6` passed Documentation CI run `29406303155` and pinned OpenCL workflow run `29406303147`.
+- Added detailed note `logs/research/2026-07-15/1452-opencl-event-pairing-audit.md`.
+- The source-bearing artifact from workflow run `29410050891`, artifact `8340693497`, was used for the complete event pairing audit.
 - Final-head workflow results must be checked before the run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
 ## Known blockers and caveats
 
-- **Q4_0 event leak:** both pinned Q4_0 conversion branches wait for a locally returned command event but omit `clReleaseEvent()`, leaking one event reference per successful conversion.
+- **Systematic OpenCL event leak:** 46 of 51 direct host-waited command events have no matching release or ownership transfer in the pinned translation unit.
+- **Error-path caveat:** a mechanical successful-path release fix is not enough until `CL_CHECK` failure behavior is understood; RAII or scope guards may be required.
 - **Deterministic-release gap:** the pinned translation unit intentionally keeps device/backend contexts process-lifetime and contains no explicit queue/context release or per-device backend-context deletion path.
 - **Adreno library lifetime:** the optional binary-kernel loader loses its raw `dl_handle`. This prevents early unload but omits deterministic release and also retains invalid-symbol loads until process exit.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Actions are the authoritative validation path for this branch.
