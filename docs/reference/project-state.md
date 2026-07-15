@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 12:49 Africa/Cairo_
+_Last updated: 2026-07-15 13:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -44,19 +44,21 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Portable OpenCL evidence manifest: artifact-root basenames, pre-upload `sha256sum -c`, and an exact-filename guard make the downloaded artifact directly verifiable after extraction.
 - Classified the pinned `transpose_2d()` nonblocking sub-buffer release as locally safe under the official OpenCL memory-object lifetime contract.
 - Audited every pinned `transpose_2d*()` call site: all 53 typed-wrapper calls omit the final argument and use `blocking=true`; no caller selects the nonblocking branch.
+- Classified the pinned Q4_0 conversion group: both conversion branches explicitly wait before releasing temporary `data_device`, but both retain the returned command event indefinitely by omitting `clReleaseEvent(evt)`.
 
 ## Latest concrete findings
 
-- The complete source-bearing artifact from successful workflow run `29402771146` was inspected.
-- `transpose_2d_as_8b()` has 8 call sites, `transpose_2d_as_16b()` has 42, and `transpose_2d_as_32b()` has 3.
-- Every one of the 53 typed-wrapper calls uses the default `blocking=true`; no direct or wrapper call passes `false`.
-- Reachable pinned behavior always enqueues the copy with an event, waits for it, releases the event, then releases the temporary `trans` sub-buffer.
-- The `blocking=false` branch is a dormant capability in the pinned revision, not an active execution path.
-- The prior local safety conclusion remains valid, but live pinned callers provide the stronger guarantee of host-visible copy completion before return.
+- The complete source-bearing artifact from successful workflow run `29406303147`, artifact `8339175662`, was inspected.
+- Both `GGML_TYPE_Q4_0` conversion branches perform a blocking write, enqueue a conversion kernel with a locally declared event, wait for that event, and only then release temporary `data_device`.
+- The explicit wait proves the temporary input buffer, produced quant/scale sub-buffers, host input data, and same-queue ordering are safe for this group.
+- Neither branch calls `clReleaseEvent(evt)` after waiting.
+- The OpenCL specification states that commands returning events implicitly retain them, while `clReleaseEvent()` is the operation that decrements the event reference count.
+- Each successful Q4_0 conversion therefore leaks one event reference even though command completion and memory-object release ordering are correct.
+- The 51-wait versus 6-event-release lifecycle totals now have at least two confirmed locally leaked event instances rather than only an aggregate mismatch.
 
 ## In progress
 
-- Classification of temporary quantization image/sub-buffer groups and cross-queue releases.
+- Full pairing audit of locally declared OpenCL events passed to `clWaitForEvents()`.
 - Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -68,12 +70,12 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Choose one temporary quantization image/sub-buffer group
-  → identify all enqueue users and queues
-  → identify explicit waits or same-queue ordering
-  → verify host-storage and wrapper lifetime
-  → verify pooled-region reuse cannot precede completion
-  → classify the release as explicit-completion, command-retained, or unsafe/open
+Enumerate each local cl_event passed to clWaitForEvents()
+  → locate the command that created or retained it
+  → locate matching clReleaseEvent or ownership transfer
+  → classify completed-and-released, transferred, process-lifetime, or leaked
+  → separate simple lexical pairs from wrapper/container ownership
+  → add a focused extractor/test only if it can avoid misleading semantic claims
 ```
 
 In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
@@ -81,26 +83,27 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/1249-opencl-transpose-callsite-audit.md`.
-- The preceding head `95daf9002016f152b8fcd3134682ac4486000337` passed Documentation CI run `29402771036` and pinned OpenCL workflow run `29402771146`.
+- Added detailed note `logs/research/2026-07-15/1352-opencl-q4-0-conversion-event-lifetime.md`.
+- The preceding head `07d68c5c84a375536b263729e4542ada77c364e6` passed Documentation CI run `29406303155` and pinned OpenCL workflow run `29406303147`.
 - Final-head workflow results must be checked before the run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
 ## Known blockers and caveats
 
+- **Q4_0 event leak:** both pinned Q4_0 conversion branches wait for a locally returned command event but omit `clReleaseEvent()`, leaking one event reference per successful conversion.
 - **Deterministic-release gap:** the pinned translation unit intentionally keeps device/backend contexts process-lifetime and contains no explicit queue/context release or per-device backend-context deletion path.
 - **Adreno library lifetime:** the optional binary-kernel loader loses its raw `dl_handle`. This prevents early unload but omits deterministic release and also retains invalid-symbol loads until process exit.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Actions are the authoritative validation path for this branch.
 - **Pages verification blocker:** branch-added content cannot deploy until PR #1 merges; live response verification remains unavailable independently of strict-build success.
 - **Dormant-branch caveat:** `blocking=false` is locally retention-safe but has no pinned callers; future revisions must be re-audited if the branch becomes reachable.
-- **Retention classification caveat:** `clReleaseMemObject()` safely defers deletion for queued users, but that does not protect unrelated host storage, wrapper callbacks, pooled-region reuse, or missing cross-queue dependencies.
+- **Retention classification caveat:** `clReleaseMemObject()` safely defers deletion for queued users, but that does not protect event references, unrelated host storage, wrapper callbacks, pooled-region reuse, or missing cross-queue dependencies.
 - **Lifecycle-extractor caveat:** selected direct APIs and bounded context are navigation evidence only; wrapper constructors, ownership, error paths, macro wrappers, disabled code, raw strings, and semantic ordering still require human source review.
 - **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers and constructor function-try-blocks remain intentionally omitted from navigation but are counted as bounded candidates.
 - **Telemetry caveat:** unsupported-syntax counts are prioritization signals, not parser-completeness metrics.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
-- Mapping, allocation, residency, validity, command completion, ownership, reset, thread-local leases, and release remain distinct states.
+- Mapping, allocation, residency, validity, command completion, event ownership, reset, thread-local leases, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
 
