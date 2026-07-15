@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 06:49 Africa/Cairo_
+_Last updated: 2026-07-15 07:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -34,7 +34,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Python unit tests split into source-index, boundary, unsupported-syntax, function-try-block, OpenCL lifecycle, and interactive-link suites, followed by a full discovery guard.
 - Source-index exact-line support for attributes, trailing returns, bounded constraints, operators, qualified special members, parenthesized initializer lists, and delegating constructors.
 - Negative boundary tests plus bounded telemetry for braced/multiline constructor initializers and constructor function-try-blocks.
-- Bounded OpenCL lifecycle-call extractor for completion/wait and queue/context/program/kernel/event/buffer release calls.
+- Bounded OpenCL lifecycle-call extractor for direct queue/context creation and retention plus completion/wait and queue/context/program/kernel/event/buffer releases.
 - C/C++ comment and quoted-literal masking for lifecycle extraction while preserving exact source offsets and line numbers.
 - Function-try initializer-line guard preventing `try : member(...) {` from becoming a false ordinary-function symbol.
 - Optional bounded original-source context for every lifecycle record, with exact clamped line ranges and backward-compatible default output.
@@ -42,18 +42,21 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Latest concrete findings
 
+- The extractor now inventories `clCreateContext`, `clCreateContextFromType`, `clRetainContext`, `clCreateCommandQueue`, `clCreateCommandQueueWithProperties`, and `clRetainCommandQueue` in addition to the existing completion/release APIs.
+- Existing lexical masking, source ordering, exact 1-based lines, and optional original-source context are unchanged.
+- Focused tests cover direct creation/retention calls, context-from-type creation, similar identifiers, and call-shaped comments/literals.
+- The existing workflow trigger includes extractor and test changes, so the next pinned artifact will expose direct queue/context ownership transitions without another workflow edit.
 - GitHub Actions run `29385330482` successfully generated artifact `opencl-lifecycle-pinned-e3546c7` from the complete pinned translation unit; artifact ID `8331189030` expires on 2026-08-14.
-- The report contains 556 selected direct calls: 343 `clReleaseMemObject`, 121 `clReleaseProgram`, 51 `clWaitForEvents`, 23 `clReleaseKernel`, 11 `clFinish`, 6 `clReleaseEvent`, and 1 `clFlush`.
-- No direct `clReleaseCommandQueue` or `clReleaseContext` calls appear in the bounded report.
+- The preceding report contains 556 selected direct calls: 343 `clReleaseMemObject`, 121 `clReleaseProgram`, 51 `clWaitForEvents`, 23 `clReleaseKernel`, 11 `clFinish`, 6 `clReleaseEvent`, and 1 `clFlush`.
+- No direct `clReleaseCommandQueue` or `clReleaseContext` calls appeared in that earlier bounded report.
 - The shared OpenCL `free()` path calls `clFinish(queue)` before decrementing `ref_count`; when the final reference disappears it releases pooled image/sub-buffer views and clears those pools.
 - Cross-device synchronization uses peer-queue marker events plus `clFlush()`, then a destination-queue barrier with the collected wait list, followed by event-reference release.
-- Several temporary conversion/readback paths wait before releasing temporary memory objects; selected readback paths use blocking reads and/or `clFinish()`.
-- OpenCL teardown is now classified as **conditional with verified local completion evidence**, not globally safe: final queue/context ownership, scheduler-resource independence, optional binary-library lifetime, and all enqueue-then-release groups remain unresolved.
-- The pinned OpenCL blob remains `f283f65690af7790e163092207647d16dac9fb3e`.
+- OpenCL teardown remains **conditional with verified local completion evidence**, not globally safe.
 
 ## In progress
 
-- Exact command-queue and OpenCL-context creation/final ownership.
+- Regeneration and inspection of direct command-queue/OpenCL-context creation and retention calls.
+- Mapping each resulting call to its enclosing wrapper, global, or process-lifetime owner.
 - Scheduler event/buffer independence after backend-wrapper destruction.
 - Classification of enqueue-then-release groups that rely on OpenCL retention semantics rather than explicit waits.
 - Optional Adreno binary-library handle lifetime and kernel-destruction ordering.
@@ -67,8 +70,8 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Locate OpenCL queue/context creation and final owner
-  → inspect wrapper/global/process lifetime
+Inspect regenerated pinned OpenCL ownership calls
+  → map direct create/retain sites to enclosing owners
   → verify scheduler buffer/event deleter independence
   → update backend teardown comparison matrix
 ```
@@ -78,19 +81,19 @@ If that path is blocked, implement the admitted CPU repack `MUL_MAT` fixture wit
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/0649-opencl-lifecycle-first-pass.md`.
+- Added detailed note `logs/research/2026-07-15/0752-opencl-ownership-call-inventory.md`.
 - Preceding Documentation CI run `29385330547` completed successfully.
-- Pinned lifecycle-report run `29385330482` completed successfully and its artifact was inspected.
-- Commit-scoped workflows for the new documentation head must be checked before the next run closes.
+- Preceding pinned lifecycle-report run `29385330482` completed successfully and its artifact was inspected.
+- Commit-scoped Documentation CI and pinned lifecycle-report workflows for this increment must be checked before the run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
 ## Known blockers and caveats
 
-- **Queue/context ownership blocker:** the bounded direct-call report contains no `clReleaseCommandQueue()` or `clReleaseContext()` call, so final ownership must be resolved from creation sites, wrappers, globals, or process-lifetime design rather than inferred from absence.
+- **Queue/context ownership blocker:** the earlier direct-call report contained no `clReleaseCommandQueue()` or `clReleaseContext()` call; the regenerated report must now be checked for direct creation/retention before wrapper/global/process ownership is inferred.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Actions are the authoritative validation path for this branch.
 - **Pages verification blocker:** branch-added content cannot deploy until PR #1 merges; live response verification remains unavailable independently of strict-build success.
-- **Lifecycle-extractor caveat:** selected direct API calls and bounded context are navigation evidence only; ownership, error paths, macro wrappers, preprocessor-disabled code, raw strings, and semantic ordering still require human source review.
+- **Lifecycle-extractor caveat:** selected direct APIs and bounded context are navigation evidence only; wrapper constructors, ownership, error paths, macro wrappers, preprocessor-disabled code, raw strings, and semantic ordering still require human source review.
 - **Context-window caveat:** a local source window may omit the enclosing owner or completion guarantee; increase the radius or inspect the function when classification remains ambiguous.
 - **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers and constructor function-try-blocks remain intentionally omitted from navigation but are counted as bounded candidates.
 - **Telemetry caveat:** unsupported-syntax counts are prioritization signals, not parser-completeness metrics, and may undercount or overcount unusual C++ forms.
