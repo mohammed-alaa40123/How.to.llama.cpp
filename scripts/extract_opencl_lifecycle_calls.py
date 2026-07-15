@@ -5,7 +5,9 @@ This is a teardown-audit aid, not a C/C++ parser. It reports selected direct
 OpenCL creation, retention, completion, and release calls after masking comments
 and string/character literals while preserving source length and newline
 positions. Optional bounded source context makes generated reports reviewable
-without changing call matching.
+without changing call matching. A separate simple-local waited-event diagnostic
+pairs ``clWaitForEvents(1, &event)`` with a later ``clReleaseEvent(event)`` in
+the same lexical brace scope; it is deliberately a heuristic, not ownership proof.
 """
 from __future__ import annotations
 
@@ -22,6 +24,9 @@ OPENCL_LIFECYCLE_CALL_RE = re.compile(
     r"clReleaseCommandQueue|clReleaseContext|clReleaseProgram|"
     r"clReleaseKernel|clReleaseEvent|clReleaseMemObject"
     r")\s*\("
+)
+SIMPLE_WAIT_EVENT_RE = re.compile(
+    r"\bclWaitForEvents\s*\(\s*1\s*,\s*&\s*([A-Za-z_]\w*)\s*\)"
 )
 
 
@@ -108,6 +113,56 @@ def source_context(text: str, line: int, radius: int) -> dict[str, object]:
     }
 
 
+def enclosing_scope_end(masked: str, offset: int) -> int:
+    """Return the offset just before the current lexical brace scope ends."""
+    depth = 0
+    for ch in masked[:offset]:
+        if ch == "{":
+            depth += 1
+        elif ch == "}" and depth:
+            depth -= 1
+
+    if depth == 0:
+        return len(masked)
+
+    current_depth = depth
+    for index in range(offset, len(masked)):
+        ch = masked[index]
+        if ch == "{":
+            current_depth += 1
+        elif ch == "}":
+            current_depth -= 1
+            if current_depth < depth:
+                return index
+    return len(masked)
+
+
+def analyze_simple_waited_events(text: str) -> list[dict[str, object]]:
+    """Pair simple local event waits with releases before lexical scope exit.
+
+    Only ``clWaitForEvents(1, &identifier)`` is recognized. The search is lexical,
+    ignores comments and literals, and does not model aliases, macros, control-flow
+    reachability, ownership transfer, or releases performed by helper functions.
+    """
+    masked = mask_comments_and_literals(text)
+    diagnostics: list[dict[str, object]] = []
+    for wait in SIMPLE_WAIT_EVENT_RE.finditer(masked):
+        event = wait.group(1)
+        scope_end = enclosing_scope_end(masked, wait.end())
+        release_re = re.compile(rf"\bclReleaseEvent\s*\(\s*{re.escape(event)}\s*\)")
+        release = release_re.search(masked, wait.end(), scope_end)
+        record: dict[str, object] = {
+            "event": event,
+            "wait_line": line_number(masked, wait.start()),
+            "scope_end_line": line_number(masked, scope_end),
+            "status": "released_in_scope" if release else "unmatched_in_scope",
+        }
+        if release:
+            record["release_line"] = line_number(masked, release.start())
+        diagnostics.append(record)
+    return diagnostics
+
+
 def extract_opencl_lifecycle_calls(
     text: str, context_lines: int = 0
 ) -> list[dict[str, object]]:
@@ -143,6 +198,7 @@ def main() -> int:
 
     text = args.source.read_text(encoding="utf-8")
     calls = extract_opencl_lifecycle_calls(text, context_lines=args.context_lines)
+    wait_diagnostics = analyze_simple_waited_events(text)
     summary = {
         "source": str(args.source),
         "context_lines": args.context_lines,
@@ -150,6 +206,11 @@ def main() -> int:
         "counts": {
             name: sum(1 for call in calls if call["name"] == name)
             for name in sorted({str(call["name"]) for call in calls})
+        },
+        "simple_waited_events": wait_diagnostics,
+        "simple_waited_event_counts": {
+            status: sum(1 for item in wait_diagnostics if item["status"] == status)
+            for status in ("released_in_scope", "unmatched_in_scope")
         },
     }
     rendered = json.dumps(summary, indent=2) + "\n"
