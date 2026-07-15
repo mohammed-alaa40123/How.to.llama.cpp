@@ -2,11 +2,11 @@
 
 - Run time: 2026-07-15 07:52 Africa/Cairo
 - Repository branch: `automation/backend-teardown-audit-method`
-- Scope: expand the exact-line OpenCL lifecycle report so the next pinned artifact can reveal direct queue/context creation and retention sites as well as releases
+- Scope: expand the exact-line OpenCL lifecycle report and inspect the regenerated pinned artifact for direct queue/context ownership transitions
 
 ## Startup and inspection
 
-Read the complete README first, then project state, research log, research ledger, and the latest detailed note. Inspected the current extractor, focused test suite, PR metadata, first-pass OpenCL lifecycle findings, and the current living TODO order before editing.
+Read the complete README first, then project state, research log, research ledger, and the latest detailed note. Inspected the current extractor, focused test suite, PR metadata, first-pass OpenCL lifecycle findings, generated artifact, workflow results, and the OpenCL lifetime page before editing.
 
 ## Artifact
 
@@ -19,37 +19,45 @@ Expanded `scripts/extract_opencl_lifecycle_calls.py` to recognize these addition
 - `clCreateCommandQueueWithProperties`
 - `clRetainCommandQueue`
 
-Updated `tests/test_extract_opencl_lifecycle_calls.py` with exact-line, source-order, lexical-masking, and similar-identifier regressions for the new calls.
+Updated `tests/test_extract_opencl_lifecycle_calls.py` with exact-line, source-order, lexical-masking, and similar-identifier regressions. Updated `docs/architecture/opencl-build-and-buffer-lifetimes.md` with the regenerated 558-call inventory and two exact creation assignments.
 
 ## Verified
 
 - The lifecycle matcher now spans direct creation, retention, completion, and release calls for command queues and contexts.
 - Existing comment/literal masking, exact 1-based line calculation, optional original-source context, and source ordering remain unchanged.
-- `clCreateContextFromType` has dedicated coverage.
-- Call-shaped text inside comments and literals remains excluded.
-- Similar identifiers such as `create_clCreateContext(...)` remain excluded because the matcher requires a word boundary at the API name.
-- The repository-owned OpenCL workflow is already configured to rerun when the extractor or its tests change, so the next artifact will report the pinned translation unit without requiring another workflow edit.
+- GitHub Actions run `29390227929` succeeded and uploaded artifact `8332938429` for the exact pinned revision.
+- The regenerated report contains 558 selected direct calls.
+- Exactly one `clCreateContext(...)` call appears at pinned line 5545; its result is assigned to `shared_context` after constructing platform properties from `default_device->platform->id`.
+- Exactly one `clCreateCommandQueue(...)` call appears at pinned line 5902; its result is assigned to `backend_ctx->queue` after optional profiling flags are added.
+- The report contains zero direct `clCreateContextFromType`, `clCreateCommandQueueWithProperties`, `clRetainContext`, `clRetainCommandQueue`, `clReleaseContext`, or `clReleaseCommandQueue` calls.
+- Final-head Documentation CI run `29390352407` passed.
+- Final-head pinned OpenCL report run `29390352399` passed.
+- PR #1 remains open and mergeable at head `883cb806c1690918ee11568f5dd4c39e2c1860f1`.
 
 ## Interpretation
 
-This increment does not resolve ownership by itself. It removes a blind spot in the generated evidence: a report containing zero direct releases can now be compared against direct creation and retention sites. If the regenerated pinned report also contains zero direct creation calls, wrapper constructors, generated code, globals, or process-lifetime ownership become the higher-probability review targets.
+The ownership gap is narrower. The context is created into a variable named `shared_context`, while the queue is stored directly in `backend_ctx->queue`. The asymmetric direct-call result—one create for each handle type, no retain, and no release—makes wrapper destruction, global/process-lifetime policy, or an omitted generated/macro path the next review target. It is not proof of a leak.
+
+Three context lines are sufficient to identify both assignments but not the declaration lifetime of `shared_context` or the destructor/free behavior of `backend_ctx`.
 
 ## Historical
 
-The first complete pinned report classified 556 selected completion/release calls but did not inventory direct queue/context creation or retention. That made the absence of `clReleaseCommandQueue()` and `clReleaseContext()` difficult to interpret. This increment makes the next report symmetric enough for a bounded ownership audit.
+The first complete pinned report classified 556 selected completion/release calls but did not inventory direct queue/context creation or retention. This increment expands that report to 558 calls and locates the two direct creation sites.
 
 ## Open questions
 
-- How many direct queue/context creation and retention calls appear in pinned revision `e3546c7948e3af463d0b401e6421d5a4c2faf565`?
-- Which enclosing object owns each returned handle?
-- Are queue/context objects wrapper-owned or deliberately process-scoped?
+- Where is `shared_context` declared, and is its lifetime intentionally process-wide?
+- Which destructor or free path owns `backend_ctx->queue`?
+- Why are there no direct context/queue release calls in the translation unit?
 - Do scheduler events and buffers retain the required underlying OpenCL objects independently of the backend wrapper?
-- Should creation/retention and release records be automatically paired after the regenerated report is inspected?
+- Should enclosing-function metadata be added only for these two ownership sites?
 
 ## Validation
 
-The extractor and focused tests were committed. Documentation CI and the pinned OpenCL lifecycle-report workflow must be checked on the final head. Local checkout validation remains unavailable in this runtime, so GitHub-hosted workflows are authoritative.
+Both final-head GitHub-hosted workflows passed: Documentation CI `29390352407` and pinned report generation `29390352399`. Local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
+
+The production Pages site could not be independently verified: public search returned no indexed result, direct URL opening remained blocked by the available safety mechanism, and branch-only content cannot appear before PR #1 merges.
 
 ## Next priority
 
-Inspect the regenerated pinned lifecycle artifact, map direct queue/context ownership calls to enclosing objects, and update the OpenCL row in the backend teardown comparison matrix.
+Locate the declarations and destruction paths for `shared_context` and `backend_ctx->queue`, then verify scheduler event/buffer deleter independence and update the OpenCL row in the backend teardown comparison matrix.
