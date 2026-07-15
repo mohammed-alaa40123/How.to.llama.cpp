@@ -107,7 +107,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/ggml/graph-construction-and-moe.md` | Graph construction, reuse, MoE routing, and cache design |
 | `docs/architecture/backend-teardown-audit-method.md` | Reusable completion/ownership audit worksheet and runtime matrix |
 | `docs/architecture/backend-teardown-comparison.md` | Cross-backend completion, resource-independence, and safety matrix |
-| `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build, source-backed lifecycle inventory, ownership, and remaining gaps |
+| `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build, source-backed lifecycle inventory, ownership, Adreno library lifetime, and remaining gaps |
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
 | `docs/reference/source-index.md` | Human-reviewed source areas and generated symbol-location/link format |
 | `.github/workflows/docs-ci.yml` | Named validators, isolated unit-test suites, discovery guard, strict build, and actionable failures |
@@ -120,9 +120,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Resolve the optional Adreno binary-library handle lifetime and kernel-destruction ordering using the preserved pinned source.
 - [ ] Classify OpenCL enqueue-then-release groups that rely on object-retention semantics rather than explicit waits.
-- [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; verify repeated registration or shared-library unload behavior.
+- [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; include explicit Adreno handle ownership, invalid-symbol cleanup, repeated registration, and shared-library unload behavior.
 - [ ] Fix the OpenCL artifact SHA-256 manifest to use artifact-root basenames so `sha256sum -c` works directly after download.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts; use actual candidate volume to prioritize scanner work.
 - [ ] Implement the first CPU repack regression fixture: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
@@ -156,6 +155,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Resolve the optional Adreno binary-library lifetime: the raw handle is lost, the library remains process-lifetime, invalid-symbol loads are not closed, and close-before-kernel ordering is absent rather than unsafe.
 - [x] Preserve the complete exact pinned OpenCL translation unit and SHA-256 manifest beside the generated lifecycle report.
 - [x] Resolve pinned OpenCL queue/context ownership: shared context and per-device backend context/queue persist in static process-lifetime device state; wrapper free finishes the queue and drops only a reference.
 - [x] Verify pinned OpenCL scheduler events are unsupported and buffer deleters use buffer-local `cl_mem` ownership rather than the destroyed backend wrapper.
