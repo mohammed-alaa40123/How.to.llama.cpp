@@ -382,3 +382,27 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Run the extractor against the complete pinned file and inspect each result in context.
 - Determine whether backend teardown explicitly finishes or waits before queue/context/program/kernel release.
 - Pair release calls with creation/retention sites if ownership remains ambiguous.
+
+## 2026-07-15 03:51 — OpenCL lifecycle lexical masking
+
+**Verified**
+
+- Added lexical masking for line comments, block comments, string literals, and character literals before lifecycle-call matching.
+- Masking preserves source length and every newline, so exact 1-based call locations remain stable.
+- Added regressions for commented-out calls, quoted call-shaped text, escaped character literals, multiline comments, and a real call after masked regions.
+- A local focused reproduction returned only the real `clFlush` call on line 6.
+- Documentation CI run `29377620068` failed at full unittest discovery after the two dedicated suites passed; the available decoded log did not expose the exact failing assertion.
+
+**Interpretation**
+
+- Removing call-shaped comments and literals reduces false teardown evidence without turning the extractor into a full C++ parser.
+
+**Historical**
+
+- The first extractor used a direct regex over raw source. This increment closes a concrete false-positive class before pinned-tree execution.
+
+**Open questions**
+
+- Raw strings, preprocessor-disabled regions, macro expansions, and wrappers remain outside the bounded lexical model.
+- Run the masked extractor against the complete pinned OpenCL file and inspect each result in context.
+- Verify the commit-scoped Documentation CI result and production Pages after merge.
