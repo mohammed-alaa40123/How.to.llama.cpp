@@ -57,352 +57,136 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Backend-before-scheduler safety depends on both resource-deleter independence and queued-work completion.
 - OpenCL buffer-local RAII does not itself prove command completion before release.
 
-## 2026-07-13 19:51–20:51 — Generated source navigation
+## 2026-07-13 19:51–21:49 — Source navigation and teardown comparison
 
 **Verified**
 
-- `scripts/index_upstream.py` emits untruncated, source-ordered `symbol_locations` with approximate declaration kind and 1-based line.
-- Generated file and symbol records can carry revision-pinned GitHub URLs with `#L<line>` fragments derived from the selected revision.
-- The legacy compact symbol list remains for compatibility and regression tests cover ordering and link generation.
+- `scripts/index_upstream.py` emits untruncated, source-ordered `symbol_locations` with approximate declaration kind, exact 1-based lines, and revision-pinned file/symbol URLs.
+- Added a pinned teardown matrix for ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and the OpenCL gap.
 
 **Open question**
 
 - Regenerate the pinned inventory when upstream access is available and use it to finish OpenCL teardown.
 
-## 2026-07-13 21:49 — Cross-backend teardown comparison
+## 2026-07-14 01:52–08:49 — Inference atlas and CPU optional buffers
 
 **Verified**
 
-- Added a pinned comparison matrix covering ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and the OpenCL gap.
-- The matrix separates execution completion from scheduler-resource independence and links each classification to its detailed audit.
-
-## 2026-07-14 01:52–02:49 — Inference atlas and teardown method
-
-**Verified**
-
-- Added a clickable inference pipeline linking GGUF, model loading, `llama_model`, `llama_context`, graph construction, scheduler execution, backends, sampling, and decode reuse.
-- Added a reusable ten-step teardown worksheet separating host-visible completion from scheduler-resource deleter independence.
-- Standardized bounded classifications and a minimum asynchronous-destruction runtime matrix.
-
-## 2026-07-14 03:51–06:50 — CPU optional extra-buffer audits
-
-**Verified**
-
-- CPU repack delegates allocation/free to ordinary CPU buffers and uses process-static traits.
-- AMX owns a dedicated aligned host allocation and complete buffer interface.
-- KleidiAI retains ordinary CPU allocation/free ownership while publishing process-static feature/kernel state and packed slots.
-- SpacemiT owns pooled weight allocations and uses process-static IME/RVV traits while adding worker-local TCM coordination.
-- All four execute synchronously through ordinary CPU graph computation and do not introduce scheduler events or accelerator queues.
+- Added a clickable inference pipeline and reusable ten-step teardown worksheet.
+- Audited CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer ownership and synchronous execution.
+- Added a cross-implementation comparison, portable destruction-test matrix, and an implementation-ready admitted `MUL_MAT` fixture.
 
 **Interpretation**
 
-- Weight-buffer destruction is independent of `ggml_backend_cpu_context` for all four audited paths, while AMX and SpacemiT retain platform- or process-level cleanup questions.
-
-**Historical**
-
-- Admission rules, callback tables, packed layouts, allocator APIs, and worker hooks are revision-sensitive.
+- A tiny deterministic graph is stronger than a full model for the lifetime-ordering question because admission, fallback placement, owners, and destruction order remain visible.
 
 **Open questions**
 
 - Validate AMX allocator pairing, KleidiAI initialization/readback behavior, SpacemiT TCM/process-pool shutdown, and sanitizer ordering tests.
 
-## 2026-07-14 07:49–08:49 — CPU comparison and destruction harness
+## 2026-07-14 09:49–12:50 — CI observability and source-line repair
 
 **Verified**
 
-- Added one ownership/completion comparison for repack, AMX, KleidiAI, and SpacemiT IME.
-- Added a portable destruction-test matrix and an implementation-ready tiny admitted `MUL_MAT` fixture specification.
-- The fixture separates admission, output correctness, synchronous completion, backend-free-before-buffer-free ordering, and sanitizer-clean final destruction.
-- CPU repack is the first portable target; hardware-gated skips are not evidence that a lifetime claim passed.
+- Split Documentation CI into named validators and isolated unit suites before full discovery.
+- Found that regex `\s` crossed newlines and shifted type/function records to preceding blank or template lines.
+- Replaced relevant leading whitespace with horizontal-only matching and added regression coverage.
+- Complete CI passed through runs `29319949484` and `29323751656`.
 
 **Interpretation**
 
-- A tiny deterministic graph is stronger than a full model for this ownership question because fallback placement, allocation owners, and destruction order remain visible.
+- Generated links should target definitions, not adjacent whitespace; exact location is more valuable than broad approximate parsing.
 
-## 2026-07-14 09:49–10:52 — Documentation CI observability and suite isolation
+## 2026-07-14 13:51–19:53 — Bounded C++ syntax indexing
 
 **Verified**
 
-- The compound documentation validation step was split into named context, link, test, shell, compilation, asset, dependency, and strict-build steps.
-- Source-index and interactive-link unit suites now run independently before full discovery.
-- This isolated the remaining failure to source-index tests without reducing coverage.
+- Added exact-line support for same-line attributes, trailing returns, bounded `requires`, qualified operators, constructors/destructors, and parenthesized constructor initializer lists.
+- Dedicated rules avoid weakening ordinary function extraction.
+- Complete CI passed through run `29352222406`.
 
 **Interpretation**
 
-- Observability changes identified the defect but did not themselves prove a repair.
-
-## 2026-07-14 11:51–12:50 — Source-index line repair and whitespace regression
-
-**Verified**
-
-- `CLASS_RE` used `^\s*`; because `\s` includes newline, a declaration following a blank line could report the previous line.
-- Horizontal-only whitespace corrected the declaration location.
-- Regression coverage verifies multiple blank lines and namespace indentation.
-- Documentation CI runs `29319949484` and `29323751656` passed all tests and strict MkDocs.
-
-**Interpretation**
-
-- The implementation was wrong, not the expected line: generated links should target declarations rather than adjacent whitespace.
-
-## 2026-07-14 13:51–15:50 — Attributed and trailing-return indexing
-
-**Verified**
-
-- Type indexing recognizes same-line attributes before and after type keywords.
-- Function indexing recognizes same-line leading attributes and bounded same-line trailing-return clauses.
-- Horizontal whitespace preserves exact physical lines.
-- Complete Documentation CI passed through run `29334576467`.
-
-**Interpretation**
-
-- These are bounded navigation improvements, not a claim to parse the full C++ grammar.
-
-## 2026-07-14 16:51 — Constrained C++ function indexing and line accuracy
-
-**Verified**
-
-- Return-type matching still included `\s`, allowing a match to begin on a preceding template line.
-- Return-type whitespace is now horizontal-only.
-- One bounded same-line C++20 `requires` clause is accepted after ordinary or trailing-return signatures.
-- Focused tests preserve physical definition lines after template declarations.
-- Documentation CI run `29339261751` passed the complete suite and strict MkDocs.
-
-**Interpretation**
-
-- Exact navigation lines are more valuable than broad syntax acceptance with shifted locations.
+- These are bounded navigation features, not claims to parse full C++ grammar.
 
 **Open questions**
 
-- Multiline constraints and complex requires-expressions remain candidates only if the pinned tree demonstrates sufficient need.
+- Multiline syntax, complex requires-expressions, literals, macros, in-class members, and brace-containing initializer lists require pinned-tree evidence before expansion.
 
-## 2026-07-14 17:49 — Bounded C++ operator-function indexing
-
-**Verified**
-
-- Ordinary function-name extraction cannot represent `operator` names because it accepts only identifier components.
-- Conversion operators have no return type before `operator`, requiring a dedicated bounded pattern.
-- Added qualified same-line support for symbolic, call, subscript, `new`/`delete`, and single-token conversion operators.
-- Focused tests require exact lines for `tensor_view::operator==`, `tensor_view::operator()`, `tensor_view::operator[]`, and `resource::operator bool`.
-- The existing ordinary-function and type patterns were not broadened.
-- The pinned OpenCL target compiles `ggml-opencl.cpp`; its pinned blob SHA is `f283f65690af7790e163092207647d16dac9fb3e`.
-- Large-blob connector output still truncates before OpenCL backend teardown symbols, so no unseen cleanup behavior was inferred.
-- Documentation CI run `29343666640` passed the complete suite and strict MkDocs for the final operator-indexing head.
-
-**Interpretation**
-
-- Operator definitions are valuable navigation targets for backend RAII and ownership code. A separate pattern is safer than allowing arbitrary punctuation in the ordinary function-name rule.
-
-**Historical**
-
-- This closes the operator-definition scanner gap recorded after the constrained-function increment.
-
-**Open questions**
-
-- Multiline operator signatures, literals, complex conversion targets, and macro-generated definitions remain unsupported.
-- Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
-
-## 2026-07-14 18:51 — Qualified constructor and destructor indexing
+## 2026-07-14 20:52–23:51 — Constructor boundaries and telemetry
 
 **Verified**
 
-- Constructors and destructors have no return type, so they require a dedicated bounded scanner pattern.
-- `SPECIAL_MEMBER_RE` recognizes same-line qualified out-of-class constructors and destructors with optional attributes, `noexcept`, and one bounded same-line `requires` clause.
-- Requiring at least one scope qualifier limits false positives and targets common RAII definitions.
-- Focused tests require exact lines for an ordinary constructor, destructor, and attributed constrained nested constructor.
-- Ordinary functions, operators, and type extraction remain separate.
-- Documentation CI run `29348084640` passed the complete suite and strict MkDocs for the final special-member head.
+- Confirmed same-line parenthesized delegating constructors were already recognized and added explicit regression coverage.
+- Added negative tests proving braced and multiline initializer lists do not emit partial symbols.
+- Added per-file and aggregate unsupported-syntax counters for braced and multiline constructor initializer candidates.
 
 **Interpretation**
 
-- Special members are high-value source-index targets because backend acquisition and release logic commonly lives in constructors and destructors. Making the ordinary return-type pattern optional would be less precise.
-
-**Historical**
-
-- This closes the common out-of-class special-member gap after the operator increment.
-
-**Open questions**
-
-- In-class special members, initializer lists, multiline signatures, defaulted/deleted definitions, literals, and generated declarations remain unsupported.
-
-## 2026-07-14 19:53 — Constructor initializer-list indexing
-
-**Verified**
-
-- The previous special-member matcher required `{` immediately after optional `noexcept` and `requires`, so constructors with `: member(value)` initializer lists were absent from the index.
-- Added one bounded same-line initializer-list clause excluding newlines, semicolons, and braces.
-- Focused tests require exact lines for ordinary parenthesized initializer lists on qualified constructors.
-- Destructor behavior and ordinary-function, operator, and type extraction were not broadened.
-- Documentation CI run `29352222406` passed the complete suite and strict MkDocs for initializer-list head `f427ab95f3a9147acfc58a7248ebc2bd312f1a24`.
-
-**Interpretation**
-
-- Constructor initializer lists are valuable navigation targets because backend resource ownership and synchronization state are often established there.
-
-**Historical**
-
-- This extends the bounded qualified special-member scanner while preserving exact physical-line priority.
-
-**Open questions**
-
-- Braced and multiline initializer lists, function-try-blocks, in-class special members, and macro-generated definitions remain unsupported.
-- Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
-
-## 2026-07-14 20:52 — Delegating constructor indexing audit
-
-**Verified**
-
-- The current same-line initializer-list rule already recognizes constructor delegation such as `backend_state::backend_state(int device) : backend_state(device, nullptr) {`.
-- A focused reproduction using the exact branch regex returned the correct constructor names and physical lines for two delegating-constructor examples.
-- The class-name backreference remains in force, and the initializer-list body still excludes newlines, semicolons, and braces.
-- No scanner implementation change was required.
-
-**Interpretation**
-
-- Delegation was a falsely recorded gap: the real unresolved boundary is multiline or brace-containing initialization.
-
-**Historical**
-
-- Delegating-constructor support arrived implicitly with the preceding initializer-list clause but was not documented or tested.
-
-**Open questions**
-
-- Add an explicit regression fixture before treating this behavior as a permanent compatibility guarantee.
-- Multiline delegation, braced arguments, function-try-blocks, and in-class definitions remain unsupported.
-
-## 2026-07-14 21:49 — Delegating constructor regression
-
-**Verified**
-
-- Added explicit source-index regression coverage for two bounded same-line qualified delegating constructors.
-- The fixture covers ordinary and nested qualified names, including `noexcept`, and requires exact physical lines 1 and 4.
-- The production scanner was not broadened; this converts previously verified behavior into a tested compatibility promise.
-
-**Interpretation**
-
-- Parenthesized same-line delegation is now protected, while multiline delegation and brace-containing arguments remain outside the approximate scanner contract.
-
-**Historical**
-
-- This closes the missing-test gap identified in the preceding delegating-constructor behavior audit.
-
-**Open questions**
-
-- Multiline delegation, braced arguments, function-try-blocks, and in-class definitions remain unsupported.
-- Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
-
-## 2026-07-14 22:49 — Constructor initializer boundary regression
-
-**Verified**
-
-- Added `tests/test_index_upstream_initializer_boundaries.py`.
-- Same-line parenthesized constructor initialization remains indexed at the exact definition line.
-- Same-line braced initializers and multiline initializer lists are required to produce no partial symbol record.
-- The production scanner was not broadened.
-- The preceding branch head passed complete Documentation CI run `29359626167`.
-
-**Interpretation**
-
-- For an approximate navigation index, explicit false negatives on unsupported syntax are safer than misleading partial matches and incorrect pinned links.
-
-**Historical**
-
-- Braced and multiline initializer lists were documented as unsupported after the bounded initializer-list rule, but that boundary lacked negative regression coverage.
-
-**Open questions**
-
-- Add unsupported-syntax counters if pinned-tree regeneration shows enough missed constructor initializers to justify a stateful scanner.
-- Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
-
-## 2026-07-14 23:51 — Unsupported source-index syntax telemetry
-
-**Verified**
-
-- Added bounded per-file counters for braced and multiline constructor initializer candidates.
-- Added aggregate `unsupported_syntax_counts` to the generated JSON summary and both totals to the generated Markdown inventory.
-- Added focused tests for positive counts, zero counts on supported parenthesized same-line initialization, and continued omission of unsupported candidates from symbol records.
-- Symbol extraction was not broadened; telemetry remains separate from navigation records.
-
-**Interpretation**
-
-- Measurable false-negative telemetry can prioritize future scanner work without weakening the current guarantee against partial or misleading pinned links.
-
-**Historical**
-
-- This closes the observability gap identified after the constructor-initializer negative-boundary regression.
-
-**Open questions**
-
-- Regenerate the pinned tree to determine whether the candidate volume justifies a stateful constructor scanner.
-- Extend counters only when pinned-tree evidence identifies another high-value unsupported form.
-- Complete pinned OpenCL teardown still requires searchable access to the end of the translation unit or a regenerated local inventory.
+- Measurable false-negative telemetry can prioritize scanner work without weakening navigation accuracy.
 
 ## 2026-07-15 01:50 — Constructor function-try-block telemetry
 
 **Verified**
 
-- Added a bounded counter for qualified constructor function-try-block candidates with same-line or next-line `try`.
-- Both `try : initializer(...) {` and `try {` forms are counted.
-- Ordinary function function-try-blocks are excluded by the constructor-name backreference.
-- Function-try-block constructors remain intentionally absent from `extract_symbols()` and therefore cannot produce partial navigation links.
-- Per-file JSON, aggregate JSON, and generated Markdown reporting now include `constructor_function_try_blocks`.
-- Focused regression coverage protects the positive, negative, and no-symbol contracts.
+- Added bounded candidate counts for qualified constructor function-try-blocks with same-line or next-line `try`.
+- These forms remain excluded from navigation records.
 
-**Interpretation**
+**Open question**
 
-- The new counter closes an observability gap without claiming parser completeness or changing navigation semantics.
-
-**Historical**
-
-- The preceding boundary audit established that function-try-blocks were invisible to both extraction and telemetry; this increment implements the narrower telemetry step proposed there.
-
-**Open questions**
-
-- Regenerate the pinned tree and use actual counts to decide whether stateful extraction is justified and whether a future link should target the signature or `try` line.
-- Complete pinned OpenCL teardown still requires searchable access to the hidden portion of `ggml-opencl.cpp` or a regenerated local inventory.
+- Regenerate the pinned tree to determine whether stateful extraction is justified and which line a future record should target.
 
 ## 2026-07-15 02:51 — OpenCL lifecycle-call extractor
 
 **Verified**
 
-- Added `scripts/extract_opencl_lifecycle_calls.py` as a bounded exact-line inventory for selected OpenCL completion and release APIs.
-- Added focused tests covering `clFinish`, `clFlush`, `clWaitForEvents`, queue/context/program/kernel/event/buffer release, source order, exact lines, and similar non-call identifiers.
-- The extractor emits JSON call records plus per-name counts and remains separate from approximate declaration indexing.
-- The pinned blob SHA remains `f283f65690af7790e163092207647d16dac9fb3e`; visible blob content confirms the already-audited `ggml_cl_buffer` destructor releases its `cl_mem` with `clReleaseMemObject`.
+- Added `scripts/extract_opencl_lifecycle_calls.py` for selected OpenCL completion/wait and release calls.
+- Records are source ordered and contain exact 1-based lines and per-name counts.
+- The pinned blob SHA remains `f283f65690af7790e163092207647d16dac9fb3e`; visible content confirms `ggml_cl_buffer` releases `cl_mem` with `clReleaseMemObject`.
 
 **Interpretation**
 
-- A call-site inventory narrows the teardown audit but does not establish ownership, error-path cleanup, release ordering, or queued-work completion.
+- A call inventory narrows review but does not establish ownership, error-path cleanup, release ordering, or command completion.
 
-**Historical**
-
-- Repeated line-ranged connector reads could not expose hidden portions of the large OpenCL translation unit. The new tool can operate on the complete pinned file in a checkout or CI workspace instead of depending on connector rendering.
-
-**Open questions**
-
-- Run the extractor against the complete pinned file and inspect each result in context.
-- Determine whether backend teardown explicitly finishes or waits before queue/context/program/kernel release.
-- Pair release calls with creation/retention sites if ownership remains ambiguous.
-
-## 2026-07-15 03:51 — OpenCL lifecycle lexical masking
+## 2026-07-15 03:51 — Lifecycle lexical masking and function-try repair
 
 **Verified**
 
-- Added lexical masking for line comments, block comments, string literals, and character literals before lifecycle-call matching.
-- Masking preserves source length and every newline, so exact 1-based call locations remain stable.
-- Added regressions for commented-out calls, quoted call-shaped text, escaped character literals, multiline comments, and a real call after masked regions.
-- A local focused reproduction returned only the real `clFlush` call on line 6.
-- Documentation CI run `29377620068` failed at full unittest discovery after the two dedicated suites passed; the available decoded log did not expose the exact failing assertion.
+- Masked line comments, block comments, string literals, and character literals while preserving source offsets/newlines.
+- Added regressions for call-shaped comments/literals and exact lines after masked regions.
+- Full discovery exposed `try : device(device) {` being misread as a function named `device`; a bounded guard fixed it.
+- Documentation CI run `29380673982` passed all suites and strict MkDocs.
 
 **Interpretation**
 
-- Removing call-shaped comments and literals reduces false teardown evidence without turning the extractor into a full C++ parser.
-
-**Historical**
-
-- The first extractor used a direct regex over raw source. This increment closes a concrete false-positive class before pinned-tree execution.
+- Lexical masking removes a concrete false-positive class without pretending to parse C++.
 
 **Open questions**
 
-- Raw strings, preprocessor-disabled regions, macro expansions, and wrappers remain outside the bounded lexical model.
-- Run the masked extractor against the complete pinned OpenCL file and inspect each result in context.
-- Verify the commit-scoped Documentation CI result and production Pages after merge.
+- Raw strings, disabled preprocessor regions, macros, and wrappers remain outside the bounded model.
+- Run the extractor against the complete pinned OpenCL file and inspect each result in context.
+
+## 2026-07-15 04:49 — Bounded lifecycle source context
+
+**Verified**
+
+- `extract_opencl_lifecycle_calls()` now accepts an optional non-negative `context_lines` radius.
+- Default zero preserves the existing `{name, line}` record shape.
+- `--context-lines N` adds original-source `start_line`, `end_line`, and `text` around each call.
+- Context clamps at file boundaries and is taken from the unmasked source, while detection still uses masked source.
+- Focused tests cover exact context, boundary clamping, and negative-radius rejection.
+- The lifecycle API set and matching semantics were not broadened.
+
+**Interpretation**
+
+- Bounded context turns the generated inventory into a usable first-pass teardown worksheet while remaining evidence for human review rather than proof of ownership or safe ordering.
+
+**Historical**
+
+- The preceding increment removed false-positive calls. This increment addresses the next bottleneck: reviewing true positives in a large translation unit whose connector rendering is truncated.
+
+**Open questions**
+
+- Determine the smallest useful context radius from the pinned report.
+- Add enclosing-function metadata or creation/release pairing only if context remains insufficient.
+- Obtain the complete pinned `ggml-opencl.cpp`, generate the real report, and finish the teardown matrix.
