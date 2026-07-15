@@ -28,31 +28,49 @@ jobs:
           git -C build/upstream fetch --depth=1 origin e3546c7948e3af463d0b401e6421d5a4c2faf565
           git -C build/upstream checkout --detach FETCH_HEAD
           test -s build/upstream/ggml/src/ggml-opencl/ggml-opencl.cpp
+          test "$(git -C build/upstream rev-parse HEAD)" = "e3546c7948e3af463d0b401e6421d5a4c2faf565"
 
       - name: Generate lifecycle report with bounded context
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p build/reports
+          source_path=build/upstream/ggml/src/ggml-opencl/ggml-opencl.cpp
+          report_path=build/reports/opencl-lifecycle-pinned-e3546c7.json
+          preserved_source=build/reports/ggml-opencl-pinned-e3546c7.cpp
+          manifest_path=build/reports/opencl-lifecycle-pinned-e3546c7.sha256
+
           python3 scripts/extract_opencl_lifecycle_calls.py \
-            build/upstream/ggml/src/ggml-opencl/ggml-opencl.cpp \
+            "$source_path" \
             --context-lines 3 \
-            --out build/reports/opencl-lifecycle-pinned-e3546c7.json
+            --out "$report_path"
+          cp "$source_path" "$preserved_source"
+          sha256sum "$report_path" "$preserved_source" > "$manifest_path"
+
           python3 - <<'PY'
           import json
           from pathlib import Path
 
-          path = Path("build/reports/opencl-lifecycle-pinned-e3546c7.json")
-          report = json.loads(path.read_text(encoding="utf-8"))
-          print(json.dumps(report["counts"], indent=2, sort_keys=True))
-          if not report["calls"]:
+          report = Path("build/reports/opencl-lifecycle-pinned-e3546c7.json")
+          source = Path("build/reports/ggml-opencl-pinned-e3546c7.cpp")
+          manifest = Path("build/reports/opencl-lifecycle-pinned-e3546c7.sha256")
+          data = json.loads(report.read_text(encoding="utf-8"))
+          print(json.dumps(data["counts"], indent=2, sort_keys=True))
+          if not data["calls"]:
               raise SystemExit("OpenCL lifecycle report unexpectedly contains no calls")
+          if source.stat().st_size < 100_000:
+              raise SystemExit("Pinned OpenCL source is unexpectedly small")
+          if len(manifest.read_text(encoding="utf-8").splitlines()) != 2:
+              raise SystemExit("Checksum manifest must contain report and source entries")
           PY
 
-      - name: Upload pinned lifecycle report
+      - name: Upload pinned lifecycle report and source evidence
         uses: actions/upload-artifact@v4
         with:
           name: opencl-lifecycle-pinned-e3546c7
-          path: build/reports/opencl-lifecycle-pinned-e3546c7.json
+          path: |
+            build/reports/opencl-lifecycle-pinned-e3546c7.json
+            build/reports/ggml-opencl-pinned-e3546c7.cpp
+            build/reports/opencl-lifecycle-pinned-e3546c7.sha256
           if-no-files-found: error
           retention-days: 30
