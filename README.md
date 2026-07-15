@@ -119,8 +119,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Trace the three `nested_scope_exit` OpenCL waits and establish whether synchronous `ggml_backend_tensor_set()` requires device-side conversion completion before return; then label the 21 temporary-input-release waits required, redundant, or contract-dependent.
-- [ ] Decide whether to submit the generated 46-release OpenCL patch upstream before synchronization cleanup, and rebase/re-audit it against current upstream if needed.
+- [ ] Rebase and re-audit the generated 46-release OpenCL patch against current upstream; if the leak remains, prepare an upstream-ready patch or issue while preserving synchronization.
 - [ ] Decide whether a move-only OpenCL event owner is worthwhile for maintainability even though pinned `CL_CHECK` failures abort without stack unwinding.
 - [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; include explicit Adreno handle ownership, invalid-symbol cleanup, repeated registration, and shared-library unload behavior.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts; use actual candidate volume to prioritize scanner work.
@@ -141,6 +140,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
+- [ ] Document the de facto synchronous `ggml_backend_tensor_set()` completion behavior explicitly in the public backend API, or record a deliberate weaker contract.
+- [ ] Rename the three OpenCL classifier records to `return_boundary_expansion_completion` and optionally annotate all 24 as required by the pinned synchronous set contract.
 - [ ] Search historical and newer pinned llama.cpp revisions for actual `transpose_2d(..., false)` use; remove the dormant branch or add a regression guard if it remains unused.
 - [ ] Add a machine-readable metadata file containing the pinned commit and extractor version to the OpenCL evidence artifact.
 - [ ] Add enclosing-function metadata only for lifecycle groups that remain ambiguous after source review.
@@ -157,6 +158,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Trace the three OpenCL nested-scope waits and compare the generic wrapper plus pinned CUDA and SYCL implementations: ordinary tensor-set is de facto synchronous, so all remaining 24 OpenCL conversion/expansion waits are required by the pinned return contract even though the header does not state it normatively.
 - [x] Add `scripts/classify_opencl_set_tensor_waits.py` to the pinned workflow, preserve its JSON artifact, and CI-guard the reviewed 24-record split: 21 temporary upload-buffer releases, 3 nested scope exits, all inside `ggml_backend_opencl_buffer_set_tensor()`, and zero `other` records.
 - [x] Reproducibly classify the remaining 24 unmatched OpenCL waits: 21 immediately precede `clReleaseMemObject(data_device)`, while 3 end nested lexical scopes inside `ggml_backend_opencl_buffer_set_tensor()`.
 - [x] Generate a concrete behavior-preserving patch for all 46 pinned OpenCL event leaks and CI-prove 50 released / 0 unmatched simple waits while preserving all 51 waits and the independent 22/24 synchronization classification.
@@ -166,7 +168,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [x] Resolve pinned `CL_CHECK` failure semantics: OpenCL errors log, assert, invoke `ggml_abort()`, and unconditionally terminate with `abort()`; successful-path event releases do not need recoverable-error cleanup.
 - [x] Audit all 51 pinned direct `clWaitForEvents()` sites: 5 waited events are released, while 46 local command-event references have no release or ownership transfer.
 - [x] Classify the Q4_0 conversion temporary-buffer group: both branches explicitly wait before releasing `data_device`, but both omit `clReleaseEvent(evt)` and leak one event reference per conversion.
-- [x] Audit every pinned `transpose_2d*()` call site: all 53 typed-wrapper calls use the default `blocking=true`; the `blocking=false` branch has zero callers and is dormant in the baseline.
+- [x] Audit every pinned `transpose_2d*()` call site: all 53 typed-wrapper call sites use the default `blocking=true`; the `blocking=false` branch has zero callers and is dormant in the baseline.
 - [x] Classify pinned OpenCL `transpose_2d()` immediate sub-buffer release: the nonblocking branch is locally safe under command retention, while all reachable pinned callers additionally wait for copy completion.
 - [x] Fix the OpenCL artifact manifest to use artifact-root basenames, verify it with `sha256sum -c` before upload, and guard the exact two filenames.
 - [x] Resolve the optional Adreno binary-library lifetime: the raw handle is lost, the library remains process-lifetime, invalid-symbol loads are not closed, and close-before-kernel ordering is absent rather than unsafe.
