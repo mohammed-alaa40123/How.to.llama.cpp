@@ -16,7 +16,7 @@ How.to.llama.cpp explains the path from a GGUF file to generated tokens: backend
 - Clickable foundations and inference explorers.
 - A research ledger for official docs, PRs, discussions, papers, talks, videos, blogs, and technical posts.
 - Scripts for source mirroring, indexing, context loading, validation, and site health checks.
-- GitHub Actions for hourly context validation, daily upstream indexing, strict documentation CI, pinned OpenCL lifecycle-report generation, and Pages deployment.
+- GitHub Actions for hourly context validation, daily upstream indexing, strict documentation CI, pinned OpenCL lifecycle/source evidence, and Pages deployment.
 
 Current progress lives in [`docs/reference/project-state.md`](docs/reference/project-state.md).
 
@@ -53,7 +53,7 @@ Start a local run with:
 | Daily | Website quality review | Review discoverability, source traceability, accessibility, diagrams, and interactions |
 | Hourly at minute 23 UTC | `.github/workflows/hourly-context-check.yml` | Validate context and scripts |
 | Daily at 02:17 UTC | `.github/workflows/refresh-source-index.yml` | Refresh upstream source inventory through a PR |
-| Manual and extractor-related PR changes | `.github/workflows/opencl-lifecycle-report.yml` | Fetch the exact pinned OpenCL source and upload a context-bearing lifecycle report |
+| Manual and extractor-related PR changes | `.github/workflows/opencl-lifecycle-report.yml` | Fetch exact pinned OpenCL source, generate the lifecycle report, preserve both with checksums |
 | Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, and `mkdocs build --strict` |
 | Every push to `main` | `.github/workflows/pages.yml` | Build, deploy, and verify the public site |
 
@@ -67,7 +67,7 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts for large translation units. `scripts/extract_opencl_lifecycle_calls.py` separately inventories selected OpenCL creation, retention, completion, and release call sites with exact lines after masking C/C++ comments and quoted literals; optional bounded original-source context makes generated reports reviewable without changing call matching. `.github/workflows/opencl-lifecycle-report.yml` obtains the complete exact pinned translation unit in GitHub Actions and preserves the generated report as an artifact.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts. `scripts/extract_opencl_lifecycle_calls.py` inventories selected OpenCL ownership, completion, and release calls after masking comments and quoted literals. `.github/workflows/opencl-lifecycle-report.yml` now preserves the exact pinned translation unit, generated JSON report, and SHA-256 manifest in one artifact.
 
 ### Write layered documentation
 
@@ -107,12 +107,11 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/ggml/graph-construction-and-moe.md` | Graph construction, reuse, MoE routing, and cache design |
 | `docs/architecture/backend-teardown-audit-method.md` | Reusable completion/ownership audit worksheet and runtime matrix |
 | `docs/architecture/backend-teardown-comparison.md` | Cross-backend completion, resource-independence, and safety matrix |
-| `docs/architecture/cpu-extra-buffer-comparison.md` | Cross-implementation ownership comparison and portable destruction-test matrix |
+| `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build, source-backed lifecycle inventory, ownership, and remaining gaps |
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
-| `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build composition, exact lifecycle inventory, local completion evidence, and remaining ownership gaps |
 | `docs/reference/source-index.md` | Human-reviewed source areas and generated symbol-location/link format |
-| `.github/workflows/docs-ci.yml` | Named validators, isolated unit-test suites, discovery guard, strict build, and actionable failure reporting |
-| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, validation, and artifact preservation |
+| `.github/workflows/docs-ci.yml` | Named validators, isolated unit-test suites, discovery guard, strict build, and actionable failures |
+| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, checksum validation, and artifact preservation |
 
 <!-- PROJECT-TODOS:START -->
 ## Living TODO list
@@ -121,14 +120,15 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Inspect the regenerated pinned OpenCL report for direct queue/context creation and retention calls; map each result to its enclosing owner and update the backend teardown comparison matrix.
-- [ ] Verify scheduler buffer/event deleter independence and classify OpenCL enqueue-then-release groups that rely on object-retention semantics rather than explicit waits.
-- [ ] Resolve optional Adreno binary-library handle lifetime and kernel-destruction ordering.
-- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned source links, and unsupported-syntax counts for braced initializers, multiline initializers, and constructor function-try-blocks; use actual candidate volume to prioritize scanner work.
-- [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
+- [ ] Resolve the optional Adreno binary-library handle lifetime and kernel-destruction ordering using the preserved pinned source.
+- [ ] Classify OpenCL enqueue-then-release groups that rely on object-retention semantics rather than explicit waits.
+- [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; verify repeated registration or shared-library unload behavior.
+- [ ] Fix the OpenCL artifact SHA-256 manifest to use artifact-root basenames so `sha256sum -c` works directly after download.
+- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts; use actual candidate volume to prioritize scanner work.
+- [ ] Implement the first CPU repack regression fixture: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
-- [ ] Verify SpacemiT worker cleanup and process-level Spine pool, huge-page mapping, device-fd, and TCM synchronization shutdown.
-- [ ] Validate KleidiAI null readback/copy callbacks, concurrent initialization, packed-layout portability, and packed-slot memory expansion.
+- [ ] Verify SpacemiT worker cleanup and process-level Spine pool, huge-page mapping, device-fd, and TCM shutdown.
+- [ ] Validate KleidiAI null readback/copy callbacks, concurrent initialization, packed-layout portability, and packed-slot expansion.
 - [ ] Validate AMX allocator pairing, repeated tile-permission initialization, and disabled readback/copy paths.
 - [ ] Verify CANN reset semantics with authoritative runtime documentation and a destruction-order test matrix.
 - [ ] Design and test a real RPC synchronization/completion command and shared-socket serialization.
@@ -142,17 +142,10 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Add enclosing-function metadata only for OpenCL lifecycle groups that remain ambiguous after targeted source review.
-- [ ] Extend OpenCL lexical masking only if pinned-source evidence requires raw-string, preprocessor-disabled-region, or macro-expansion handling.
-- [ ] Automatically pair OpenCL creation/retention calls with release sites only if the expanded direct-call report remains ambiguous.
-- [ ] Define constructor function-try-block navigation line semantics and consider stateful extraction only if regenerated pinned-tree counts justify it.
-- [ ] Evaluate multiline attributes, multiline constraints/returns, in-class special members, braced or multiline constructor initializer lists, defaulted/deleted definitions, literals, complex conversion operators, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
-- [ ] Extend unsupported-syntax telemetry only after pinned-tree evidence identifies additional high-value missed forms.
-- [ ] Upload or preserve validator output as Actions artifacts if isolated suites and verbose unittest output are still insufficient.
-- [ ] Validate generated pinned blob URLs and line fragments during Documentation CI.
+- [ ] Add enclosing-function metadata only for lifecycle groups that remain ambiguous after source review.
+- [ ] Extend OpenCL lexical masking only if pinned-source evidence requires raw strings, disabled preprocessor regions, or macro expansion.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
 - [ ] Extend interactive-link validation to built HTML IDs, generated routes, assets, and plugin-generated anchors.
-- [ ] Add RAII guidance or an upstream example patch for deterministic cleanup on minimal-example error paths.
 - [ ] Locate strong public contracts for model sharing, context concurrency, thread safety, backend synchronization, and destruction order.
 - [ ] Prototype per-layer LRU expert-cache instrumentation with separate logical, OS-residency, and backend-copy validity.
 - [ ] Prototype cache-aware routing before `ggml_argsort_top_k()`.
@@ -163,40 +156,15 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
-- [x] Expand the OpenCL lifecycle extractor to include direct context/queue creation and retention APIs, preserving lexical masking, exact lines, bounded context, and focused regression coverage.
-- [x] Inspect the first complete pinned OpenCL lifecycle artifact, record exact API totals, verify shared-free and cross-device synchronization ordering, and classify teardown as conditional with local completion evidence.
-- [x] Add a GitHub-hosted workflow that fetches the exact pinned OpenCL translation unit, generates a context-bearing lifecycle report, validates non-empty output, and uploads it as an artifact.
-- [x] Add optional bounded original-source context to OpenCL lifecycle records, with exact clamped line ranges, backward-compatible default output, and focused regression coverage.
-- [x] Isolate Documentation CI suites, diagnose `try : member(...) {` as a false ordinary-function record, add a bounded `FUNC_RE` guard, and pass full Documentation CI run `29380673982`.
-- [x] Mask line comments, block comments, string literals, and character literals before extracting OpenCL lifecycle calls while preserving exact source lines.
-- [x] Add a bounded exact-line OpenCL lifecycle-call extractor and focused tests for completion/wait and queue/context/program/kernel/event/buffer release APIs.
-- [x] Add bounded constructor function-try-block telemetry for same-line and next-line `try` forms while keeping navigation extraction unchanged.
-- [x] Audit constructor function-try-block behavior and confirm it produces neither a partial symbol record nor current unsupported-syntax telemetry.
-- [x] Add bounded per-file and aggregate unsupported-syntax counters for braced and multiline constructor initializer candidates without emitting partial symbol records.
-- [x] Protect the constructor-initializer scanner boundary with negative tests proving braced and multiline forms are not partially indexed.
-- [x] Add explicit regression coverage for bounded same-line qualified delegating constructors with exact source lines.
-- [x] Verify that the bounded same-line initializer-list rule already recognizes delegating constructors and remove the false unsupported-capability TODO.
-- [x] Recognize bounded same-line out-of-class constructor initializer lists without weakening exact definition-line indexing.
-- [x] Recognize bounded same-line qualified out-of-class constructor and destructor definitions while preserving exact definition lines.
-- [x] Recognize bounded same-line C++ operator definitions, including qualified symbolic, call, subscript, and single-token conversion operators, while preserving exact definition lines.
-- [x] Preserve exact function definition lines across preceding template lines and recognize bounded same-line C++20 `requires` clauses.
-- [x] Recognize same-line C++ trailing-return function definitions while preserving exact definition lines.
-- [x] Recognize same-line C++ attributes before function return types while preserving exact definition lines.
-- [x] Recognize same-line C++ attributes before or after type keywords while preserving exact declaration lines.
-- [x] Confirm the source-index type line-number fix and multiple-blank-line/namespace-indentation regression through successful full Documentation CI runs.
-- [x] Diagnose and fix source-index type declarations reporting the preceding blank line instead of the declaration line.
-- [x] Split Python unit tests into source-index and interactive-link suites while retaining full discovery coverage.
-- [x] Split Documentation CI validation into named steps and enable verbose unittest output so failures identify the subsystem.
-- [x] Specify an implementation-ready CPU optional-buffer destruction harness.
-- [x] Synthesize CPU repack, AMX, KleidiAI, and SpacemiT IME into one ownership/completion comparison and portable test matrix.
-- [x] Audit the pinned CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer paths.
-- [x] Add a reusable backend teardown audit method and cross-backend comparison matrix.
-- [x] Add a guided end-to-end inference atlas.
-- [x] Add line-aware, revision-pinned source-index links and tests.
-- [x] Map pinned OpenCL build composition and initial `cl_mem` ownership.
-- [x] Complete Pass A for public API, model/GGUF loading, runtime context/memory, and scheduler internals.
-- [x] Publish canonical GGUF, model placement, model/context, graph/MoE, memory-lifetime, and system-ownership pages.
-- [x] Add interactive explorers, validation, strict CI, Pages deployment, source indexing, and durable run context.
+- [x] Preserve the complete exact pinned OpenCL translation unit and SHA-256 manifest beside the generated lifecycle report.
+- [x] Resolve pinned OpenCL queue/context ownership: shared context and per-device backend context/queue persist in static process-lifetime device state; wrapper free finishes the queue and drops only a reference.
+- [x] Verify pinned OpenCL scheduler events are unsupported and buffer deleters use buffer-local `cl_mem` ownership rather than the destroyed backend wrapper.
+- [x] Add direct context/queue creation and retention APIs to the lifecycle extractor with exact-line tests.
+- [x] Inspect the complete pinned lifecycle artifact and classify local completion, cross-device synchronization, and temporary wait-before-release paths.
+- [x] Add a GitHub-hosted pinned OpenCL report workflow, bounded source context, lexical masking, focused tests, and CI coverage.
+- [x] Add bounded source-index support and regressions for attributes, trailing returns, constraints, operators, special members, initializer lists, delegating constructors, and unsupported constructor syntax telemetry.
+- [x] Add a reusable backend teardown audit method, cross-backend comparison, CPU optional-buffer lifetime audits, and an implementation-ready destruction harness.
+- [x] Publish canonical GGUF, model placement, model/context, graph/MoE, memory-lifetime, scheduler, teardown, and inference-atlas pages.
 <!-- PROJECT-TODOS:END -->
 
 ## Contribution and license
