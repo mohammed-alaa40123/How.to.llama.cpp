@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 16:51 Africa/Cairo_
+_Last updated: 2026-07-15 17:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -48,19 +48,22 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Completed the full direct-wait pairing audit: 5 of 51 waited events are released, while 46 local command-event references have no release or ownership transfer.
 - Resolved `CL_CHECK` failure semantics: any non-success OpenCL status logs, triggers `GGML_ASSERT(0)`, enters `ggml_abort()`, and ends in unconditional `abort()` rather than recoverable error propagation.
 - Added a bounded simple-local waited-event diagnostic that machine-checks the pinned 51 total, 5 released, and 46 unmatched ownership counts in the source-evidence workflow.
+- Classified 22 of the 46 unmatched waits as redundant before an immediate same-queue blocking `clEnqueueReadBuffer(..., CL_TRUE, ...)`; 24 waits remain for separate API-contract and consumer-order analysis.
 
 ## Latest concrete findings
 
-- The lifecycle report now includes `simple_waited_events` records for literal `clWaitForEvents(1, &identifier)` calls.
-- Each record contains the event identifier, exact wait line, lexical brace-scope end, and either a same-scope release line or `unmatched_in_scope`.
-- The diagnostic reuses comment and literal masking and intentionally does not model aliases, macros, helper releases, event arrays, control-flow reachability, or ownership transfer.
-- The pinned workflow now fails if the audited ownership contract changes from 51 simple waits, 5 same-scope releases, and 46 unmatched waits.
-- This converts a one-time manual audit into a reproducible regression guard suitable for validating a future release-only patch.
+- The complete pinned source contains 22 unmatched event waits followed immediately by a blocking read on the same `queue`.
+- The sites span `Q1_0`, `Q4_0`, `Q4_1`, `Q5_0`, `Q5_1`, `MXFP4`, `Q8_0`, `IQ4_NL`, `Q4_K`, `Q5_K`, and `Q6_K` readback paths.
+- The queue is in-order because its creation properties do not enable `CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE`.
+- Khronos specifies that `clEnqueueReadBuffer(..., CL_TRUE, ...)` does not return until the data has been copied to host memory.
+- Therefore, those 22 explicit waits are redundant for completion; the blocking read already waits for the preceding in-order restore/unpack kernel.
+- Event ownership remains independently broken: the 22 event references still need release if the waits are retained.
+- The safest upstream sequence remains release-only first for all 46 leaks, followed by a separate synchronization-cleanup patch for the proven redundant subset.
 
 ## In progress
 
-- Classifying the 46 unmatched waits into required completion versus waits redundant before a following same-queue blocking operation.
-- Preparing a minimal release-only upstream correction and using the new ownership diagnostic as a bounded regression before any separate synchronization-removal optimization.
+- Preparing a minimal release-only upstream correction for all 46 unmatched events and using the ownership diagnostic to require zero unmatched entries.
+- Classifying the remaining 24 unmatched waits, primarily upload/conversion paths, against the backend `set_tensor` completion contract and same-queue consumer chain.
 - Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -72,13 +75,12 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Classify and patch OpenCL waited events
-  → use the generated 46-entry unmatched inventory
-  → identify waits followed by same-queue blocking operations
-  → keep required waits and remove only independently proven redundant waits
-  → first prepare a low-risk release-only patch for all 46 successful waits
-  → validate the patch by driving unmatched_in_scope toward zero
-  → validate model-load and conversion paths with leak tooling when hardware is available
+Prepare release-only OpenCL event fix
+  → add clReleaseEvent(evt) after every successful unmatched wait
+  → preserve all existing synchronization in the first patch
+  → validate 51 released_in_scope and 0 unmatched_in_scope
+  → separately remove the 22 waits proven redundant before blocking reads
+  → classify the remaining 24 waits against set_tensor completion semantics
 ```
 
 In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
@@ -86,8 +88,8 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/1651-opencl-waited-event-regression.md`.
-- The extractor, focused tests, and pinned-source workflow guard were updated on the PR branch.
+- Added detailed note `logs/research/2026-07-15/1752-opencl-blocking-read-wait-classification.md`.
+- The required startup files and complete pinned OpenCL source-bearing artifact were inspected before editing.
 - Final-head workflow results must be checked before the run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime and `gh` is not installed.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
@@ -95,6 +97,7 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Known blockers and caveats
 
 - **Systematic OpenCL event leak:** 46 of 51 direct host-waited command events have no matching release or ownership transfer in the pinned translation unit.
+- **Synchronization split:** 22 of those 46 waits are redundant before an immediate same-queue blocking read; the remaining 24 require a different completion-contract analysis.
 - **Diagnostic scope:** the simple-local wait/release guard recognizes only literal count-one waits and same-identifier releases in the same lexical brace scope; it is not proof of general C++ ownership.
 - **Fatal-error policy:** `CL_CHECK` terminates via `abort()`; normal C++ destructors and scope guards do not run after a checked failure, so deterministic cleanup is meaningful only on successful paths or after a future nonfatal error redesign.
 - **Deterministic-release gap:** the pinned translation unit intentionally keeps device/backend contexts process-lifetime and contains no explicit queue/context release or per-device backend-context deletion path.
