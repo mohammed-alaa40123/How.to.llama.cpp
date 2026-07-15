@@ -6,9 +6,11 @@ on:
     paths:
       - "scripts/extract_opencl_lifecycle_calls.py"
       - "scripts/annotate_opencl_wait_followups.py"
+      - "scripts/classify_opencl_set_tensor_waits.py"
       - "scripts/apply_opencl_event_release_fix.py"
       - "tests/test_extract_opencl_lifecycle_calls.py"
       - "tests/test_annotate_opencl_wait_followups.py"
+      - "tests/test_classify_opencl_set_tensor_waits.py"
       - "tests/test_apply_opencl_event_release_fix.py"
       - ".github/workflows/opencl-lifecycle-report.yml"
 
@@ -120,6 +122,51 @@ jobs:
               )
           PY
 
+      - name: Classify remaining set_tensor waits
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_path=build/upstream/ggml/src/ggml-opencl/ggml-opencl.cpp
+          report_path=build/reports/opencl-lifecycle-pinned-e3546c7.json
+          groups_path=build/reports/opencl-set-tensor-wait-groups-e3546c7.json
+
+          python3 scripts/classify_opencl_set_tensor_waits.py \
+            "$source_path" \
+            "$report_path" \
+            --output "$groups_path"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("build/reports/opencl-set-tensor-wait-groups-e3546c7.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          expected_counts = {
+              "nested_scope_exit": 3,
+              "temporary_upload_buffer_release": 21,
+          }
+          if data["classified_wait_count"] != 24:
+              raise SystemExit(
+                  "Pinned set_tensor wait classifier must produce exactly 24 records: "
+                  f"got {data['classified_wait_count']}"
+              )
+          if data["counts"] != expected_counts:
+              raise SystemExit(
+                  "Pinned set_tensor wait groups changed: "
+                  f"expected {expected_counts}, got {data['counts']}"
+              )
+          functions = {record["enclosing_function"] for record in data["records"]}
+          expected_function = {"ggml_backend_opencl_buffer_set_tensor"}
+          if functions != expected_function:
+              raise SystemExit(
+                  "All 24 pinned records must remain in ggml_backend_opencl_buffer_set_tensor: "
+                  f"got {sorted(functions)}"
+              )
+          if any(record["classification"] == "other" for record in data["records"]):
+              raise SystemExit("Pinned set_tensor classifier produced an unresolved 'other' record")
+          print(json.dumps(data["counts"], indent=2, sort_keys=True))
+          PY
+
       - name: Generate and validate release-only event fix
         shell: bash
         run: |
@@ -173,6 +220,7 @@ jobs:
             build/reports/opencl-lifecycle-pinned-e3546c7.json
             build/reports/ggml-opencl-pinned-e3546c7.cpp
             build/reports/opencl-lifecycle-pinned-e3546c7.sha256
+            build/reports/opencl-set-tensor-wait-groups-e3546c7.json
             build/reports/opencl-event-release-e3546c7.patch
             build/reports/opencl-lifecycle-event-release-fixed-e3546c7.json
           if-no-files-found: error
