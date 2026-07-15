@@ -1,0 +1,58 @@
+name: Generate pinned OpenCL lifecycle report
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/extract_opencl_lifecycle_calls.py"
+      - "tests/test_extract_opencl_lifecycle_calls.py"
+      - ".github/workflows/opencl-lifecycle-report.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out documentation repository
+        uses: actions/checkout@v4
+
+      - name: Fetch pinned llama.cpp OpenCL source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/upstream
+          git -C build/upstream init
+          git -C build/upstream remote add origin https://github.com/ggml-org/llama.cpp.git
+          git -C build/upstream fetch --depth=1 origin e3546c7948e3af463d0b401e6421d5a4c2faf565
+          git -C build/upstream checkout --detach FETCH_HEAD
+          test -s build/upstream/ggml/src/ggml-opencl/ggml-opencl.cpp
+
+      - name: Generate lifecycle report with bounded context
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/reports
+          python3 scripts/extract_opencl_lifecycle_calls.py \
+            build/upstream/ggml/src/ggml-opencl/ggml-opencl.cpp \
+            --context-lines 3 \
+            --out build/reports/opencl-lifecycle-pinned-e3546c7.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("build/reports/opencl-lifecycle-pinned-e3546c7.json")
+          report = json.loads(path.read_text(encoding="utf-8"))
+          print(json.dumps(report["counts"], indent=2, sort_keys=True))
+          if not report["calls"]:
+              raise SystemExit("OpenCL lifecycle report unexpectedly contains no calls")
+          PY
+
+      - name: Upload pinned lifecycle report
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencl-lifecycle-pinned-e3546c7
+          path: build/reports/opencl-lifecycle-pinned-e3546c7.json
+          if-no-files-found: error
+          retention-days: 30
