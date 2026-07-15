@@ -253,3 +253,39 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Does current upstream retain the same implementations and leak?
 - Should the synchronous completion behavior be documented explicitly in `ggml-backend.h`?
 - Should the release-only patch be rebased and submitted upstream before any synchronization cleanup?
+
+## 2026-07-16 00:52 — Current-upstream OpenCL audit workflow
+
+**Verified**
+
+- Added `.github/workflows/current-opencl-lifecycle-audit.yml` to resolve an exact current `llama.cpp` master SHA, preserve the complete source, rerun lifecycle analysis, generate a current-source release-only candidate, and upload checksummed evidence.
+- The workflow records counts without freezing them until human review.
+- Current upstream revision `505b1ed15ca80e2a19f12ff4ac365e40fb374053` was 58 commits ahead of the pinned baseline and changed the OpenCL translation unit by 165 lines.
+
+**Interpretation**
+
+- Current applicability must be established semantically from regenerated evidence rather than by textually applying the pinned patch.
+
+## 2026-07-16 01:52 — Current-upstream event audit result
+
+**Verified**
+
+- Workflow run `29453611188` passed and uploaded artifact `8358479508` for exact upstream revision `505b1ed15ca80e2a19f12ff4ac365e40fb374053`.
+- Current upstream retains 51 direct waits, six direct event releases, 50 simple identifier waits, four same-scope releases, and 46 unmatched simple event references.
+- The current follow-up split is unchanged: 22 unmatched waits immediately precede same-queue blocking reads and 24 are other synchronous tensor-set waits.
+- The current-source generator inserts 46 releases and its post-patch report reaches zero unmatched simple waited-event records without removing any wait.
+- Added `data/opencl-current-audit-505b1ed.json` as a machine-readable reviewed checkpoint.
+
+**Interpretation**
+
+- The ownership defect remains present in current upstream. The generated current-source patch is semantically applicable and preserves the de facto synchronous tensor-set contract.
+- The upstream-ready contribution should use the exact current-source patch rather than textually rebasing the pinned patch.
+
+**Historical**
+
+- The bounded current counts are identical to the pinned baseline despite 58 intervening commits and 165 changed lines in the OpenCL translation unit.
+
+**Open questions**
+
+- Whether maintainers prefer 46 explicit releases or a small move-only event owner.
+- Whether to submit the correction directly as a pull request or first document it in an issue.
