@@ -16,7 +16,7 @@ How.to.llama.cpp explains the path from a GGUF file to generated tokens: backend
 - Clickable foundations and inference explorers.
 - A research ledger for official docs, PRs, discussions, papers, talks, videos, blogs, and technical posts.
 - Scripts for source mirroring, indexing, context loading, validation, and site health checks.
-- GitHub Actions for hourly context validation, daily upstream indexing, strict documentation CI, pinned OpenCL lifecycle/source evidence, and Pages deployment.
+- GitHub Actions for hourly context validation, daily upstream indexing, strict documentation CI, pinned OpenCL lifecycle/source evidence, generated release-only patch validation, and Pages deployment.
 
 Current progress lives in [`docs/reference/project-state.md`](docs/reference/project-state.md).
 
@@ -53,7 +53,7 @@ Start a local run with:
 | Daily | Website quality review | Review discoverability, source traceability, accessibility, diagrams, and interactions |
 | Hourly at minute 23 UTC | `.github/workflows/hourly-context-check.yml` | Validate context and scripts |
 | Daily at 02:17 UTC | `.github/workflows/refresh-source-index.yml` | Refresh upstream source inventory through a PR |
-| Manual and extractor-related PR changes | `.github/workflows/opencl-lifecycle-report.yml` | Fetch exact pinned OpenCL source, generate the lifecycle report, preserve both with directly verifiable checksums |
+| Manual and extractor-related PR changes | `.github/workflows/opencl-lifecycle-report.yml` | Fetch exact pinned OpenCL source, generate lifecycle evidence, generate the release-only event patch, and preserve review artifacts |
 | Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, and `mkdocs build --strict` |
 | Every push to `main` | `.github/workflows/pages.yml` | Build, deploy, and verify the public site |
 
@@ -67,7 +67,7 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered `symbol_locations` with approximate kind, exact 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts. `scripts/extract_opencl_lifecycle_calls.py` inventories selected OpenCL ownership, completion, and release calls after masking comments and quoted literals; it also emits a bounded simple-local wait/release diagnostic for `clWaitForEvents(1, &event)` patterns. `scripts/annotate_opencl_wait_followups.py` separately marks immediate same-queue blocking-read follow-ups without changing ownership status. `.github/workflows/opencl-lifecycle-report.yml` preserves the exact pinned translation unit, generated JSON report, and an artifact-root SHA-256 manifest that is verified before upload.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered `symbol_locations` with approximate kind, exact 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts. `scripts/extract_opencl_lifecycle_calls.py` inventories selected OpenCL ownership, completion, and release calls after masking comments and quoted literals; it also emits a bounded simple-local wait/release diagnostic for `clWaitForEvents(1, &event)` patterns. `scripts/annotate_opencl_wait_followups.py` separately marks immediate same-queue blocking-read follow-ups without changing ownership status. `scripts/apply_opencl_event_release_fix.py` generates a behavior-preserving release-only correction from the audited unmatched records and can emit a unified patch. `.github/workflows/opencl-lifecycle-report.yml` preserves the exact pinned translation unit, baseline and post-patch JSON reports, generated patch, and artifact-root SHA-256 manifest.
 
 ### Write layered documentation
 
@@ -109,9 +109,8 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/backend-teardown-comparison.md` | Cross-backend completion, resource-independence, and safety matrix |
 | `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build, source-backed lifecycle inventory, ownership, Adreno library lifetime, and remaining gaps |
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
-| `docs/reference/source-index.md` | Human-reviewed source areas and generated symbol-location/link format |
 | `.github/workflows/docs-ci.yml` | Named validators, isolated unit-test suites, discovery guard, strict build, and actionable failures |
-| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, wait/release ownership and blocking-read follow-up regressions, portable checksum validation, and artifact preservation |
+| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, ownership/follow-up regressions, generated release-only patch proof, and artifact preservation |
 
 <!-- PROJECT-TODOS:START -->
 ## Living TODO list
@@ -120,8 +119,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Prepare a minimal release-only upstream patch for all 46 pinned OpenCL event leaks, keeping synchronization unchanged and validating that `unmatched_in_scope` reaches zero.
 - [ ] Classify the remaining 24 unmatched OpenCL waits that are not immediately followed by a same-queue blocking read; establish the backend `set_tensor` completion contract before removing any wait.
+- [ ] Decide whether to submit the generated 46-release OpenCL patch upstream before synchronization cleanup, and rebase/re-audit it against current upstream if needed.
 - [ ] Decide whether a move-only OpenCL event owner is worthwhile for maintainability even though pinned `CL_CHECK` failures abort without stack unwinding.
 - [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; include explicit Adreno handle ownership, invalid-symbol cleanup, repeated registration, and shared-library unload behavior.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts; use actual candidate volume to prioritize scanner work.
@@ -158,6 +157,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Generate a concrete behavior-preserving patch for all 46 pinned OpenCL event leaks and CI-prove 50 released / 0 unmatched simple waits while preserving all 51 waits and the independent 22/24 synchronization classification.
 - [x] Add a bounded `followed_by_same_queue_blocking_read` annotation to the waited-event report and CI-guard the reviewed 22 blocking-read / 24 other unmatched split while keeping ownership status independent.
 - [x] Classify 22 of the 46 unmatched OpenCL waits as redundant before an immediate same-queue `clEnqueueReadBuffer(..., CL_TRUE, ...)`; retain 24 waits for separate contract and consumer-order analysis.
 - [x] Add a bounded simple-local OpenCL wait/release diagnostic and pin the source-evidence workflow to the audited 50 simple-identifier records, 4 released, and 46 unmatched counts.
