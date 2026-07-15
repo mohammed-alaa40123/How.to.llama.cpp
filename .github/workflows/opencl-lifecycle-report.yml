@@ -6,8 +6,10 @@ on:
     paths:
       - "scripts/extract_opencl_lifecycle_calls.py"
       - "scripts/annotate_opencl_wait_followups.py"
+      - "scripts/apply_opencl_event_release_fix.py"
       - "tests/test_extract_opencl_lifecycle_calls.py"
       - "tests/test_annotate_opencl_wait_followups.py"
+      - "tests/test_apply_opencl_event_release_fix.py"
       - ".github/workflows/opencl-lifecycle-report.yml"
 
 permissions:
@@ -118,6 +120,51 @@ jobs:
               )
           PY
 
+      - name: Generate and validate release-only event fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_path=build/upstream/ggml/src/ggml-opencl/ggml-opencl.cpp
+          report_path=build/reports/opencl-lifecycle-pinned-e3546c7.json
+          fixed_source=build/reports/ggml-opencl-event-release-fixed-e3546c7.cpp
+          fixed_report=build/reports/opencl-lifecycle-event-release-fixed-e3546c7.json
+          patch_path=build/reports/opencl-event-release-e3546c7.patch
+
+          python3 scripts/apply_opencl_event_release_fix.py \
+            "$source_path" \
+            "$report_path" \
+            --out "$fixed_source" \
+            --patch-out "$patch_path" \
+            --expected-fixes 46
+
+          python3 scripts/extract_opencl_lifecycle_calls.py \
+            "$fixed_source" \
+            --context-lines 3 \
+            --out "$fixed_report"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(
+              Path("build/reports/opencl-lifecycle-event-release-fixed-e3546c7.json")
+              .read_text(encoding="utf-8")
+          )
+          expected = {"released_in_scope": 50, "unmatched_in_scope": 0}
+          if report["simple_waited_event_counts"] != expected:
+              raise SystemExit(
+                  "release-only patch did not close all simple event ownership gaps: "
+                  f"expected {expected}, got {report['simple_waited_event_counts']}"
+              )
+          if report["counts"]["clWaitForEvents"] != 51:
+              raise SystemExit("release-only patch must preserve all 51 waits")
+          if report["counts"]["clReleaseEvent"] != 52:
+              raise SystemExit("release-only patch must add exactly 46 event releases")
+          if not Path("build/reports/opencl-event-release-e3546c7.patch").stat().st_size:
+              raise SystemExit("generated release-only patch is empty")
+          print(json.dumps(report["simple_waited_event_counts"], indent=2, sort_keys=True))
+          PY
+
       - name: Upload pinned lifecycle report and source evidence
         uses: actions/upload-artifact@v4
         with:
@@ -126,5 +173,7 @@ jobs:
             build/reports/opencl-lifecycle-pinned-e3546c7.json
             build/reports/ggml-opencl-pinned-e3546c7.cpp
             build/reports/opencl-lifecycle-pinned-e3546c7.sha256
+            build/reports/opencl-event-release-e3546c7.patch
+            build/reports/opencl-lifecycle-event-release-fixed-e3546c7.json
           if-no-files-found: error
           retention-days: 30
