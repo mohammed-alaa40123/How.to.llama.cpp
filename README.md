@@ -53,7 +53,7 @@ Start a local run with:
 | Daily | Website quality review | Review discoverability, source traceability, accessibility, diagrams, and interactions |
 | Hourly at minute 23 UTC | `.github/workflows/hourly-context-check.yml` | Validate context and scripts |
 | Daily at 02:17 UTC | `.github/workflows/refresh-source-index.yml` | Refresh upstream source inventory through a PR |
-| Manual and extractor-related PR changes | `.github/workflows/opencl-lifecycle-report.yml` | Fetch exact pinned OpenCL source, generate the lifecycle report, preserve both with checksums |
+| Manual and extractor-related PR changes | `.github/workflows/opencl-lifecycle-report.yml` | Fetch exact pinned OpenCL source, generate the lifecycle report, preserve both with directly verifiable checksums |
 | Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, and `mkdocs build --strict` |
 | Every push to `main` | `.github/workflows/pages.yml` | Build, deploy, and verify the public site |
 
@@ -67,7 +67,7 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts. `scripts/extract_opencl_lifecycle_calls.py` inventories selected OpenCL ownership, completion, and release calls after masking comments and quoted literals. `.github/workflows/opencl-lifecycle-report.yml` now preserves the exact pinned translation unit, generated JSON report, and SHA-256 manifest in one artifact.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts. `scripts/extract_opencl_lifecycle_calls.py` inventories selected OpenCL ownership, completion, and release calls after masking comments and quoted literals. `.github/workflows/opencl-lifecycle-report.yml` preserves the exact pinned translation unit, generated JSON report, and an artifact-root SHA-256 manifest that is verified before upload.
 
 ### Write layered documentation
 
@@ -111,7 +111,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
 | `docs/reference/source-index.md` | Human-reviewed source areas and generated symbol-location/link format |
 | `.github/workflows/docs-ci.yml` | Named validators, isolated unit-test suites, discovery guard, strict build, and actionable failures |
-| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, checksum validation, and artifact preservation |
+| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, portable checksum validation, and artifact preservation |
 
 <!-- PROJECT-TODOS:START -->
 ## Living TODO list
@@ -122,7 +122,6 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 - [ ] Classify OpenCL enqueue-then-release groups that rely on object-retention semantics rather than explicit waits.
 - [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; include explicit Adreno handle ownership, invalid-symbol cleanup, repeated registration, and shared-library unload behavior.
-- [ ] Fix the OpenCL artifact SHA-256 manifest to use artifact-root basenames so `sha256sum -c` works directly after download.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts; use actual candidate volume to prioritize scanner work.
 - [ ] Implement the first CPU repack regression fixture: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
@@ -141,6 +140,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
+- [ ] Add a machine-readable metadata file containing the pinned commit and extractor version to the OpenCL evidence artifact.
 - [ ] Add enclosing-function metadata only for lifecycle groups that remain ambiguous after source review.
 - [ ] Extend OpenCL lexical masking only if pinned-source evidence requires raw strings, disabled preprocessor regions, or macro expansion.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
@@ -155,6 +155,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Fix the OpenCL artifact manifest to use artifact-root basenames, verify it with `sha256sum -c` before upload, and guard the exact two filenames.
 - [x] Resolve the optional Adreno binary-library lifetime: the raw handle is lost, the library remains process-lifetime, invalid-symbol loads are not closed, and close-before-kernel ordering is absent rather than unsafe.
 - [x] Preserve the complete exact pinned OpenCL translation unit and SHA-256 manifest beside the generated lifecycle report.
 - [x] Resolve pinned OpenCL queue/context ownership: shared context and per-device backend context/queue persist in static process-lifetime device state; wrapper free finishes the queue and drops only a reference.
