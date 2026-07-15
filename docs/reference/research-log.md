@@ -44,7 +44,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 **Verified**
 
-- Published Pass A pages for the public API/minimal example, model/GGUF loader, runtime context/memory, backend scheduler, and concrete context-memory implementations.
+- Published Pass A pages for public API/minimal example, model/GGUF loader, runtime context/memory, backend scheduler, and concrete context-memory implementations.
 - Published the cross-subsystem ownership/execution map.
 - The pinned tree contains ordinary KV, iSWA, DSA, DSV4, recurrent, hybrid, and hybrid-iSWA persistent memory implementations.
 - Scheduler copy allocation, current-generation validity, and previous-consumer completion are separate states.
@@ -54,19 +54,14 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Interpretation**
 
 - The loader is a transactional publisher, `llama_context` is a mutable session around a borrowed model, and the scheduler is an execution planner.
-- Backend-before-scheduler safety depends on both resource-deleter independence and queued-work completion.
-- OpenCL buffer-local RAII does not itself prove command completion before release.
+- Backend-before-scheduler safety depends on resource-deleter independence and queued-work completion.
 
 ## 2026-07-13 19:51–21:49 — Source navigation and teardown comparison
 
 **Verified**
 
-- `scripts/index_upstream.py` emits untruncated, source-ordered `symbol_locations` with approximate declaration kind, exact 1-based lines, and revision-pinned file/symbol URLs.
-- Added a pinned teardown matrix for ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and the OpenCL gap.
-
-**Open question**
-
-- Regenerate the pinned inventory when upstream access is available and use it to finish OpenCL teardown.
+- `scripts/index_upstream.py` emits source-ordered `symbol_locations` with approximate kind, exact 1-based lines, and revision-pinned links.
+- Added a pinned teardown matrix for CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and the initial OpenCL gap.
 
 ## 2026-07-14 01:52–08:49 — Inference atlas and CPU optional buffers
 
@@ -74,189 +69,105 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Added a clickable inference pipeline and reusable ten-step teardown worksheet.
 - Audited CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer ownership and synchronous execution.
-- Added a cross-implementation comparison, portable destruction-test matrix, and an implementation-ready admitted `MUL_MAT` fixture.
+- Added a cross-implementation comparison, portable destruction-test matrix, and implementation-ready admitted `MUL_MAT` fixture.
 
 **Interpretation**
 
-- A tiny deterministic graph is stronger than a full model for the lifetime-ordering question because admission, fallback placement, owners, and destruction order remain visible.
-
-**Open questions**
-
-- Validate AMX allocator pairing, KleidiAI initialization/readback behavior, SpacemiT TCM/process-pool shutdown, and sanitizer ordering tests.
+- A tiny deterministic graph is stronger than a full model for lifetime-ordering tests because admission, fallback placement, owners, and destruction order remain visible.
 
 ## 2026-07-14 09:49–12:50 — CI observability and source-line repair
 
 **Verified**
 
 - Split Documentation CI into named validators and isolated unit suites before full discovery.
-- Found that regex `\s` crossed newlines and shifted type/function records to preceding blank or template lines.
-- Replaced relevant leading whitespace with horizontal-only matching and added regression coverage.
-- Complete CI passed through runs `29319949484` and `29323751656`.
+- Replaced newline-crossing whitespace matches that shifted type/function records to preceding lines.
+- Added regression coverage and passed complete CI.
 
-**Interpretation**
-
-- Generated links should target definitions, not adjacent whitespace; exact location is more valuable than broad approximate parsing.
-
-## 2026-07-14 13:51–19:53 — Bounded C++ syntax indexing
+## 2026-07-14 13:51–23:51 — Bounded C++ syntax and telemetry
 
 **Verified**
 
-- Added exact-line support for same-line attributes, trailing returns, bounded `requires`, qualified operators, constructors/destructors, and parenthesized constructor initializer lists.
-- Dedicated rules avoid weakening ordinary function extraction.
-- Complete CI passed through run `29352222406`.
+- Added exact-line support for same-line attributes, trailing returns, bounded `requires`, qualified operators, constructors/destructors, parenthesized initializer lists, and delegating constructors.
+- Added negative tests and per-file/aggregate telemetry for braced and multiline constructor initializers.
+- Added constructor function-try-block telemetry while keeping those forms out of navigation.
 
 **Interpretation**
 
 - These are bounded navigation features, not claims to parse full C++ grammar.
+- Measurable false-negative telemetry prioritizes scanner work without weakening link accuracy.
 
-**Open questions**
-
-- Multiline syntax, complex requires-expressions, literals, macros, in-class members, and brace-containing initializer lists require pinned-tree evidence before expansion.
-
-## 2026-07-14 20:52–23:51 — Constructor boundaries and telemetry
+## 2026-07-15 02:51–04:49 — OpenCL lifecycle extraction
 
 **Verified**
 
-- Confirmed same-line parenthesized delegating constructors were already recognized and added explicit regression coverage.
-- Added negative tests proving braced and multiline initializer lists do not emit partial symbols.
-- Added per-file and aggregate unsupported-syntax counters for braced and multiline constructor initializer candidates.
+- Added an exact-line extractor for selected OpenCL completion, wait, release, creation, and retention calls.
+- Masked comments and quoted literals while preserving offsets and lines.
+- Added bounded original-source context and focused regression coverage.
+- Full discovery exposed and fixed a `try : member(...) {` false ordinary-function record.
 
 **Interpretation**
 
-- Measurable false-negative telemetry can prioritize scanner work without weakening navigation accuracy.
-
-## 2026-07-15 01:50 — Constructor function-try-block telemetry
-
-**Verified**
-
-- Added bounded candidate counts for qualified constructor function-try-blocks with same-line or next-line `try`.
-- These forms remain excluded from navigation records.
-
-**Open question**
-
-- Regenerate the pinned tree to determine whether stateful extraction is justified and which line a future record should target.
-
-## 2026-07-15 02:51 — OpenCL lifecycle-call extractor
-
-**Verified**
-
-- Added `scripts/extract_opencl_lifecycle_calls.py` for selected OpenCL completion/wait and release calls.
-- Records are source ordered and contain exact 1-based lines and per-name counts.
-- The pinned blob SHA remains `f283f65690af7790e163092207647d16dac9fb3e`; visible content confirms `ggml_cl_buffer` releases `cl_mem` with `clReleaseMemObject`.
-
-**Interpretation**
-
-- A call inventory narrows review but does not establish ownership, error-path cleanup, release ordering, or command completion.
-
-## 2026-07-15 03:51 — Lifecycle lexical masking and function-try repair
-
-**Verified**
-
-- Masked line comments, block comments, string literals, and character literals while preserving source offsets/newlines.
-- Added regressions for call-shaped comments/literals and exact lines after masked regions.
-- Full discovery exposed `try : device(device) {` being misread as a function named `device`; a bounded guard fixed it.
-- Documentation CI run `29380673982` passed all suites and strict MkDocs.
-
-**Interpretation**
-
-- Lexical masking removes a concrete false-positive class without pretending to parse C++.
-
-**Open questions**
-
-- Raw strings, disabled preprocessor regions, macros, and wrappers remain outside the bounded model.
-- Run the extractor against the complete pinned OpenCL file and inspect each result in context.
-
-## 2026-07-15 04:49 — Bounded lifecycle source context
-
-**Verified**
-
-- `extract_opencl_lifecycle_calls()` now accepts an optional non-negative `context_lines` radius.
-- Default zero preserves the existing `{name, line}` record shape.
-- `--context-lines N` adds original-source `start_line`, `end_line`, and `text` around each call.
-- Context clamps at file boundaries and is taken from the unmasked source, while detection still uses masked source.
-- Focused tests cover exact context, boundary clamping, and negative-radius rejection.
-- The lifecycle API set and matching semantics were not broadened.
-
-**Interpretation**
-
-- Bounded context turns the generated inventory into a usable first-pass teardown worksheet while remaining evidence for human review rather than proof of ownership or safe ordering.
-
-**Historical**
-
-- The preceding increment removed false-positive calls. This increment addresses the next bottleneck: reviewing true positives in a large translation unit whose connector rendering is truncated.
-
-**Open questions**
-
-- Determine the smallest useful context radius from the pinned report.
-- Add enclosing-function metadata or creation/release pairing only if context remains insufficient.
-- Obtain the complete pinned `ggml-opencl.cpp`, generate the real report, and finish the teardown matrix.
+- The extractor is a review inventory, not proof of ownership or safe release ordering.
 
 ## 2026-07-15 05:51 — GitHub-hosted pinned OpenCL report generation
 
 **Verified**
 
-- Added `.github/workflows/opencl-lifecycle-report.yml`.
-- The workflow fetches exactly llama.cpp revision `e3546c7948e3af463d0b401e6421d5a4c2faf565` and verifies the pinned OpenCL translation unit is non-empty.
-- It runs the tested lifecycle extractor with three context lines, rejects an unexpectedly empty inventory, prints per-call counts, and uploads the JSON report as a 30-day artifact.
-- The workflow is manually dispatchable and also runs when the extractor, its tests, or the workflow definition changes.
-- Preceding Documentation CI run `29382836507` completed successfully.
+- Added `.github/workflows/opencl-lifecycle-report.yml` to fetch the exact pinned source, generate the report, validate it, and upload a 30-day artifact.
+- This replaced the local DNS/source-recovery blocker with a repository-owned evidence path.
 
-**Interpretation**
-
-- This replaces the runtime-specific local checkout blocker with a repository-owned, reproducible GitHub-hosted source-recovery path.
-- The artifact remains navigation evidence; each call still requires human ownership, completion, and release-order classification.
-
-**Historical**
-
-- The extractor and bounded context existed, but the repository did not yet have a mechanism to obtain the complete pinned translation unit and preserve the report.
-
-**Open questions**
-
-- Inspect the first generated artifact and determine whether three context lines are sufficient.
-- Add enclosing-function metadata or creation/retention pairing only if the artifact leaves material ambiguity.
-
-## 2026-07-15 06:49 — Pinned OpenCL lifecycle first-pass classification
+## 2026-07-15 06:49 — First complete OpenCL lifecycle classification
 
 **Verified**
 
-- Workflow run `29385330482` successfully generated and uploaded the complete pinned report; Documentation CI run `29385330547` also passed for the preceding head.
-- The report contains 556 selected direct calls: 343 memory-object releases, 121 program releases, 51 event waits, 23 kernel releases, 11 queue finishes, 6 event releases, and 1 queue flush.
-- The bounded inventory contains no direct command-queue or OpenCL-context release call.
-- The shared OpenCL `free()` path calls `clFinish(queue)` before decrementing its reference count and releases pooled image/sub-buffer views only at the final reference.
-- Cross-device synchronization uses peer-queue marker events and `clFlush()`, then a destination-queue barrier waiting on those events before their references are released.
-- Multiple temporary conversion/readback paths wait before releasing temporary memory objects.
+- The first complete report contained 556 selected calls: 343 memory releases, 121 program releases, 51 waits, 23 kernel releases, 11 finishes, 6 event releases, and 1 flush.
+- Shared `free()` calls `clFinish(queue)` before final-reference pooled-view cleanup.
+- Cross-device synchronization publishes marker events with `clFlush()`, then enqueues a dependent destination barrier.
 
 **Interpretation**
 
-- OpenCL teardown can now be classified as conditional with verified local completion evidence, not globally safe.
-- Missing direct queue/context release calls are an unresolved ownership signal, not proof of a leak.
-- Three context lines are sufficient for the shared-free and synchronization idioms but not every enclosing owner.
+- OpenCL teardown became conditional with verified local completion evidence; queue/context ownership was still unresolved.
 
-**Historical**
-
-- The first complete pinned artifact removes the earlier large-file/source-recovery blocker.
-
-**Open questions**
-
-- Locate final queue/context ownership, verify scheduler-resource independence, classify retention-only enqueue/release groups, and resolve optional Adreno binary-library lifetime.
-
-## 2026-07-15 07:52 — OpenCL queue/context ownership-call inventory
+## 2026-07-15 07:52 — Queue/context ownership-call inventory
 
 **Verified**
 
-- Expanded the lifecycle matcher to include `clCreateContext`, `clCreateContextFromType`, `clRetainContext`, `clCreateCommandQueue`, `clCreateCommandQueueWithProperties`, and `clRetainCommandQueue`.
-- Exact source ordering, 1-based lines, lexical masking, and optional original-source context remain unchanged.
-- Focused tests cover direct creation/retention calls, context-from-type creation, similar identifiers, and call-shaped comments/literals.
-- The existing pinned-report workflow already triggers on extractor and test changes.
-
-**Interpretation**
-
-- The regenerated report can now distinguish “no direct releases” from a symmetric direct-call inventory containing creation/retention sites. Zero direct creation calls would shift attention toward wrappers, generated code, globals, or process-lifetime ownership rather than proving a leak.
-
-**Historical**
-
-- The first complete report inventoried completion and release calls only, leaving direct queue/context ownership transitions outside the generated evidence.
+- Expanded the report to 558 calls by adding direct context/queue creation and retention APIs.
+- One `clCreateContext()` assigns to `shared_context`; one `clCreateCommandQueue()` assigns to `backend_ctx->queue`.
+- No direct context/queue retain or release call appears.
 
 **Open questions**
 
-- Inspect the regenerated pinned report, map each direct ownership call to its enclosing owner, verify scheduler-resource independence, and update the OpenCL teardown matrix.
+- Locate declarations and final ownership, verify scheduler-resource independence, classify retention-only release groups, and resolve Adreno library lifetime.
+
+## 2026-07-15 08:50–09:10 — Source-bearing artifact and process-lifetime ownership
+
+**Verified**
+
+- Updated the report workflow to verify the exact checkout revision and preserve the complete pinned `ggml-opencl.cpp`, generated JSON report, and a SHA-256 manifest in one artifact.
+- Workflow run `29392658206` succeeded; artifact `8333854723` expires on 2026-08-14.
+- The downloaded source and report hashes matched the manifest.
+- Device registration creates one `shared_context` and copies it into every supported device context.
+- Device contexts are stored in static `g_ggml_backend_opencl_dev_ctxs`; the source explicitly states the devices and contexts live as long as the process.
+- `ggml_cl_init()` lazily creates one `ggml_backend_opencl_context` per device, stores it in `dev_ctx->backend_ctx`, copies the shared context, and creates one queue.
+- Backend wrappers increment `ref_count`; wrapper free calls `clFinish(queue)` and decrements it but does not delete the per-device context or release queue/context handles.
+- On the final wrapper reference, pooled KV/dequant image and sub-buffer views are released.
+- OpenCL backend events are unsupported and event callbacks are null; no scheduler-owned OpenCL event deleter outlives the wrapper.
+- Buffer deleters own buffer-local `cl_mem` references and do not require the destroyed wrapper.
+
+**Interpretation**
+
+- Pinned OpenCL backend-wrapper destruction is structurally supported because work is completed and the real OpenCL owner persists in process-lifetime state.
+- Deterministic process-exit cleanup is omitted: no explicit command-queue/context release or per-device backend-context deletion path exists in the pinned translation unit.
+- The stronger classification is **backend-wrapper order supported; deterministic process-exit release omitted**.
+
+**Historical**
+
+- Earlier three-line report windows located creation but could not expose declaration or owner lifetimes. Preserving the exact source closed that gap.
+
+**Open questions**
+
+- Resolve optional Adreno dynamic-library handle and kernel-destruction ordering.
+- Classify enqueue-then-release groups relying only on OpenCL object-retention semantics.
+- Determine whether repeated registration or shared-library unload is supported.
+- Fix the artifact checksum manifest to use basenames for direct `sha256sum -c` after download.
