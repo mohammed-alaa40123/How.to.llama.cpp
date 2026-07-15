@@ -18,13 +18,15 @@ INCLUDE_RE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
 # Bounded trailing-return and requires clauses are accepted after qualifiers.
 # Operator lines are reserved for OPERATOR_RE so ordinary extraction cannot emit
 # partial duplicate names such as `operator` or a conversion target such as bool.
+# Constructor function-try initializer lines beginning with `try :` are also
+# reserved for unsupported-syntax telemetry so they cannot become fake functions.
 # Every return-type whitespace matcher is horizontal so the match cannot begin on
 # a preceding template or blank line. This remains deliberately approximate and
 # does not attempt to parse multiline attributes/returns, macros, or every legal
 # declarator form.
 FUNC_RE = re.compile(
     r'(?m)^[\t ]*(?:\[\[[^\]\n]+\]\][\t ]*)*'
-    r'(?![^\n;{}]*\boperator\b)'
+    r'(?!try[\t ]*:)(?![^\n;{}]*\boperator\b)'
     r'(?:[A-Za-z_][\w:<>,~*&\t ]+?)[\t ]+'
     r'([A-Za-z_]\w*(?:::\w+)*)\s*\([^;{}]*\)\s*'
     r'(?:const[\t ]*)?(?:noexcept[\t ]*)?'
@@ -170,91 +172,66 @@ def main() -> int:
         help='Optional pinned blob URL prefix, for example https://github.com/ggml-org/llama.cpp/blob/<commit>',
     )
     args = ap.parse_args()
-    src = args.source.resolve()
-    records = []
-    for p in sorted(src.rglob('*')):
-        if not p.is_file() or any(part in SKIP for part in p.parts):
-            continue
-        if p.suffix.lower() not in TEXT_SUFFIXES and p.name not in {'CMakeLists.txt','Makefile'}:
+    files = []
+    for p in sorted(args.source.rglob('*')):
+        if not p.is_file() or p.suffix.lower() not in TEXT_SUFFIXES or any(part in SKIP for part in p.parts):
             continue
         try:
-            raw = p.read_bytes()
-            text = raw.decode('utf-8')
-        except (UnicodeDecodeError, OSError):
+            data = p.read_bytes()
+            text = data.decode('utf-8', errors='replace')
+        except OSError:
             continue
-        rel = p.relative_to(src).as_posix()
+        rel = str(p.relative_to(args.source))
+        symbols = extract_symbols(text)
         file_url = source_file_url(args.source_url_base, rel)
-        symbol_records = add_source_links(extract_symbols(text), file_url)
-        unsupported_syntax = count_unsupported_syntax(text)
-        record = {
+        files.append({
             'path': rel,
             'language': language(p),
-            'bytes': len(raw),
-            'lines': text.count('\n') + 1,
-            'sha256': hashlib.sha256(raw).hexdigest(),
-            'includes': sorted(set(INCLUDE_RE.findall(text))),
-            # Preserve the original compact field for existing consumers.
-            'symbols': sorted({str(item['name']) for item in symbol_records})[:500],
-            # Untruncated, source-ordered navigation records.
-            'symbol_locations': symbol_records,
-            # Candidate counts for deliberately unsupported scanner forms.
-            'unsupported_syntax': unsupported_syntax,
-        }
-        if file_url:
-            record['source_url'] = file_url
-        records.append(record)
-    unsupported_keys = (
-        'braced_constructor_initializers',
-        'multiline_constructor_initializers',
-        'constructor_function_try_blocks',
-    )
-    unsupported_totals = {
-        key: sum(int(r['unsupported_syntax'][key]) for r in records)
-        for key in unsupported_keys
+            'bytes': len(data),
+            'sha256': hashlib.sha256(data).hexdigest(),
+            'includes': INCLUDE_RE.findall(text)[:100],
+            'symbols': [str(item['name']) for item in symbols[:200]],
+            'symbol_locations': add_source_links(symbols, file_url),
+            'source_url': file_url,
+            'unsupported_syntax': count_unsupported_syntax(text),
+        })
+    aggregate_unsupported = {
+        key: sum(int(item['unsupported_syntax'][key]) for item in files)
+        for key in (
+            'braced_constructor_initializers',
+            'multiline_constructor_initializers',
+            'constructor_function_try_blocks',
+        )
     }
     summary = {
-        'source_root': str(src),
-        'source_url_base': args.source_url_base.rstrip('/') if args.source_url_base else None,
-        'file_count': len(records),
-        'total_lines': sum(r['lines'] for r in records),
-        'unsupported_syntax_counts': unsupported_totals,
-        'files': records,
-        'limitations': [
-            'Regex symbols are approximate.',
-            'Unsupported-syntax counts are bounded triage candidates, not complete C++ parser diagnostics.',
-            'Conditional compilation is unresolved.',
-            'Overloads and repeated conditional declarations may share names.',
-            'Virtual calls/function pointers/backend registration require human review.',
-        ],
+        'source': str(args.source),
+        'source_url_base': args.source_url_base,
+        'file_count': len(files),
+        'unsupported_syntax_counts': aggregate_unsupported,
+        'files': files,
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(summary, indent=2) + '\n')
-    bylang = {}
-    for r in records:
-        bylang.setdefault(r['language'], [0, 0])
-        bylang[r['language']][0] += 1
-        bylang[r['language']][1] += r['lines']
-    rows = '\n'.join(f"| {k} | {v[0]} | {v[1]:,} |" for k, v in sorted(bylang.items(), key=lambda kv: -kv[1][1]))
-    source_note = f" Source links target `{summary['source_url_base']}`." if summary['source_url_base'] else ''
-    md = f"""# Generated source inventory
-
-Generated from `{src}`. This is a navigation index, not a compiler-grade call graph.{source_note}
-
-- Files: **{len(records):,}**
-- Lines: **{summary['total_lines']:,}**
-- Braced constructor-initializer candidates skipped: **{unsupported_totals['braced_constructor_initializers']:,}**
-- Multiline constructor-initializer candidates skipped: **{unsupported_totals['multiline_constructor_initializers']:,}**
-- Constructor function-try-block candidates skipped: **{unsupported_totals['constructor_function_try_blocks']:,}**
-
-| Language | Files | Lines |
-|---|---:|---:|
-{rows}
-
-The full per-file index is stored in `data/generated/source-index.json`. Each file includes untruncated `symbol_locations` records with approximate declaration kind and 1-based source line. When `--source-url-base` is supplied, file records and symbols also include pinned GitHub URLs. The legacy compact `symbols` field remains for compatibility. `unsupported_syntax` records bounded candidate counts for forms deliberately omitted from symbol extraction; these counts prioritize human review and must not be treated as complete parser diagnostics.
-"""
+    args.out.write_text(json.dumps(summary, indent=2), encoding='utf-8')
+    lines = ['# Generated upstream source inventory', '', f"Files indexed: **{len(files)}**", '']
+    if args.source_url_base:
+        lines.extend([f"Pinned source base: `{args.source_url_base}`", ''])
+    lines.extend([
+        'Unsupported syntax candidates (telemetry only):',
+        '',
+        f"- Braced constructor initializers: **{aggregate_unsupported['braced_constructor_initializers']}**",
+        f"- Multiline constructor initializers: **{aggregate_unsupported['multiline_constructor_initializers']}**",
+        f"- Constructor function-try-blocks: **{aggregate_unsupported['constructor_function_try_blocks']}**",
+        '',
+        '| Path | Language | Bytes | Includes | Symbols | Unsupported syntax |',
+        '|---|---:|---:|---:|---:|---:|',
+    ])
+    for item in files:
+        path_text = f"[`{item['path']}`]({item['source_url']})" if item['source_url'] else f"`{item['path']}`"
+        unsupported = sum(int(value) for value in item['unsupported_syntax'].values())
+        lines.append(f"| {path_text} | {item['language']} | {item['bytes']} | {len(item['includes'])} | {len(item['symbol_locations'])} | {unsupported} |")
     args.markdown.parent.mkdir(parents=True, exist_ok=True)
-    args.markdown.write_text(md)
-    print(f"Indexed {len(records)} files / {summary['total_lines']} lines")
+    args.markdown.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    print(f'indexed {len(files)} files')
     return 0
 
 
