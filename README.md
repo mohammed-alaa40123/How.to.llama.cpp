@@ -120,7 +120,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Trace every `transpose_2d(..., false)` call site to its next same-queue consumer or synchronization point; then classify temporary quantization image/sub-buffer release groups.
+- [ ] Classify one temporary OpenCL quantization image/sub-buffer release group; distinguish explicit wait-before-release, same-queue command retention, host-storage lifetime, pooled reuse, and cross-queue dependencies.
 - [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; include explicit Adreno handle ownership, invalid-symbol cleanup, repeated registration, and shared-library unload behavior.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts; use actual candidate volume to prioritize scanner work.
 - [ ] Implement the first CPU repack regression fixture: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
@@ -140,6 +140,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
+- [ ] Search historical and newer pinned llama.cpp revisions for actual `transpose_2d(..., false)` use; remove the dormant branch or add a regression guard if it remains unused.
 - [ ] Add a machine-readable metadata file containing the pinned commit and extractor version to the OpenCL evidence artifact.
 - [ ] Add enclosing-function metadata only for lifecycle groups that remain ambiguous after source review.
 - [ ] Extend OpenCL lexical masking only if pinned-source evidence requires raw strings, disabled preprocessor regions, or macro expansion.
@@ -155,7 +156,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
-- [x] Classify pinned OpenCL `transpose_2d()` immediate sub-buffer release: the nonblocking branch safely drops the host reference after enqueue because OpenCL defers deletion until queued users finish; no host storage is invalidated.
+- [x] Audit every pinned `transpose_2d*()` call site: all 53 typed-wrapper calls use the default `blocking=true`; the `blocking=false` branch has zero callers and is dormant in the baseline.
+- [x] Classify pinned OpenCL `transpose_2d()` immediate sub-buffer release: the nonblocking branch is locally safe under command retention, while all reachable pinned callers additionally wait for copy completion.
 - [x] Fix the OpenCL artifact manifest to use artifact-root basenames, verify it with `sha256sum -c` before upload, and guard the exact two filenames.
 - [x] Resolve the optional Adreno binary-library lifetime: the raw handle is lost, the library remains process-lifetime, invalid-symbol loads are not closed, and close-before-kernel ordering is absent rather than unsafe.
 - [x] Preserve the complete exact pinned OpenCL translation unit and SHA-256 manifest beside the generated lifecycle report.
