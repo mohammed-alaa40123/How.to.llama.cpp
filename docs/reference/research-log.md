@@ -204,32 +204,52 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 **Interpretation**
 
-- The 21 waits are not yet proven removable because synchronous tensor-set output readiness remains unresolved.
-
-**Open questions**
-
-- What exact operations follow the three nested-scope waits?
-- Does synchronous `ggml_backend_tensor_set()` require device-side conversion completion before return?
+- The 21 waits were not yet proven removable because synchronous tensor-set output readiness remained unresolved.
 
 ## 2026-07-15 21:52 — Pinned `set_tensor` wait-group CI contract
 
 **Verified**
 
 - Integrated `scripts/classify_opencl_set_tensor_waits.py` and its tests into the pinned OpenCL workflow trigger set.
-- The workflow now generates and uploads `opencl-set-tensor-wait-groups-e3546c7.json`.
+- The workflow generates and uploads `opencl-set-tensor-wait-groups-e3546c7.json`.
 - CI asserts exactly 24 records, 21 `temporary_upload_buffer_release`, 3 `nested_scope_exit`, all in `ggml_backend_opencl_buffer_set_tensor()`, and zero `other` records.
-- Updated the README living TODO list and project state; the research ledger was reviewed and unchanged because no source changed.
 
 **Interpretation**
 
-- The reviewed 21/3 grouping is now a pinned evidence contract. Source drift or classifier regression must fail visibly and trigger re-audit.
-- The workflow freezes lexical facts, not the unresolved synchronous tensor-set completion contract.
+- The reviewed 21/3 grouping is a pinned evidence contract. Source drift or classifier regression must fail visibly and trigger re-audit.
+
+## 2026-07-15 22:49 — OpenCL return-boundary expansion waits
+
+**Verified**
+
+- The three `nested_scope_exit` records are Q5_0, Q8_0, and Q5_K MoE scale/min expansion kernels.
+- Each wait occurs immediately before effective return from its tensor-type branch.
+
+**Interpretation**
+
+- They are return-boundary completion waits: redundant for later same-queue consumers but potentially required by synchronous tensor-set return semantics.
+
+## 2026-07-15 23:49 — Cross-backend tensor-set completion contract
+
+**Verified**
+
+- The generic `ggml_backend_tensor_set()` wrapper directly dispatches to `buf->iface.set_tensor(...)` and performs no extra synchronization.
+- Pinned CUDA enqueues the host-to-device copy and synchronizes `cudaStreamPerThread` before returning.
+- Pinned SYCL waits device queues and waits the submitted copy before returning; its mmap staging buffer is freed only after completion.
+- Pinned OpenCL waits its conversion and expansion kernels before returning from ordinary tensor set.
+
+**Interpretation**
+
+- CUDA, SYCL, and OpenCL establish a strong de facto synchronous tensor-set contract in the pinned baseline, although the public header does not state it normatively.
+- All remaining 24 OpenCL conversion/expansion waits are required by that pinned return contract. The 21 temporary-input-release waits are not needed for `cl_mem` lifetime but still ensure the persistent converted representation is complete at return.
+- The generated 46-event release patch remains the correct behavior-preserving first fix; synchronization should remain unchanged unless the API contract is deliberately weakened.
 
 **Historical**
 
-- The previous run produced the classifier but left it outside CI and could not safely update the living context files. This increment closes those durability gaps.
+- This resolves the previous 21/3 contract-dependent classification for the pinned baseline.
 
 **Open questions**
 
-- Are the 21 temporary-input-release waits required, redundant, or contract-dependent after separating host-input reuse from output readiness?
-- Should the generated 46-release patch be submitted upstream before synchronization cleanup?
+- Does current upstream retain the same implementations and leak?
+- Should the synchronous completion behavior be documented explicitly in `ggml-backend.h`?
+- Should the release-only patch be rebased and submitted upstream before any synchronization cleanup?
