@@ -67,7 +67,7 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts. `scripts/extract_opencl_lifecycle_calls.py` inventories selected OpenCL ownership, completion, and release calls after masking comments and quoted literals; it also emits a bounded simple-local wait/release diagnostic for `clWaitForEvents(1, &event)` patterns. `.github/workflows/opencl-lifecycle-report.yml` preserves the exact pinned translation unit, generated JSON report, and an artifact-root SHA-256 manifest that is verified before upload.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered `symbol_locations` with approximate kind, exact 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts. `scripts/extract_opencl_lifecycle_calls.py` inventories selected OpenCL ownership, completion, and release calls after masking comments and quoted literals; it also emits a bounded simple-local wait/release diagnostic for `clWaitForEvents(1, &event)` patterns. `scripts/annotate_opencl_wait_followups.py` separately marks immediate same-queue blocking-read follow-ups without changing ownership status. `.github/workflows/opencl-lifecycle-report.yml` preserves the exact pinned translation unit, generated JSON report, and an artifact-root SHA-256 manifest that is verified before upload.
 
 ### Write layered documentation
 
@@ -111,7 +111,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
 | `docs/reference/source-index.md` | Human-reviewed source areas and generated symbol-location/link format |
 | `.github/workflows/docs-ci.yml` | Named validators, isolated unit-test suites, discovery guard, strict build, and actionable failures |
-| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, wait/release ownership regression, portable checksum validation, and artifact preservation |
+| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, wait/release ownership and blocking-read follow-up regressions, portable checksum validation, and artifact preservation |
 
 <!-- PROJECT-TODOS:START -->
 ## Living TODO list
@@ -137,12 +137,11 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Add asynchronous-destruction regression tests for accelerator and RPC backends.
 - [ ] Map architecture-specific graph-builder downcasts to `llama_memory_context_i` subtypes and exact state tensors.
 - [ ] Add runtime evidence for parsing, mapping, page faults, copies, event waits, KV/recurrent growth, activation peaks, synchronization, and teardown.
-- [ ] Verify the latest **Deploy documentation** and **Hourly research context check** runs.
+- [ ] Verify the latest **Documentation CI**, **Generate pinned OpenCL lifecycle report**, **Deploy documentation**, and **Hourly research context check** runs.
 - [ ] Verify the public Pages site returns HTTP 200 and renders branch-added architecture pages after PR #1 merges.
 
 ### Future improvements
 
-- [ ] Add a bounded `followed_by_same_queue_blocking_read` hint to the waited-event report while keeping synchronization hints separate from event ownership status.
 - [ ] Search historical and newer pinned llama.cpp revisions for actual `transpose_2d(..., false)` use; remove the dormant branch or add a regression guard if it remains unused.
 - [ ] Add a machine-readable metadata file containing the pinned commit and extractor version to the OpenCL evidence artifact.
 - [ ] Add enclosing-function metadata only for lifecycle groups that remain ambiguous after source review.
@@ -159,8 +158,9 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add a bounded `followed_by_same_queue_blocking_read` annotation to the waited-event report and CI-guard the reviewed 22 blocking-read / 24 other unmatched split while keeping ownership status independent.
 - [x] Classify 22 of the 46 unmatched OpenCL waits as redundant before an immediate same-queue `clEnqueueReadBuffer(..., CL_TRUE, ...)`; retain 24 waits for separate contract and consumer-order analysis.
-- [x] Add a bounded simple-local OpenCL wait/release diagnostic and pin the source-evidence workflow to the audited 51 total, 5 released, and 46 unmatched counts.
+- [x] Add a bounded simple-local OpenCL wait/release diagnostic and pin the source-evidence workflow to the audited 50 simple-identifier records, 4 released, and 46 unmatched counts.
 - [x] Resolve pinned `CL_CHECK` failure semantics: OpenCL errors log, assert, invoke `ggml_abort()`, and unconditionally terminate with `abort()`; successful-path event releases do not need recoverable-error cleanup.
 - [x] Audit all 51 pinned direct `clWaitForEvents()` sites: 5 waited events are released, while 46 local command-event references have no release or ownership transfer.
 - [x] Classify the Q4_0 conversion temporary-buffer group: both branches explicitly wait before releasing `data_device`, but both omit `clReleaseEvent(evt)` and leak one event reference per conversion.
