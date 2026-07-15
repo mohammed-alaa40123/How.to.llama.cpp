@@ -120,8 +120,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Audit every locally declared OpenCL event passed to `clWaitForEvents()`; classify matching release, ownership transfer, process lifetime, or leak, and add a bounded wait-without-release regression diagnostic if justified.
-- [ ] Fix the two pinned Q4_0 conversion branches by releasing `evt` after the successful wait, and add a focused source regression test or upstream patch proposal.
+- [ ] Prepare an error-safe upstream fix for the 46 pinned OpenCL waits without matching `clReleaseEvent()`; distinguish redundant waits from events that need RAII/scope-guard ownership and add focused regression coverage.
+- [ ] Review `CL_CHECK` failure behavior so event and temporary-buffer cleanup remains correct on enqueue/wait errors.
 - [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; include explicit Adreno handle ownership, invalid-symbol cleanup, repeated registration, and shared-library unload behavior.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts; use actual candidate volume to prioritize scanner work.
 - [ ] Implement the first CPU repack regression fixture: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
@@ -157,6 +157,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Audit all 51 pinned direct `clWaitForEvents()` sites: 5 waited events are released, while 46 local command-event references have no release or ownership transfer.
 - [x] Classify the Q4_0 conversion temporary-buffer group: both branches explicitly wait before releasing `data_device`, but both omit `clReleaseEvent(evt)` and leak one event reference per conversion.
 - [x] Audit every pinned `transpose_2d*()` call site: all 53 typed-wrapper calls use the default `blocking=true`; the `blocking=false` branch has zero callers and is dormant in the baseline.
 - [x] Classify pinned OpenCL `transpose_2d()` immediate sub-buffer release: the nonblocking branch is locally safe under command retention, while all reachable pinned callers additionally wait for copy completion.
