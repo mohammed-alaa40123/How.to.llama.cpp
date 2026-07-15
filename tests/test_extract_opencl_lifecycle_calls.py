@@ -163,6 +163,68 @@ void teardown() {
         with self.assertRaisesRegex(ValueError, "non-negative"):
             extractor.extract_opencl_lifecycle_calls("clFinish(queue);", context_lines=-1)
 
+    def test_pairs_simple_wait_with_release_in_same_scope(self) -> None:
+        source = """\
+void convert() {
+    cl_event evt;
+    CL_CHECK(clWaitForEvents(1, &evt));
+    CL_CHECK(clReleaseEvent(evt));
+}
+"""
+        self.assertEqual(
+            extractor.analyze_simple_waited_events(source),
+            [
+                {
+                    "event": "evt",
+                    "wait_line": 3,
+                    "scope_end_line": 5,
+                    "status": "released_in_scope",
+                    "release_line": 4,
+                }
+            ],
+        )
+
+    def test_marks_simple_wait_unmatched_at_scope_exit(self) -> None:
+        source = """\
+void convert() {
+    cl_event evt;
+    CL_CHECK(clWaitForEvents(1, &evt));
+}
+CL_CHECK(clReleaseEvent(evt));
+"""
+        self.assertEqual(
+            extractor.analyze_simple_waited_events(source),
+            [
+                {
+                    "event": "evt",
+                    "wait_line": 3,
+                    "scope_end_line": 4,
+                    "status": "unmatched_in_scope",
+                }
+            ],
+        )
+
+    def test_does_not_pair_release_outside_nested_scope(self) -> None:
+        source = """\
+void convert() {
+    if (enabled) {
+        CL_CHECK(clWaitForEvents(1, &evt));
+    }
+    CL_CHECK(clReleaseEvent(evt));
+}
+"""
+        diagnostic = extractor.analyze_simple_waited_events(source)[0]
+        self.assertEqual(diagnostic["status"], "unmatched_in_scope")
+        self.assertNotIn("release_line", diagnostic)
+
+    def test_wait_diagnostic_ignores_comments_literals_and_non_simple_waits(self) -> None:
+        source = """\
+// clWaitForEvents(1, &fake);
+const char * text = "clWaitForEvents(1, &also_fake)";
+clWaitForEvents(count, events);
+"""
+        self.assertEqual(extractor.analyze_simple_waited_events(source), [])
+
 
 if __name__ == "__main__":
     unittest.main()
