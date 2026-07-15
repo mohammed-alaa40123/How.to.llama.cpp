@@ -190,3 +190,27 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Which of the 46 waits are required versus redundant before ordered blocking operations?
 - Should upstream prefer 46 explicit releases or a small move-only event owner?
 - Can a bounded source regression detect the known local wait-without-release pattern without claiming full ownership analysis?
+
+## 2026-07-15 16:51 — Simple waited-event regression
+
+**Verified**
+
+- Added a bounded lexical diagnostic for literal `clWaitForEvents(1, &identifier)` calls.
+- Each record reports exact wait and scope lines plus a same-scope release line or `unmatched_in_scope`.
+- Focused tests cover same-scope release, nested-scope boundaries, unmatched waits, comments/literals, and unsupported non-simple waits.
+- The pinned OpenCL workflow now guards the audited contract: 51 simple waits, 5 released in scope, and 46 unmatched.
+
+**Interpretation**
+
+- The manual pairing result is now a reproducible source-evidence regression suitable for validating a release-only patch.
+- The heuristic remains intentionally narrower than C++ ownership analysis and does not model aliases, macros, helper releases, arrays, transfer, or control-flow reachability.
+
+**Historical**
+
+- The 5/46 result previously existed only as a detailed human audit; this increment makes it machine-readable and CI-enforced.
+
+**Open questions**
+
+- Which unmatched waits are redundant before a same-queue blocking operation?
+- Should a patched upstream revision be required to reach zero `unmatched_in_scope` entries?
+- Is a bounded next-blocking-command hint useful without conflating completion and ownership?
