@@ -67,8 +67,22 @@ jobs:
           expected_names = {report.name, source.name}
           data = json.loads(report.read_text(encoding="utf-8"))
           print(json.dumps(data["counts"], indent=2, sort_keys=True))
+          print(json.dumps(data["simple_waited_event_counts"], indent=2, sort_keys=True))
           if not data["calls"]:
               raise SystemExit("OpenCL lifecycle report unexpectedly contains no calls")
+
+          expected_wait_counts = {
+              "released_in_scope": 5,
+              "unmatched_in_scope": 46,
+          }
+          if data["simple_waited_event_counts"] != expected_wait_counts:
+              raise SystemExit(
+                  "Pinned simple waited-event ownership counts changed: "
+                  f"expected {expected_wait_counts}, got {data['simple_waited_event_counts']}"
+              )
+          if len(data["simple_waited_events"]) != 51:
+              raise SystemExit("Pinned source must contain exactly 51 simple local waits")
+
           if source.stat().st_size < 100_000:
               raise SystemExit("Pinned OpenCL source is unexpectedly small")
 
