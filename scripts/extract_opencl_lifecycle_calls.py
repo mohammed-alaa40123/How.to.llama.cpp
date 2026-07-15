@@ -2,9 +2,10 @@
 """Extract bounded OpenCL lifecycle calls with exact source lines.
 
 This is a teardown-audit aid, not a C/C++ parser. It reports selected direct
-OpenCL completion and release calls after masking comments and string/character
-literals while preserving source length and newline positions. Optional bounded
-source context makes generated reports reviewable without changing call matching.
+OpenCL creation, retention, completion, and release calls after masking comments
+and string/character literals while preserving source length and newline
+positions. Optional bounded source context makes generated reports reviewable
+without changing call matching.
 """
 from __future__ import annotations
 
@@ -15,6 +16,8 @@ from pathlib import Path
 
 OPENCL_LIFECYCLE_CALL_RE = re.compile(
     r"\b("
+    r"clCreateContext|clCreateContextFromType|clRetainContext|"
+    r"clCreateCommandQueue|clCreateCommandQueueWithProperties|clRetainCommandQueue|"
     r"clFinish|clFlush|clWaitForEvents|"
     r"clReleaseCommandQueue|clReleaseContext|clReleaseProgram|"
     r"clReleaseKernel|clReleaseEvent|clReleaseMemObject"
