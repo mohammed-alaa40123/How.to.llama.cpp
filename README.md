@@ -109,7 +109,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/backend-teardown-comparison.md` | Cross-backend completion, resource-independence, and safety matrix |
 | `docs/architecture/cpu-extra-buffer-comparison.md` | Cross-implementation ownership comparison and portable destruction-test matrix |
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
-| `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build composition, kernel deployment, and initial buffer ownership |
+| `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build composition, exact lifecycle inventory, local completion evidence, and remaining ownership gaps |
 | `docs/reference/source-index.md` | Human-reviewed source areas and generated symbol-location/link format |
 | `.github/workflows/docs-ci.yml` | Named validators, isolated unit-test suites, discovery guard, strict build, and actionable failure reporting |
 | `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, validation, and artifact preservation |
@@ -121,7 +121,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Inspect the first **Generate pinned OpenCL lifecycle report** run, download `opencl-lifecycle-pinned-e3546c7`, classify every completion/release call in context, and finish the OpenCL teardown audit.
+- [ ] Locate command-queue and OpenCL-context creation/final ownership in the pinned translation unit; verify scheduler buffer/event deleter independence and update the backend teardown comparison matrix.
+- [ ] Classify OpenCL enqueue-then-release groups that rely on object-retention semantics rather than explicit waits, and resolve optional Adreno binary-library handle lifetime.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned source links, and unsupported-syntax counts for braced initializers, multiline initializers, and constructor function-try-blocks; use actual candidate volume to prioritize scanner work.
 - [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
@@ -140,9 +141,9 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Determine the smallest useful lifecycle context radius and add enclosing-function metadata only if pinned-source review remains cumbersome.
+- [ ] Add enclosing-function metadata only for OpenCL lifecycle groups that remain ambiguous after targeted source review.
 - [ ] Extend OpenCL lexical masking only if pinned-source evidence requires raw-string, preprocessor-disabled-region, or macro-expansion handling.
-- [ ] Pair OpenCL lifecycle release calls with creation/retention sites if the release-only inventory leaves ownership ambiguous.
+- [ ] Pair OpenCL lifecycle release calls with creation/retention sites if targeted ownership review remains ambiguous.
 - [ ] Define constructor function-try-block navigation line semantics and consider stateful extraction only if regenerated pinned-tree counts justify it.
 - [ ] Evaluate multiline attributes, multiline constraints/returns, in-class special members, braced or multiline constructor initializer lists, defaulted/deleted definitions, literals, complex conversion operators, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
 - [ ] Extend unsupported-syntax telemetry only after pinned-tree evidence identifies additional high-value missed forms.
@@ -161,6 +162,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Inspect the first complete pinned OpenCL lifecycle artifact, record exact API totals, verify shared-free and cross-device synchronization ordering, and classify teardown as conditional with local completion evidence.
 - [x] Add a GitHub-hosted workflow that fetches the exact pinned OpenCL translation unit, generates a context-bearing lifecycle report, validates non-empty output, and uploads it as an artifact.
 - [x] Add optional bounded original-source context to OpenCL lifecycle records, with exact clamped line ranges, backward-compatible default output, and focused regression coverage.
 - [x] Isolate Documentation CI suites, diagnose `try : member(...) {` as a false ordinary-function record, add a bounded `FUNC_RE` guard, and pass full Documentation CI run `29380673982`.
@@ -190,8 +192,6 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [x] Add a guided end-to-end inference atlas.
 - [x] Add line-aware, revision-pinned source-index links and tests.
 - [x] Map pinned OpenCL build composition and initial `cl_mem` ownership.
-- [x] Audit pinned CANN, RPC, SYCL, Vulkan, Metal, CUDA, ordinary CPU, and generic scheduler teardown.
-- [x] Trace exact `llama_model` and `llama_context` declaration and reverse-destruction order.
 - [x] Complete Pass A for public API, model/GGUF loading, runtime context/memory, and scheduler internals.
 - [x] Publish canonical GGUF, model placement, model/context, graph/MoE, memory-lifetime, and system-ownership pages.
 - [x] Add interactive explorers, validation, strict CI, Pages deployment, source indexing, and durable run context.
