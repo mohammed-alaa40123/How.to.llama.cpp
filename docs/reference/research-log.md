@@ -214,3 +214,28 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Inspect the first generated artifact and determine whether three context lines are sufficient.
 - Add enclosing-function metadata or creation/retention pairing only if the artifact leaves material ambiguity.
+
+## 2026-07-15 06:49 — Pinned OpenCL lifecycle first-pass classification
+
+**Verified**
+
+- Workflow run `29385330482` successfully generated and uploaded the complete pinned report; Documentation CI run `29385330547` also passed for the preceding head.
+- The report contains 556 selected direct calls: 343 memory-object releases, 121 program releases, 51 event waits, 23 kernel releases, 11 queue finishes, 6 event releases, and 1 queue flush.
+- The bounded inventory contains no direct command-queue or OpenCL-context release call.
+- The shared OpenCL `free()` path calls `clFinish(queue)` before decrementing its reference count and releases pooled image/sub-buffer views only at the final reference.
+- Cross-device synchronization uses peer-queue marker events and `clFlush()`, then a destination-queue barrier waiting on those events before their references are released.
+- Multiple temporary conversion/readback paths wait before releasing temporary memory objects.
+
+**Interpretation**
+
+- OpenCL teardown can now be classified as conditional with verified local completion evidence, not globally safe.
+- Missing direct queue/context release calls are an unresolved ownership signal, not proof of a leak.
+- Three context lines are sufficient for the shared-free and synchronization idioms but not every enclosing owner.
+
+**Historical**
+
+- The first complete pinned artifact removes the earlier large-file/source-recovery blocker.
+
+**Open questions**
+
+- Locate final queue/context ownership, verify scheduler-resource independence, classify retention-only enqueue/release groups, and resolve optional Adreno binary-library lifetime.
