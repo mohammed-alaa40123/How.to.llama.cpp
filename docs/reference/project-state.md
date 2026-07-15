@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 08:50 Africa/Cairo_
+_Last updated: 2026-07-15 09:10 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -23,8 +23,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Exact pinned declaration and reverse-destruction map for `llama_model` and `llama_context`.
 - Generic scheduler plus ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
 - Cross-backend teardown comparison matrix and reusable teardown audit method.
-- Pinned OpenCL build composition and initial `cl_mem` ownership map.
-- First complete pinned OpenCL lifecycle report review with exact API totals, shared-free completion evidence, cross-device synchronization ordering, and a conditional teardown classification.
+- Pinned OpenCL build composition, exact lifecycle inventory, and source-backed queue/context ownership classification.
 - Line-aware generated source indexing with pinned file and symbol links.
 - Guided end-to-end inference atlas with clickable reading paths.
 - Bounded CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer lifetime audits.
@@ -38,30 +37,30 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - C/C++ comment and quoted-literal masking for lifecycle extraction while preserving exact source offsets and line numbers.
 - Function-try initializer-line guard preventing `try : member(...) {` from becoming a false ordinary-function symbol.
 - Optional bounded original-source context for every lifecycle record, with exact clamped line ranges and backward-compatible default output.
-- GitHub-hosted pinned OpenCL lifecycle-report workflow that fetches the exact baseline source, generates the context-bearing report, validates non-empty output, and uploads it as an Actions artifact.
-- Pinned OpenCL report workflow now preserves the complete verified source and a SHA-256 manifest beside the JSON report.
+- GitHub-hosted pinned OpenCL workflow that verifies the exact baseline checkout and preserves the complete source, generated report, and SHA-256 manifest.
+- Verified OpenCL backend-wrapper order: queue completion occurs before wrapper reference drop, while the actual device/backend context remains process-lifetime.
+- Verified OpenCL scheduler events are unsupported and buffer deleters use buffer-local `cl_mem` ownership rather than the destroyed wrapper.
 
 ## Latest concrete findings
 
-- The regenerated report contains 558 selected direct calls.
-- Exactly one `clCreateContext(...)` call appears at pinned line 5545 and assigns its result to `shared_context`.
-- Exactly one `clCreateCommandQueue(...)` call appears at pinned line 5902 and assigns its result to `backend_ctx->queue`.
-- The report contains zero direct context/queue retain or release calls.
-- Three-line context identifies the assignments but not declaration lifetime or final ownership.
-- The workflow now verifies `git rev-parse HEAD` equals the full pinned revision before report generation.
-- The next artifact includes `opencl-lifecycle-pinned-e3546c7.json`, `ggml-opencl-pinned-e3546c7.cpp`, and `opencl-lifecycle-pinned-e3546c7.sha256`.
-- The source-size guard rejects an unexpectedly small recovered translation unit, and the manifest must contain exactly the report and source entries.
-- The shared OpenCL `free()` path calls `clFinish(queue)` before decrementing `ref_count`; when the final reference disappears it releases pooled image/sub-buffer views and clears those pools.
-- Cross-device synchronization uses peer-queue marker events plus `clFlush()`, then a destination-queue barrier with the collected wait list, followed by event-reference release.
-- OpenCL teardown remains **conditional with verified local completion evidence**, not globally safe.
+- Workflow run `29392658206` succeeded and uploaded artifact `8333854723`, expiring on 2026-08-14.
+- The artifact contains the exact pinned source, the 558-call JSON report, and a two-entry SHA-256 manifest.
+- Recomputed hashes matched the manifest: report `31b708767b506629ef1bdf9aebfa18c54d56554cd15745f1be77d35eac0d26ba`; source `8e2f6fdd532de1b78dbfe14d14921df05d1b37c5b73d415d620a787f635fde6d`.
+- Device registration creates one `shared_context` and copies it into each supported `ggml_backend_opencl_device_context`.
+- Device contexts are held by static `g_ggml_backend_opencl_dev_ctxs`; the source explicitly states those devices and contexts live as long as the process.
+- `ggml_cl_init()` lazily allocates one `ggml_backend_opencl_context` per device, stores it in `dev_ctx->backend_ctx`, copies the shared context, and creates one command queue.
+- Backend-wrapper initialization increments `ref_count`; wrapper free calls `clFinish(queue)` and decrements it.
+- Final-wrapper cleanup releases pooled image/sub-buffer views but does not delete the per-device backend context or release the command queue/context.
+- Backend capabilities advertise `events = false`, and event callbacks are null; there is no scheduler-owned OpenCL event deleter that can outlive the wrapper.
+- Buffer-local `cl_mem` deleters do not require the deleted `ggml_backend` wrapper.
+- Pinned classification is now **backend-wrapper order supported; deterministic process-exit release omitted**.
 
 ## In progress
 
-- Generation and inspection of the source-bearing pinned OpenCL artifact.
-- Mapping `shared_context` and `backend_ctx->queue` to exact declarations and destruction paths.
-- Scheduler event/buffer independence after backend-wrapper destruction.
-- Classification of enqueue-then-release groups that rely on OpenCL retention semantics rather than explicit waits.
 - Optional Adreno binary-library handle lifetime and kernel-destruction ordering.
+- Classification of enqueue-then-release groups that rely on OpenCL retention semantics rather than explicit waits.
+- Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
+- Fixing checksum-manifest paths to use artifact-root basenames for direct `sha256sum -c` verification.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
 - CPU extra-buffer destruction tests for KleidiAI, AMX, and SpacemiT plus TSan and hardware-specific cleanup coverage.
@@ -72,35 +71,35 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Download source-bearing pinned OpenCL artifact
-  → verify the SHA-256 manifest
-  → locate shared_context and backend_ctx->queue declarations/destruction
-  → verify scheduler buffer/event deleter independence
-  → update backend teardown comparison matrix
+Inspect preserved pinned OpenCL source
+  → trace optional Adreno dl_handle ownership and close path
+  → order dynamic-library lifetime against program/kernel lifetime
+  → classify retention-only enqueue/release groups
+  → update OpenCL teardown page and comparison matrix
 ```
 
-If that path is blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
+In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
 
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/0850-opencl-source-evidence-artifact.md`.
-- Preceding Documentation CI run `29390352407` completed successfully.
-- Preceding pinned lifecycle-report run `29390352399` completed successfully.
-- Commit-scoped Documentation CI and pinned lifecycle-report workflows for the source-preservation increment must be checked before the run closes.
+- Added detailed notes `logs/research/2026-07-15/0850-opencl-source-evidence-artifact.md` and `logs/research/2026-07-15/0910-opencl-process-lifetime-ownership.md`.
+- Pinned lifecycle/source workflow run `29392658206` completed successfully for the source-preservation increment.
+- The generated artifact was downloaded and its report/source hashes were verified.
+- Documentation CI for the final durable-state head must be checked before the run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
 ## Known blockers and caveats
 
-- **Queue/context ownership blocker:** direct calls show one create for each handle and no retain/release; the source-bearing artifact is required to trace declarations, wrappers, globals, and destruction paths without truncated rendering.
+- **Deterministic-release gap:** the pinned translation unit intentionally keeps device/backend contexts process-lifetime and contains no explicit queue/context release or per-device backend-context deletion path.
+- **Adreno library blocker:** the optional binary-kernel loader obtains a `dl_handle`; its retained ownership and close ordering remain unresolved.
+- **Checksum usability caveat:** the manifest hashes are correct, but entries include `build/reports/...` paths, so direct `sha256sum -c` from the artifact root needs path adjustment.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Actions are the authoritative validation path for this branch.
 - **Pages verification blocker:** branch-added content cannot deploy until PR #1 merges; live response verification remains unavailable independently of strict-build success.
-- **Lifecycle-extractor caveat:** selected direct APIs and bounded context are navigation evidence only; wrapper constructors, ownership, error paths, macro wrappers, preprocessor-disabled code, raw strings, and semantic ordering still require human source review.
-- **Context-window caveat:** a local source window may omit the enclosing owner or completion guarantee; inspect the preserved complete source when classification remains ambiguous.
-- **Artifact-integrity caveat:** the checksum manifest binds the uploaded report and source, but the workflow run and artifact retention period must still be recorded for durable provenance.
+- **Lifecycle-extractor caveat:** selected direct APIs and bounded context are navigation evidence only; wrapper constructors, ownership, error paths, macro wrappers, disabled code, raw strings, and semantic ordering still require human source review.
 - **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers and constructor function-try-blocks remain intentionally omitted from navigation but are counted as bounded candidates.
-- **Telemetry caveat:** unsupported-syntax counts are prioritization signals, not parser-completeness metrics, and may undercount or overcount unusual C++ forms.
+- **Telemetry caveat:** unsupported-syntax counts are prioritization signals, not parser-completeness metrics.
 - **Harness caveat:** a skipped hardware-gated path is not evidence that the lifetime ordering passed.
 - **SpacemiT caveat:** buffer lifetime is distinct from thread-local TCM leases and process-level pool-manager lifetime.
 - Mapping, allocation, residency, validity, command completion, ownership, reset, thread-local leases, and release remain distinct states.
