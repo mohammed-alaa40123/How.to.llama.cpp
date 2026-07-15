@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 05:51 Africa/Cairo_
+_Last updated: 2026-07-15 06:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -24,6 +24,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Generic scheduler plus ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
 - Cross-backend teardown comparison matrix and reusable teardown audit method.
 - Pinned OpenCL build composition and initial `cl_mem` ownership map.
+- First complete pinned OpenCL lifecycle report review with exact API totals, shared-free completion evidence, cross-device synchronization ordering, and a conditional teardown classification.
 - Line-aware generated source indexing with pinned file and symbol links.
 - Guided end-to-end inference atlas with clickable reading paths.
 - Bounded CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer lifetime audits.
@@ -41,17 +42,21 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Latest concrete findings
 
-- `.github/workflows/opencl-lifecycle-report.yml` fetches exactly revision `e3546c7948e3af463d0b401e6421d5a4c2faf565`, not a moving upstream branch.
-- The workflow verifies the pinned `ggml/src/ggml-opencl/ggml-opencl.cpp` file is non-empty before extraction.
-- It runs the tested extractor with `--context-lines 3`, prints per-API counts, rejects an unexpectedly empty call inventory, and uploads the JSON report for 30 days.
-- The workflow runs manually and on changes to the extractor, its tests, or the workflow definition.
-- This removes the need for a usable local pinned checkout to generate the lifecycle inventory, but human ownership/completion classification is still required.
+- GitHub Actions run `29385330482` successfully generated artifact `opencl-lifecycle-pinned-e3546c7` from the complete pinned translation unit; artifact ID `8331189030` expires on 2026-08-14.
+- The report contains 556 selected direct calls: 343 `clReleaseMemObject`, 121 `clReleaseProgram`, 51 `clWaitForEvents`, 23 `clReleaseKernel`, 11 `clFinish`, 6 `clReleaseEvent`, and 1 `clFlush`.
+- No direct `clReleaseCommandQueue` or `clReleaseContext` calls appear in the bounded report.
+- The shared OpenCL `free()` path calls `clFinish(queue)` before decrementing `ref_count`; when the final reference disappears it releases pooled image/sub-buffer views and clears those pools.
+- Cross-device synchronization uses peer-queue marker events plus `clFlush()`, then a destination-queue barrier with the collected wait list, followed by event-reference release.
+- Several temporary conversion/readback paths wait before releasing temporary memory objects; selected readback paths use blocking reads and/or `clFinish()`.
+- OpenCL teardown is now classified as **conditional with verified local completion evidence**, not globally safe: final queue/context ownership, scheduler-resource independence, optional binary-library lifetime, and all enqueue-then-release groups remain unresolved.
 - The pinned OpenCL blob remains `f283f65690af7790e163092207647d16dac9fb3e`.
 
 ## In progress
 
-- First commit-scoped execution of the pinned OpenCL lifecycle-report workflow and inspection of its uploaded artifact.
-- Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
+- Exact command-queue and OpenCL-context creation/final ownership.
+- Scheduler event/buffer independence after backend-wrapper destruction.
+- Classification of enqueue-then-release groups that rely on OpenCL retention semantics rather than explicit waits.
+- Optional Adreno binary-library handle lifetime and kernel-destruction ordering.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
 - CPU extra-buffer destruction tests for KleidiAI, AMX, and SpacemiT plus TSan and hardware-specific cleanup coverage.
@@ -62,26 +67,27 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Run or inspect Generate pinned OpenCL lifecycle report
-  → download opencl-lifecycle-pinned-e3546c7 artifact
-  → classify every completion/release site in context
-  → finish OpenCL teardown and update the backend matrix
+Locate OpenCL queue/context creation and final owner
+  → inspect wrapper/global/process lifetime
+  → verify scheduler buffer/event deleter independence
+  → update backend teardown comparison matrix
 ```
 
-If that workflow is blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
+If that path is blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
 
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/0551-opencl-report-workflow.md`.
-- Preceding Documentation CI run `29382836507` completed successfully.
-- The new workflow and current commit-scoped Documentation CI must be checked before this run closes.
+- Added detailed note `logs/research/2026-07-15/0649-opencl-lifecycle-first-pass.md`.
+- Preceding Documentation CI run `29385330547` completed successfully.
+- Pinned lifecycle-report run `29385330482` completed successfully and its artifact was inspected.
+- Commit-scoped workflows for the new documentation head must be checked before the next run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
 ## Known blockers and caveats
 
-- **Workflow-result blocker:** the new pinned lifecycle report is not evidence until its first run succeeds and the uploaded JSON is inspected.
+- **Queue/context ownership blocker:** the bounded direct-call report contains no `clReleaseCommandQueue()` or `clReleaseContext()` call, so final ownership must be resolved from creation sites, wrappers, globals, or process-lifetime design rather than inferred from absence.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Actions are the authoritative validation path for this branch.
 - **Pages verification blocker:** branch-added content cannot deploy until PR #1 merges; live response verification remains unavailable independently of strict-build success.
 - **Lifecycle-extractor caveat:** selected direct API calls and bounded context are navigation evidence only; ownership, error paths, macro wrappers, preprocessor-disabled code, raw strings, and semantic ordering still require human source review.
