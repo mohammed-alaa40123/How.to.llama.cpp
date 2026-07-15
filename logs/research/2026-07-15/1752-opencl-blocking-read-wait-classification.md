@@ -47,6 +47,8 @@ The explicit event wait is therefore redundant for host-visible completion. The 
 
 The event object is still leaked in the pinned source because neither waiting nor the blocking read decrements the application-owned event reference.
 
+The complete translation unit has 51 direct waits, but the bounded `simple_waited_events` diagnostic intentionally matches only `&identifier`. It therefore contains **50** records: **4** released and **46** unmatched. The remaining released profiling wait uses `&info.evt` and is outside the simple-identifier heuristic.
+
 ## Interpretation
 
 These 22 sites admit two behavior-preserving correction options:
@@ -58,7 +60,9 @@ The remaining 24 unmatched waits are mostly upload/conversion paths followed by 
 
 ## Historical
 
-The previous run converted the manual 5-released/46-unmatched event audit into a CI-enforced lexical regression. This increment supplies the first synchronization classification over that inventory: 22 waits are provably redundant before a same-queue blocking read, while 24 remain unclassified.
+The previous run converted the manual direct-wait audit into a CI-enforced lexical regression, but its workflow incorrectly expected the identifier-only diagnostic to include the member-expression wait `&info.evt`. This caused the pinned report workflow to fail. The workflow contract was corrected to the actual bounded scope: 50 simple waits, 4 released, and 46 unmatched.
+
+This increment supplies the first synchronization classification over the unmatched inventory: 22 waits are provably redundant before a same-queue blocking read, while 24 remain unclassified.
 
 ## Open questions
 
@@ -72,6 +76,12 @@ The previous run converted the manual 5-released/46-unmatched event audit into a
 - Pinned `ggml/src/ggml-opencl/ggml-opencl.cpp` preserved by the repository workflow artifact.
 - Khronos `clEnqueueReadBuffer` reference: blocking reads do not return until data reaches host memory.
 - Khronos `clCreateCommandQueue` reference: queues execute in order unless `CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE` is set.
+
+## Validation
+
+- Recomputed the bounded heuristic locally against the exact pinned source: 50 simple `&identifier` waits, 4 released, 46 unmatched.
+- Inspected the failed workflow and fixed its incorrect 51/5 expectation.
+- Final-head Documentation CI and pinned lifecycle workflow were re-triggered; their final status must be checked before closing the run.
 
 ## Next priority
 
