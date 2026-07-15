@@ -239,3 +239,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Locate final queue/context ownership, verify scheduler-resource independence, classify retention-only enqueue/release groups, and resolve optional Adreno binary-library lifetime.
+
+## 2026-07-15 07:52 — OpenCL queue/context ownership-call inventory
+
+**Verified**
+
+- Expanded the lifecycle matcher to include `clCreateContext`, `clCreateContextFromType`, `clRetainContext`, `clCreateCommandQueue`, `clCreateCommandQueueWithProperties`, and `clRetainCommandQueue`.
+- Exact source ordering, 1-based lines, lexical masking, and optional original-source context remain unchanged.
+- Focused tests cover direct creation/retention calls, context-from-type creation, similar identifiers, and call-shaped comments/literals.
+- The existing pinned-report workflow already triggers on extractor and test changes.
+
+**Interpretation**
+
+- The regenerated report can now distinguish “no direct releases” from a symmetric direct-call inventory containing creation/retention sites. Zero direct creation calls would shift attention toward wrappers, generated code, globals, or process-lifetime ownership rather than proving a leak.
+
+**Historical**
+
+- The first complete report inventoried completion and release calls only, leaving direct queue/context ownership transitions outside the generated evidence.
+
+**Open questions**
+
+- Inspect the regenerated pinned report, map each direct ownership call to its enclosing owner, verify scheduler-resource independence, and update the OpenCL teardown matrix.
