@@ -190,3 +190,27 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Determine the smallest useful context radius from the pinned report.
 - Add enclosing-function metadata or creation/release pairing only if context remains insufficient.
 - Obtain the complete pinned `ggml-opencl.cpp`, generate the real report, and finish the teardown matrix.
+
+## 2026-07-15 05:51 — GitHub-hosted pinned OpenCL report generation
+
+**Verified**
+
+- Added `.github/workflows/opencl-lifecycle-report.yml`.
+- The workflow fetches exactly llama.cpp revision `e3546c7948e3af463d0b401e6421d5a4c2faf565` and verifies the pinned OpenCL translation unit is non-empty.
+- It runs the tested lifecycle extractor with three context lines, rejects an unexpectedly empty inventory, prints per-call counts, and uploads the JSON report as a 30-day artifact.
+- The workflow is manually dispatchable and also runs when the extractor, its tests, or the workflow definition changes.
+- Preceding Documentation CI run `29382836507` completed successfully.
+
+**Interpretation**
+
+- This replaces the runtime-specific local checkout blocker with a repository-owned, reproducible GitHub-hosted source-recovery path.
+- The artifact remains navigation evidence; each call still requires human ownership, completion, and release-order classification.
+
+**Historical**
+
+- The extractor and bounded context existed, but the repository did not yet have a mechanism to obtain the complete pinned translation unit and preserve the report.
+
+**Open questions**
+
+- Inspect the first generated artifact and determine whether three context lines are sufficient.
+- Add enclosing-function metadata or creation/retention pairing only if the artifact leaves material ambiguity.
