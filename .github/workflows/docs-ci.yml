@@ -43,6 +43,15 @@ jobs:
       - name: Test source indexing
         run: python3 -m unittest -v tests.test_index_upstream
 
+      - name: Test source-index initializer boundaries
+        run: python3 -m unittest -v tests.test_index_upstream_initializer_boundaries
+
+      - name: Test source-index unsupported syntax
+        run: python3 -m unittest -v tests.test_index_upstream_unsupported_syntax
+
+      - name: Test source-index function try blocks
+        run: python3 -m unittest -v tests.test_index_upstream_function_try_blocks
+
       - name: Test interactive-link validation
         run: python3 -m unittest -v tests.test_validate_interactive_links
 
