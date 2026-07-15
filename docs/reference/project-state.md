@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 21:52 Africa/Cairo_
+_Last updated: 2026-07-15 23:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -53,21 +53,22 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Added a bounded release-only patch generator that inserts 46 `clReleaseEvent(evt)` calls from the audited report, preserves all 51 waits, emits a unified patch, and CI-validates 50 released / 0 unmatched simple events.
 - Classified the remaining 24 waits: 21 are immediately followed by `clReleaseMemObject(data_device)`, 3 end nested lexical scopes, all are inside `ggml_backend_opencl_buffer_set_tensor()`, and no record falls into `other`.
 - Added the 21/3 `set_tensor` wait grouping to the pinned workflow and artifact so source drift now fails CI instead of silently invalidating the review.
+- Traced the three nested-scope records to MoE scale/min expansion kernels immediately before effective return.
+- Compared the pinned generic wrapper, CUDA, and SYCL implementations: ordinary `ggml_backend_tensor_set()` has a strong de facto synchronous completion contract, so all remaining 24 OpenCL conversion/expansion waits are required by the pinned return behavior even though the public header does not state it normatively.
 
 ## Latest concrete findings
 
-- All remaining 24 non-blocking-read waits are inside `ggml_backend_opencl_buffer_set_tensor()`.
-- Twenty-one waits precede only `clReleaseMemObject(data_device)`. OpenCL command retention means the wait is not needed merely to keep that temporary input object alive.
-- Three waits end nested lexical scopes after secondary expansion kernels and require direct control-flow and API-contract review.
-- The pinned workflow now asserts exactly 24 classified records, counts of 21 temporary-upload-buffer releases and 3 nested-scope exits, one enclosing function, and zero `other` records.
-- The generated JSON is uploaded with the lifecycle/source evidence and release-only patch.
-- These facts do not yet prove that the 21 waits are removable: output readiness at synchronous `ggml_backend_tensor_set()` return remains unresolved.
+- The generic `ggml_backend_tensor_set()` wrapper performs direct buffer-interface dispatch and adds no synchronization; each backend owns the completion contract.
+- Pinned CUDA enqueues the host-to-device copy and calls `cudaStreamSynchronize(cudaStreamPerThread)` before returning.
+- Pinned SYCL waits device queues, waits the submitted copy, and frees its temporary mmap staging buffer only after completion.
+- OpenCL's 21 conversion waits and 3 return-boundary expansion waits therefore preserve parity with the pinned synchronous CUDA/SYCL behavior.
+- The 21 waits are not needed for temporary `cl_mem` lifetime, but they are required to make the converted persistent tensor representation complete at ordinary tensor-set return.
+- The public header's distinction between ordinary and explicitly asynchronous APIs supports this reading but does not provide a normative prose guarantee.
 
 ## In progress
 
-- Tracing the three nested-scope waits and establishing the synchronous `set_tensor` completion contract.
-- Deciding whether the 21 temporary-input-release waits are required, redundant, or contract-dependent after return semantics are established.
-- Deciding whether to submit the generated explicit-release patch upstream before any wait-removal optimization.
+- Rebasing and re-auditing the generated 46-event release patch against current upstream.
+- Deciding whether to submit the explicit-release patch upstream before any synchronization cleanup.
 - Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -79,13 +80,12 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Trace the three nested-scope OpenCL waits
-  → identify the exact branches and operations after each scope
-  → establish the observable synchronous tensor-set return contract
-  → distinguish host-input reuse, output readiness, and same-queue consumer ordering
-  → label the 21 temporary-input-release waits required, redundant, or contract-dependent
-  → preserve the release-only ownership patch independently
-  → decide whether to submit that patch upstream before synchronization cleanup
+Rebase the generated OpenCL event-release correction
+  → inspect current upstream wait/release sites
+  → determine whether the 46-reference leak still exists
+  → regenerate or manually rebase the behavior-preserving release-only patch
+  → preserve all synchronization under the de facto synchronous tensor-set contract
+  → prepare an upstream-ready patch or issue with pinned and current evidence
 ```
 
 In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
@@ -93,8 +93,9 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/2152-opencl-set-tensor-wait-ci-contract.md`.
-- Added the pinned 21/3 wait-group workflow assertion and preserved JSON artifact.
+- Added detailed note `logs/research/2026-07-15/2349-cross-backend-set-tensor-contract.md`.
+- Updated README living TODOs and this project checkpoint.
+- The research ledger was reviewed and unchanged because no external source changed; the increment used pinned primary source already recorded there.
 - The required startup files and current repository files were inspected before editing.
 - Final-head Documentation CI and pinned OpenCL report results must be checked after all durable-context updates.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime and `gh` is not installed.
@@ -103,7 +104,8 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Known blockers and caveats
 
 - **Systematic OpenCL event leak in baseline:** 46 of 51 direct host-waited command events have no matching release or ownership transfer in the pinned translation unit; the generated patch closes the bounded simple-identifier subset but has not been submitted upstream.
-- **Synchronization split:** 22 waits are redundant before immediate same-queue blocking reads; the other 24 are now grouped 21 temporary-input releases / 3 nested-scope exits, but their synchronous return semantics remain unresolved.
+- **Synchronous contract status:** CUDA, SYCL, and OpenCL pinned implementations provide completion-before-return for ordinary tensor set, but the public header does not state this guarantee normatively.
+- **Synchronization split:** 22 waits are redundant before immediate same-queue blocking reads; the other 24 are required by the pinned de facto synchronous tensor-set return contract.
 - **Diagnostic scope:** the simple-local wait/release guard recognizes only literal count-one waits and same-identifier releases in the same lexical brace scope; it is not proof of general C++ ownership.
 - **Set-tensor classifier scope:** the classifier is lexical. It reports the immediate next statement and nearest preceding function-shaped declaration; it does not model macros, aliases, branches, dataflow, or the backend API contract.
 - **Patch-generator scope:** the generator trusts the reviewed report but verifies the exact wait line and identifier. It does not discover aliases, helper ownership, arrays, or semantic control flow.
