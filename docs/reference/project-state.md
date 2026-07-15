@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 10:50 Africa/Cairo_
+_Last updated: 2026-07-15 11:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -42,30 +42,23 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Verified OpenCL scheduler events are unsupported and buffer deleters use buffer-local `cl_mem` ownership rather than the destroyed wrapper.
 - Resolved optional Adreno binary-library lifetime: the raw loader handle is not retained or closed, so the library, exported lookup function, and accepted binary-kernel path remain process-lifetime.
 - Portable OpenCL evidence manifest: artifact-root basenames, pre-upload `sha256sum -c`, and an exact-filename guard make the downloaded artifact directly verifiable after extraction.
+- Classified the pinned `transpose_2d()` nonblocking sub-buffer release as a safe command-retained reference drop under the official OpenCL memory-object lifetime contract.
 
 ## Latest concrete findings
 
-- The previous checksum manifest used repository-relative `build/reports/...` paths even though uploaded files appear at the artifact root.
-- The workflow now generates checksums from inside `build/reports`, so the manifest stores only `opencl-lifecycle-pinned-e3546c7.json` and `ggml-opencl-pinned-e3546c7.cpp`.
-- The workflow verifies the manifest with `sha256sum -c` before upload.
-- A Python guard requires exactly two manifest entries and exact equality with the two artifact-root filenames.
-- The evidence content, pinned revision verification, minimum source-size guard, non-empty lifecycle report check, and 30-day retention remain unchanged.
-- After download and extraction into one directory, verification is now a single command: `sha256sum -c opencl-lifecycle-pinned-e3546c7.sha256`.
-- Device registration creates one `shared_context` and copies it into each supported `ggml_backend_opencl_device_context`.
-- Device contexts are held by static `g_ggml_backend_opencl_dev_ctxs`; the source explicitly states those devices and contexts live as long as the process.
-- `ggml_cl_init()` lazily allocates one `ggml_backend_opencl_context` per device, stores it in `dev_ctx->backend_ctx`, copies the shared context, and creates one command queue.
-- Backend-wrapper initialization increments `ref_count`; wrapper free calls `clFinish(queue)` and decrements it.
-- Final-wrapper cleanup releases pooled image/sub-buffer views but does not delete the per-device backend context or release the command queue/context.
-- Backend capabilities advertise `events = false`, and event callbacks are null; there is no scheduler-owned OpenCL event deleter that can outlive the wrapper.
-- Buffer-local `cl_mem` deleters do not require the deleted `ggml_backend` wrapper.
-- Under `GGML_OPENCL_USE_ADRENO_BIN_KERNELS`, `kernel_lib_handle` is a block-local raw handle. `libdl.h` provides a deleter, but the loader neither owns nor closes the handle.
-- Only `get_adreno_bin_kernel_func` is retained in the process-lifetime backend context. A successfully loaded library and a loaded library with a missing symbol both remain mapped until process teardown.
-- Five pinned paths consume library-provided bytes through `clCreateProgramWithBinary()`, create a kernel, and release the temporary program reference.
-- Pinned classification remains **backend-wrapper order supported; deterministic process-exit release omitted; Adreno binary library process-lifetime by leaked handle**.
+- `transpose_2d()` creates a `trans` sub-buffer, enqueues a transpose kernel, then enqueues a same-queue copy from `trans` to `dst`.
+- With `blocking=true`, the copy returns an event; the helper waits, releases the event, then releases `trans`.
+- With `blocking=false`, the helper releases its host reference to `trans` immediately after both commands are enqueued.
+- Khronos specifies that a memory object whose reference count reaches zero is not deleted until queued commands using it have finished; a parent buffer also cannot be deleted while sub-buffers remain.
+- The release does not free host staging storage or destroy a wrapper consulted by queued work.
+- The pinned queue is not created with `CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE`, so the copy is ordered after the kernel on the same queue.
+- This is a local retention-safe classification, not evidence that every enqueue-then-release site is safe.
+- Existing process-lifetime context/queue ownership and wrapper-free `clFinish()` findings remain unchanged.
 
 ## In progress
 
-- Classification of enqueue-then-release groups that rely on OpenCL retention semantics rather than explicit waits.
+- Tracing every `transpose_2d(..., false)` caller to its next same-queue consumer or synchronization point.
+- Classification of temporary quantization image/sub-buffer groups and cross-queue releases.
 - Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -77,11 +70,11 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Inspect preserved pinned OpenCL source
-  → classify temporary cl_mem release immediately after enqueue
-  → separate retention-only-safe paths from host-storage lifetime hazards
-  → document any site requiring an explicit wait or event
-  → update OpenCL teardown page and comparison matrix
+Find every transpose_2d(..., false) caller
+  → identify the next same-queue consumer or explicit synchronization
+  → verify no host-side dst use occurs early
+  → classify one temporary quantization image/sub-buffer group
+  → separate same-queue retention from cross-queue dependency requirements
 ```
 
 In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
@@ -89,8 +82,7 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/1050-opencl-artifact-manifest-basename-fix.md`.
-- The workflow implementation commit is `64dfba1a11b124d6a7a15b65b49b1f5ed65adf6e`.
+- Added detailed note `logs/research/2026-07-15/1151-opencl-transpose-retention-case-study.md`.
 - Final-head Documentation CI and pinned OpenCL workflow results must be checked before the run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
@@ -101,6 +93,7 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 - **Adreno library lifetime:** the optional binary-kernel loader loses its raw `dl_handle`. This prevents early unload but omits deterministic release and also retains invalid-symbol loads until process exit.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Actions are the authoritative validation path for this branch.
 - **Pages verification blocker:** branch-added content cannot deploy until PR #1 merges; live response verification remains unavailable independently of strict-build success.
+- **Retention classification caveat:** `clReleaseMemObject()` safely defers deletion for queued users, but that does not protect unrelated host storage, wrapper callbacks, pooled-region reuse, or missing cross-queue dependencies.
 - **Lifecycle-extractor caveat:** selected direct APIs and bounded context are navigation evidence only; wrapper constructors, ownership, error paths, macro wrappers, disabled code, raw strings, and semantic ordering still require human source review.
 - **Source-index caveat:** same-line standard attributes, trailing-return definitions, bounded same-line constraints, bounded operators, qualified out-of-class special members, and bounded parenthesized member/delegating constructor initializer lists are recognized. Braced and multiline constructor initializers and constructor function-try-blocks remain intentionally omitted from navigation but are counted as bounded candidates.
 - **Telemetry caveat:** unsupported-syntax counts are prioritization signals, not parser-completeness metrics.
