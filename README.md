@@ -53,7 +53,7 @@ Start a local run with:
 | Daily | Website quality review | Review discoverability, source traceability, accessibility, diagrams, and interactions |
 | Hourly at minute 23 UTC | `.github/workflows/hourly-context-check.yml` | Validate context and scripts |
 | Daily at 02:17 UTC | `.github/workflows/refresh-source-index.yml` | Refresh upstream source inventory through a PR |
-| Manual and extractor-related PR changes | `.github/workflows/opencl-lifecycle-report.yml` | Fetch exact pinned OpenCL source, generate lifecycle evidence, generate the release-only event patch, and preserve review artifacts |
+| Manual and extractor-related PR changes | `.github/workflows/opencl-lifecycle-report.yml` | Fetch exact pinned OpenCL source, generate lifecycle evidence, classify wait groups, generate the release-only event patch, and preserve review artifacts |
 | Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, and `mkdocs build --strict` |
 | Every push to `main` | `.github/workflows/pages.yml` | Build, deploy, and verify the public site |
 
@@ -67,7 +67,7 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered `symbol_locations` with approximate kind, exact 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts. `scripts/extract_opencl_lifecycle_calls.py` inventories selected OpenCL ownership, completion, and release calls after masking comments and quoted literals; it also emits a bounded simple-local wait/release diagnostic for `clWaitForEvents(1, &event)` patterns. `scripts/annotate_opencl_wait_followups.py` separately marks immediate same-queue blocking-read follow-ups without changing ownership status. `scripts/apply_opencl_event_release_fix.py` generates a behavior-preserving release-only correction from the audited unmatched records and can emit a unified patch. `.github/workflows/opencl-lifecycle-report.yml` preserves the exact pinned translation unit, baseline and post-patch JSON reports, generated patch, and artifact-root SHA-256 manifest.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered `symbol_locations` with approximate kind, exact 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts. `scripts/extract_opencl_lifecycle_calls.py` inventories selected OpenCL ownership, completion, and release calls after masking comments and quoted literals; it also emits a bounded simple-local wait/release diagnostic for `clWaitForEvents(1, &event)` patterns. `scripts/annotate_opencl_wait_followups.py` separately marks immediate same-queue blocking-read follow-ups without changing ownership status. `scripts/classify_opencl_set_tensor_waits.py` groups the remaining pinned `set_tensor` waits by their immediate lexical successor. `scripts/apply_opencl_event_release_fix.py` generates a behavior-preserving release-only correction from the audited unmatched records and can emit a unified patch. `.github/workflows/opencl-lifecycle-report.yml` preserves the exact pinned translation unit, baseline and post-patch JSON reports, generated wait-group report, generated patch, and artifact-root SHA-256 manifest.
 
 ### Write layered documentation
 
@@ -110,7 +110,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build, source-backed lifecycle inventory, ownership, Adreno library lifetime, and remaining gaps |
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
 | `.github/workflows/docs-ci.yml` | Named validators, isolated unit-test suites, discovery guard, strict build, and actionable failures |
-| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, ownership/follow-up regressions, generated release-only patch proof, and artifact preservation |
+| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, ownership/follow-up/wait-group regressions, generated release-only patch proof, and artifact preservation |
 
 <!-- PROJECT-TODOS:START -->
 ## Living TODO list
@@ -119,7 +119,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Classify the remaining 24 unmatched OpenCL waits that are not immediately followed by a same-queue blocking read; establish the backend `set_tensor` completion contract before removing any wait.
+- [ ] Trace the three `nested_scope_exit` OpenCL waits and establish whether synchronous `ggml_backend_tensor_set()` requires device-side conversion completion before return; then label the 21 temporary-input-release waits required, redundant, or contract-dependent.
 - [ ] Decide whether to submit the generated 46-release OpenCL patch upstream before synchronization cleanup, and rebase/re-audit it against current upstream if needed.
 - [ ] Decide whether a move-only OpenCL event owner is worthwhile for maintainability even though pinned `CL_CHECK` failures abort without stack unwinding.
 - [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; include explicit Adreno handle ownership, invalid-symbol cleanup, repeated registration, and shared-library unload behavior.
@@ -157,6 +157,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add `scripts/classify_opencl_set_tensor_waits.py` to the pinned workflow, preserve its JSON artifact, and CI-guard the reviewed 24-record split: 21 temporary upload-buffer releases, 3 nested scope exits, all inside `ggml_backend_opencl_buffer_set_tensor()`, and zero `other` records.
+- [x] Reproducibly classify the remaining 24 unmatched OpenCL waits: 21 immediately precede `clReleaseMemObject(data_device)`, while 3 end nested lexical scopes inside `ggml_backend_opencl_buffer_set_tensor()`.
 - [x] Generate a concrete behavior-preserving patch for all 46 pinned OpenCL event leaks and CI-prove 50 released / 0 unmatched simple waits while preserving all 51 waits and the independent 22/24 synchronization classification.
 - [x] Add a bounded `followed_by_same_queue_blocking_read` annotation to the waited-event report and CI-guard the reviewed 22 blocking-read / 24 other unmatched split while keeping ownership status independent.
 - [x] Classify 22 of the 46 unmatched OpenCL waits as redundant before an immediate same-queue `clEnqueueReadBuffer(..., CL_TRUE, ...)`; retain 24 waits for separate contract and consumer-order analysis.
