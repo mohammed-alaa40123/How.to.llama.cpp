@@ -194,3 +194,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Add explicit RAII ownership and registry teardown, close invalid-symbol loads immediately, and test repeated registration/shared-library unload behavior.
+
+## 2026-07-15 10:50 — Portable OpenCL artifact checksum verification
+
+**Verified**
+
+- The prior manifest stored workflow-relative `build/reports/...` paths, while uploaded files are extracted at the artifact root.
+- The workflow now creates the manifest from inside `build/reports`, so both entries use artifact-root basenames.
+- The workflow runs `sha256sum -c` before upload and rejects any manifest whose two filenames do not exactly match the report and preserved source.
+- Pinned-revision, source-size, non-empty-report, and artifact-retention checks remain intact.
+
+**Interpretation**
+
+- The checksum file is now a portable evidence contract: after extraction, a reviewer can verify both files with one standard command and no path rewriting.
+
+**Historical**
+
+- The hashes were already correct; this increment fixes post-download usability rather than evidence content.
+
+**Open questions**
+
+- Add machine-readable artifact metadata for the pinned revision and extractor version if future consumers need stronger provenance automation.
