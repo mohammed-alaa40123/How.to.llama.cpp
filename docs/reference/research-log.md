@@ -171,3 +171,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Classify enqueue-then-release groups relying only on OpenCL object-retention semantics.
 - Determine whether repeated registration or shared-library unload is supported.
 - Fix the artifact checksum manifest to use basenames for direct `sha256sum -c` after download.
+
+## 2026-07-15 09:51 — Adreno binary-library lifetime
+
+**Verified**
+
+- `ggml_cl_init()` loads the optional binary-kernel library into block-local raw pointer `kernel_lib_handle`.
+- Pinned `libdl.h` provides a deleter that calls `FreeLibrary()` or `dlclose()`, but the OpenCL loader does not use it and never closes the handle.
+- Only `get_adreno_bin_kernel_func` is retained in the process-lifetime backend context.
+- A successfully loaded library and a loaded library with a missing export both remain mapped until process teardown.
+- Five binary-kernel paths call the exported function, pass returned bytes to `clCreateProgramWithBinary()`, create kernels, and release temporary program references.
+- No close-before-kernel-destruction risk exists because neither the library nor accepted kernels are deterministically destroyed in the pinned process-lifetime design.
+
+**Interpretation**
+
+- The library has an implicit process-lifetime policy implemented by losing the raw loader handle. This preserves future function-pointer calls but omits deterministic ownership and unload support.
+
+**Historical**
+
+- Reading pinned `libdl.h` alongside the preserved OpenCL source resolved the previously open handle-lifetime question.
+
+**Open questions**
+
+- Add explicit RAII ownership and registry teardown, close invalid-symbol loads immediately, and test repeated registration/shared-library unload behavior.
