@@ -198,7 +198,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Added a bounded lexical diagnostic for literal `clWaitForEvents(1, &identifier)` calls.
 - Each record reports exact wait and scope lines plus a same-scope release line or `unmatched_in_scope`.
 - Focused tests cover same-scope release, nested-scope boundaries, unmatched waits, comments/literals, and unsupported non-simple waits.
-- The pinned OpenCL workflow now guards the audited contract: 51 simple waits, 5 released in scope, and 46 unmatched.
+- The pinned OpenCL workflow guards 50 simple identifier waits: 4 released in scope and 46 unmatched.
 
 **Interpretation**
 
@@ -207,13 +207,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 **Historical**
 
-- The 5/46 result previously existed only as a detailed human audit; this increment makes it machine-readable and CI-enforced.
-
-**Open questions**
-
-- Which unmatched waits are redundant before a same-queue blocking operation?
-- Should a patched upstream revision be required to reach zero `unmatched_in_scope` entries?
-- Is a bounded next-blocking-command hint useful without conflating completion and ownership?
+- The 5/46 complete direct-call result includes one released member-expression profiling wait outside the simple `&identifier` heuristic.
 
 ## 2026-07-15 17:52 — Blocking-read wait classification
 
@@ -239,3 +233,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Does `set_tensor` promise device conversion completion before return?
 - Which of the remaining 24 waits precede only ordered same-queue consumers?
 - Should the report add a bounded blocking-read hint separate from ownership status?
+
+## 2026-07-15 18:51 — Machine-readable blocking-read follow-up hints
+
+**Verified**
+
+- Added `scripts/annotate_opencl_wait_followups.py` as a separate post-processor for the pinned lifecycle report.
+- It marks a wait only when the immediately following statement directly calls `clEnqueueReadBuffer`, uses literal queue `queue`, and passes literal `CL_TRUE` as the blocking argument.
+- Added focused tests for positive, nonblocking, different-queue, intervening-statement, and comment/literal cases.
+- The pinned workflow now independently guards ownership counts (`4 released`, `46 unmatched`) and follow-up counts (`22 immediate same-queue blocking reads`, `24 other unmatched`).
+
+**Interpretation**
+
+- Synchronization hints and event ownership remain independent fields: a blocking read may make an explicit wait redundant but does not release the event reference.
+- The report now provides stable acceptance criteria for a release-only leak fix and a later synchronization-cleanup patch.
+
+**Historical**
+
+- The preceding 22/24 split was a manual source audit and a future TODO; this increment turns it into reproducible JSON evidence and CI policy.
+
+**Open questions**
+
+- Which bounded hints, if any, are useful for the remaining 24 waits?
+- Does the backend `set_tensor` contract require conversion completion before return?
