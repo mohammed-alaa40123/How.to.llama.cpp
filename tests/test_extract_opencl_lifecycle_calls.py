@@ -83,6 +83,68 @@ clReleaseMemObject(buffer);
             ],
         )
 
+    def test_includes_bounded_original_source_context(self) -> None:
+        source = """\
+void teardown() {
+    // completion before releases
+    CL_CHECK(clFinish(queue));
+    clReleaseCommandQueue(queue);
+    clReleaseContext(context);
+}
+"""
+        self.assertEqual(
+            extractor.extract_opencl_lifecycle_calls(source, context_lines=1),
+            [
+                {
+                    "name": "clFinish",
+                    "line": 3,
+                    "context": {
+                        "start_line": 2,
+                        "end_line": 4,
+                        "text": "    // completion before releases\n"
+                        "    CL_CHECK(clFinish(queue));\n"
+                        "    clReleaseCommandQueue(queue);",
+                    },
+                },
+                {
+                    "name": "clReleaseCommandQueue",
+                    "line": 4,
+                    "context": {
+                        "start_line": 3,
+                        "end_line": 5,
+                        "text": "    CL_CHECK(clFinish(queue));\n"
+                        "    clReleaseCommandQueue(queue);\n"
+                        "    clReleaseContext(context);",
+                    },
+                },
+                {
+                    "name": "clReleaseContext",
+                    "line": 5,
+                    "context": {
+                        "start_line": 4,
+                        "end_line": 6,
+                        "text": "    clReleaseCommandQueue(queue);\n"
+                        "    clReleaseContext(context);\n}",
+                    },
+                },
+            ],
+        )
+
+    def test_context_is_clamped_at_file_boundaries(self) -> None:
+        source = "clFlush(queue);\nclReleaseContext(context);\n"
+        calls = extractor.extract_opencl_lifecycle_calls(source, context_lines=3)
+        expected_context = {
+            "start_line": 1,
+            "end_line": 2,
+            "text": "clFlush(queue);\nclReleaseContext(context);",
+        }
+        self.assertEqual(calls[0]["context"], expected_context)
+        self.assertEqual(calls[1]["context"], expected_context)
+
+    def test_rejects_negative_context_radius(self) -> None:
+        with self.assertRaisesRegex(ValueError, "non-negative"):
+            extractor.extract_opencl_lifecycle_calls("clFinish(queue);", context_lines=-1)
+
 
 if __name__ == "__main__":
     unittest.main()
