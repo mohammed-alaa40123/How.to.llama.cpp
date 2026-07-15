@@ -67,7 +67,7 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts for large translation units. `scripts/extract_opencl_lifecycle_calls.py` separately inventories selected OpenCL completion and release call sites with exact lines after masking C/C++ comments and quoted literals; optional bounded original-source context makes generated reports reviewable without changing call matching. `.github/workflows/opencl-lifecycle-report.yml` obtains the complete exact pinned translation unit in GitHub Actions and preserves the generated report as an artifact.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts for large translation units. `scripts/extract_opencl_lifecycle_calls.py` separately inventories selected OpenCL creation, retention, completion, and release call sites with exact lines after masking C/C++ comments and quoted literals; optional bounded original-source context makes generated reports reviewable without changing call matching. `.github/workflows/opencl-lifecycle-report.yml` obtains the complete exact pinned translation unit in GitHub Actions and preserves the generated report as an artifact.
 
 ### Write layered documentation
 
@@ -121,8 +121,9 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Locate command-queue and OpenCL-context creation/final ownership in the pinned translation unit; verify scheduler buffer/event deleter independence and update the backend teardown comparison matrix.
-- [ ] Classify OpenCL enqueue-then-release groups that rely on object-retention semantics rather than explicit waits, and resolve optional Adreno binary-library handle lifetime.
+- [ ] Inspect the regenerated pinned OpenCL report for direct queue/context creation and retention calls; map each result to its enclosing owner and update the backend teardown comparison matrix.
+- [ ] Verify scheduler buffer/event deleter independence and classify OpenCL enqueue-then-release groups that rely on object-retention semantics rather than explicit waits.
+- [ ] Resolve optional Adreno binary-library handle lifetime and kernel-destruction ordering.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned source links, and unsupported-syntax counts for braced initializers, multiline initializers, and constructor function-try-blocks; use actual candidate volume to prioritize scanner work.
 - [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
@@ -143,7 +144,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 - [ ] Add enclosing-function metadata only for OpenCL lifecycle groups that remain ambiguous after targeted source review.
 - [ ] Extend OpenCL lexical masking only if pinned-source evidence requires raw-string, preprocessor-disabled-region, or macro-expansion handling.
-- [ ] Pair OpenCL lifecycle release calls with creation/retention sites if targeted ownership review remains ambiguous.
+- [ ] Automatically pair OpenCL creation/retention calls with release sites only if the expanded direct-call report remains ambiguous.
 - [ ] Define constructor function-try-block navigation line semantics and consider stateful extraction only if regenerated pinned-tree counts justify it.
 - [ ] Evaluate multiline attributes, multiline constraints/returns, in-class special members, braced or multiline constructor initializer lists, defaulted/deleted definitions, literals, complex conversion operators, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
 - [ ] Extend unsupported-syntax telemetry only after pinned-tree evidence identifies additional high-value missed forms.
@@ -162,6 +163,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Expand the OpenCL lifecycle extractor to include direct context/queue creation and retention APIs, preserving lexical masking, exact lines, bounded context, and focused regression coverage.
 - [x] Inspect the first complete pinned OpenCL lifecycle artifact, record exact API totals, verify shared-free and cross-device synchronization ordering, and classify teardown as conditional with local completion evidence.
 - [x] Add a GitHub-hosted workflow that fetches the exact pinned OpenCL translation unit, generates a context-bearing lifecycle report, validates non-empty output, and uploads it as an artifact.
 - [x] Add optional bounded original-source context to OpenCL lifecycle records, with exact clamped line ranges, backward-compatible default output, and focused regression coverage.
