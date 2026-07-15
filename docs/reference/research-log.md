@@ -215,3 +215,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Add machine-readable artifact metadata for the pinned revision and extractor version if future consumers need stronger provenance automation.
+
+## 2026-07-15 11:51 — OpenCL transpose command-retention case study
+
+**Verified**
+
+- Pinned `transpose_2d()` creates a `trans` sub-buffer, enqueues a transpose kernel, then enqueues a same-queue copy from `trans` to `dst`.
+- The blocking branch waits on the copy event before releasing `trans`; the nonblocking branch releases its host reference immediately after enqueue.
+- Khronos specifies that a memory object is deleted only after its reference count reaches zero and all queued commands using it have finished.
+- The release does not invalidate host staging memory or wrapper state, and the pinned queue is not configured for out-of-order execution.
+
+**Interpretation**
+
+- The nonblocking branch is a safe command-retained reference drop, not a use-after-free hazard. It omits host completion but preserves device-side memory-object lifetime.
+- This conclusion is local to `transpose_2d()` and does not cover host-storage release, pooled-region reuse, wrapper callbacks, or cross-queue dependencies.
+
+**Historical**
+
+- This is the first function-level classification from the 343 direct `clReleaseMemObject()` sites in the complete pinned lifecycle report.
+
+**Open questions**
+
+- Trace every `transpose_2d(..., false)` caller to its next synchronization or same-queue consumer.
+- Classify temporary quantization image/sub-buffer groups and cross-queue release paths.
