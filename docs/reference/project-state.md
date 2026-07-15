@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 18:51 Africa/Cairo_
+_Last updated: 2026-07-15 19:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -30,14 +30,14 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Cross-implementation CPU optional-buffer comparison and portable destruction-test matrix.
 - Implementation-ready CPU optional-buffer destruction-harness specification with admission, correctness, lifetime-ordering, and sanitizer assertions.
 - Documentation CI validation commands split into named steps with verbose unittest output.
-- Python unit tests split into source-index, boundary, unsupported-syntax, function-try-block, OpenCL lifecycle/follow-up, and interactive-link suites, followed by a full discovery guard.
+- Python unit tests split into source-index, boundary, unsupported-syntax, function-try-block, OpenCL lifecycle/follow-up/release-fix, and interactive-link suites, followed by a full discovery guard.
 - Source-index exact-line support for attributes, trailing returns, bounded constraints, operators, qualified special members, parenthesized initializer lists, and delegating constructors.
 - Negative boundary tests plus bounded telemetry for braced/multiline constructor initializers and constructor function-try-blocks.
 - Bounded OpenCL lifecycle-call extractor for direct queue/context creation and retention plus completion/wait and queue/context/program/kernel/event/buffer releases.
 - C/C++ comment and quoted-literal masking for lifecycle extraction while preserving exact source offsets and line numbers.
 - Function-try initializer-line guard preventing `try : member(...) {` from becoming a false ordinary-function symbol.
 - Optional bounded original-source context for every lifecycle record, with exact clamped line ranges and backward-compatible default output.
-- GitHub-hosted pinned OpenCL workflow that verifies the exact baseline checkout and preserves the complete source, generated report, and SHA-256 manifest.
+- GitHub-hosted pinned OpenCL workflow that verifies the exact baseline checkout and preserves the complete source, generated report, generated release-only patch, post-patch report, and SHA-256 manifest.
 - Verified OpenCL backend-wrapper order: queue completion occurs before wrapper reference drop, while the actual device/backend context remains process-lifetime.
 - Verified OpenCL scheduler events are unsupported and buffer deleters use buffer-local `cl_mem` ownership rather than the destroyed wrapper.
 - Resolved optional Adreno binary-library lifetime: the raw loader handle is not retained or closed, so the library, exported lookup function, and accepted binary-kernel path remain process-lifetime.
@@ -50,19 +50,20 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Added a bounded simple-local waited-event diagnostic that machine-checks the pinned 50 simple identifier records, 4 released, and 46 unmatched ownership counts.
 - Classified 22 of the 46 unmatched waits as redundant before an immediate same-queue `clEnqueueReadBuffer(..., CL_TRUE, ...)`; 24 waits remain for separate API-contract and consumer-order analysis.
 - Added a separate machine-readable blocking-read follow-up annotation and pinned workflow guard for the reviewed 22/24 split without changing event ownership status.
+- Added a bounded release-only patch generator that inserts 46 `clReleaseEvent(evt)` calls from the audited report, preserves all 51 waits, emits a unified patch, and CI-validates 50 released / 0 unmatched simple events.
 
 ## Latest concrete findings
 
-- The lifecycle report now stores `followed_by_same_queue_blocking_read` and `next_read_line` beside simple waited-event records.
-- The annotator requires the immediately following statement to call `clEnqueueReadBuffer`, use literal queue `queue`, and pass `CL_TRUE` as the blocking argument.
-- The pinned workflow independently guards ownership (`4 released`, `46 unmatched`) and synchronization hints (`22 immediate blocking reads`, `24 other unmatched`).
-- The distinction is intentional: a blocking read can make a wait redundant but cannot release the event reference.
-- Focused tests reject nonblocking reads, different queues, intervening statements, and call-shaped text in comments or literals.
+- The release-only generator consumes exact report line numbers and event identifiers and rejects stale, duplicate, empty, or unexpected inputs.
+- The generated patch preserves all existing waits and synchronization while adding exactly 46 event-reference decrements.
+- Post-patch lifecycle extraction is now a CI contract: 50 simple identifier waits released in scope, zero unmatched, 51 total waits unchanged, and 52 total direct event releases.
+- The baseline report remains independently preserved with 4 released / 46 unmatched ownership and the 22 blocking-read / 24 other synchronization split.
+- Local generation against the source-bearing artifact passed `git apply --check` and produced the expected direct call counts.
 
 ## In progress
 
-- Preparing a minimal release-only upstream correction for all 46 unmatched events and using the ownership diagnostic to require zero unmatched entries.
 - Classifying the remaining 24 unmatched waits, primarily upload/conversion paths, against the backend `set_tensor` completion contract and same-queue consumer chain.
+- Deciding whether to submit the generated explicit-release patch upstream before any wait-removal optimization.
 - Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -74,13 +75,13 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Prepare release-only OpenCL event fix
-  → add clReleaseEvent(evt) after every successful unmatched wait
-  → preserve all existing synchronization in the first patch
-  → validate 0 unmatched_in_scope ownership records
-  → retain the independent 22/24 synchronization annotation
-  → separately remove the 22 waits proven redundant before blocking reads
-  → classify the remaining 24 waits against set_tensor completion semantics
+Classify the remaining 24 OpenCL waits
+  → identify each enclosing upload/conversion helper
+  → establish whether set_tensor must return after conversion completes
+  → trace the next same-queue consumer or temporary-buffer release
+  → label each wait required, redundant, or unresolved
+  → keep ownership repair separate from synchronization optimization
+  → decide whether to submit the generated 46-release patch upstream
 ```
 
 In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
@@ -88,19 +89,21 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/1851-opencl-wait-followup-annotation.md`.
-- Added `scripts/annotate_opencl_wait_followups.py` and focused regression tests.
+- Added detailed note `logs/research/2026-07-15/1952-opencl-release-only-patch-generator.md`.
+- Added `scripts/apply_opencl_event_release_fix.py`, focused tests, and CI generation/validation of the concrete unified patch.
 - The required startup files and current repository files were inspected before editing.
-- Documentation CI and pinned OpenCL report runs were triggered for the implementation commits; final-head results must be checked before the run closes.
+- Prior head `3a8bc45e134f291114cdfd9da954aa4840e3de45` passed Documentation CI run `29430361648` and pinned OpenCL report run `29430360856`.
+- Final-head Documentation CI and pinned OpenCL report results must be checked after all durable-context updates.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime and `gh` is not installed.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
 ## Known blockers and caveats
 
-- **Systematic OpenCL event leak:** 46 of 51 direct host-waited command events have no matching release or ownership transfer in the pinned translation unit.
+- **Systematic OpenCL event leak in baseline:** 46 of 51 direct host-waited command events have no matching release or ownership transfer in the pinned translation unit; the generated patch closes the bounded simple-identifier subset but has not been submitted upstream.
 - **Synchronization split:** 22 of those 46 waits are redundant before an immediate same-queue blocking read; the remaining 24 require a different completion-contract analysis.
 - **Diagnostic scope:** the simple-local wait/release guard recognizes only literal count-one waits and same-identifier releases in the same lexical brace scope; it is not proof of general C++ ownership.
-- **Follow-up annotation scope:** the new annotator requires an immediate semicolon-terminated statement, literal queue name `queue`, and literal `CL_TRUE`; aliases, macros, branches, and general control flow remain human-review work.
+- **Patch-generator scope:** the generator trusts the reviewed report but verifies the exact wait line and identifier. It does not discover aliases, helper ownership, arrays, or semantic control flow.
+- **Follow-up annotation scope:** the annotator requires an immediate semicolon-terminated statement, literal queue name `queue`, and literal `CL_TRUE`; aliases, macros, branches, and general control flow remain human-review work.
 - **Fatal-error policy:** `CL_CHECK` terminates via `abort()`; normal C++ destructors and scope guards do not run after a checked failure, so deterministic cleanup is meaningful only on successful paths or after a future nonfatal error redesign.
 - **Deterministic-release gap:** the pinned translation unit intentionally keeps device/backend contexts process-lifetime and contains no explicit queue/context release or per-device backend-context deletion path.
 - **Adreno library lifetime:** the optional binary-kernel loader loses its raw `dl_handle`. This prevents early unload but omits deterministic release and also retains invalid-symbol loads until process exit.
