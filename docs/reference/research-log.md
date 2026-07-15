@@ -144,141 +144,92 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - The nonblocking branch is dormant capability in the baseline.
 
-## 2026-07-15 13:52 — Q4_0 conversion event lifetime
+## 2026-07-15 13:52–15:52 — Event lifetime, pairing, and fatal errors
 
 **Verified**
 
 - Both Q4_0 conversion branches wait before releasing temporary `data_device` but omit `clReleaseEvent(evt)`.
-- Each successful conversion therefore leaks one application-owned command-event reference.
+- Paired all 51 direct `clWaitForEvents()` sites: five waited events are released and 46 local command events are waited without release or transfer.
+- Pinned `CL_CHECK` logs non-success, asserts, enters `ggml_abort()`, and unconditionally calls `abort()`.
 
 **Interpretation**
 
-- Classification: **explicit completion before temporary-buffer release; persistent event-reference leak**.
-
-## 2026-07-15 14:52 — Complete waited-event pairing audit
-
-**Verified**
-
-- Paired all 51 direct `clWaitForEvents()` sites with producers and ownership paths.
-- Five waited events are released; 46 local command events are waited without release or transfer.
-- The unmatched events span eleven quantized tensor-type groups and conversion/upload/readback helpers.
-
-**Interpretation**
-
-- The event leak is systematic and primarily scales with tensor conversion/readback and repeated model/backend initialization, not decode tokens.
-
-## 2026-07-15 15:52 — `CL_CHECK` fatal failure semantics
-
-**Verified**
-
-- Pinned `CL_CHECK` logs any non-success OpenCL result and executes `GGML_ASSERT(0)`.
-- `GGML_ASSERT` maps to `GGML_ABORT`; pinned `ggml_abort()` invokes an optional callback or prints diagnostics and then unconditionally calls `abort()`.
-- A checked enqueue, wait, release, or other OpenCL failure does not return, throw, or continue to later cleanup statements.
-
-**Interpretation**
-
-- The 46 observed successful-path leaks can be corrected by adding `clReleaseEvent(evt)` after each successful wait without designing recoverable-error cleanup for the pinned code.
-- RAII remains useful for maintainability and future nonfatal error propagation, but it cannot unwind after the current `abort()` path.
-- The safest patch sequence is release-only first, then separately remove waits proven redundant by a following same-queue blocking operation.
-
-**Historical**
-
-- The previous pairing audit treated RAII as potentially required because `CL_CHECK` behavior was unresolved. The pinned macro-to-abort chain narrows it to an optional design improvement.
-
-**Open questions**
-
-- Which of the 46 waits are required versus redundant before ordered blocking operations?
-- Should upstream prefer 46 explicit releases or a small move-only event owner?
-- Can a bounded source regression detect the known local wait-without-release pattern without claiming full ownership analysis?
+- The event leak is systematic and primarily scales with tensor conversion/readback and repeated initialization, not decode tokens.
+- Successful-path releases can be inserted after waits without designing recoverable-error cleanup for the pinned code.
 
 ## 2026-07-15 16:51 — Simple waited-event regression
 
 **Verified**
 
 - Added a bounded lexical diagnostic for literal `clWaitForEvents(1, &identifier)` calls.
-- Each record reports exact wait and scope lines plus a same-scope release line or `unmatched_in_scope`.
-- Focused tests cover same-scope release, nested-scope boundaries, unmatched waits, comments/literals, and unsupported non-simple waits.
-- The pinned OpenCL workflow guards 50 simple identifier waits: 4 released in scope and 46 unmatched.
+- The pinned workflow guards 50 simple identifier waits: 4 released in scope and 46 unmatched.
 
 **Interpretation**
 
-- The manual pairing result is now a reproducible source-evidence regression suitable for validating a release-only patch.
-- The heuristic remains intentionally narrower than C++ ownership analysis and does not model aliases, macros, helper releases, arrays, transfer, or control-flow reachability.
+- The heuristic is a reproducible bounded regression, not general C++ ownership analysis.
 
-**Historical**
-
-- The 5/46 complete direct-call result includes one released member-expression profiling wait outside the simple `&identifier` heuristic.
-
-## 2026-07-15 17:52 — Blocking-read wait classification
+## 2026-07-15 17:52–18:51 — Blocking-read wait classification
 
 **Verified**
 
-- Of the 46 unmatched local event waits, 22 are immediately followed by `clEnqueueReadBuffer(..., CL_TRUE, ...)` on the same in-order command queue.
-- The 22 sites cover eleven tensor types: `Q1_0`, `Q4_0`, `Q4_1`, `Q5_0`, `Q5_1`, `MXFP4`, `Q8_0`, `IQ4_NL`, `Q4_K`, `Q5_K`, and `Q6_K`.
-- Khronos specifies that a blocking read does not return until buffer data has been copied to host memory; the pinned queue does not enable out-of-order execution.
-- The preceding explicit waits are therefore redundant for completion, although their event references remain leaked unless explicitly released.
-- Twenty-four unmatched waits remain outside this pattern.
+- Of the 46 unmatched waits, 22 are immediately followed by same-queue `clEnqueueReadBuffer(..., CL_TRUE, ...)` calls.
+- The pinned queue is in-order, and a blocking read supplies the required host-visible completion.
+- Added a separate machine-readable follow-up annotation and CI guard for the 22/24 split.
 
 **Interpretation**
 
-- Keep synchronization unchanged in the first release-only patch, then remove the 22 proven redundant waits and event creations in a separate optimization patch.
-- The remaining 24 upload/conversion waits require the backend `set_tensor` completion contract and subsequent consumer ordering to be established before removal.
-
-**Historical**
-
-- The prior run established ownership status only. This increment separates event ownership from synchronization necessity for the first large subgroup.
-
-**Open questions**
-
-- Does `set_tensor` promise device conversion completion before return?
-- Which of the remaining 24 waits precede only ordered same-queue consumers?
-- Should the report add a bounded blocking-read hint separate from ownership status?
-
-## 2026-07-15 18:51 — Machine-readable blocking-read follow-up hints
-
-**Verified**
-
-- Added `scripts/annotate_opencl_wait_followups.py` as a separate post-processor for the pinned lifecycle report.
-- It marks a wait only when the immediately following statement directly calls `clEnqueueReadBuffer`, uses literal queue `queue`, and passes literal `CL_TRUE` as the blocking argument.
-- Added focused tests for positive, nonblocking, different-queue, intervening-statement, and comment/literal cases.
-- The pinned workflow now independently guards ownership counts (`4 released`, `46 unmatched`) and follow-up counts (`22 immediate same-queue blocking reads`, `24 other unmatched`).
-
-**Interpretation**
-
-- Synchronization hints and event ownership remain independent fields: a blocking read may make an explicit wait redundant but does not release the event reference.
-- The report now provides stable acceptance criteria for a release-only leak fix and a later synchronization-cleanup patch.
-
-**Historical**
-
-- The preceding 22/24 split was a manual source audit and a future TODO; this increment turns it into reproducible JSON evidence and CI policy.
-
-**Open questions**
-
-- Which bounded hints, if any, are useful for the remaining 24 waits?
-- Does the backend `set_tensor` contract require conversion completion before return?
+- The 22 explicit waits are redundant for completion, but their event references still require release.
+- Ownership repair and synchronization removal remain separate patches.
 
 ## 2026-07-15 19:52 — Generated release-only event patch
 
 **Verified**
 
-- Added `scripts/apply_opencl_event_release_fix.py`, which inserts a release immediately after each audited unmatched simple wait using exact report line numbers and event identifiers.
-- The generator rejects stale lines, duplicate records, empty unmatched sets, and unexpected fix counts, and emits both patched source and a unified patch.
-- Added focused unit tests for insertion, indentation, stale input, duplicate lines, and already-released input.
-- The pinned workflow now proves that the generated patch adds exactly 46 releases, preserves all 51 waits, changes the simple ownership result from 4 released / 46 unmatched to 50 released / 0 unmatched, and produces 52 direct event-release calls total.
-- The baseline source/report and its independent 22/24 synchronization classification remain preserved beside the generated patch and post-patch report.
+- Added `scripts/apply_opencl_event_release_fix.py`, which inserts releases after all 46 audited unmatched simple waits using exact lines and identifiers.
+- The workflow proves 46 inserted releases, 51 waits preserved, 50 simple waits released in scope, zero unmatched, and 52 total direct event releases.
+- The baseline report and independent 22/24 synchronization split remain preserved.
 
 **Interpretation**
 
-- The repository now has a behavior-preserving concrete correction artifact, not merely a proposed edit list.
-- Ownership repair remains intentionally separate from later removal of 22 waits proven redundant before blocking reads.
-- Generating the patch from the audited report reduces repetitive manual-edit risk while refusing silent application after source drift.
+- The repository now has a concrete behavior-preserving ownership correction artifact.
 
-**Historical**
+## 2026-07-15 20:51 — Remaining `set_tensor` wait groups
 
-- The previous run made the synchronization split machine-readable. This increment turns the release-only plan into a reproducible patch and CI acceptance contract.
+**Verified**
+
+- Added `scripts/classify_opencl_set_tensor_waits.py` and focused tests.
+- All remaining 24 non-blocking-read waits are inside `ggml_backend_opencl_buffer_set_tensor()`.
+- Twenty-one waits are immediately followed by `clReleaseMemObject(data_device)`; three end nested lexical scopes; zero fall into `other`.
+- OpenCL command retention means the 21 waits are not needed merely to keep the temporary input object alive.
+
+**Interpretation**
+
+- The 21 waits are not yet proven removable because synchronous tensor-set output readiness remains unresolved.
 
 **Open questions**
 
-- Should the generated explicit-release patch be submitted upstream before classifying all remaining wait semantics?
-- Would current upstream prefer explicit releases or a move-only event owner?
-- Which of the remaining 24 waits are required by `set_tensor` return semantics?
+- What exact operations follow the three nested-scope waits?
+- Does synchronous `ggml_backend_tensor_set()` require device-side conversion completion before return?
+
+## 2026-07-15 21:52 — Pinned `set_tensor` wait-group CI contract
+
+**Verified**
+
+- Integrated `scripts/classify_opencl_set_tensor_waits.py` and its tests into the pinned OpenCL workflow trigger set.
+- The workflow now generates and uploads `opencl-set-tensor-wait-groups-e3546c7.json`.
+- CI asserts exactly 24 records, 21 `temporary_upload_buffer_release`, 3 `nested_scope_exit`, all in `ggml_backend_opencl_buffer_set_tensor()`, and zero `other` records.
+- Updated the README living TODO list and project state; the research ledger was reviewed and unchanged because no source changed.
+
+**Interpretation**
+
+- The reviewed 21/3 grouping is now a pinned evidence contract. Source drift or classifier regression must fail visibly and trigger re-audit.
+- The workflow freezes lexical facts, not the unresolved synchronous tensor-set completion contract.
+
+**Historical**
+
+- The previous run produced the classifier but left it outside CI and could not safely update the living context files. This increment closes those durability gaps.
+
+**Open questions**
+
+- Are the 21 temporary-input-release waits required, redundant, or contract-dependent after separating host-input reuse from output readiness?
+- Should the generated 46-release patch be submitted upstream before synchronization cleanup?
