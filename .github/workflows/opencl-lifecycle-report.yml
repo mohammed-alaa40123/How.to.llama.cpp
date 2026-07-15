@@ -71,17 +71,20 @@ jobs:
           if not data["calls"]:
               raise SystemExit("OpenCL lifecycle report unexpectedly contains no calls")
 
+          # This bounded diagnostic intentionally accepts only &identifier. The
+          # separate profiling wait uses &info.evt and is correctly outside this
+          # simple-local inventory, leaving 50 records rather than all 51 waits.
           expected_wait_counts = {
-              "released_in_scope": 5,
+              "released_in_scope": 4,
               "unmatched_in_scope": 46,
           }
           if data["simple_waited_event_counts"] != expected_wait_counts:
               raise SystemExit(
-                  "Pinned simple waited-event ownership counts changed: "
+                  "Pinned simple identifier waited-event ownership counts changed: "
                   f"expected {expected_wait_counts}, got {data['simple_waited_event_counts']}"
               )
-          if len(data["simple_waited_events"]) != 51:
-              raise SystemExit("Pinned source must contain exactly 51 simple local waits")
+          if len(data["simple_waited_events"]) != 50:
+              raise SystemExit("Pinned source must contain exactly 50 simple &identifier waits")
 
           if source.stat().st_size < 100_000:
               raise SystemExit("Pinned OpenCL source is unexpectedly small")
