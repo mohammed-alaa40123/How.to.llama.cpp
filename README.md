@@ -120,8 +120,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Prepare an error-safe upstream fix for the 46 pinned OpenCL waits without matching `clReleaseEvent()`; distinguish redundant waits from events that need RAII/scope-guard ownership and add focused regression coverage.
-- [ ] Review `CL_CHECK` failure behavior so event and temporary-buffer cleanup remains correct on enqueue/wait errors.
+- [ ] Classify the 46 pinned OpenCL waits as required completion versus redundant before a same-queue blocking operation, then prepare a minimal release-only upstream patch and focused regression coverage.
+- [ ] Decide whether a move-only OpenCL event owner is worthwhile for maintainability even though pinned `CL_CHECK` failures abort without stack unwinding.
 - [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; include explicit Adreno handle ownership, invalid-symbol cleanup, repeated registration, and shared-library unload behavior.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts; use actual candidate volume to prioritize scanner work.
 - [ ] Implement the first CPU repack regression fixture: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
@@ -157,6 +157,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Resolve pinned `CL_CHECK` failure semantics: OpenCL errors log, assert, invoke `ggml_abort()`, and unconditionally terminate with `abort()`; successful-path event releases do not need recoverable-error cleanup.
 - [x] Audit all 51 pinned direct `clWaitForEvents()` sites: 5 waited events are released, while 46 local command-event references have no release or ownership transfer.
 - [x] Classify the Q4_0 conversion temporary-buffer group: both branches explicitly wait before releasing `data_device`, but both omit `clReleaseEvent(evt)` and leak one event reference per conversion.
 - [x] Audit every pinned `transpose_2d*()` call site: all 53 typed-wrapper calls use the default `blocking=true`; the `blocking=false` branch has zero callers and is dormant in the baseline.
