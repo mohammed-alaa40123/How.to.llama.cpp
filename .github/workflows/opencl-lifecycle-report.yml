@@ -36,16 +36,26 @@ jobs:
           set -euo pipefail
           mkdir -p build/reports
           source_path=build/upstream/ggml/src/ggml-opencl/ggml-opencl.cpp
-          report_path=build/reports/opencl-lifecycle-pinned-e3546c7.json
-          preserved_source=build/reports/ggml-opencl-pinned-e3546c7.cpp
-          manifest_path=build/reports/opencl-lifecycle-pinned-e3546c7.sha256
+          report_name=opencl-lifecycle-pinned-e3546c7.json
+          source_name=ggml-opencl-pinned-e3546c7.cpp
+          manifest_name=opencl-lifecycle-pinned-e3546c7.sha256
+          report_path=build/reports/$report_name
+          preserved_source=build/reports/$source_name
+          manifest_path=build/reports/$manifest_name
 
           python3 scripts/extract_opencl_lifecycle_calls.py \
             "$source_path" \
             --context-lines 3 \
             --out "$report_path"
           cp "$source_path" "$preserved_source"
-          sha256sum "$report_path" "$preserved_source" > "$manifest_path"
+
+          # Record artifact-root basenames so verification works immediately after
+          # extracting the uploaded ZIP into one directory.
+          (
+            cd build/reports
+            sha256sum "$report_name" "$source_name" > "$manifest_name"
+            sha256sum -c "$manifest_name"
+          )
 
           python3 - <<'PY'
           import json
@@ -54,14 +64,23 @@ jobs:
           report = Path("build/reports/opencl-lifecycle-pinned-e3546c7.json")
           source = Path("build/reports/ggml-opencl-pinned-e3546c7.cpp")
           manifest = Path("build/reports/opencl-lifecycle-pinned-e3546c7.sha256")
+          expected_names = {report.name, source.name}
           data = json.loads(report.read_text(encoding="utf-8"))
           print(json.dumps(data["counts"], indent=2, sort_keys=True))
           if not data["calls"]:
               raise SystemExit("OpenCL lifecycle report unexpectedly contains no calls")
           if source.stat().st_size < 100_000:
               raise SystemExit("Pinned OpenCL source is unexpectedly small")
-          if len(manifest.read_text(encoding="utf-8").splitlines()) != 2:
+
+          manifest_lines = manifest.read_text(encoding="utf-8").splitlines()
+          if len(manifest_lines) != 2:
               raise SystemExit("Checksum manifest must contain report and source entries")
+          manifest_names = {line.split(maxsplit=1)[1].lstrip("*") for line in manifest_lines}
+          if manifest_names != expected_names:
+              raise SystemExit(
+                  f"Checksum manifest must use artifact-root basenames: {sorted(expected_names)}; "
+                  f"got {sorted(manifest_names)}"
+              )
           PY
 
       - name: Upload pinned lifecycle report and source evidence
