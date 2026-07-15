@@ -66,7 +66,7 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts for large translation units. `scripts/extract_opencl_lifecycle_calls.py` separately inventories selected OpenCL completion and release call sites with exact lines for teardown review.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts for large translation units. `scripts/extract_opencl_lifecycle_calls.py` separately inventories selected OpenCL completion and release call sites with exact lines after masking C/C++ comments and quoted literals.
 
 ### Write layered documentation
 
@@ -133,11 +133,12 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Add asynchronous-destruction regression tests for accelerator and RPC backends.
 - [ ] Map architecture-specific graph-builder downcasts to `llama_memory_context_i` subtypes and exact state tensors.
 - [ ] Add runtime evidence for parsing, mapping, page faults, copies, event waits, KV/recurrent growth, activation peaks, synchronization, and teardown.
-- [ ] Verify the latest **Deploy documentation** and **Hourly research context check** runs after Documentation CI is repaired.
+- [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after the lexical-masking commit.
 - [ ] Verify the public Pages site returns HTTP 200 and renders branch-added architecture pages after PR #1 merges.
 
 ### Future improvements
 
+- [ ] Extend OpenCL lexical masking only if pinned-source evidence requires raw-string, preprocessor-disabled-region, or macro-expansion handling.
 - [ ] Pair OpenCL lifecycle release calls with creation/retention sites if the release-only inventory leaves ownership ambiguous.
 - [ ] Define constructor function-try-block navigation line semantics and consider stateful extraction only if regenerated pinned-tree counts justify it.
 - [ ] Evaluate multiline attributes, multiline constraints/returns, in-class special members, braced or multiline constructor initializer lists, defaulted/deleted definitions, literals, complex conversion operators, and export/declaration macros from the pinned tree before expanding the approximate source scanner further.
@@ -157,6 +158,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Mask line comments, block comments, string literals, and character literals before extracting OpenCL lifecycle calls while preserving exact source lines.
 - [x] Add a bounded exact-line OpenCL lifecycle-call extractor and focused tests for completion/wait and queue/context/program/kernel/event/buffer release APIs.
 - [x] Add bounded constructor function-try-block telemetry for same-line and next-line `try` forms while keeping navigation extraction unchanged.
 - [x] Audit constructor function-try-block behavior and confirm it produces neither a partial symbol record nor current unsupported-syntax telemetry.
