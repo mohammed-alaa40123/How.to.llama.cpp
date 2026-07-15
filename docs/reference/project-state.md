@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 04:49 Africa/Cairo_
+_Last updated: 2026-07-15 05:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -37,20 +37,22 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - C/C++ comment and quoted-literal masking for lifecycle extraction while preserving exact source offsets and line numbers.
 - Function-try initializer-line guard preventing `try : member(...) {` from becoming a false ordinary-function symbol.
 - Optional bounded original-source context for every lifecycle record, with exact clamped line ranges and backward-compatible default output.
+- GitHub-hosted pinned OpenCL lifecycle-report workflow that fetches the exact baseline source, generates the context-bearing report, validates non-empty output, and uploads it as an Actions artifact.
 
 ## Latest concrete findings
 
-- `extract_opencl_lifecycle_calls()` now accepts `context_lines`; zero preserves the original `{name, line}` record shape.
-- `--context-lines N` adds original-source `start_line`, `end_line`, and `text` around each true-positive lifecycle call.
-- Context is sliced from unmasked source, so comments, wrappers, adjacent releases, and ownership clues remain visible while detection still uses masked source.
-- Context ranges clamp at the beginning and end of the file, and negative radii fail explicitly.
-- The lifecycle matcher and API set were not broadened; this increment improves reviewability rather than claiming additional parser coverage.
+- `.github/workflows/opencl-lifecycle-report.yml` fetches exactly revision `e3546c7948e3af463d0b401e6421d5a4c2faf565`, not a moving upstream branch.
+- The workflow verifies the pinned `ggml/src/ggml-opencl/ggml-opencl.cpp` file is non-empty before extraction.
+- It runs the tested extractor with `--context-lines 3`, prints per-API counts, rejects an unexpectedly empty call inventory, and uploads the JSON report for 30 days.
+- The workflow runs manually and on changes to the extractor, its tests, or the workflow definition.
+- This removes the need for a usable local pinned checkout to generate the lifecycle inventory, but human ownership/completion classification is still required.
 - The pinned OpenCL blob remains `f283f65690af7790e163092207647d16dac9fb3e`.
 
 ## In progress
 
-- Regeneration of the pinned source inventory with line-aware records, pinned source links, unsupported-syntax counts, and the masked, context-bearing OpenCL lifecycle-call report.
+- First commit-scoped execution of the pinned OpenCL lifecycle-report workflow and inspection of its uploaded artifact.
 - Exact OpenCL backend/context teardown, queue completion, scheduler events/buffers, and program/kernel/context release order.
+- Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
 - CPU extra-buffer destruction tests for KleidiAI, AMX, and SpacemiT plus TSan and hardware-specific cleanup coverage.
 - Shared generated metadata for the static inference atlas and interactive workflow.
@@ -59,33 +61,28 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Immediate next task
 
-Resume one of the two highest-value implementation tracks:
-
 ```text
-A. obtain the complete pinned ggml-opencl.cpp in CI or a checkout
-   → run extract_opencl_lifecycle_calls.py with a small context radius
-   → inspect every completion/release site in context
-   → finish OpenCL teardown and update the backend matrix
-B. implement the admitted CPU repack MUL_MAT fixture
-   → reference comparison
-   → CPU backend wrapper free
-   → repack buffer free
-   → ASan/LSan repetition
+Run or inspect Generate pinned OpenCL lifecycle report
+  → download opencl-lifecycle-pinned-e3546c7 artifact
+  → classify every completion/release site in context
+  → finish OpenCL teardown and update the backend matrix
 ```
+
+If that workflow is blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
 
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/0449-opencl-lifecycle-context-windows.md`.
-- Focused context-window tests were added; the current commit-scoped Documentation CI conclusion must be checked before this run closes.
+- Added detailed note `logs/research/2026-07-15/0551-opencl-report-workflow.md`.
+- Preceding Documentation CI run `29382836507` completed successfully.
+- The new workflow and current commit-scoped Documentation CI must be checked before this run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
-- Public search/direct live verification remains unavailable, and branch-only content cannot deploy until PR #1 merges.
+- Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
 ## Known blockers and caveats
 
-- **Pinned regeneration blocker:** no usable local pinned llama.cpp checkout is available, so the source index and OpenCL lifecycle report could not be regenerated here.
-- **Large upstream file blocker:** connector blob rendering truncates the pinned OpenCL file; exact hidden teardown functions remain unavailable.
-- **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Documentation CI is the authoritative validation path for this branch.
+- **Workflow-result blocker:** the new pinned lifecycle report is not evidence until its first run succeeds and the uploaded JSON is inspected.
+- **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Actions are the authoritative validation path for this branch.
 - **Pages verification blocker:** branch-added content cannot deploy until PR #1 merges; live response verification remains unavailable independently of strict-build success.
 - **Lifecycle-extractor caveat:** selected direct API calls and bounded context are navigation evidence only; ownership, error paths, macro wrappers, preprocessor-disabled code, raw strings, and semantic ordering still require human source review.
 - **Context-window caveat:** a local source window may omit the enclosing owner or completion guarantee; increase the radius or inspect the function when classification remains ambiguous.
