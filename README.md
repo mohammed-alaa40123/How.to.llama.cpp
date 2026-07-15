@@ -66,7 +66,7 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts for large translation units. `scripts/extract_opencl_lifecycle_calls.py` separately inventories selected OpenCL completion and release call sites with exact lines after masking C/C++ comments and quoted literals.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered symbol locations with approximate declaration kinds, 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts for large translation units. `scripts/extract_opencl_lifecycle_calls.py` separately inventories selected OpenCL completion and release call sites with exact lines after masking C/C++ comments and quoted literals; optional bounded original-source context makes generated reports reviewable without changing call matching.
 
 ### Write layered documentation
 
@@ -119,7 +119,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Obtain the complete pinned `ggml-opencl.cpp` in CI or a checkout, run `scripts/extract_opencl_lifecycle_calls.py`, inspect every completion/release call in context, and finish the OpenCL teardown audit.
+- [ ] Obtain the complete pinned `ggml-opencl.cpp` in CI or a checkout, run `scripts/extract_opencl_lifecycle_calls.py --context-lines 3`, inspect every completion/release call in context, and finish the OpenCL teardown audit.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned source links, and unsupported-syntax counts for braced initializers, multiline initializers, and constructor function-try-blocks; use actual candidate volume to prioritize scanner work.
 - [ ] Implement the first CPU repack regression fixture from `cpu-extra-buffer-destruction-harness.md`: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
 - [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
@@ -138,6 +138,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
+- [ ] Determine the smallest useful lifecycle context radius and add enclosing-function metadata only if pinned-source review remains cumbersome.
 - [ ] Extend OpenCL lexical masking only if pinned-source evidence requires raw-string, preprocessor-disabled-region, or macro-expansion handling.
 - [ ] Pair OpenCL lifecycle release calls with creation/retention sites if the release-only inventory leaves ownership ambiguous.
 - [ ] Define constructor function-try-block navigation line semantics and consider stateful extraction only if regenerated pinned-tree counts justify it.
@@ -158,6 +159,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add optional bounded original-source context to OpenCL lifecycle records, with exact clamped line ranges, backward-compatible default output, and focused regression coverage.
 - [x] Isolate Documentation CI suites, diagnose `try : member(...) {` as a false ordinary-function record, add a bounded `FUNC_RE` guard, and pass full Documentation CI run `29380673982`.
 - [x] Mask line comments, block comments, string literals, and character literals before extracting OpenCL lifecycle calls while preserving exact source lines.
 - [x] Add a bounded exact-line OpenCL lifecycle-call extractor and focused tests for completion/wait and queue/context/program/kernel/event/buffer release APIs.
