@@ -99,12 +99,21 @@ The patch changes event ownership only. Any future removal of waits before block
 ## Validation
 
 - Downloaded and extracted workflow artifact `8358479508`.
-- Verified the artifact contains the exact current source, generated patch, baseline report, post-patch report, and checksum manifest.
+- Verified all eight artifact files against `opencl-current-artifact.sha256`.
 - Counted 46 added `clReleaseEvent` statements in the generated patch.
 - Matched every insertion to the immediately preceding local `clWaitForEvents(1, &evt)`.
 - Classified all insertions by enclosing function and existing synchronization role.
 - Confirmed the generated post-patch report reaches zero unmatched simple waited-event records without deleting waits.
+- Validated the machine-readable review as JSON and asserted 46 unique wait lines, the 24/22 function split, and zero post-patch unmatched records.
+- Final-head Documentation CI run `29459839570`, pinned OpenCL lifecycle run `29459839556`, and current-upstream OpenCL audit run `29459839583` all passed.
+
+## Publication and blockers
+
+- PR #1 remains open and mergeable.
+- The production Pages site could not be independently verified: exact-site search returned no indexed result and direct URL opening remained unavailable in the browsing environment.
+- Branch-only content cannot appear on production Pages before PR #1 merges.
+- The README TODO, project state, and concise research log still require the same completion update. The available connector only replaces complete files, while local cloning remains blocked by `Could not resolve host: github.com`; replacing long living files without a patch-capable checkout risks deleting accumulated history.
 
 ## Next priority
 
-Submit or stage the narrow current-source explicit-release patch upstream. Keep an event-wrapper refactor and any removal of redundant readback waits as separate follow-up changes.
+Submit or stage the narrow current-source explicit-release patch upstream. Keep an event-wrapper refactor and any removal of redundant readback waits as separate follow-up changes. Then apply the durable-context delta to README, project state, and research log through a patch-capable checkout.
