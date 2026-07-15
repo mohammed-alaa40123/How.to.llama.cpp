@@ -47,9 +47,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Published Pass A pages for public API/minimal example, model/GGUF loader, runtime context/memory, backend scheduler, and concrete context-memory implementations.
 - Published the cross-subsystem ownership/execution map.
 - The pinned tree contains ordinary KV, iSWA, DSA, DSV4, recurrent, hybrid, and hybrid-iSWA persistent memory implementations.
-- Scheduler copy allocation, current-generation validity, and previous-consumer completion are separate states.
-- Published model/context, generic scheduler, CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
-- Published the pinned OpenCL build, kernel deployment, platform scope, and initial `cl_mem` ownership map.
+- Published model/context, generic scheduler, CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and initial OpenCL teardown audits.
 
 **Interpretation**
 
@@ -61,7 +59,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Verified**
 
 - `scripts/index_upstream.py` emits source-ordered `symbol_locations` with approximate kind, exact 1-based lines, and revision-pinned links.
-- Added a pinned teardown matrix for CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and the initial OpenCL gap.
+- Added a pinned teardown matrix for CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL.
 
 ## 2026-07-14 01:52–08:49 — Inference atlas and CPU optional buffers
 
@@ -70,10 +68,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Added a clickable inference pipeline and reusable ten-step teardown worksheet.
 - Audited CPU repack, AMX, KleidiAI, and SpacemiT IME extra-buffer ownership and synchronous execution.
 - Added a cross-implementation comparison, portable destruction-test matrix, and implementation-ready admitted `MUL_MAT` fixture.
-
-**Interpretation**
-
-- A tiny deterministic graph is stronger than a full model for lifetime-ordering tests because admission, fallback placement, owners, and destruction order remain visible.
 
 ## 2026-07-14 09:49–12:50 — CI observability and source-line repair
 
@@ -88,229 +82,111 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Verified**
 
 - Added exact-line support for same-line attributes, trailing returns, bounded `requires`, qualified operators, constructors/destructors, parenthesized initializer lists, and delegating constructors.
-- Added negative tests and per-file/aggregate telemetry for braced and multiline constructor initializers.
-- Added constructor function-try-block telemetry while keeping those forms out of navigation.
+- Added negative tests and telemetry for braced/multiline initializers and constructor function-try-blocks.
 
 **Interpretation**
 
 - These are bounded navigation features, not claims to parse full C++ grammar.
-- Measurable false-negative telemetry prioritizes scanner work without weakening link accuracy.
 
-## 2026-07-15 02:51–04:49 — OpenCL lifecycle extraction
+## 2026-07-15 02:51–05:51 — OpenCL lifecycle extraction and evidence workflow
 
 **Verified**
 
-- Added an exact-line extractor for selected OpenCL completion, wait, release, creation, and retention calls.
+- Added an exact-line extractor for selected OpenCL ownership, completion, wait, and release calls.
 - Masked comments and quoted literals while preserving offsets and lines.
-- Added bounded original-source context and focused regression coverage.
+- Added bounded source context, focused tests, and a GitHub-hosted exact-pinned-source report artifact.
 - Full discovery exposed and fixed a `try : member(...) {` false ordinary-function record.
 
 **Interpretation**
 
 - The extractor is a review inventory, not proof of ownership or safe release ordering.
 
-## 2026-07-15 05:51 — GitHub-hosted pinned OpenCL report generation
+## 2026-07-15 06:49–09:10 — Complete OpenCL ownership classification
 
 **Verified**
 
-- Added `.github/workflows/opencl-lifecycle-report.yml` to fetch the exact pinned source, generate the report, validate it, and upload a 30-day artifact.
-- This replaced the local DNS/source-recovery blocker with a repository-owned evidence path.
-
-## 2026-07-15 06:49 — First complete OpenCL lifecycle classification
-
-**Verified**
-
-- The first complete report contained 556 selected calls: 343 memory releases, 121 program releases, 51 waits, 23 kernel releases, 11 finishes, 6 event releases, and 1 flush.
+- The complete report contained 558 selected direct calls after adding context/queue creation and retention APIs.
 - Shared `free()` calls `clFinish(queue)` before final-reference pooled-view cleanup.
-- Cross-device synchronization publishes marker events with `clFlush()`, then enqueues a dependent destination barrier.
+- One `clCreateContext()` creates `shared_context`; one `clCreateCommandQueue()` creates `backend_ctx->queue`; no direct retain or release exists for either handle.
+- Static device contexts and lazily allocated per-device backend contexts live for the process.
+- OpenCL backend scheduler events are unsupported; buffer deleters use buffer-local `cl_mem` handles.
 
 **Interpretation**
 
-- OpenCL teardown became conditional with verified local completion evidence; queue/context ownership was still unresolved.
-
-## 2026-07-15 07:52 — Queue/context ownership-call inventory
-
-**Verified**
-
-- Expanded the report to 558 calls by adding direct context/queue creation and retention APIs.
-- One `clCreateContext()` assigns to `shared_context`; one `clCreateCommandQueue()` assigns to `backend_ctx->queue`.
-- No direct context/queue retain or release call appears.
-
-**Open questions**
-
-- Locate declarations and final ownership, verify scheduler-resource independence, classify retention-only release groups, and resolve Adreno library lifetime.
-
-## 2026-07-15 08:50–09:10 — Source-bearing artifact and process-lifetime ownership
-
-**Verified**
-
-- Updated the report workflow to verify the exact checkout revision and preserve the complete pinned `ggml-opencl.cpp`, generated JSON report, and a SHA-256 manifest in one artifact.
-- Workflow run `29392658206` succeeded; artifact `8333854723` expires on 2026-08-14.
-- The downloaded source and report hashes matched the manifest.
-- Device registration creates one `shared_context` and copies it into every supported device context.
-- Device contexts are stored in static `g_ggml_backend_opencl_dev_ctxs`; the source explicitly states the devices and contexts live as long as the process.
-- `ggml_cl_init()` lazily creates one `ggml_backend_opencl_context` per device, stores it in `dev_ctx->backend_ctx`, copies the shared context, and creates one queue.
-- Backend wrappers increment `ref_count`; wrapper free calls `clFinish(queue)` and decrements it but does not delete the per-device context or release queue/context handles.
-- On the final wrapper reference, pooled KV/dequant image and sub-buffer views are released.
-- OpenCL backend events are unsupported and event callbacks are null; no scheduler-owned OpenCL event deleter outlives the wrapper.
-- Buffer deleters own buffer-local `cl_mem` references and do not require the destroyed wrapper.
-
-**Interpretation**
-
-- Pinned OpenCL backend-wrapper destruction is structurally supported because work is completed and the real OpenCL owner persists in process-lifetime state.
-- Deterministic process-exit cleanup is omitted: no explicit command-queue/context release or per-device backend-context deletion path exists in the pinned translation unit.
-- The stronger classification is **backend-wrapper order supported; deterministic process-exit release omitted**.
-
-**Historical**
-
-- Earlier three-line report windows located creation but could not expose declaration or owner lifetimes. Preserving the exact source closed that gap.
-
-**Open questions**
-
-- Resolve optional Adreno dynamic-library handle and kernel-destruction ordering.
-- Classify enqueue-then-release groups relying only on OpenCL object-retention semantics.
-- Determine whether repeated registration or shared-library unload is supported.
-- Fix the artifact checksum manifest to use basenames for direct `sha256sum -c` after download.
+- Backend-wrapper destruction is structurally supported, while deterministic process-exit release is omitted.
 
 ## 2026-07-15 09:51 — Adreno binary-library lifetime
 
 **Verified**
 
-- `ggml_cl_init()` loads the optional binary-kernel library into block-local raw pointer `kernel_lib_handle`.
-- Pinned `libdl.h` provides a deleter that calls `FreeLibrary()` or `dlclose()`, but the OpenCL loader does not use it and never closes the handle.
-- Only `get_adreno_bin_kernel_func` is retained in the process-lifetime backend context.
-- A successfully loaded library and a loaded library with a missing export both remain mapped until process teardown.
-- Five binary-kernel paths call the exported function, pass returned bytes to `clCreateProgramWithBinary()`, create kernels, and release temporary program references.
-- No close-before-kernel-destruction risk exists because neither the library nor accepted kernels are deterministically destroyed in the pinned process-lifetime design.
+- `ggml_cl_init()` loads the optional library into a block-local raw handle, retains only the exported lookup function, and never closes the handle.
+- Successful and invalid-symbol loads both remain mapped until process teardown.
 
 **Interpretation**
 
-- The library has an implicit process-lifetime policy implemented by losing the raw loader handle. This preserves future function-pointer calls but omits deterministic ownership and unload support.
+- The library is process-lifetime by leaked raw handle; close ordering is absent rather than prematurely unsafe.
 
-**Historical**
-
-- Reading pinned `libdl.h` alongside the preserved OpenCL source resolved the previously open handle-lifetime question.
-
-**Open questions**
-
-- Add explicit RAII ownership and registry teardown, close invalid-symbol loads immediately, and test repeated registration/shared-library unload behavior.
-
-## 2026-07-15 10:50 — Portable OpenCL artifact checksum verification
+## 2026-07-15 10:50 — Portable artifact verification
 
 **Verified**
 
-- The prior manifest stored workflow-relative `build/reports/...` paths, while uploaded files are extracted at the artifact root.
-- The workflow now creates the manifest from inside `build/reports`, so both entries use artifact-root basenames.
-- The workflow runs `sha256sum -c` before upload and rejects any manifest whose two filenames do not exactly match the report and preserved source.
-- Pinned-revision, source-size, non-empty-report, and artifact-retention checks remain intact.
+- The OpenCL evidence manifest now uses artifact-root basenames, passes `sha256sum -c` before upload, and guards the exact two filenames.
+
+## 2026-07-15 11:51–12:49 — Transpose retention and callers
+
+**Verified**
+
+- `transpose_2d()` enqueues a transpose and same-queue copy before dropping the temporary sub-buffer reference.
+- OpenCL command retention makes the nonblocking reference drop locally safe.
+- All 53 pinned typed-wrapper call sites use the default `blocking=true`; `blocking=false` has zero pinned callers.
 
 **Interpretation**
 
-- The checksum file is now a portable evidence contract: after extraction, a reviewer can verify both files with one standard command and no path rewriting.
+- The nonblocking branch is dormant capability in the baseline.
 
-**Historical**
-
-- The hashes were already correct; this increment fixes post-download usability rather than evidence content.
-
-**Open questions**
-
-- Add machine-readable artifact metadata for the pinned revision and extractor version if future consumers need stronger provenance automation.
-
-## 2026-07-15 11:51 — OpenCL transpose command-retention case study
+## 2026-07-15 13:52 — Q4_0 conversion event lifetime
 
 **Verified**
 
-- Pinned `transpose_2d()` creates a `trans` sub-buffer, enqueues a transpose kernel, then enqueues a same-queue copy from `trans` to `dst`.
-- The blocking branch waits on the copy event before releasing `trans`; the nonblocking branch releases its host reference immediately after enqueue.
-- Khronos specifies that a memory object is deleted only after its reference count reaches zero and all queued commands using it have finished.
-- The release does not invalidate host staging memory or wrapper state, and the pinned queue is not configured for out-of-order execution.
-
-**Interpretation**
-
-- The nonblocking branch is a safe command-retained reference drop, not a use-after-free hazard. It omits host completion but preserves device-side memory-object lifetime.
-- This conclusion is local to `transpose_2d()` and does not cover host-storage release, pooled-region reuse, wrapper callbacks, or cross-queue dependencies.
-
-**Historical**
-
-- This is the first function-level classification from the 343 direct `clReleaseMemObject()` sites in the complete pinned lifecycle report.
-
-**Open questions**
-
-- Trace every `transpose_2d(..., false)` caller to its next synchronization or same-queue consumer.
-- Classify temporary quantization image/sub-buffer groups and cross-queue release paths.
-
-## 2026-07-15 12:49 — OpenCL transpose call-site audit
-
-**Verified**
-
-- Downloaded the exact source-bearing artifact from successful workflow run `29402771146` and scanned balanced call expressions in the complete pinned translation unit.
-- Found 8 calls to `transpose_2d_as_8b()`, 42 to `transpose_2d_as_16b()`, and 3 to `transpose_2d_as_32b()`.
-- All 53 typed-wrapper calls omit the final argument and therefore use `blocking=true`; no pinned call passes `false`.
-- Every reachable caller waits for the copy event before the helper releases the temporary sub-buffer and returns.
-
-**Interpretation**
-
-- The nonblocking branch is dormant capability in the pinned revision. Its local retention-safety classification remains valid, but it is not part of live baseline execution.
-- Caller synchronization tracing is closed for the baseline; the next useful slice is a temporary quantization image/sub-buffer group.
-
-**Historical**
-
-- The preceding function-local audit left nonblocking callers open. Complete-source call-site enumeration proves there are none.
-
-**Open questions**
-
-- Determine whether historical or newer revisions ever select `blocking=false`.
-- Classify one temporary quantization image/sub-buffer release group and distinguish wait-before-release, same-queue retention, host-storage lifetime, pooled reuse, and cross-queue dependencies.
-
-## 2026-07-15 13:52 — Q4_0 conversion event-lifetime audit
-
-**Verified**
-
-- Inspected both pinned `GGML_TYPE_Q4_0` conversion-kernel branches in the complete source-bearing artifact from workflow run `29406303147`.
-- Each branch enqueues a kernel with a locally declared `cl_event`, waits for it, and only then releases temporary `data_device`; temporary-buffer, host-input, produced-sub-buffer, pooled-reuse, and same-queue ordering are safe in this group.
-- Neither branch calls `clReleaseEvent(evt)` after the wait.
-- OpenCL commands that return an event implicitly retain it; `clWaitForEvents()` synchronizes but does not decrement that reference; `clReleaseEvent()` is required to release the application reference.
-- Each successful Q4_0 conversion therefore leaks one command-event reference.
+- Both Q4_0 conversion branches wait before releasing temporary `data_device` but omit `clReleaseEvent(evt)`.
+- Each successful conversion therefore leaks one application-owned command-event reference.
 
 **Interpretation**
 
 - Classification: **explicit completion before temporary-buffer release; persistent event-reference leak**.
-- The leak is per tensor conversion rather than per decode token, but repeated model loading or backend initialization can accumulate it.
-- The minimal correction is `CL_CHECK(clReleaseEvent(evt));` after each successful wait, plus focused regression coverage.
 
-**Historical**
-
-- The aggregate report contained 51 waits and only 6 event releases. This function-level audit proves at least two unmatched waits are genuine local event leaks rather than wrapper-owned events.
-
-**Open questions**
-
-- Audit every remaining local event passed to `clWaitForEvents()` and pair it with release or ownership transfer.
-- Determine whether a bounded wait-without-release diagnostic can be added without overstating C++ scope semantics.
-- Review `CL_CHECK` failure behavior for event and temporary-buffer cleanup.
-
-## 2026-07-15 14:52 — Complete OpenCL waited-event pairing audit
+## 2026-07-15 14:52 — Complete waited-event pairing audit
 
 **Verified**
 
-- Downloaded the exact source-bearing artifact from successful workflow run `29410050891`, artifact `8340693497`.
-- Paired all 51 direct `clWaitForEvents()` sites with their producer and local ownership path.
-- Five waited events are released: profiling, blocking transpose copy, backend synchronization barrier, BF16 upload conversion, and BF16 readback conversion.
-- Forty-six locally returned command events are waited but never released or transferred.
-- The unmatched waits span eleven quantized tensor-type groups; `Q5_0` has 6, `Q5_1`, `Q5_K`, and `Q6_K` have 5 each, five groups have 4 each, `Q1_0` has 3, and `IQ4_NL` has 2.
-- The sixth direct event release in the file belongs to cross-device marker events consumed by a barrier wait list, not a direct host wait.
+- Paired all 51 direct `clWaitForEvents()` sites with producers and ownership paths.
+- Five waited events are released; 46 local command events are waited without release or transfer.
+- The unmatched events span eleven quantized tensor-type groups and conversion/upload/readback helpers.
 
 **Interpretation**
 
-- The event leak is systematic across tensor conversion, upload, and readback helpers rather than isolated to Q4_0.
-- A successful-path mechanical release patch is possible, but RAII or scope guards may be required for correct cleanup when `CL_CHECK` fails.
-- Some explicit waits may be redundant where the next same-queue command is already blocking and ordered.
+- The event leak is systematic and primarily scales with tensor conversion/readback and repeated model/backend initialization, not decode tokens.
+
+## 2026-07-15 15:52 — `CL_CHECK` fatal failure semantics
+
+**Verified**
+
+- Pinned `CL_CHECK` logs any non-success OpenCL result and executes `GGML_ASSERT(0)`.
+- `GGML_ASSERT` maps to `GGML_ABORT`; pinned `ggml_abort()` invokes an optional callback or prints diagnostics and then unconditionally calls `abort()`.
+- A checked enqueue, wait, release, or other OpenCL failure does not return, throw, or continue to later cleanup statements.
+
+**Interpretation**
+
+- The 46 observed successful-path leaks can be corrected by adding `clReleaseEvent(evt)` after each successful wait without designing recoverable-error cleanup for the pinned code.
+- RAII remains useful for maintainability and future nonfatal error propagation, but it cannot unwind after the current `abort()` path.
+- The safest patch sequence is release-only first, then separately remove waits proven redundant by a following same-queue blocking operation.
 
 **Historical**
 
-- The Q4_0 audit established two concrete leaks; the complete pairing table expands that result to 46 unmatched waited references.
+- The previous pairing audit treated RAII as potentially required because `CL_CHECK` behavior was unresolved. The pinned macro-to-abort chain narrows it to an optional design improvement.
 
 **Open questions**
 
-- Determine `CL_CHECK` failure behavior.
-- Separate necessary waits from waits made redundant by following same-queue blocking operations.
-- Prepare a focused upstream-ready correction and regression strategy.
+- Which of the 46 waits are required versus redundant before ordered blocking operations?
+- Should upstream prefer 46 explicit releases or a small move-only event owner?
+- Can a bounded source regression detect the known local wait-without-release pattern without claiming full ownership analysis?
