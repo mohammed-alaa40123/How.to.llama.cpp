@@ -256,3 +256,29 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Which bounded hints, if any, are useful for the remaining 24 waits?
 - Does the backend `set_tensor` contract require conversion completion before return?
+
+## 2026-07-15 19:52 — Generated release-only event patch
+
+**Verified**
+
+- Added `scripts/apply_opencl_event_release_fix.py`, which inserts a release immediately after each audited unmatched simple wait using exact report line numbers and event identifiers.
+- The generator rejects stale lines, duplicate records, empty unmatched sets, and unexpected fix counts, and emits both patched source and a unified patch.
+- Added focused unit tests for insertion, indentation, stale input, duplicate lines, and already-released input.
+- The pinned workflow now proves that the generated patch adds exactly 46 releases, preserves all 51 waits, changes the simple ownership result from 4 released / 46 unmatched to 50 released / 0 unmatched, and produces 52 direct event-release calls total.
+- The baseline source/report and its independent 22/24 synchronization classification remain preserved beside the generated patch and post-patch report.
+
+**Interpretation**
+
+- The repository now has a behavior-preserving concrete correction artifact, not merely a proposed edit list.
+- Ownership repair remains intentionally separate from later removal of 22 waits proven redundant before blocking reads.
+- Generating the patch from the audited report reduces repetitive manual-edit risk while refusing silent application after source drift.
+
+**Historical**
+
+- The previous run made the synchronization split machine-readable. This increment turns the release-only plan into a reproducible patch and CI acceptance contract.
+
+**Open questions**
+
+- Should the generated explicit-release patch be submitted upstream before classifying all remaining wait semantics?
+- Would current upstream prefer explicit releases or a move-only event owner?
+- Which of the remaining 24 waits are required by `set_tensor` return semantics?
