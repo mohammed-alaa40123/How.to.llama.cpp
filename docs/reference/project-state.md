@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 23:49 Africa/Cairo_
+_Last updated: 2026-07-16 01:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -8,6 +8,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 - Repository: `ggml-org/llama.cpp`
 - Pinned revision: `e3546c7948e3af463d0b401e6421d5a4c2faf565`
+- Current upstream OpenCL revision audited: `505b1ed15ca80e2a19f12ff4ac365e40fb374053`
 - Current upstream reference used for the graph/MoE chapter: `6b4dc2116a92c5c8f2782bfe51fabe5ee66fb5ef`
 - Policy: baseline claims stay pinned; newer refs are documented separately and labelled.
 
@@ -55,20 +56,27 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Added the 21/3 `set_tensor` wait grouping to the pinned workflow and artifact so source drift now fails CI instead of silently invalidating the review.
 - Traced the three nested-scope records to MoE scale/min expansion kernels immediately before effective return.
 - Compared the pinned generic wrapper, CUDA, and SYCL implementations: ordinary `ggml_backend_tensor_set()` has a strong de facto synchronous completion contract, so all remaining 24 OpenCL conversion/expansion waits are required by the pinned return behavior even though the public header does not state it normatively.
+- Added a current-upstream OpenCL lifecycle workflow that resolves an exact master SHA, preserves complete source and reports, generates a current release-only candidate, and uploads a checksummed evidence artifact without freezing counts.
+- Audited current upstream revision `505b1ed15ca80e2a19f12ff4ac365e40fb374053`: it retains the same 51 direct waits, 46 unmatched simple event references, and 22/24 follow-up split as the pinned baseline; its generated release-only candidate reaches zero unmatched events without removing synchronization.
 
 ## Latest concrete findings
 
+- Current upstream run `29453611188` resolved `505b1ed15ca80e2a19f12ff4ac365e40fb374053` and uploaded evidence artifact `8358479508` with digest `sha256:e2293f8a6aeaaa173c0430f4714d0b83ac564c7e2250298b9a7863338a84c30d`.
+- The current source still contains 51 direct `clWaitForEvents()` calls and only six direct `clReleaseEvent()` calls.
+- The bounded simple-local diagnostic still reports 50 identifier waits: four released in scope and 46 unmatched.
+- The current follow-up split is unchanged: 22 unmatched waits immediately precede same-queue blocking reads and 24 are other synchronous tensor-set waits.
+- The current-source patch generator inserts 46 releases; the post-patch report reaches zero unmatched simple waits while preserving every wait.
 - The generic `ggml_backend_tensor_set()` wrapper performs direct buffer-interface dispatch and adds no synchronization; each backend owns the completion contract.
 - Pinned CUDA enqueues the host-to-device copy and calls `cudaStreamSynchronize(cudaStreamPerThread)` before returning.
 - Pinned SYCL waits device queues, waits the submitted copy, and frees its temporary mmap staging buffer only after completion.
 - OpenCL's 21 conversion waits and 3 return-boundary expansion waits therefore preserve parity with the pinned synchronous CUDA/SYCL behavior.
-- The 21 waits are not needed for temporary `cl_mem` lifetime, but they are required to make the converted persistent tensor representation complete at ordinary tensor-set return.
 - The public header's distinction between ordinary and explicitly asynchronous APIs supports this reading but does not provide a normative prose guarantee.
 
 ## In progress
 
-- Rebasing and re-auditing the generated 46-event release patch against current upstream.
-- Deciding whether to submit the explicit-release patch upstream before any synchronization cleanup.
+- Reviewing the generated current-source 46-release patch for upstream style and branch context.
+- Deciding whether to submit the explicit-release patch directly or open an issue first.
+- Deciding whether a move-only event owner is preferable to 46 explicit releases.
 - Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -80,12 +88,12 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Rebase the generated OpenCL event-release correction
-  → inspect current upstream wait/release sites
-  → determine whether the 46-reference leak still exists
-  → regenerate or manually rebase the behavior-preserving release-only patch
+Prepare the current-upstream OpenCL ownership correction
+  → extract artifact 8358479508 and review all 46 generated insertions
+  → verify each insertion follows the exact waited event in current source
   → preserve all synchronization under the de facto synchronous tensor-set contract
-  → prepare an upstream-ready patch or issue with pinned and current evidence
+  → choose explicit releases versus a small event owner
+  → prepare an upstream-ready pull request or issue with pinned and current evidence
 ```
 
 In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
@@ -93,17 +101,19 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/2349-cross-backend-set-tensor-contract.md`.
-- Updated README living TODOs and this project checkpoint.
-- The research ledger was reviewed and unchanged because no external source changed; the increment used pinned primary source already recorded there.
+- Added machine-readable record `data/opencl-current-audit-505b1ed.json`.
+- Added detailed note `logs/research/2026-07-16/0152-current-opencl-event-audit-result.md`.
+- Updated README living TODOs, this project checkpoint, and the concise research log.
+- The research ledger was reviewed and unchanged because no external source changed; this increment used the already-recorded llama.cpp primary source and the repository's generated evidence.
 - The required startup files and current repository files were inspected before editing.
-- Final-head Documentation CI and pinned OpenCL report results must be checked after all durable-context updates.
+- Before durable-context updates, Documentation CI run `29453611196`, pinned OpenCL run `29453611136`, and current-upstream OpenCL run `29453611188` all passed.
+- Final-head workflow results must be checked after all durable-context updates.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime and `gh` is not installed.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
 ## Known blockers and caveats
 
-- **Systematic OpenCL event leak in baseline:** 46 of 51 direct host-waited command events have no matching release or ownership transfer in the pinned translation unit; the generated patch closes the bounded simple-identifier subset but has not been submitted upstream.
+- **Systematic OpenCL event leak persists upstream:** current revision `505b1ed1` retains the same 46 unmatched simple waited-event references as the pinned baseline; a generated current-source patch exists but has not been submitted upstream.
 - **Synchronous contract status:** CUDA, SYCL, and OpenCL pinned implementations provide completion-before-return for ordinary tensor set, but the public header does not state this guarantee normatively.
 - **Synchronization split:** 22 waits are redundant before immediate same-queue blocking reads; the other 24 are required by the pinned de facto synchronous tensor-set return contract.
 - **Diagnostic scope:** the simple-local wait/release guard recognizes only literal count-one waits and same-identifier releases in the same lexical brace scope; it is not proof of general C++ ownership.
