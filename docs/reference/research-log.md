@@ -261,3 +261,29 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Determine whether historical or newer revisions ever select `blocking=false`.
 - Classify one temporary quantization image/sub-buffer release group and distinguish wait-before-release, same-queue retention, host-storage lifetime, pooled reuse, and cross-queue dependencies.
+
+## 2026-07-15 13:52 — Q4_0 conversion event-lifetime audit
+
+**Verified**
+
+- Inspected both pinned `GGML_TYPE_Q4_0` conversion-kernel branches in the complete source-bearing artifact from workflow run `29406303147`.
+- Each branch enqueues a kernel with a locally declared `cl_event`, waits for it, and only then releases temporary `data_device`; temporary-buffer, host-input, produced-sub-buffer, pooled-reuse, and same-queue ordering are safe in this group.
+- Neither branch calls `clReleaseEvent(evt)` after the wait.
+- OpenCL commands that return an event implicitly retain it; `clWaitForEvents()` synchronizes but does not decrement that reference; `clReleaseEvent()` is required to release the application reference.
+- Each successful Q4_0 conversion therefore leaks one command-event reference.
+
+**Interpretation**
+
+- Classification: **explicit completion before temporary-buffer release; persistent event-reference leak**.
+- The leak is per tensor conversion rather than per decode token, but repeated model loading or backend initialization can accumulate it.
+- The minimal correction is `CL_CHECK(clReleaseEvent(evt));` after each successful wait, plus focused regression coverage.
+
+**Historical**
+
+- The aggregate report contained 51 waits and only 6 event releases. This function-level audit proves at least two unmatched waits are genuine local event leaks rather than wrapper-owned events.
+
+**Open questions**
+
+- Audit every remaining local event passed to `clWaitForEvents()` and pair it with release or ownership transfer.
+- Determine whether a bounded wait-without-release diagnostic can be added without overstating C++ scope semantics.
+- Review `CL_CHECK` failure behavior for event and temporary-buffer cleanup.
