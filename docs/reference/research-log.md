@@ -214,3 +214,28 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Which unmatched waits are redundant before a same-queue blocking operation?
 - Should a patched upstream revision be required to reach zero `unmatched_in_scope` entries?
 - Is a bounded next-blocking-command hint useful without conflating completion and ownership?
+
+## 2026-07-15 17:52 — Blocking-read wait classification
+
+**Verified**
+
+- Of the 46 unmatched local event waits, 22 are immediately followed by `clEnqueueReadBuffer(..., CL_TRUE, ...)` on the same in-order command queue.
+- The 22 sites cover eleven tensor types: `Q1_0`, `Q4_0`, `Q4_1`, `Q5_0`, `Q5_1`, `MXFP4`, `Q8_0`, `IQ4_NL`, `Q4_K`, `Q5_K`, and `Q6_K`.
+- Khronos specifies that a blocking read does not return until buffer data has been copied to host memory; the pinned queue does not enable out-of-order execution.
+- The preceding explicit waits are therefore redundant for completion, although their event references remain leaked unless explicitly released.
+- Twenty-four unmatched waits remain outside this pattern.
+
+**Interpretation**
+
+- Keep synchronization unchanged in the first release-only patch, then remove the 22 proven redundant waits and event creations in a separate optimization patch.
+- The remaining 24 upload/conversion waits require the backend `set_tensor` completion contract and subsequent consumer ordering to be established before removal.
+
+**Historical**
+
+- The prior run established ownership status only. This increment separates event ownership from synchronization necessity for the first large subgroup.
+
+**Open questions**
+
+- Does `set_tensor` promise device conversion completion before return?
+- Which of the remaining 24 waits precede only ordered same-queue consumers?
+- Should the report add a bounded blocking-read hint separate from ownership status?
