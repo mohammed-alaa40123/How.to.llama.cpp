@@ -46,6 +46,9 @@ jobs:
       - name: Test interactive-link validation
         run: python3 -m unittest -v tests.test_validate_interactive_links
 
+      - name: Test OpenCL lifecycle extraction
+        run: python3 -m unittest -v tests.test_extract_opencl_lifecycle_calls
+
       - name: Guard unit-test discovery
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
 
