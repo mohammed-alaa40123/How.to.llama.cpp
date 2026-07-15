@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 17:52 Africa/Cairo_
+_Last updated: 2026-07-15 18:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -30,7 +30,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Cross-implementation CPU optional-buffer comparison and portable destruction-test matrix.
 - Implementation-ready CPU optional-buffer destruction-harness specification with admission, correctness, lifetime-ordering, and sanitizer assertions.
 - Documentation CI validation commands split into named steps with verbose unittest output.
-- Python unit tests split into source-index, boundary, unsupported-syntax, function-try-block, OpenCL lifecycle, and interactive-link suites, followed by a full discovery guard.
+- Python unit tests split into source-index, boundary, unsupported-syntax, function-try-block, OpenCL lifecycle/follow-up, and interactive-link suites, followed by a full discovery guard.
 - Source-index exact-line support for attributes, trailing returns, bounded constraints, operators, qualified special members, parenthesized initializer lists, and delegating constructors.
 - Negative boundary tests plus bounded telemetry for braced/multiline constructor initializers and constructor function-try-blocks.
 - Bounded OpenCL lifecycle-call extractor for direct queue/context creation and retention plus completion/wait and queue/context/program/kernel/event/buffer releases.
@@ -47,18 +47,17 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Classified the pinned Q4_0 conversion group: both conversion branches explicitly wait before releasing temporary `data_device`, but both retain the returned command event indefinitely by omitting `clReleaseEvent(evt)`.
 - Completed the full direct-wait pairing audit: 5 of 51 waited events are released, while 46 local command-event references have no release or ownership transfer.
 - Resolved `CL_CHECK` failure semantics: any non-success OpenCL status logs, triggers `GGML_ASSERT(0)`, enters `ggml_abort()`, and ends in unconditional `abort()` rather than recoverable error propagation.
-- Added a bounded simple-local waited-event diagnostic that machine-checks the pinned 51 total, 5 released, and 46 unmatched ownership counts in the source-evidence workflow.
-- Classified 22 of the 46 unmatched waits as redundant before an immediate same-queue blocking `clEnqueueReadBuffer(..., CL_TRUE, ...)`; 24 waits remain for separate API-contract and consumer-order analysis.
+- Added a bounded simple-local waited-event diagnostic that machine-checks the pinned 50 simple identifier records, 4 released, and 46 unmatched ownership counts.
+- Classified 22 of the 46 unmatched waits as redundant before an immediate same-queue `clEnqueueReadBuffer(..., CL_TRUE, ...)`; 24 waits remain for separate API-contract and consumer-order analysis.
+- Added a separate machine-readable blocking-read follow-up annotation and pinned workflow guard for the reviewed 22/24 split without changing event ownership status.
 
 ## Latest concrete findings
 
-- The complete pinned source contains 22 unmatched event waits followed immediately by a blocking read on the same `queue`.
-- The sites span `Q1_0`, `Q4_0`, `Q4_1`, `Q5_0`, `Q5_1`, `MXFP4`, `Q8_0`, `IQ4_NL`, `Q4_K`, `Q5_K`, and `Q6_K` readback paths.
-- The queue is in-order because its creation properties do not enable `CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE`.
-- Khronos specifies that `clEnqueueReadBuffer(..., CL_TRUE, ...)` does not return until the data has been copied to host memory.
-- Therefore, those 22 explicit waits are redundant for completion; the blocking read already waits for the preceding in-order restore/unpack kernel.
-- Event ownership remains independently broken: the 22 event references still need release if the waits are retained.
-- The safest upstream sequence remains release-only first for all 46 leaks, followed by a separate synchronization-cleanup patch for the proven redundant subset.
+- The lifecycle report now stores `followed_by_same_queue_blocking_read` and `next_read_line` beside simple waited-event records.
+- The annotator requires the immediately following statement to call `clEnqueueReadBuffer`, use literal queue `queue`, and pass `CL_TRUE` as the blocking argument.
+- The pinned workflow independently guards ownership (`4 released`, `46 unmatched`) and synchronization hints (`22 immediate blocking reads`, `24 other unmatched`).
+- The distinction is intentional: a blocking read can make a wait redundant but cannot release the event reference.
+- Focused tests reject nonblocking reads, different queues, intervening statements, and call-shaped text in comments or literals.
 
 ## In progress
 
@@ -78,7 +77,8 @@ Read this file after the root README on every run. It is the compact checkpoint 
 Prepare release-only OpenCL event fix
   → add clReleaseEvent(evt) after every successful unmatched wait
   → preserve all existing synchronization in the first patch
-  → validate 51 released_in_scope and 0 unmatched_in_scope
+  → validate 0 unmatched_in_scope ownership records
+  → retain the independent 22/24 synchronization annotation
   → separately remove the 22 waits proven redundant before blocking reads
   → classify the remaining 24 waits against set_tensor completion semantics
 ```
@@ -88,9 +88,10 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/1752-opencl-blocking-read-wait-classification.md`.
-- The required startup files and complete pinned OpenCL source-bearing artifact were inspected before editing.
-- Final-head workflow results must be checked before the run closes.
+- Added detailed note `logs/research/2026-07-15/1851-opencl-wait-followup-annotation.md`.
+- Added `scripts/annotate_opencl_wait_followups.py` and focused regression tests.
+- The required startup files and current repository files were inspected before editing.
+- Documentation CI and pinned OpenCL report runs were triggered for the implementation commits; final-head results must be checked before the run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime and `gh` is not installed.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
 
@@ -99,6 +100,7 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 - **Systematic OpenCL event leak:** 46 of 51 direct host-waited command events have no matching release or ownership transfer in the pinned translation unit.
 - **Synchronization split:** 22 of those 46 waits are redundant before an immediate same-queue blocking read; the remaining 24 require a different completion-contract analysis.
 - **Diagnostic scope:** the simple-local wait/release guard recognizes only literal count-one waits and same-identifier releases in the same lexical brace scope; it is not proof of general C++ ownership.
+- **Follow-up annotation scope:** the new annotator requires an immediate semicolon-terminated statement, literal queue name `queue`, and literal `CL_TRUE`; aliases, macros, branches, and general control flow remain human-review work.
 - **Fatal-error policy:** `CL_CHECK` terminates via `abort()`; normal C++ destructors and scope guards do not run after a checked failure, so deterministic cleanup is meaningful only on successful paths or after a future nonfatal error redesign.
 - **Deterministic-release gap:** the pinned translation unit intentionally keeps device/backend contexts process-lifetime and contains no explicit queue/context release or per-device backend-context deletion path.
 - **Adreno library lifetime:** the optional binary-kernel loader loses its raw `dl_handle`. This prevents early unload but omits deterministic release and also retains invalid-symbol loads until process exit.
