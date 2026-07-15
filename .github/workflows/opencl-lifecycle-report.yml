@@ -5,7 +5,9 @@ on:
   pull_request:
     paths:
       - "scripts/extract_opencl_lifecycle_calls.py"
+      - "scripts/annotate_opencl_wait_followups.py"
       - "tests/test_extract_opencl_lifecycle_calls.py"
+      - "tests/test_annotate_opencl_wait_followups.py"
       - ".github/workflows/opencl-lifecycle-report.yml"
 
 permissions:
@@ -47,6 +49,7 @@ jobs:
             "$source_path" \
             --context-lines 3 \
             --out "$report_path"
+          python3 scripts/annotate_opencl_wait_followups.py "$source_path" "$report_path"
           cp "$source_path" "$preserved_source"
 
           # Record artifact-root basenames so verification works immediately after
@@ -68,6 +71,7 @@ jobs:
           data = json.loads(report.read_text(encoding="utf-8"))
           print(json.dumps(data["counts"], indent=2, sort_keys=True))
           print(json.dumps(data["simple_waited_event_counts"], indent=2, sort_keys=True))
+          print(json.dumps(data["simple_waited_event_followup_counts"], indent=2, sort_keys=True))
           if not data["calls"]:
               raise SystemExit("OpenCL lifecycle report unexpectedly contains no calls")
 
@@ -85,6 +89,20 @@ jobs:
               )
           if len(data["simple_waited_events"]) != 50:
               raise SystemExit("Pinned source must contain exactly 50 simple &identifier waits")
+
+          # Synchronization hints are intentionally independent of ownership.
+          # They guard the reviewed subset of unmatched waits whose next statement
+          # is a same-queue CL_TRUE readback.
+          expected_followup_counts = {
+              "unmatched_followed_by_same_queue_blocking_read": 22,
+              "other_unmatched": 24,
+          }
+          if data["simple_waited_event_followup_counts"] != expected_followup_counts:
+              raise SystemExit(
+                  "Pinned blocking-read follow-up counts changed: "
+                  f"expected {expected_followup_counts}, "
+                  f"got {data['simple_waited_event_followup_counts']}"
+              )
 
           if source.stat().st_size < 100_000:
               raise SystemExit("Pinned OpenCL source is unexpectedly small")
