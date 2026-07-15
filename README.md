@@ -133,7 +133,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Add asynchronous-destruction regression tests for accelerator and RPC backends.
 - [ ] Map architecture-specific graph-builder downcasts to `llama_memory_context_i` subtypes and exact state tensors.
 - [ ] Add runtime evidence for parsing, mapping, page faults, copies, event waits, KV/recurrent growth, activation peaks, synchronization, and teardown.
-- [ ] Verify the latest **Documentation CI**, **Deploy documentation**, and **Hourly research context check** runs after the lexical-masking commit.
+- [ ] Verify the latest **Deploy documentation** and **Hourly research context check** runs.
 - [ ] Verify the public Pages site returns HTTP 200 and renders branch-added architecture pages after PR #1 merges.
 
 ### Future improvements
@@ -158,6 +158,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Isolate Documentation CI suites, diagnose `try : member(...) {` as a false ordinary-function record, add a bounded `FUNC_RE` guard, and pass full Documentation CI run `29380673982`.
 - [x] Mask line comments, block comments, string literals, and character literals before extracting OpenCL lifecycle calls while preserving exact source lines.
 - [x] Add a bounded exact-line OpenCL lifecycle-call extractor and focused tests for completion/wait and queue/context/program/kernel/event/buffer release APIs.
 - [x] Add bounded constructor function-try-block telemetry for same-line and next-line `try` forms while keeping navigation extraction unchanged.
