@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-15 14:52 Africa/Cairo_
+_Last updated: 2026-07-15 15:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -46,20 +46,21 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Audited every pinned `transpose_2d*()` call site: all 53 typed-wrapper calls omit the final argument and use `blocking=true`; no caller selects the nonblocking branch.
 - Classified the pinned Q4_0 conversion group: both conversion branches explicitly wait before releasing temporary `data_device`, but both retain the returned command event indefinitely by omitting `clReleaseEvent(evt)`.
 - Completed the full direct-wait pairing audit: 5 of 51 waited events are released, while 46 local command-event references have no release or ownership transfer.
+- Resolved `CL_CHECK` failure semantics: any non-success OpenCL status logs, triggers `GGML_ASSERT(0)`, enters `ggml_abort()`, and ends in unconditional `abort()` rather than recoverable error propagation.
 
 ## Latest concrete findings
 
-- The complete source-bearing artifact from successful workflow run `29410050891`, artifact `8340693497`, was inspected.
-- All 51 direct `clWaitForEvents()` sites were paired with their producer and local event ownership path.
-- Five waits correctly release their events: profiling, blocking transpose copy, backend synchronization barrier, BF16 upload conversion, and BF16 readback conversion.
-- Forty-six waits use a local `cl_event evt`, wait successfully, and leave the branch without `clReleaseEvent()` or ownership transfer.
-- The unmatched waits span `Q1_0`, `Q4_0`, `Q4_1`, `Q5_0`, `Q5_1`, `Q8_0`, `IQ4_NL`, `Q4_K`, `Q5_K`, `Q6_K`, and `MXFP4` paths.
-- The sixth direct `clReleaseEvent()` in the translation unit releases cross-device marker events that are consumed by a barrier wait list rather than host-waited directly.
-- The pinned event issue is therefore systematic across tensor conversion/upload/readback helpers, not isolated to Q4_0.
+- Pinned `ggml-opencl.cpp` defines `CL_CHECK` to log and execute `GGML_ASSERT(0)` on any non-`CL_SUCCESS` result.
+- Pinned `ggml.h` maps `GGML_ASSERT` to `GGML_ABORT`, and `ggml.c` implements `ggml_abort()` with an optional callback or backtrace followed by unconditional `abort()`.
+- Failed OpenCL enqueue, wait, release, or other checked operations therefore do not return, throw, or continue to later cleanup statements.
+- The previous concern that a post-wait `clReleaseEvent(evt)` fix required recoverable-error cleanup does not apply to this pinned implementation.
+- Explicit `clReleaseEvent(evt)` after each of the 46 successful waits is sufficient to close the observed successful-path leaks without changing synchronization.
+- RAII remains a maintainability option and future-proofs nonfatal error handling, but stack unwinding cannot occur after the current `abort()` path.
 
 ## In progress
 
-- Preparing an error-safe correction strategy for the 46 unmatched waited events and identifying waits made redundant by a following same-queue blocking operation.
+- Classifying the 46 unmatched waits into required completion versus waits redundant before a following same-queue blocking operation.
+- Preparing a minimal release-only upstream correction and bounded source regression before any separate synchronization-removal optimization.
 - Determining whether repeated OpenCL registration, registry teardown, or shared-library unload is supported.
 - Regeneration of the pinned source inventory with line-aware records, pinned source links, and unsupported-syntax counts.
 - Implementation of the first CPU repack backend-free-before-buffer-free test fixture under ASan/LSan.
@@ -71,12 +72,12 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-Design an upstream-safe OpenCL event fix
-  → classify waits followed by same-queue blocking operations
-  → remove redundant event creation/waits where completion is already guaranteed
-  → use RAII or scope-guard ownership for events that must remain
-  → add focused regression coverage for simple local wait/release paths
-  → review CL_CHECK failure behavior before proposing the patch
+Classify and patch OpenCL waited events
+  → identify waits followed by same-queue blocking operations
+  → keep required waits and remove only independently proven redundant waits
+  → first prepare a low-risk release-only patch for all 46 successful waits
+  → add a bounded regression for simple local wait/release ownership
+  → validate model-load and conversion paths with leak tooling when hardware is available
 ```
 
 In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture with reference comparison, CPU backend-wrapper free, repack-buffer free, and ASan/LSan repetition.
@@ -84,8 +85,8 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Publication and verification state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-15/1452-opencl-event-pairing-audit.md`.
-- The source-bearing artifact from workflow run `29410050891`, artifact `8340693497`, was used for the complete event pairing audit.
+- Added detailed note `logs/research/2026-07-15/1552-opencl-cl-check-failure-semantics.md`.
+- The exact pinned OpenCL source from workflow artifact `8340693497` plus pinned `ggml.h` and `ggml.c` were used to resolve the macro-to-abort chain.
 - Final-head workflow results must be checked before the run closes.
 - Full local checkout validation remains unavailable because direct GitHub DNS resolution is blocked in this runtime.
 - Public Pages verification remains blocked for branch-only content until PR #1 merges.
@@ -93,7 +94,7 @@ In parallel or if blocked, implement the admitted CPU repack `MUL_MAT` fixture w
 ## Known blockers and caveats
 
 - **Systematic OpenCL event leak:** 46 of 51 direct host-waited command events have no matching release or ownership transfer in the pinned translation unit.
-- **Error-path caveat:** a mechanical successful-path release fix is not enough until `CL_CHECK` failure behavior is understood; RAII or scope guards may be required.
+- **Fatal-error policy:** `CL_CHECK` terminates via `abort()`; normal C++ destructors and scope guards do not run after a checked failure, so deterministic cleanup is meaningful only on successful paths or after a future nonfatal error redesign.
 - **Deterministic-release gap:** the pinned translation unit intentionally keeps device/backend contexts process-lifetime and contains no explicit queue/context release or per-device backend-context deletion path.
 - **Adreno library lifetime:** the optional binary-kernel loader loses its raw `dl_handle`. This prevents early unload but omits deterministic release and also retains invalid-symbol loads until process exit.
 - **Local validation blocker:** direct cloning fails with `Could not resolve host: github.com`; GitHub-hosted Actions are the authoritative validation path for this branch.
