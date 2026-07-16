@@ -125,3 +125,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Exact pinned graph/allocation implementation and Q4_0 tolerance.
 - AVX2 availability on the authoritative sanitizer runner.
+
+## 2026-07-16 07:52 — CPU repack graph, allocation, and tolerance contract
+
+**Verified**
+
+- The pinned backend-op harness uses no-allocation GGML contexts, verifies backend support, allocates storage, expands the graph, uploads inputs, and compares execution.
+- Its base comparison is normalized mean squared error with threshold `1e-7`.
+- The lifetime fixture should quantize one deterministic F32 weight source once and upload the exact same Q4_0 byte vector to both ordinary and repack weights.
+- A mixed ordinary/repack graph needs explicit per-tensor allocation or separate contexts because ordinary context allocation cannot place only one tensor in CPU_REPACK.
+
+**Interpretation**
+
+- Use two independent no-allocation graphs instead of backend graph cloning because ordinary Q4_0 and CPU_REPACK have different physical weight representations.
+- Compare outputs before unusual teardown, then free the tested backend wrapper before graph metadata and retained repack-buffer destruction.
+
+**Historical**
+
+- This resolves the prior generator's graph/allocation and tolerance questions.
+
+**Open questions**
+
+- Confirm the exact pinned per-tensor allocation API before emitting the final C++ body.
+- AVX2 availability on the authoritative sanitizer runner.
