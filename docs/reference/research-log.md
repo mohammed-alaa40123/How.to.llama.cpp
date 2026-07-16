@@ -159,3 +159,25 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Whether the uncaught promise rejection disappears or reveals a separate initialization or diagram-syntax failure.
 - Whether the releases-API 404 should be corrected independently.
 - Whether the prepared asset should gain a pinned checksum after the first successful build.
+
+## 2026-07-16 21:51 — Generated Mermaid SVG detector
+
+**Verified**
+
+- Documentation CI run `29521791301` passed all pre-browser stages and failed only at `home/desktop`.
+- Artifact `8385027631` has digest `sha256:7e65774799d6fa713cb85d9c82db28c02d165a1817d8349292ff51dac7850954`.
+- Its JSONL record reported zero of one rendered diagrams, but the retained full-page screenshot visibly contains the complete flowchart.
+- The old detector only recognized an SVG nested inside the original `.mermaid` element.
+- The corrected detector counts source diagrams, recognizes nested and generated `svg[id^="mermaid-"]` output, deduplicates SVG nodes, and requires exact rendered/source equality within the same 15-second bound.
+- The Playwright wait now uses the correct function-argument and options positions and reports source and processed-container counts on failure.
+
+**Interpretation**
+
+- The screenshot proves a detector/output mismatch rather than a blank-page failure.
+- The correct browser-level postcondition is the generated diagram visible to readers, not one library-specific nesting arrangement.
+
+**Open questions**
+
+- Whether the full eight-case matrix now passes.
+- Whether `pageerror: Object` remains after rendering is recognized and requires explicit Mermaid rejection instrumentation.
+- Whether the external releases-API 404 should be fixed independently.
