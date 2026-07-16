@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 12:50 Africa/Cairo_
+_Last updated: 2026-07-16 13:16 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -25,74 +25,74 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Complete pinned/current OpenCL event-ownership audit, generated 46-release correction, synchronous tensor-set contract analysis, and upstream proposal staging.
 - First executable CPU_REPACK lifetime regression with exact path proof, numerical comparison, and repeated ASan/LSan evidence.
 - Upstream-suitability decision and staged two-file CPU_REPACK regression proposal.
+- Website UX review with task-oriented Architecture navigation grouping.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Current upstream commit `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6` still defines `llama_build_and_test()` and groups direct-backend tests under `if (NOT GGML_BACKEND_DL)`.
-- Current `ggml/src/ggml-cpu/repack.h` still declares the internal `ggml_backend_cpu_repack_buffer_type()` entry point.
-- The passing fixture can be staged as a dedicated `tests/test-cpu-extra-buffer-lifetime.cpp` plus `tests/CMakeLists.txt` registration, guarded from dynamic-backend builds.
-- The upstream candidate must retain exact buffer identity, non-null repack traits, operation admission, identical quantized inputs, `1e-7` NMSE, and backend-wrapper-before-buffer teardown.
-- The proposal is recorded in `docs/reference/upstream-cpu-repack-lifetime-fixture-proposal.md`.
+- The homepage already provides four reading modes and links to interactive, overview, source-deep-dive, and systems-foundation entry points.
+- MkDocs Material enables instant navigation, sections, search suggestion/highlighting, palette switching, heading permalinks, code copy, tabs, and Mermaid.
+- The interactive foundations iframe has a descriptive title and is accompanied by prose and truth-labelled content.
+- The Architecture navigation previously exposed 27 pages in one flat list.
+- Architecture pages are now grouped under Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends without changing any route.
 
 ### Interpretation
 
-- The fixture is suitable for upstream review as a narrow two-file test.
-- The project-specific generator, retained-artifact machinery, and twenty-process workflow should remain outside the first upstream patch.
-- A cross-platform test may skip when AVX2 is unavailable, but an authoritative sanitizer lane must require AVX2 and successful CPU_REPACK admission so the test cannot silently become permanently skipped.
-- A dedicated executable is clearer than folding unusual destruction ordering into broad backend-op correctness tests.
+- Technical depth is strong, but navigation growth had begun to mirror repository history rather than reader tasks.
+- Grouping reduces scanning cost while preserving links and bookmarks.
+- The next major UX gain is a section index with audience-based reading paths and concise page descriptions.
+- The Foundations/Architecture/Inference lifecycle/Interactive distinction should be made more explicit, especially because the foundations explorer appears in two navigation locations.
 
 ### Historical
 
-- Workflow run `29481384561` established the pinned executable evidence: twenty AVX2-confirmed ASan/LSan processes, stable NMSE `3.82787e-16`, no skips, and no sanitizer diagnostics.
-- Prior runs selected the minimal shape, resolved graph/per-tensor allocation, generated the fixture, and preserved the first passing artifact.
+- The flat Architecture list was reasonable when the site contained fewer pages; teardown and optional-buffer research made it substantially denser.
+- Current upstream commit `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6` still defines `llama_build_and_test()` and retains the internal CPU_REPACK buffer-type entry point.
+- Workflow run `29481384561` established the pinned CPU_REPACK executable evidence: twenty AVX2-confirmed ASan/LSan processes with stable NMSE `3.82787e-16`.
 
 ### Open questions
 
-- Whether current upstream `8ee54c8` still admits the exact Q4_0 `[32, 8]` case at runtime rather than merely retaining compatible APIs.
-- Which upstream CI lane can guarantee AVX2 and sanitizer execution.
-- Whether maintainers prefer `tensor->extra` or another observable for path proof.
-- Whether repeated in-process execution belongs in the first upstream patch or a follow-up.
+- Whether the grouped nested navigation remains comfortable on mobile.
+- Whether interactive HTML assets provide complete keyboard navigation and visible focus states internally.
+- Whether Mermaid and custom diagram colors satisfy contrast requirements in both palettes.
+- Whether current upstream `8ee54c8` still admits the exact CPU_REPACK fixture at runtime.
 
 ## Immediate next task
 
 ```text
-generate the staged two-file fixture against current upstream 8ee54c8
-  → compile with ASan/LSan
-  → require AVX2 and real CPU_REPACK admission
-  → confirm numerical and teardown behavior
-  → update proposal with current-tree evidence
-  → open or manually stage the upstream pull request
+wait for strict Documentation CI on grouped navigation
+  → inspect and fix any MkDocs/nav failure
+  → add an Architecture section index with audience-based reading paths
+  → verify deployed desktop/mobile navigation, search, diagrams, iframe interaction, and keyboard access
 ```
 
 ## In progress
 
-- Manual/upstream submission of the reviewed 46-release OpenCL ownership correction; GitHub App write access to upstream is blocked.
 - Current-tree regeneration and sanitizer validation of the CPU_REPACK lifetime candidate.
+- Manual/upstream submission of the reviewed 46-release OpenCL ownership correction; GitHub App write access to upstream is blocked.
 - Source-index regeneration with pinned line-aware symbol inventory.
 - Hardware-specific lifetime extensions for KleidiAI, AMX, SpacemiT, and ARM repack.
 - Runtime overlays for mmap/page faults, scheduler copies, events, KV/recurrent growth, and backend queues.
+- Website accessibility and deployed-browser verification.
 
 ## Publication and validation state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- CPU_REPACK sanitizer workflow run `29481384561`: passed.
-- Job `87565708592`: passed all setup, compile, twenty-process execution, and evidence-upload steps.
-- Artifact `8368782428`: retained with digest `sha256:ef4f0a36e27f7811b106e0a870c278724f1e620aed991807b7f2c3e443d1efaf`.
-- Added `docs/reference/upstream-cpu-repack-lifetime-fixture-proposal.md` and detailed note `logs/research/2026-07-16/1250-cpu-repack-upstream-suitability.md`.
-- Research ledger unchanged: this increment used the already-recorded official llama.cpp primary source.
-- PR #1 was open and mergeable before these context updates.
+- Previous head `1c16b8f` passed Documentation CI, pinned/current OpenCL workflows, and CPU_REPACK sanitizer workflow.
+- Added detailed UX note `logs/research/2026-07-16/1316-website-ux-review.md`.
+- Updated `mkdocs.yml` to group Architecture navigation while preserving routes.
+- Research ledger unchanged because no external source was added or reclassified.
 - Final-head workflow results must be checked after all context commits.
 
 ## Known blockers and caveats
 
+- **Live-site verification:** direct GitHub Pages retrieval was blocked in the browsing environment, so HTTP status, rendered navigation, search, responsive layout, keyboard behavior, and interactive assets could not be independently tested.
+- **Deployment scope:** branch-added navigation cannot appear on production Pages until PR #1 merges.
+- **Accessibility scope:** source inspection confirms iframe titles and prose fallbacks, but does not prove internal keyboard behavior, focus visibility, or contrast.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the fixture has not yet been compiled and executed against that exact current revision.
-- **Evidence retention:** artifact `8368782428` expires on 2026-08-15; durable textual findings and digest are recorded, but long-term binary retention may require downloading or regenerating it.
-- **Hardware scope:** the passing evidence is AVX2-specific and does not cover ARM, KleidiAI, AMX, or SpacemiT.
-- **Path proof:** correct numerical output alone remains insufficient; future fixtures must preserve exact buffer identity, traits, and operation-admission checks.
+- **Evidence retention:** artifact `8368782428` expires on 2026-08-15.
+- **Hardware scope:** the passing CPU_REPACK evidence is AVX2-specific and does not cover ARM, KleidiAI, AMX, or SpacemiT.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
-- **Pages verification:** branch-added content cannot deploy until PR #1 merges; independent live response verification is still required.
 - Mapping, allocation, residency, representation validity, command completion, event ownership, reset, and release remain distinct states.
 
 ## Definition of done for the foundations deepening phase
