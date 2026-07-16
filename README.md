@@ -116,9 +116,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Complete the generated `tests/test-cpu-extra-buffer-lifetime.cpp` skeleton with pinned no-alloc graph construction, exact CPU_REPACK allocation, deterministic Q4_0/F32 upload, reference comparison, and backend-wrapper-before-buffer teardown.
+- [ ] Confirm the exact pinned per-tensor allocation API, then complete the generated two-graph `tests/test-cpu-extra-buffer-lifetime.cpp` fixture with deterministic shared Q4_0 bytes and `1e-7` NMSE comparison.
 - [ ] Replace the intentional status-2 boundary with a real repeated ASan/LSan test; add an AVX2-confirmed workflow and fail when AVX2 is present but the pinned case is not admitted.
-- [ ] Resolve and reuse the exact pinned Q4_0 numerical tolerance from `test-backend-ops.cpp`.
 - [ ] Submit or manually stage the reviewed 46-release current-upstream OpenCL ownership correction; upstream GitHub App write permission is currently blocked.
 - [ ] Decide whether a move-only OpenCL event owner is worthwhile after the narrow explicit-release correction.
 - [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement.
@@ -151,6 +150,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Resolve the pinned CPU_REPACK fixture's no-allocation graph/allocation topology and reuse the backend-op `1e-7` NMSE contract for identical quantized inputs.
 - [x] Add a deterministic pinned-revision generator and structural tests for the CPU_REPACK lifetime fixture patch without claiming uncompiled runtime success.
 - [x] Select the first CPU repack regression's exact pinned case: Q4_0 `[32, 8]` × F32 `[32, 1]` on AVX2, with pointer-identity, trait, and operation-admission guards.
 - [x] Identify `tests/test-cpu-extra-buffer-lifetime.cpp` as the dedicated integration point and reuse the backend-op harness approach.
