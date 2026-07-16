@@ -107,7 +107,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/objects/llama-context.md` | Mutable runtime state and lifetime |
 | `docs/ggml/graph-construction-and-moe.md` | Graph construction, reuse, MoE routing, and cache design |
 | `docs/architecture/backend-teardown-audit-method.md` | Reusable completion/ownership audit worksheet |
-| `docs/architecture/cpu-extra-buffer-destruction-harness.md` | CPU optional-buffer lifetime fixture specification |
+| `docs/architecture/cpu-extra-buffer-destruction-harness.md` | CPU optional-buffer lifetime fixture specification and executable evidence |
 | `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL lifecycle and ownership audit |
 
 <!-- PROJECT-TODOS:START -->
@@ -117,8 +117,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Inspect the first pinned CPU_REPACK sanitizer run; fix any exact compiler, allocation, CMake, or runtime failure until twenty AVX2-confirmed ASan/LSan executions pass without a skip.
-- [ ] Preserve the passing CPU_REPACK workflow artifact identity and concrete NMSE results, then update the destruction-harness page with executable evidence.
+- [ ] Decide whether to propose the passing CPU_REPACK fixture upstream as a permanent regression target, and stage the narrow patch if appropriate.
+- [ ] Add an admitted ARM NEON+dotprod or KleidiAI optional-buffer lifetime fixture with the same exact-path, numerical, teardown, and sanitizer requirements.
 - [ ] Submit or manually stage the reviewed 46-release current-upstream OpenCL ownership correction; upstream GitHub App write permission is currently blocked.
 - [ ] Decide whether a move-only OpenCL event owner is worthwhile after the narrow explicit-release correction.
 - [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement.
@@ -133,12 +133,12 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Determine Vulkan performance-query-pool ownership and persistent device teardown.
 - [ ] Map architecture-specific graph-builder downcasts to `llama_memory_context_i` subtypes and exact state tensors.
 - [ ] Add runtime evidence for page faults, copies, event waits, KV/recurrent growth, activation peaks, synchronization, and teardown.
-- [ ] Verify latest Documentation CI, CPU_REPACK sanitizer, pinned/current OpenCL workflows, Pages deployment, and hourly context checks.
+- [ ] Verify latest Documentation CI, pinned/current OpenCL workflows, Pages deployment, and hourly context checks.
 - [ ] Verify the public Pages site returns HTTP 200 and renders branch-added architecture pages after PR #1 merges.
 
 ### Future improvements
 
-- [ ] Add an ARM NEON+dotprod CPU repack lifetime case after the x86 AVX2 fixture.
+- [ ] Add repeated CPU_REPACK executions inside one process to complement the passing twenty-process teardown coverage.
 - [ ] Document ordinary `ggml_backend_tensor_set()` completion semantics explicitly or record a deliberate weaker contract.
 - [ ] Rename the three OpenCL classifier records to `return_boundary_expansion_completion`.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
@@ -151,6 +151,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Preserve the first passing CPU_REPACK workflow evidence: run `29481384561`, twenty AVX2-confirmed ASan/LSan processes, stable NMSE `3.82787e-16`, no skip, and artifact `8368782428` with digest `sha256:ef4f0a36e27f7811b106e0a870c278724f1e620aed991807b7f2c3e443d1efaf`.
+- [x] Update the CPU optional-buffer destruction-harness page with the executable CPU_REPACK result and bounded ownership conclusion.
 - [x] Add a pinned-source AVX2-confirmed ASan/LSan workflow that materializes, compiles, and requires twenty non-skipped executions of the generated CPU_REPACK fixture.
 - [x] Replace the generated CPU_REPACK fixture's intentional status-2 boundary with complete two-graph construction, deterministic shared Q4_0/F32 inputs, compute/readback, `1e-7` NMSE, exact path proof, and backend-before-buffer teardown.
 - [x] Confirm the pinned per-tensor allocation API: allocate a backend buffer using `ggml_backend_buft_get_alloc_size()`, pass an aligned address from its base to `ggml_backend_tensor_alloc()`, and preserve explicit buffer ownership.
