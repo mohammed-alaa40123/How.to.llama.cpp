@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 05:51 Africa/Cairo_
+_Last updated: 2026-07-16 06:49 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -27,41 +27,40 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ### Verified
 
-- Pinned `ggml/src/ggml-cpu/CMakeLists.txt` always includes `ggml-cpu/repack.cpp` in the ordinary CPU backend target; there is no separate pinned `GGML_CPU_REPACK` build option.
-- Pinned Q4_0 repack selection uses `q4_0_8x8_q8_0` when AVX2 is available and the weight row count `ne[1]` is divisible by eight.
-- The smallest admitted x86 case is Q4_0 weight `[32, 8]` multiplied by F32 activation `[32, 1]`, producing F32 `[8, 1]`.
-- Extra-buffer admission additionally requires a two-dimensional weight allocated from the exact `ggml_backend_cpu_repack_buffer_type()`, a non-null selected trait, host-addressable activation storage, and F32 activation type.
-- The repack allocator delegates storage to ordinary CPU allocation, then replaces buffer identity and tensor init/set callbacks. Tensor initialization stores static repack traits in `tensor->extra`; upload performs the interleaved repack.
+- Added `scripts/generate_cpu_repack_lifetime_fixture.py`, which deterministically emits a revision-scoped candidate patch for the dedicated CPU_REPACK lifetime test and CMake target.
+- The generated skeleton encodes Q4_0 `[32, 8]` × F32 `[32, 1]`, AVX2 gating, exact repack-buffer lookup, mandatory buffer/trait/admission proof, and backend-before-buffer teardown order.
+- Added focused unit tests for deterministic output, pinned revision, minimal dimensions, CMake registration, path-proof tokens, teardown ordering, and false-success prevention.
+- The generated skeleton intentionally exits with status 2 after setup; it cannot be reported as successful lifetime evidence before pinned-tree graph/allocation integration and sanitizer execution.
+- Pinned `tests/CMakeLists.txt` uses `llama_build_and_test()` for test targets, and the repack buffer type is declared in internal `ggml/src/ggml-cpu/repack.h`.
 
 ### Interpretation
 
-- `Q4_0 [32, 8] × F32 [32, 1]` is the smallest bounded fixture that exercises repack initialization, upload, optional dispatch, synchronous compute, correctness comparison, and backend-wrapper-before-buffer teardown on common x86 AVX2 hardware.
-- Buffer-type pointer identity and non-null traits are stronger path evidence than matching the diagnostic name `CPU_REPACK`.
-- A non-AVX2 skip is not lifetime evidence; CI needs at least one runner whose logs confirm AVX2 and successful repack admission.
+- The generator is a safe intermediate artifact: structural CI can freeze the intended fixture contract without pretending an uncompiled C++ skeleton proves lifetime correctness.
+- A successful Python test run validates patch shape only. Runtime evidence still requires compiling against the pinned tree, proving actual CPU_REPACK admission, comparing numerical output, and running repeated ASan/LSan teardown.
 
 ### Historical
 
-- The previous run identified `tests/test-cpu-extra-buffer-lifetime.cpp` as the correct dedicated integration point and recommended reusing backend-op quantization, upload, graph, readback, and comparison helpers.
-- The exact type and minimum dimensions were previously open; this run resolves them for the first x86 fixture.
+- The prior run selected the smallest admitted AVX2 case and resolved the dedicated integration point.
+- This run materializes those decisions into deterministic candidate patch output.
 
 ### Open questions
 
-- Whether GitHub-hosted Ubuntu formally guarantees AVX2 or only exposes it on current hosts.
-- Whether to extract shared test helpers or duplicate a bounded subset for the first patch.
-- Which existing Q4_0 comparison tolerance should be reused verbatim.
-- Whether to add an ARM NEON+dotprod case immediately after x86.
+- Which exact pinned no-allocation graph and buffer-allocation sequence best permits the repack buffer to outlive the tested backend wrapper?
+- Which existing Q4_0 comparison tolerance should be reused verbatim?
+- Whether GitHub-hosted Ubuntu exposes AVX2 consistently enough for authoritative sanitizer coverage.
 
 ## Immediate next task
 
 ```text
-Implement tests/test-cpu-extra-buffer-lifetime.cpp
-  → Q4_0 weight [32, 8]
-  → F32 activation [32, 1]
-  → assert AVX2, exact CPU_REPACK pointer identity, non-null traits, and supports_op
-  → compare output against ordinary CPU
+Complete the generated CPU_REPACK fixture
+  → construct identical reference and repack no-alloc MUL_MAT graphs
+  → allocate only the tested weight from CPU_REPACK
+  → upload deterministic identical Q4_0/F32 inputs
+  → assert buffer identity, non-null traits, and supports_op
+  → compare F32 outputs with the pinned Q4_0 tolerance
   → free tested CPU backend wrapper before retained repack buffer
   → repeat under ASan/LSan
-  → add CMake target and AVX2-confirmed CI invocation
+  → add an AVX2-confirmed CI invocation
 ```
 
 ## In progress
@@ -75,14 +74,15 @@ Implement tests/test-cpu-extra-buffer-lifetime.cpp
 ## Publication and validation state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-16/0551-cpu-repack-minimal-admitted-case.md`.
+- Added generator `scripts/generate_cpu_repack_lifetime_fixture.py`, focused tests, and detailed note `logs/research/2026-07-16/0649-cpu-repack-fixture-generator.md`.
 - Updated README living TODOs, this project checkpoint, and the concise research log.
 - Research ledger unchanged: this increment used the already-recorded pinned llama.cpp primary source.
-- Local compilation remains unavailable because a patch-capable upstream checkout is not mounted; GitHub-hosted CI is authoritative once source implementation lands.
+- Local pinned-tree C++ compilation remains unavailable; GitHub-hosted documentation CI validates the generator and Python tests only.
 - Final-head workflow results must be checked after all context commits.
 
 ## Known blockers and caveats
 
+- **Runtime proof:** the generated source is intentionally incomplete and exits nonzero until graph/allocation integration is implemented.
 - **Hardware gate:** successful skip on a non-AVX2 runner does not validate repack lifetime ordering.
 - **Path proof:** correct numerical output alone is insufficient because ordinary CPU fallback can produce the same answer.
 - **Sanitizer scope:** process-static dispatch metadata should be documented separately, not hidden with broad leak suppression.
