@@ -163,3 +163,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Whether generated Material pages need narrow documented exceptions, and whether the next increment should audit standalone explorers or add a representative axe-core browser lane.
+
+## 2026-07-16 15:51 — First generated-site accessibility CI result
+
+**Verified**
+
+- Documentation CI run `29496291134` passed for commit `bc98c6fcadeb2f5194686355f4c6d9a053669d28`.
+- `mkdocs build --strict` completed successfully before the generated-site validator.
+- `Validate built-site accessibility structure` passed without an exception, suppression, or weakened rule.
+- CPU_REPACK sanitizer run `29496291183`, pinned OpenCL lifecycle run `29496291154`, and current-upstream OpenCL audit run `29496291112` also passed on the same commit.
+- PR #1 merged into `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
+
+**Interpretation**
+
+- The generated Material pages satisfy the validator's bounded structural accessibility contract, but browser-level accessibility remains unproven.
+- No Material-theme exception is currently justified; the structural checks should remain strict.
+
+**Historical**
+
+- This closes the first-real-site-result TODO created by the 14:51 accessibility-guard increment.
+
+**Open questions**
+
+- Post-merge Pages deployment, deployed responsive/keyboard behavior, and standalone interactive explorer accessibility remain unverified.
