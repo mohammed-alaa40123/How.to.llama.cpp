@@ -119,10 +119,10 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Inspect and fix the first generated-HTML accessibility validation result; document any narrow Material-theme exceptions rather than weakening checks globally.
+- [ ] Verify the post-merge Pages deployment and audit the homepage, Architecture index, grouped navigation, search, diagrams, iframe interactions, keyboard access, card layout, and responsive behavior.
+- [ ] Add a representative browser-based accessibility lane if direct deployed-site verification remains blocked.
 - [ ] Generate and compile the staged two-file CPU_REPACK lifetime candidate against current upstream `8ee54c8`, requiring AVX2, exact path admission, numerical agreement, and ASan/LSan-clean backend-before-buffer teardown.
 - [ ] Open or manually stage the current-tree CPU_REPACK regression pull request after runtime validation; connected GitHub App upstream write permission may remain blocked.
-- [ ] Verify the Architecture index, grouped navigation, search, diagrams, iframe interactions, keyboard access, card layout, and responsive behavior on the deployed Pages site after PR #1 merges.
 - [ ] Add an admitted ARM NEON+dotprod or KleidiAI optional-buffer lifetime fixture with the same exact-path, numerical, teardown, and sanitizer requirements.
 - [ ] Submit or manually stage the reviewed 46-release current-upstream OpenCL ownership correction; upstream GitHub App write permission is currently blocked.
 - [ ] Decide whether a move-only OpenCL event owner is worthwhile after the narrow explicit-release correction.
@@ -139,11 +139,9 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Map architecture-specific graph-builder downcasts to `llama_memory_context_i` subtypes and exact state tensors.
 - [ ] Add runtime evidence for page faults, copies, event waits, KV/recurrent growth, activation peaks, synchronization, and teardown.
 - [ ] Verify latest Documentation CI, pinned/current OpenCL workflows, Pages deployment, and hourly context checks.
-- [ ] Verify the public Pages site returns HTTP 200 and renders branch-added architecture pages after PR #1 merges.
 
 ### Future improvements
 
-- [ ] Add a browser-based accessibility lane for representative routes, computed contrast, keyboard focus, accessible names, and reduced motion.
 - [ ] Audit standalone interactive explorers for keyboard operation, visible focus, text equivalents, and iframe/fullscreen fallbacks.
 - [ ] Add an Inference lifecycle section index if deployed review confirms the same cross-section discoverability gap.
 - [ ] Remove or explicitly explain the duplicate Foundations explorer navigation entry.
@@ -161,6 +159,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Inspect the first generated-site accessibility result: Documentation CI run `29496291134` passed strict MkDocs output and the accessibility structure validator without a Material-theme exception.
 - [x] Add a dependency-free built-site accessibility structure check for language metadata, main landmarks, top-level headings, image alternatives, iframe titles, and button names, with focused tests and Documentation CI integration.
 - [x] Add an Architecture section index with six goal-based entry points, concise summaries for all Architecture pages, and ordered paths for beginners, mmap/copy/page-fault research, scheduling, and teardown.
 - [x] Group the flat Architecture navigation into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends without changing page routes.
