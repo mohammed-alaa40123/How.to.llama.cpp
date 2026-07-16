@@ -94,37 +94,17 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Diagnostic name matching is insufficient; pointer identity and trait admission are the path proof.
 - A non-AVX2 skip is not lifetime evidence, so sanitizer CI needs an AVX2-confirmed runner.
 
-**Historical**
-
-- The prior run resolved the integration point; this run resolves the exact type and dimensions.
-
-**Open questions**
-
-- Whether hosted-runner AVX2 is a guaranteed contract.
-- Whether to extract shared test helpers or duplicate a bounded subset.
-- Which existing Q4_0 tolerance should be reused.
-- Whether ARM NEON+dotprod should be the immediate second fixture.
-
 ## 2026-07-16 06:49 — CPU repack fixture patch generator
 
 **Verified**
 
 - Added a deterministic, pinned-revision generator for the candidate `test-cpu-extra-buffer-lifetime.cpp` and CMake patch.
 - Added focused tests for revision scope, minimal dimensions, AVX2 gate, exact repack path-proof tokens, teardown order, CMake registration, and deterministic output.
-- The generated C++ skeleton intentionally exits with status 2, preventing structural validation from being misreported as successful runtime lifetime evidence.
+- The generated C++ skeleton intentionally exited with status 2, preventing structural validation from being misreported as successful runtime lifetime evidence.
 
 **Interpretation**
 
-- This is a safe intermediate implementation artifact: the fixture contract is now executable as deterministic patch generation, while pinned-tree compilation, numerical comparison, and ASan/LSan remain explicit requirements.
-
-**Historical**
-
-- The previous two increments selected the integration point and exact admitted shape; this increment materializes them into reproducible patch output.
-
-**Open questions**
-
-- Exact pinned graph/allocation implementation and Q4_0 tolerance.
-- AVX2 availability on the authoritative sanitizer runner.
+- This was a safe intermediate implementation artifact while pinned-tree compilation, numerical comparison, and ASan/LSan remained explicit requirements.
 
 ## 2026-07-16 07:52 — CPU repack graph, allocation, and tolerance contract
 
@@ -140,15 +120,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Use two independent no-allocation graphs instead of backend graph cloning because ordinary Q4_0 and CPU_REPACK have different physical weight representations.
 - Compare outputs before unusual teardown, then free the tested backend wrapper before graph metadata and retained repack-buffer destruction.
 
-**Historical**
-
-- This resolves the prior generator's graph/allocation and tolerance questions.
-
-**Open questions**
-
-- Confirm the exact pinned per-tensor allocation API before emitting the final C++ body.
-- AVX2 availability on the authoritative sanitizer runner.
-
 ## 2026-07-16 08:51 — CPU repack per-tensor allocation API
 
 **Verified**
@@ -156,7 +127,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Pinned `ggml_backend_tensor_alloc(buffer, tensor, addr)` takes an address inside an already allocated backend buffer, not an offset.
 - Pinned `ggml_tallocr_alloc()` demonstrates the required backend-specific size query, buffer-base/alignment calculation, and tensor initialization sequence.
 - Updated the generator with a concrete one-tensor-per-buffer helper using `ggml_backend_buft_get_alloc_size()`, `ggml_backend_buft_alloc_buffer()`, the aligned buffer base, and a `GGML_STATUS_SUCCESS` check.
-- Updated focused tests to enforce the complete allocation API sequence.
 - The ordinary graph allocator recognizes externally buffered tensors as already allocated, allowing only the tested Q4_0 weight to use CPU_REPACK.
 
 **Interpretation**
@@ -164,12 +134,25 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Direct per-tensor allocation is suitable and clearer than a separate weight-only context for this fixture.
 - Backend-specific allocation size must be used because repacked physical storage may differ from ordinary Q4_0 bytes.
 
+## 2026-07-16 09:51 — Complete generated CPU repack fixture
+
+**Verified**
+
+- Replaced the generator's intentional status-2 boundary with complete independent reference and CPU_REPACK graphs.
+- Added deterministic one-time Q4_0 quantization, identical weight/input uploads, graph compute, F32 readback, and `1e-7` NMSE comparison.
+- Preserved exact buffer-identity, non-null-trait, and operation-admission path proof.
+- Preserved backend-wrapper-before-repack-buffer teardown and added a success marker emitted only after execution and comparison.
+- Expanded focused tests to seven cases covering graph construction, allocation, deterministic inputs, compute, readback, NMSE, CMake registration, path proof, teardown order, and removal of the incomplete boundary.
+
+**Interpretation**
+
+- The generator-level implementation is complete, but runtime proof still requires compilation and repeated ASan/LSan execution against the exact pinned tree on an AVX2-confirmed runner.
+
 **Historical**
 
-- This closes the allocation-API question left by the previous graph/allocation design increment.
+- This combines the previously verified shape, topology, tolerance, and per-tensor allocation contract into one reviewable generated C++ candidate.
 
 **Open questions**
 
-- Complete graph execution, deterministic upload, readback, and `1e-7` NMSE comparison.
-- Confirm final graph allocation preserves the externally allocated repack weight.
-- AVX2 availability on the authoritative sanitizer runner.
+- Compiler validation of exact pinned API spelling and graph sizing.
+- AVX2 availability and successful CPU_REPACK admission on the sanitizer runner.
