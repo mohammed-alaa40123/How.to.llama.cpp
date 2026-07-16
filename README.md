@@ -122,8 +122,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Inspect the first same-origin Mermaid Chromium result and retained `diagnostics.jsonl`; keep exact SVG rendering, same-origin failures, route, viewport, focus, overflow, iframe, and reduced-motion checks strict.
-- [ ] If same-origin Mermaid still fails, inspect the local page exception and diagram source rather than extending the timeout.
+- [ ] Inspect the corrected Mermaid generated-SVG detector result across the full four-route by two-viewport matrix.
+- [ ] If visible rendering is recognized but `pageerror: Object` remains, preserve the exact Mermaid rejection object before deciding whether it is a real site failure.
 - [ ] Fix or explicitly classify the external GitHub releases-API 404 observed in browser diagnostics.
 - [ ] Verify the post-merge Pages deployment and audit the homepage, Architecture index, grouped navigation, search, diagrams, iframe interactions, keyboard access, card layout, and responsive behavior.
 - [ ] Generate and compile the staged two-file CPU_REPACK lifetime candidate against current upstream `8ee54c8`, requiring AVX2, exact path admission, numerical agreement, and ASan/LSan-clean backend-before-buffer teardown.
@@ -145,7 +145,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Add a pinned checksum for the prepared Mermaid asset after the first successful same-origin build establishes the exact bytes.
+- [ ] Add a pinned checksum for the prepared Mermaid asset after the first successful same-origin browser run establishes the exact bytes.
 - [ ] Add axe-core and explicit computed-contrast/focus-style checks after the representative browser matrix stabilizes.
 - [ ] Audit standalone interactive explorers for complete keyboard operation, visible focus, text equivalents, and iframe/fullscreen fallbacks.
 - [ ] Add an Inference lifecycle section index if deployed review confirms the same discoverability gap.
@@ -166,6 +166,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Inspect the first same-origin Mermaid Chromium result: run `29521791301` retained a screenshot with a visibly rendered flowchart while the detector reported zero; correct the detector to recognize generated Mermaid SVGs while preserving exact source-diagram counts.
 - [x] Move Mermaid from browser-runtime CDN loading to a pinned build-time local asset shared by Documentation CI and Pages after the full readiness bound still produced zero SVGs.
 - [x] Inspect the third representative Chromium failure: run `29513543532` reached the real Mermaid assertion and failed `0 of 1` about 2.6 seconds after browser start; the validator now waits for the exact SVG postcondition for up to 15 seconds while preserving a hard bounded failure.
 - [x] Inspect the second representative Chromium failure and replace empty-location-as-local with same-origin, cross-origin, and unlocated diagnostic classes plus per-case JSONL evidence.
