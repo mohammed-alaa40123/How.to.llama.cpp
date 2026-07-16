@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 10:50 Africa/Cairo_
+_Last updated: 2026-07-16 11:58 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -22,72 +22,73 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Generic scheduler plus CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown audits.
 - CPU repack, AMX, KleidiAI, and SpacemiT extra-buffer ownership comparison and destruction-harness specification.
 - Complete pinned/current OpenCL event-ownership audit, generated 46-release correction, synchronous tensor-set contract analysis, and upstream proposal staging.
+- First executable CPU_REPACK lifetime regression with exact path proof, numerical comparison, and repeated ASan/LSan evidence.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Added `.github/workflows/cpu-repack-lifetime-sanitizer.yml` as the first exact-revision compiler and sanitizer path for the generated CPU_REPACK fixture.
-- The workflow verifies the pinned llama.cpp SHA before materializing the generated C++ source and CMake target.
-- The hosted runner must expose AVX2; lack of AVX2 is a hard failure, not successful skipped evidence.
-- The target is configured with AddressSanitizer, LeakSanitizer leak detection, and frame pointers, then compiled independently.
-- The fixture must run in twenty separate processes, emit twenty exact CPU_REPACK success markers, and never emit `SKIP:`.
-- CPU capability, generated fixture source, and sanitizer output are uploaded as retained evidence.
-- The first workflow appeared as run `29481384561` and was queued at the initial status check.
+- Workflow run `29481384561` completed successfully on an Ubuntu 24.04 hosted runner with AVX2.
+- The exact pinned llama.cpp revision was fetched, verified, compiled, and executed under AddressSanitizer and LeakSanitizer.
+- All twenty separate fixture processes executed the `q4_0_8x8` CPU_REPACK path and printed `PASS: CPU_REPACK path executed; NMSE=3.82787e-16`.
+- No run skipped, returned non-zero, or emitted an ASan/LSan diagnostic.
+- The tested case was Q4_0 `[32, 8]` × F32 `[32, 1]` → F32 `[8, 1]`.
+- The fixture proved exact repack-buffer identity, non-null traits, operation admission, synchronous compute, numerical agreement, and backend-wrapper-before-buffer teardown.
+- Retained artifact `8368782428`, named `cpu-repack-lifetime-sanitizer-e3546c7`, has digest `sha256:ef4f0a36e27f7811b106e0a870c278724f1e620aed991807b7f2c3e443d1efaf` and expires on 2026-08-15.
+- The canonical destruction-harness page now records the executable result and bounded ownership conclusion.
 
 ### Interpretation
 
-- The CI implementation boundary is now closed, but runtime lifetime proof still requires a passing first run.
-- Separate process invocations exercise initialization and process teardown repeatedly and avoid hiding process-static lifetime behavior inside one test process.
-- The first run should be treated as compiler/runtime discovery evidence; any pinned API or allocation mismatch must be corrected rather than worked around with a skip.
+- This is executable evidence that the admitted pinned CPU_REPACK buffer does not depend on the ordinary CPU backend-wrapper lifetime for the tested synchronous `MUL_MAT` destruction order.
+- The stable NMSE `3.82787e-16` is far below the `1e-7` threshold and confirms that the optional path agreed numerically with ordinary CPU for identical quantized input bytes.
+- The evidence is bounded to one admitted AVX2 shape and twenty process-level executions; it does not establish all layouts, concurrent use, or other optional CPU implementations.
 
 ### Historical
 
-- Prior runs selected and generated the complete two-graph Q4_0 `[32, 8]` × F32 `[32, 1]` fixture with identical inputs, `1e-7` NMSE, exact path proof, and backend-wrapper-before-buffer teardown.
-- This run moves that candidate into an exact pinned-tree AVX2-confirmed ASan/LSan workflow.
+- Prior runs selected the minimal admitted shape, resolved graph and per-tensor allocation topology, generated the complete fixture, and added exact-revision sanitizer CI.
+- Run `29481384561` closes that sequence with the first passing runtime artifact.
 
 ### Open questions
 
-- Whether the generated source compiles unchanged against the pinned revision.
-- Whether `ubuntu-latest` consistently exposes AVX2.
-- Whether the graph allocator preserves the externally allocated repack weight at runtime.
-- Whether LSan reports process-static CPU dispatch allocations that require narrow documentation rather than broad suppression.
+- Whether to propose the generated CPU_REPACK fixture upstream as a permanent regression target.
+- Which hardware-gated extension should be next: ARM NEON+dotprod repack or KleidiAI.
+- Whether to add repeated iterations inside one process in addition to the current twenty-process teardown coverage.
+- Whether current upstream still admits the same minimal CPU_REPACK case without API adjustments.
 
 ## Immediate next task
 
 ```text
-inspect first CPU_REPACK sanitizer run
-  → fetch failed job logs if compilation or execution fails
-  → correct exact pinned API/CMake/runtime issues
-  → rerun until AVX2-confirmed twenty-process ASan/LSan evidence passes
-  → preserve artifact identity and concrete NMSE results
-  → update the destruction-harness page with executable evidence
+review upstream suitability of the passing CPU_REPACK fixture
+  → compare the generated target with current upstream test conventions
+  → decide whether to stage a permanent upstream regression patch
+  → preserve exact path-proof and sanitizer requirements
+  → begin one admitted ARM or KleidiAI lifetime extension
 ```
 
 ## In progress
 
-- First pinned-tree compile and sanitizer CI run for the CPU repack lifetime fixture.
 - Manual/upstream submission of the reviewed 46-release OpenCL ownership correction; GitHub App write access to upstream is blocked.
 - Source-index regeneration with pinned line-aware symbol inventory.
-- Hardware-specific lifetime extensions for KleidiAI, AMX, and SpacemiT.
+- Hardware-specific lifetime extensions for KleidiAI, AMX, SpacemiT, and ARM repack.
 - Runtime overlays for mmap/page faults, scheduler copies, events, KV/recurrent growth, and backend queues.
 
 ## Publication and validation state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added workflow `.github/workflows/cpu-repack-lifetime-sanitizer.yml`.
-- Added detailed note `logs/research/2026-07-16/1050-cpu-repack-pinned-sanitizer-workflow.md`.
-- Updated README living TODOs, this project checkpoint, and the concise research log.
-- Research ledger unchanged: this increment used the already-recorded pinned llama.cpp primary source.
-- First CPU_REPACK workflow run: `29481384561`, queued at initial verification.
+- CPU_REPACK sanitizer workflow run `29481384561`: passed.
+- Job `87565708592`: passed all setup, compile, twenty-process execution, and evidence-upload steps.
+- Artifact `8368782428`: retained with the recorded SHA-256 digest.
+- Added detailed note `logs/research/2026-07-16/1158-cpu-repack-first-passing-sanitizer-evidence.md`.
+- Updated the CPU destruction-harness page, README living TODOs, this project checkpoint, and the concise research log.
+- Research ledger unchanged: this increment used generated project evidence and the already-recorded pinned llama.cpp primary source.
+- PR #1 was open and mergeable before the final context updates.
 - Final-head workflow results must be checked after all context commits.
 
 ## Known blockers and caveats
 
-- **Runtime proof:** no passing sanitizer execution exists until run `29481384561` or a corrected successor completes.
-- **Hardware gate:** the new workflow intentionally fails when AVX2 is unavailable; a skip is not lifetime evidence.
-- **Path proof:** correct numerical output alone is insufficient because ordinary CPU fallback can produce the same answer.
-- **Sanitizer scope:** process-static dispatch metadata should be documented separately, not hidden with broad leak suppression.
+- **Evidence retention:** artifact `8368782428` expires on 2026-08-15; durable textual findings and digest are recorded, but long-term binary retention may require downloading or regenerating it.
+- **Hardware scope:** the passing evidence is AVX2-specific and does not cover ARM, KleidiAI, AMX, or SpacemiT.
+- **Path proof:** correct numerical output alone remains insufficient; future fixtures must preserve exact buffer identity, traits, and operation-admission checks.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
 - **Pages verification:** branch-added content cannot deploy until PR #1 merges; independent live response verification is still required.
 - Mapping, allocation, residency, representation validity, command completion, event ownership, reset, and release remain distinct states.
