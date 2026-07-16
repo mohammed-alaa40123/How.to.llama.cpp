@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 15:51 Africa/Cairo_
+_Last updated: 2026-07-16 16:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -29,47 +29,50 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Architecture landing page with six goal-based entry points, concise page summaries, and ordered reading paths.
 - Dependency-free generated-HTML accessibility structure validator with focused tests and Documentation CI integration.
 - First authoritative generated-site accessibility run passed without Material-theme exceptions.
+- Representative Chromium smoke lane covering four routes at desktop and mobile widths.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Documentation CI run `29496291134` completed successfully for commit `bc98c6fcadeb2f5194686355f4c6d9a053669d28`.
-- `mkdocs build --strict` passed before the generated-site accessibility validator ran.
-- `Validate built-site accessibility structure` passed without an exception, suppression, or weakened rule.
-- The same Documentation CI job passed durable-context, link, source-index, unit-test discovery, shell, Python, and required-interactive-asset checks.
-- CPU_REPACK sanitizer run `29496291183`, pinned OpenCL lifecycle run `29496291154`, and current-upstream OpenCL audit run `29496291112` also passed on the same commit.
-- PR #1 was merged into `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
+- Direct production Pages retrieval remains unavailable from this environment, and exact-site search returned no indexed result.
+- PR #2 head `e8f9c1ef0c4febb71cc5e1fc869704f911825104` passed Documentation CI run `29500081175` before this increment.
+- Added `scripts/validate_browser_smoke.mjs` using pinned Playwright `1.54.1` and headless Chromium.
+- The browser lane covers the homepage, Architecture index, system ownership diagram page, and interactive inference workflow at 1440×1000 and 390×844.
+- It checks HTTP success, one main landmark and H1, search discoverability, horizontal overflow, reduced-motion preference propagation, a visible first keyboard focus target, Architecture entry links, titled iframes, and browser console/page errors.
+- Documentation CI now serves the strict `site/` build locally, executes the browser validator, and uploads failure screenshots plus the server log for fourteen days.
 
 ### Interpretation
 
-- The generated Material pages satisfy the validator's bounded structural contract: language metadata, one main landmark, one top-level heading, image alternative-text attributes, iframe titles, and button accessible names.
-- No theme exception is currently justified; the validator should remain strict.
-- Static generated-HTML success does not establish keyboard order, focus visibility, computed contrast, reduced-motion behavior, responsive layout, or script-driven interactions.
+- Local preview-browser execution is a deterministic substitute for part of the deployed-site audit while production Pages remains unreachable.
+- The lane tests rendered behavior that static HTML parsing cannot establish, especially viewport overflow, browser focus, media preferences, and runtime console failures.
+- It is not full WCAG conformance: contrast, complete keyboard order, axe-core rules, focus-style quality, and deep standalone-explorer interactions remain open.
 
 ### Historical
 
 - The 13:16 run identified accessibility verification as a major site-quality gap.
 - The 13:52 run improved Architecture discoverability.
 - The 14:51 run implemented the generated-HTML accessibility guard.
-- The 15:51 run closes its first-real-site-result TODO with passing workflow evidence.
+- The 15:51 run preserved its first passing authoritative result.
+- The 16:51 run implements the documented browser-preview fallback because live Pages access remains blocked.
 - Workflow run `29481384561` established the pinned CPU_REPACK executable evidence: twenty AVX2-confirmed ASan/LSan processes with stable NMSE `3.82787e-16`.
 
 ### Open questions
 
+- Whether all eight browser route/viewport combinations pass in the first authoritative workflow run.
+- Whether external Mermaid loading emits console errors in the isolated CI environment.
+- Whether Material's first Tab target is visible and stable on desktop and mobile shells.
 - Whether the post-merge Pages deployment succeeded and serves the merged Architecture pages.
-- Whether the deployed Architecture index, grouped navigation, search, diagrams, cards, and iframes behave correctly across desktop and mobile.
-- Whether standalone interactive explorers provide complete keyboard operation, visible focus, and text equivalents.
-- Whether a representative browser-based accessibility lane should run on every pull request.
+- Whether axe-core and explicit dark-palette contrast/focus checks should be added after the smoke lane stabilizes.
 - Whether current upstream `8ee54c8` still admits the exact CPU_REPACK fixture at runtime.
 
 ## Immediate next task
 
 ```text
-verify post-merge Pages deployment
-  → audit homepage, Architecture index, one diagram-heavy page, and one interactive explorer
-  → check keyboard focus, accessible names, contrast, reduced motion, and responsive layout
-  → if live access remains blocked, add a representative preview/browser CI lane
+inspect the first representative Chromium workflow result
+  → fix route, selector, focus, overflow, iframe, or external-resource failures narrowly
+  → preserve the bounded route and viewport matrix
+  → after passing, add axe-core or computed contrast/focus-style coverage
 ```
 
 ## In progress
@@ -79,22 +82,24 @@ verify post-merge Pages deployment
 - Source-index regeneration with pinned line-aware symbol inventory.
 - Hardware-specific lifetime extensions for KleidiAI, AMX, SpacemiT, and ARM repack.
 - Runtime overlays for mmap/page faults, scheduler copies, events, KV/recurrent growth, and backend queues.
-- Website browser-level accessibility and deployed verification.
+- Website deployed verification and browser-level accessibility validation.
 
 ## Publication and validation state
 
-- PR #1 has merged to `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
-- Current increment is on branch `automation/accessibility-ci-result`.
-- Added detailed note `logs/research/2026-07-16/1551-first-accessibility-ci-result.md`.
-- Updated README living TODOs, project state, and research log.
+- PR #1 merged to `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
+- Current increment is on PR #2 branch `automation/accessibility-ci-result`.
+- Added `scripts/validate_browser_smoke.mjs` and detailed note `logs/research/2026-07-16/1651-representative-browser-smoke-lane.md`.
+- Updated Documentation CI, README living TODOs, project state, and research log.
 - Research ledger unchanged because no external source was added or reclassified.
-- Documentation CI and all three technical evidence workflows passed on the accessibility-guard commit.
+- The previous PR #2 head passed Documentation CI; the new browser-lane head awaits commit-scoped workflow results.
 
 ## Known blockers and caveats
 
-- **Live-site verification:** direct Pages access remains unavailable in this environment, so production HTTP status, rendered navigation, search, responsive layout, keyboard behavior, computed contrast, and interactive assets cannot be independently tested.
-- **Pages workflow visibility:** commit-scoped workflow lookup currently exposes pull-request-triggered runs, so the post-merge `main` Pages run was not available through that endpoint.
-- **Accessibility scope:** static parsing does not prove keyboard order, focus visibility, computed contrast, reduced-motion behavior, responsive layout, or script-driven accessible names.
+- **First browser result:** the new Chromium lane has not yet produced authoritative workflow evidence.
+- **Live-site verification:** direct Pages access remains unavailable, so production HTTP status and deployed rendering cannot be independently tested.
+- **Pages workflow visibility:** commit-scoped workflow lookup exposes pull-request-triggered runs and does not surface the post-merge `main` Pages run.
+- **Accessibility scope:** the smoke lane does not prove computed contrast, complete keyboard order, visible focus quality for every control, axe-core compliance, or deep interactive-state behavior.
+- **External-resource sensitivity:** Mermaid is loaded from a CDN and could produce CI browser errors even when local generated pages are structurally correct.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the fixture has not yet been compiled and executed against that exact current revision.
 - **Evidence retention:** artifact `8368782428` expires on 2026-08-15.
 - **Hardware scope:** the passing CPU_REPACK evidence is AVX2-specific and does not cover ARM, KleidiAI, AMX, or SpacemiT.
