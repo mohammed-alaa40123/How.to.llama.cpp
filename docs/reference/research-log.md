@@ -132,8 +132,30 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - The two prior failures removed unsupported console-origin assumptions; the third exposed the first genuine functional readiness race.
 
+## 2026-07-16 20:49 — Pinned same-origin Mermaid build asset
+
+**Verified**
+
+- Documentation CI run `29517576858` still produced zero of one Mermaid SVG after the full 15-second readiness bound.
+- Artifact `8383341340` retained `diagnostics.jsonl`, which records the timeout, an uncaught promise rejection, and a separate external releases-API 404.
+- The local server log showed successful responses for every same-origin page and asset requested before failure.
+- Added `scripts/prepare_mermaid_asset.sh`, pinning Mermaid `11.16.0` and downloading it before strict builds.
+- Documentation CI and Pages now prepare the same asset before `mkdocs build --strict`.
+- `mkdocs.yml` now loads Mermaid from `assets/javascripts/vendor/mermaid.min.js` instead of a browser-runtime CDN URL.
+- The existing bounded SVG, route, viewport, focus, overflow, iframe, landmark, heading, search, reduced-motion, and same-origin error checks remain strict.
+
+**Interpretation**
+
+- A full timeout with zero SVGs does not justify a longer wait.
+- Build-time retrieval converts a runtime CDN failure into a visible build failure and gives CI and deployed Pages the same-origin asset graph.
+
+**Historical**
+
+- This implements the fallback explicitly recorded by the preceding run: vendor Mermaid locally if bounded readiness still fails.
+
 **Open questions**
 
-- Whether all eight route/viewport cases now pass.
-- Whether recurring CDN delay/failure justifies vendoring Mermaid locally.
-- Which retained warnings recur after the matrix advances beyond the first case.
+- Whether all eight route/viewport cases pass with the same-origin Mermaid asset.
+- Whether the uncaught promise rejection disappears or reveals a separate initialization or diagram-syntax failure.
+- Whether the releases-API 404 should be corrected independently.
+- Whether the prepared asset should gain a pinned checksum after the first successful build.
