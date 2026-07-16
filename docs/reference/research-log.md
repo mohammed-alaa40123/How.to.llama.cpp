@@ -7,8 +7,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Verified**
 
 - Baseline pinned to `e3546c7948e3af463d0b401e6421d5a4c2faf565`.
-- Documented backend/model loading, tokenization, `llama_context`, decode, sampling, and token feedback.
-- Published canonical GGUF, model placement, `llama_model`, `llama_context`, graph/MoE, scheduler, memory, and backend pages.
+- Documented backend/model loading, tokenization, `llama_context`, decode, sampling, token feedback, GGUF, model placement, graph/MoE, scheduler, memory, and backends.
 - GGUF stores tensors and metadata, not an executable graph; architecture code builds GGML operations over loaded tensors.
 
 **Interpretation**
@@ -21,7 +20,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Verified**
 
 - Published file-by-file Pass A pages for public API, loader, context memory, scheduler, and persistent KV/recurrent implementations.
-- Added model/context, generic scheduler, CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown audits.
+- Added model/context and generic scheduler plus CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown audits.
 - Added line-aware source indexing with pinned file and symbol links.
 
 **Interpretation**
@@ -68,12 +67,12 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 **Verified**
 
-- Selected a dedicated `tests/test-cpu-extra-buffer-lifetime.cpp` executable and reused backend-op quantization, upload, graph, readback, and comparison patterns.
-- Selected the smallest admitted pinned x86 case: Q4_0 `[32, 8]` × F32 `[32, 1]` → F32 `[8, 1]`, with AVX2, exact buffer identity, non-null traits, and operation-admission guards.
+- Selected a dedicated `tests/test-cpu-extra-buffer-lifetime.cpp` executable and the smallest admitted pinned x86 case: Q4_0 `[32, 8]` × F32 `[32, 1]` → F32 `[8, 1]`.
+- Added AVX2, exact buffer identity, non-null traits, and operation-admission guards.
 - Added a deterministic pinned-revision fixture generator and focused structural tests.
 - Resolved the two-graph no-allocation topology, identical one-time Q4_0 quantization, address-based per-tensor CPU_REPACK allocation, and `1e-7` NMSE contract.
 - Completed graph construction, deterministic uploads, compute/readback, exact path proof, and backend-wrapper-before-buffer teardown.
-- Added an AVX2-required ASan/LSan workflow that compiles the exact pinned target and requires twenty non-skipped process executions.
+- Added an AVX2-required ASan/LSan workflow requiring twenty non-skipped process executions.
 
 **Interpretation**
 
@@ -118,7 +117,6 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Verified**
 
 - Reviewed the homepage, MkDocs configuration, interactive foundations page, custom stylesheet, living context, and prior CI state.
-- The homepage already offered four reading modes and strong Material search/navigation features.
 - Grouped 27 Architecture entries into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends while preserving routes.
 - Recorded a prioritized backlog for deployment verification, indexes, accessibility, diagram equivalents, interaction fallbacks, and consistency.
 
@@ -138,54 +136,29 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Navigation grouping lowers scanning cost; the index explains how sections and pages map to reader goals.
 
-**Open questions**
-
-- Mobile layout, nested navigation, keyboard behavior, dark-mode contrast, deployed rendering, an Inference lifecycle index, and duplicate Foundations explorer cleanup.
-
 ## 2026-07-16 14:51 — Built-site accessibility structure guard
 
 **Verified**
 
 - Added `scripts/validate_built_site_accessibility.py`, a dependency-free generated-HTML validator.
 - It checks non-empty `html[lang]`, exactly one `<main>`, exactly one `<h1>`, image `alt` attributes, non-empty iframe titles, and accessible button names.
-- It fails for missing or empty site output and excludes standalone `assets/interactive/` HTML for a separate interaction audit.
-- Added four focused tests and integrated the validator after `mkdocs build --strict` in Documentation CI.
+- Added focused tests and integrated the validator after `mkdocs build --strict` in Documentation CI.
 
 **Interpretation**
 
 - This is a high-confidence structural regression guard, not a WCAG conformance claim.
-- Browser-level testing is still required for computed contrast, focus visibility/order, responsive layout, reduced motion, and script-driven interactions.
-
-**Historical**
-
-- This implements the first automated accessibility item from the 13:16 UX review after the 13:52 discoverability improvement.
-
-**Open questions**
-
-- Whether generated Material pages need narrow documented exceptions, and whether the next increment should audit standalone explorers or add a representative axe-core browser lane.
 
 ## 2026-07-16 15:51 — First generated-site accessibility CI result
 
 **Verified**
 
-- Documentation CI run `29496291134` passed for commit `bc98c6fcadeb2f5194686355f4c6d9a053669d28`.
-- `mkdocs build --strict` completed successfully before the generated-site validator.
-- `Validate built-site accessibility structure` passed without an exception, suppression, or weakened rule.
+- Documentation CI run `29496291134` passed strict MkDocs output and the generated-site accessibility validator without an exception or weakened rule.
 - CPU_REPACK sanitizer run `29496291183`, pinned OpenCL lifecycle run `29496291154`, and current-upstream OpenCL audit run `29496291112` also passed on the same commit.
 - PR #1 merged into `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
 
 **Interpretation**
 
 - The generated Material pages satisfy the validator's bounded structural accessibility contract, but browser-level accessibility remains unproven.
-- No Material-theme exception is currently justified; the structural checks should remain strict.
-
-**Historical**
-
-- This closes the first-real-site-result TODO created by the 14:51 accessibility-guard increment.
-
-**Open questions**
-
-- Post-merge Pages deployment, deployed responsive/keyboard behavior, and standalone interactive explorer accessibility remain unverified.
 
 ## 2026-07-16 16:51 — Representative browser smoke lane
 
@@ -193,43 +166,50 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Added `scripts/validate_browser_smoke.mjs` and integrated pinned Playwright/Chromium execution into Documentation CI.
 - The homepage, Architecture index, ownership diagram page, and interactive inference workflow are tested at desktop and mobile widths.
-- Checks cover HTTP navigation, landmarks/headings, search discoverability, horizontal overflow, reduced-motion propagation, visible keyboard focus, Architecture links, iframe titles, and browser errors.
+- Checks cover HTTP navigation, landmarks/headings, search discoverability, horizontal overflow, reduced-motion propagation, visible keyboard focus, Architecture links, iframe titles, Mermaid rendering, and browser errors.
 - Failure screenshots and the local HTTP server log are retained as workflow evidence.
-- PR #2's preceding head passed Documentation CI run `29500081175`.
 
 **Interpretation**
 
 - Preview-browser testing supplies deterministic responsive and interaction-shell evidence while production Pages remains unreachable.
-- It complements rather than replaces static structural validation or a full accessibility audit.
-
-**Historical**
-
-- This implements the fallback proposed after the first passing static accessibility result.
-
-**Open questions**
-
-- The first browser-lane workflow result, external Mermaid behavior, selector stability, explicit contrast checks, axe-core coverage, and deep standalone-explorer keyboard operation.
 
 ## 2026-07-16 17:52 — First browser-smoke failure and narrow correction
 
 **Verified**
 
 - Documentation CI run `29504440262` passed every stage before Chromium and failed only at the browser validator.
-- Artifact `8377864569` retained a fully rendered homepage/desktop screenshot with visible skip-link focus and rendered Mermaid, plus a local server log containing successful page and asset responses without a local 404.
-- The first validator treated every console error as fatal without considering its source URL.
-- Updated the validator so same-origin console errors, same-origin request failures, and uncaught page exceptions remain fatal while cross-origin diagnostics are printed as warnings.
+- Artifact `8377864569` retained a fully rendered homepage/desktop screenshot and successful local server responses without a local 404.
+- Updated the validator so explicit same-origin errors remain fatal while cross-origin diagnostics are warnings.
 - Added a functional assertion that every Mermaid container under `main` contains a rendered SVG.
-- Preserved the complete four-route, two-viewport, landmark, search, overflow, reduced-motion, iframe-title, and focus matrix.
 
 **Interpretation**
 
-- The retained evidence is consistent with third-party console noise rather than a broken homepage, but the exact initial message was not retained separately.
 - The same-origin boundary plus explicit Mermaid-output assertion is narrower and stronger than globally ignoring browser errors.
+
+## 2026-07-16 18:52 — Second browser-smoke failure and durable three-way classification
+
+**Verified**
+
+- Documentation CI run `29509089935` passed every pre-browser stage and failed only on the first homepage/desktop Chromium case.
+- Artifact `8379817149` has digest `sha256:dc05c0e186b03edf770871de7546fb76c7e116ea607214c99b60f88c674bac9f`.
+- Its server log records successful local page, Material, project, Mermaid-init, sitemap, and search responses with no same-origin 404 before failure.
+- The previous URL helper classified an empty console source URL as same-origin.
+- The browser validator now classifies records as `same-origin`, `cross-origin`, or `unlocated`.
+- Same-origin console errors and failed requests, page exceptions, missing Mermaid SVGs, route, viewport, landmark, heading, search, overflow, reduced-motion, iframe-title, and focus failures remain fatal.
+- Cross-origin and unlocated diagnostics are warnings.
+- Every case now writes `browser-smoke-artifacts/diagnostics.jsonl` with the route, viewport, outcome, failure message, and classified records; the existing failure-artifact step already uploads that directory.
+
+**Interpretation**
+
+- A missing console location is ambiguous, not proof that generated-site code emitted the error.
+- The three-way classifier improves attribution without whitelisting a message or domain and without weakening functional rendering checks.
+- Durable JSONL evidence makes the next failure diagnosable even when job output is truncated or ephemeral.
 
 **Historical**
 
-- This is the first evidence-driven correction to the 16:51 browser lane.
+- The first correction separated known same-origin and cross-origin URLs; the second failure exposed the remaining empty-location-as-local assumption.
 
 **Open questions**
 
-- The revised eight-case result, the exact recurring cross-origin diagnostic, whether Mermaid should be vendored locally, and when to add axe-core and computed contrast/focus checks.
+- Whether all eight route/viewport cases pass under the new classifier.
+- Which unlocated diagnostic recurs, whether Mermaid should be vendored, and when to add axe-core and explicit contrast/focus-style checks.
