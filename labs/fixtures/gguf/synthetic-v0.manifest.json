@@ -1,0 +1,33 @@
+{
+  "fixture_id": "gguf-synthetic-v0",
+  "fixture_format_version": 1,
+  "gguf_version": 3,
+  "byte_order": "little-endian",
+  "alignment": 32,
+  "generator": "scripts/generate_synthetic_gguf.py",
+  "generated_binary": "labs/fixtures/gguf/synthetic-v0.gguf",
+  "golden_output": "labs/fixtures/gguf/synthetic-v0.golden.json",
+  "expected_sha256": "688d0ef28c83d6972e291cc0342e695540eae8496b3ec8e92bdbb91e3982a564",
+  "source_baseline": {
+    "repository": "ggml-org/llama.cpp",
+    "revision": "e3546c7948e3af463d0b401e6421d5a4c2faf565"
+  },
+  "educational_scope": [
+    "header",
+    "metadata-string",
+    "metadata-uint32",
+    "metadata-string-array",
+    "tensor-descriptors",
+    "alignment",
+    "relative-and-absolute-offsets",
+    "bounded-corruption-rejection"
+  ],
+  "payload_policy": "Project-authored F32 demonstration values only; not trained weights and not usable for inference.",
+  "corruption_variants": [
+    "bad-magic",
+    "misaligned-tensor-offset",
+    "truncated-tensor-payload"
+  ],
+  "distribution": "Generator, manifest, and golden output are committed. Binary and corruption variants are regenerated deterministically for tests and labs.",
+  "license": "MIT"
+}
