@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mohammed-alaa40123.github.io/How.to.llama.cpp/schemas/executable-trace.schema.json",
+  "title": "How.to.llama.cpp executable lecture trace",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "trace_id", "lesson_id", "source", "steps"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "trace_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"},
+    "lesson_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"},
+    "title": {"type": "string", "minLength": 1, "maxLength": 160},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "revision", "capture_kind"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "capture_kind": {"enum": ["native-captured", "source-derived", "authored-example"]},
+        "capture_command": {"type": "string", "maxLength": 500},
+        "fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "items": {"$ref": "#/$defs/step"}
+    }
+  },
+  "$defs": {
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "line", "function"],
+      "properties": {
+        "file": {"type": "string", "minLength": 1, "maxLength": 300},
+        "line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "function": {"type": "string", "minLength": 1, "maxLength": 200}
+      }
+    },
+    "frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "line", "function"],
+      "properties": {
+        "file": {"type": "string", "minLength": 1, "maxLength": 300},
+        "line": {"type": "integer", "minimum": 1},
+        "function": {"type": "string", "minLength": 1, "maxLength": 200}
+      }
+    },
+    "runtime_object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["object_id", "type", "summary", "evidence_kind"],
+      "properties": {
+        "object_id": {"type": "string", "pattern": "^[A-Za-z0-9_.:-]{1,100}$"},
+        "type": {"type": "string", "minLength": 1, "maxLength": 120},
+        "summary": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "address": {"type": "string", "pattern": "^0x[0-9a-fA-F]+$"},
+        "evidence_kind": {"$ref": "#/$defs/evidence_kind"}
+      }
+    },
+    "tensor_shape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tensor_id", "dimensions", "element_type", "evidence_kind"],
+      "properties": {
+        "tensor_id": {"type": "string", "pattern": "^[A-Za-z0-9_.:/-]{1,160}$"},
+        "dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {"type": "integer", "minimum": 0, "maximum": 2147483647}
+        },
+        "element_type": {"type": "string", "minLength": 1, "maxLength": 40},
+        "evidence_kind": {"$ref": "#/$defs/evidence_kind"}
+      }
+    },
+    "memory_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event", "summary", "evidence_kind"],
+      "properties": {
+        "event": {"enum": ["map", "unmap", "allocate", "free", "read", "write", "copy", "fault", "advice", "other"]},
+        "summary": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "bytes": {"type": "integer", "minimum": 0},
+        "evidence_kind": {"$ref": "#/$defs/evidence_kind"}
+      }
+    },
+    "figure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["figure_id", "path", "alt_text", "evidence_kind"],
+      "properties": {
+        "figure_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"},
+        "path": {"type": "string", "minLength": 1, "maxLength": 300},
+        "alt_text": {"type": "string", "minLength": 20, "maxLength": 1000},
+        "evidence_kind": {"$ref": "#/$defs/evidence_kind"}
+      }
+    },
+    "evidence_kind": {
+      "enum": ["native-captured", "source-derived", "authored-example", "interpretation", "open-question"]
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "step_id", "phase", "location", "explanation_id", "evidence_kind"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 0, "maximum": 499},
+        "step_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"},
+        "phase": {"type": "string", "minLength": 1, "maxLength": 80},
+        "location": {"$ref": "#/$defs/location"},
+        "call_stack": {"type": "array", "maxItems": 64, "items": {"$ref": "#/$defs/frame"}},
+        "runtime_objects": {"type": "array", "maxItems": 128, "items": {"$ref": "#/$defs/runtime_object"}},
+        "tensor_shapes": {"type": "array", "maxItems": 128, "items": {"$ref": "#/$defs/tensor_shape"}},
+        "memory_events": {"type": "array", "maxItems": 128, "items": {"$ref": "#/$defs/memory_event"}},
+        "figures": {"type": "array", "maxItems": 16, "items": {"$ref": "#/$defs/figure"}},
+        "explanation_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+        "evidence_kind": {"$ref": "#/$defs/evidence_kind"},
+        "prediction_prompt": {"type": "string", "maxLength": 1000},
+        "static_summary": {"type": "string", "minLength": 20, "maxLength": 2000}
+      }
+    }
+  }
+}
