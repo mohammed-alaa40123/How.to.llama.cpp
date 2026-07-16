@@ -83,6 +83,7 @@ python3 scripts/validate_interactive_links.py
 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 -m py_compile scripts/*.py tests/*.py
 bash -n scripts/*.sh
+./scripts/prepare_mermaid_asset.sh
 mkdocs build --strict
 python3 scripts/validate_built_site_accessibility.py site
 python3 -m http.server 8000 --directory site
@@ -121,8 +122,9 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Inspect the bounded Mermaid-readiness Chromium result and retained `diagnostics.jsonl`; keep exact SVG rendering, same-origin failures, route, viewport, focus, overflow, iframe, and reduced-motion checks strict.
-- [ ] If Mermaid still fails within the bounded readiness window, vendor Mermaid locally rather than extending the timeout without evidence.
+- [ ] Inspect the first same-origin Mermaid Chromium result and retained `diagnostics.jsonl`; keep exact SVG rendering, same-origin failures, route, viewport, focus, overflow, iframe, and reduced-motion checks strict.
+- [ ] If same-origin Mermaid still fails, inspect the local page exception and diagram source rather than extending the timeout.
+- [ ] Fix or explicitly classify the external GitHub releases-API 404 observed in browser diagnostics.
 - [ ] Verify the post-merge Pages deployment and audit the homepage, Architecture index, grouped navigation, search, diagrams, iframe interactions, keyboard access, card layout, and responsive behavior.
 - [ ] Generate and compile the staged two-file CPU_REPACK lifetime candidate against current upstream `8ee54c8`, requiring AVX2, exact path admission, numerical agreement, and ASan/LSan-clean backend-before-buffer teardown.
 - [ ] Open or manually stage the current-tree CPU_REPACK regression pull request after runtime validation; connected GitHub App upstream write permission may remain blocked.
@@ -143,6 +145,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
+- [ ] Add a pinned checksum for the prepared Mermaid asset after the first successful same-origin build establishes the exact bytes.
 - [ ] Add axe-core and explicit computed-contrast/focus-style checks after the representative browser matrix stabilizes.
 - [ ] Audit standalone interactive explorers for complete keyboard operation, visible focus, text equivalents, and iframe/fullscreen fallbacks.
 - [ ] Add an Inference lifecycle section index if deployed review confirms the same discoverability gap.
@@ -163,6 +166,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Move Mermaid from browser-runtime CDN loading to a pinned build-time local asset shared by Documentation CI and Pages after the full readiness bound still produced zero SVGs.
 - [x] Inspect the third representative Chromium failure: run `29513543532` reached the real Mermaid assertion and failed `0 of 1` about 2.6 seconds after browser start; the validator now waits for the exact SVG postcondition for up to 15 seconds while preserving a hard bounded failure.
 - [x] Inspect the second representative Chromium failure and replace empty-location-as-local with same-origin, cross-origin, and unlocated diagnostic classes plus per-case JSONL evidence.
 - [x] Inspect the first representative Chromium failure and keep same-origin errors and functional Mermaid rendering strict while treating external diagnostics as warnings.
