@@ -12,11 +12,11 @@ How.to.llama.cpp explains the path from a GGUF file to generated tokens: backend
 
 - MkDocs Material documentation with source-pinned figures and tables.
 - Beginner-readable and source-level inference walkthroughs.
-- Canonical pages for GGUF, model loading, `llama_model`, `llama_context`, graph construction, graph reuse, schedulers, memory, synchronization, and backends.
+- Canonical pages for GGUF, model loading, `llama_model`, `llama_context`, graph construction and reuse, schedulers, memory, synchronization, and backends.
 - Clickable foundations and inference explorers.
 - A research ledger for official docs, PRs, discussions, papers, talks, videos, blogs, and technical posts.
 - Scripts for source mirroring, indexing, context loading, validation, and site health checks.
-- GitHub Actions for hourly context validation, daily upstream indexing, strict documentation CI, pinned and current-upstream OpenCL lifecycle/source evidence, generated release-only patch validation, and Pages deployment.
+- GitHub Actions for context validation, upstream indexing, strict documentation CI, pinned/current OpenCL evidence, and Pages deployment.
 
 Current progress lives in [`docs/reference/project-state.md`](docs/reference/project-state.md).
 
@@ -50,11 +50,11 @@ Start a local run with:
 | Schedule | Workflow | Responsibility |
 |---|---|---|
 | Every hour | Research automation | Complete one source-pinned increment and durable context update |
-| Daily | Website quality review | Review discoverability, source traceability, accessibility, diagrams, and interactions |
+| Daily | Website quality review | Review discoverability, traceability, accessibility, diagrams, and interactions |
 | Hourly at minute 23 UTC | `.github/workflows/hourly-context-check.yml` | Validate context and scripts |
 | Daily at 02:17 UTC | `.github/workflows/refresh-source-index.yml` | Refresh upstream source inventory through a PR |
-| Manual and extractor-related PR changes | `.github/workflows/opencl-lifecycle-report.yml` | Fetch exact pinned OpenCL source, generate lifecycle evidence, classify wait groups, generate the release-only event patch, and preserve review artifacts |
-| Manual and current-audit workflow changes | `.github/workflows/current-opencl-lifecycle-audit.yml` | Resolve exact current upstream, regenerate lifecycle evidence and a current-source release-only candidate, and preserve checksummed artifacts without freezing counts |
+| Manual and extractor changes | `.github/workflows/opencl-lifecycle-report.yml` | Preserve and validate pinned OpenCL lifecycle evidence |
+| Manual and current-audit changes | `.github/workflows/current-opencl-lifecycle-audit.yml` | Regenerate exact current-upstream OpenCL ownership evidence |
 | Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, and `mkdocs build --strict` |
 | Every push to `main` | `.github/workflows/pages.yml` | Build, deploy, and verify the public site |
 
@@ -66,9 +66,9 @@ Record the exact commit, branch, PR, discussion, test, or trace. Baseline metada
 
 ### Analyze files, then synthesize subsystems
 
-For each relevant file, record purpose, major objects and functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
+For each relevant file, record purpose, major objects/functions, callers/callees, ownership, allocations/mappings/copies, threads and synchronization, error paths, backend differences, tests, and runtime evidence. Then synthesize public API, model/GGUF loading, runtime context, memory, GGML core, scheduler, CPU, accelerator backends, model architectures, and tools/tests.
 
-`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. It emits source-ordered `symbol_locations` with approximate kind, exact 1-based lines, optional revision-pinned file and symbol links, and bounded unsupported-syntax candidate counts. `scripts/extract_opencl_lifecycle_calls.py` inventories selected OpenCL ownership, completion, and release calls after masking comments and quoted literals; it also emits a bounded simple-local wait/release diagnostic for `clWaitForEvents(1, &event)` patterns. `scripts/annotate_opencl_wait_followups.py` separately marks immediate same-queue blocking-read follow-ups without changing ownership status. `scripts/classify_opencl_set_tensor_waits.py` groups the remaining pinned `set_tensor` waits by their immediate lexical successor. `scripts/apply_opencl_event_release_fix.py` generates a behavior-preserving release-only correction from the audited unmatched records and can emit a unified patch. `.github/workflows/opencl-lifecycle-report.yml` preserves the exact pinned translation unit, baseline and post-patch JSON reports, generated wait-group report, generated patch, and artifact-root SHA-256 manifest. `.github/workflows/current-opencl-lifecycle-audit.yml` applies the same bounded analysis to an exact runtime-resolved upstream revision and records its reviewed result under `data/`.
+`scripts/index_upstream.py` is a navigation aid, not a compiler-grade call graph. OpenCL lifecycle scripts are bounded evidence tools, not general C++ ownership analyzers.
 
 ### Write layered documentation
 
@@ -98,22 +98,16 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `logs/research/` | Detailed per-run notes |
 | `docs/reference/research-ledger.md` | External-source assessment |
 | `docs/roadmap.md` | Full implementation and synthesis plan |
-| `docs/lifecycle/inference-atlas.md` | Clickable end-to-end pipeline and audience-specific reading paths |
-| `docs/foundations/interactive-system-map.md` | Clickable foundations map |
+| `docs/lifecycle/inference-atlas.md` | Clickable end-to-end pipeline |
 | `docs/foundations/gguf-file-anatomy.md` | GGUF layout, descriptors, mmap, and ownership |
-| `docs/foundations/model-tensor-placement.md` | Layer/device assignment, mappings, upload paths, and ownership |
+| `docs/foundations/model-tensor-placement.md` | Layer/device assignment, mappings, uploads, and ownership |
 | `docs/foundations/memory-lifetimes.md` | Ownership and lifetime atlas |
-| `docs/objects/llama-model.md` | `llama_model` construction, storage, graph factory, and teardown |
-| `docs/objects/llama-context.md` | `llama_context` runtime state and lifetime |
+| `docs/objects/llama-model.md` | Persistent model state and teardown |
+| `docs/objects/llama-context.md` | Mutable runtime state and lifetime |
 | `docs/ggml/graph-construction-and-moe.md` | Graph construction, reuse, MoE routing, and cache design |
-| `docs/architecture/backend-teardown-audit-method.md` | Reusable completion/ownership audit worksheet and runtime matrix |
-| `docs/architecture/backend-teardown-comparison.md` | Cross-backend completion, resource-independence, and safety matrix |
-| `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL build, source-backed lifecycle inventory, ownership, Adreno library lifetime, and remaining gaps |
-| `docs/architecture/cpu-extra-buffer-destruction-harness.md` | Implementation-ready admitted-operation, lifetime-ordering, and sanitizer fixture |
-| `data/opencl-current-audit-505b1ed.json` | Reviewed current-upstream OpenCL wait/release counts and evidence-artifact identity |
-| `.github/workflows/docs-ci.yml` | Named validators, isolated unit-test suites, discovery guard, strict build, and actionable failures |
-| `.github/workflows/opencl-lifecycle-report.yml` | Exact pinned-source recovery, lifecycle extraction, ownership/follow-up/wait-group regressions, generated release-only patch proof, and artifact preservation |
-| `.github/workflows/current-opencl-lifecycle-audit.yml` | Exact current-source recovery, non-frozen lifecycle evidence, current release-only candidate, and checksummed artifact preservation |
+| `docs/architecture/backend-teardown-audit-method.md` | Reusable completion/ownership audit worksheet |
+| `docs/architecture/cpu-extra-buffer-destruction-harness.md` | CPU optional-buffer lifetime fixture specification |
+| `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL lifecycle and ownership audit |
 
 <!-- PROJECT-TODOS:START -->
 ## Living TODO list
@@ -122,69 +116,45 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Review the generated 46-insertion current-source patch from artifact `8358479508` and prepare an upstream-ready pull request or issue while preserving every existing wait.
-- [ ] Decide whether a move-only OpenCL event owner is worthwhile for maintainability even though pinned `CL_CHECK` failures abort without stack unwinding.
-- [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement; include explicit Adreno handle ownership, invalid-symbol cleanup, repeated registration, and shared-library unload behavior.
-- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts; use actual candidate volume to prioritize scanner work.
-- [ ] Implement the first CPU repack regression fixture: admitted supported `MUL_MAT` → reference comparison → CPU backend free → repack buffer free under ASan/LSan.
-- [ ] Extend the destruction fixture to KleidiAI, AMX, and SpacemiT hardware paths with explicit admission, allocator, initialization, TCM, and process-pool checks.
+- [ ] Implement `tests/test-cpu-extra-buffer-lifetime.cpp` using the pinned minimal admitted case: Q4_0 weight `[32, 8]` × F32 activation `[32, 1]`, assert `CPU_REPACK` pointer identity/traits/admission, compare against ordinary CPU, then free the CPU backend wrapper before the retained repack buffer under repeated ASan/LSan execution on an AVX2-confirmed runner.
+- [ ] Add the fixture CMake target and sanitizer workflow; treat absence of AVX2 as an explicit skip, but fail when AVX2 is present and the pinned case is not admitted.
+- [ ] Submit or manually stage the reviewed 46-release current-upstream OpenCL ownership correction; upstream GitHub App write permission is currently blocked.
+- [ ] Decide whether a move-only OpenCL event owner is worthwhile after the narrow explicit-release correction.
+- [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement.
+- [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts.
+- [ ] Extend CPU extra-buffer lifetime fixtures to KleidiAI, AMX, and SpacemiT hardware paths.
 - [ ] Verify SpacemiT worker cleanup and process-level Spine pool, huge-page mapping, device-fd, and TCM shutdown.
 - [ ] Validate KleidiAI null readback/copy callbacks, concurrent initialization, packed-layout portability, and packed-slot expansion.
 - [ ] Validate AMX allocator pairing, repeated tile-permission initialization, and disabled readback/copy paths.
-- [ ] Verify CANN reset semantics with authoritative runtime documentation and a destruction-order test matrix.
-- [ ] Design and test a real RPC synchronization/completion command and shared-socket serialization.
+- [ ] Verify CANN reset semantics with authoritative runtime documentation and a destruction-order matrix.
+- [ ] Design and test real RPC synchronization/completion and shared-socket serialization.
 - [ ] Verify SYCL all-queue and CUDA all-stream synchronization coverage.
 - [ ] Determine Vulkan performance-query-pool ownership and persistent device teardown.
-- [ ] Add asynchronous-destruction regression tests for accelerator and RPC backends.
 - [ ] Map architecture-specific graph-builder downcasts to `llama_memory_context_i` subtypes and exact state tensors.
-- [ ] Add runtime evidence for parsing, mapping, page faults, copies, event waits, KV/recurrent growth, activation peaks, synchronization, and teardown.
-- [ ] Verify the latest **Documentation CI**, **Generate pinned OpenCL lifecycle report**, **Audit current upstream OpenCL lifecycle**, **Deploy documentation**, and **Hourly research context check** runs.
+- [ ] Add runtime evidence for page faults, copies, event waits, KV/recurrent growth, activation peaks, synchronization, and teardown.
+- [ ] Verify latest Documentation CI, pinned/current OpenCL workflows, Pages deployment, and hourly context checks.
 - [ ] Verify the public Pages site returns HTTP 200 and renders branch-added architecture pages after PR #1 merges.
 
 ### Future improvements
 
-- [ ] Document the de facto synchronous `ggml_backend_tensor_set()` completion behavior explicitly in the public backend API, or record a deliberate weaker contract.
-- [ ] Rename the three OpenCL classifier records to `return_boundary_expansion_completion` and optionally annotate all 24 as required by the pinned synchronous set contract.
-- [ ] Search historical and newer pinned llama.cpp revisions for actual `transpose_2d(..., false)` use; remove the dormant branch or add a regression guard if it remains unused.
-- [ ] Add a machine-readable metadata file containing the pinned commit and extractor version to the OpenCL evidence artifact.
-- [ ] Add enclosing-function metadata only for lifecycle groups that remain ambiguous after source review.
-- [ ] Extend OpenCL lexical masking only if pinned-source evidence requires raw strings, disabled preprocessor regions, or macro expansion.
+- [ ] Add an ARM NEON+dotprod CPU repack lifetime case after the x86 AVX2 fixture.
+- [ ] Document ordinary `ggml_backend_tensor_set()` completion semantics explicitly or record a deliberate weaker contract.
+- [ ] Rename the three OpenCL classifier records to `return_boundary_expansion_completion`.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
 - [ ] Extend interactive-link validation to built HTML IDs, generated routes, assets, and plugin-generated anchors.
 - [ ] Locate strong public contracts for model sharing, context concurrency, thread safety, backend synchronization, and destruction order.
 - [ ] Prototype per-layer LRU expert-cache instrumentation with separate logical, OS-residency, and backend-copy validity.
 - [ ] Prototype cache-aware routing before `ggml_argsort_top_k()`.
 - [ ] Quantify mmap alias, mapped-copy, direct-read, synchronous-upload, and asynchronous-upload paths.
-- [ ] Extend the source index with file, object, symbol, subsystem, and caller/callee landing pages.
 - [ ] Add dedicated mmap/page-fault, CPU-thread, backend-queue, KV-cache, recurrent-memory, MoE-routing, and scheduler-timeline visualizers.
-- [ ] Add a searchable detailed-research-log index and commit-pinned link checking.
 
 ### Completed
 
-- [x] Run the exact current-upstream OpenCL lifecycle audit at `505b1ed15ca80e2a19f12ff4ac365e40fb374053`: the same 51 direct waits, 46 unmatched simple event references, and 22/24 follow-up split remain; the generated current-source release-only candidate reaches zero unmatched events without removing synchronization.
-- [x] Trace the three OpenCL nested-scope waits and compare the generic wrapper plus pinned CUDA and SYCL implementations: ordinary tensor-set is de facto synchronous, so all remaining 24 OpenCL conversion/expansion waits are required by the pinned return contract even though the header does not state it normatively.
-- [x] Add `scripts/classify_opencl_set_tensor_waits.py` to the pinned workflow, preserve its JSON artifact, and CI-guard the reviewed 24-record split: 21 temporary upload-buffer releases, 3 nested scope exits, all inside `ggml_backend_opencl_buffer_set_tensor()`, and zero `other` records.
-- [x] Reproducibly classify the remaining 24 unmatched OpenCL waits: 21 immediately precede `clReleaseMemObject(data_device)`, while 3 end nested lexical scopes inside `ggml_backend_opencl_buffer_set_tensor()`.
-- [x] Generate a concrete behavior-preserving patch for all 46 pinned OpenCL event leaks and CI-prove 50 released / 0 unmatched simple waits while preserving all 51 waits and the independent 22/24 synchronization classification.
-- [x] Add a bounded `followed_by_same_queue_blocking_read` annotation to the waited-event report and CI-guard the reviewed 22 blocking-read / 24 other unmatched split while keeping ownership status independent.
-- [x] Classify 22 of the 46 unmatched OpenCL waits as redundant before an immediate same-queue `clEnqueueReadBuffer(..., CL_TRUE, ...)`; retain 24 waits for separate contract and consumer-order analysis.
-- [x] Add a bounded simple-local OpenCL wait/release diagnostic and pin the source-evidence workflow to the audited 50 simple-identifier records, 4 released, and 46 unmatched counts.
-- [x] Resolve pinned `CL_CHECK` failure semantics: OpenCL errors log, assert, invoke `ggml_abort()`, and unconditionally terminate with `abort()`; successful-path event releases do not need recoverable-error cleanup.
-- [x] Audit all 51 pinned direct `clWaitForEvents()` sites: 5 waited events are released, while 46 local command-event references have no release or ownership transfer.
-- [x] Classify the Q4_0 conversion temporary-buffer group: both branches explicitly wait before releasing `data_device`, but both omit `clReleaseEvent(evt)` and leak one event reference per conversion.
-- [x] Audit every pinned `transpose_2d*()` call site: all 53 typed-wrapper call sites use the default `blocking=true`; the `blocking=false` branch has zero callers and is dormant in the baseline.
-- [x] Classify pinned OpenCL `transpose_2d()` immediate sub-buffer release: the nonblocking branch is locally safe under command retention, while all reachable pinned callers additionally wait for copy completion.
-- [x] Fix the OpenCL artifact manifest to use artifact-root basenames, verify it with `sha256sum -c` before upload, and guard the exact two filenames.
-- [x] Resolve the optional Adreno binary-library lifetime: the raw handle is lost, the library remains process-lifetime, invalid-symbol loads are not closed, and close-before-kernel ordering is absent rather than unsafe.
-- [x] Preserve the complete exact pinned OpenCL translation unit and SHA-256 manifest beside the generated lifecycle report.
-- [x] Resolve pinned OpenCL queue/context ownership: shared context and per-device backend context/queue persist in static process-lifetime device state; wrapper free finishes the queue and drops only a reference.
-- [x] Verify pinned OpenCL scheduler events are unsupported and buffer deleters use buffer-local `cl_mem` ownership rather than the destroyed backend wrapper.
-- [x] Add direct context/queue creation and retention APIs to the lifecycle extractor with exact-line tests.
-- [x] Inspect the complete pinned lifecycle artifact and classify local completion, cross-device synchronization, and temporary wait-before-release paths.
-- [x] Add a GitHub-hosted pinned OpenCL report workflow, bounded source context, lexical masking, focused tests, and CI coverage.
-- [x] Add bounded source-index support and regressions for attributes, trailing returns, constraints, operators, special members, initializer lists, delegating constructors, and unsupported constructor syntax telemetry.
-- [x] Add a reusable backend teardown audit method, cross-backend comparison, CPU optional-buffer lifetime audits, and an implementation-ready destruction harness.
-- [x] Publish canonical GGUF, model placement, model/context, graph/MoE, memory-lifetime, scheduler, teardown, and inference-atlas pages.
+- [x] Select the first CPU repack regression's exact pinned case: Q4_0 `[32, 8]` × F32 `[32, 1]` on AVX2, with pointer-identity, trait, and operation-admission guards.
+- [x] Identify `tests/test-cpu-extra-buffer-lifetime.cpp` as the dedicated integration point and reuse the backend-op harness approach.
+- [x] Audit current upstream OpenCL ownership and generate/review a behavior-preserving 46-release patch preserving all waits.
+- [x] Resolve the pinned OpenCL wait groups, synchronous tensor-set contract, event ownership, queue/context lifetime, and Adreno library lifetime.
+- [x] Add source indexing, canonical GGUF/model/context/graph/scheduler/memory pages, inference atlas, teardown audit method, and CPU optional-buffer destruction specification.
 <!-- PROJECT-TODOS:END -->
 
 ## Contribution and license
