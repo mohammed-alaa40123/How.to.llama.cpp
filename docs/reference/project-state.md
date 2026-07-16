@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 20:49 Africa/Cairo_
+_Last updated: 2026-07-16 21:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -29,25 +29,27 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Representative Chromium smoke lane covering four routes at desktop and mobile widths.
 - Evidence-driven browser-smoke corrections preserving the route matrix and functional assertions.
 - Pinned build-time Mermaid asset preparation for both Documentation CI and Pages.
+- Generated-SVG-aware Mermaid browser detector preserving exact source-diagram counts.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Documentation CI run `29517576858` passed every stage before representative Chromium validation and failed only at `home/desktop`.
-- The retained `diagnostics.jsonl` reports `rendered 0 of 1 Mermaid diagrams after 15000 ms` and `pageerror: Uncaught (in promise) #<Object>`.
-- Artifact `8383341340` has digest `sha256:9d0160217e04350c4462e51751dd50afd75700c6d9095cc218f3607c6f1d82bf` and is retained until 2026-07-30.
-- The local server log shows successful responses for the generated page and all same-origin assets requested before failure.
-- `scripts/prepare_mermaid_asset.sh` now pins Mermaid `11.16.0` and downloads it before strict builds.
-- `mkdocs.yml` now references `assets/javascripts/vendor/mermaid.min.js`, so deployed pages load Mermaid from the same origin.
-- Documentation CI and Pages invoke the same preparation script before `mkdocs build --strict`.
-- The 15-second exact rendered-SVG requirement and the complete four-route by two-viewport matrix remain unchanged.
+- Documentation CI run `29521791301` passed every stage before representative Chromium validation and failed only at `home/desktop`.
+- Pinned Mermaid preparation, strict MkDocs output, generated-site accessibility validation, and Playwright installation all passed.
+- Artifact `8385027631` has digest `sha256:7e65774799d6fa713cb85d9c82db28c02d165a1817d8349292ff51dac7850954` and expires on 2026-07-30.
+- Its `diagnostics.jsonl` reports `rendered 0 of 1 Mermaid diagrams after 15000 ms`, `pageerror: Object`, and the separate external GitHub releases-API 404.
+- The retained full-page screenshot visibly contains a complete rendered flowchart with nodes, labels, and edges.
+- The old detector only accepted an SVG nested inside the original `main .mermaid` container.
+- `scripts/validate_browser_smoke.mjs` now recognizes nested Mermaid SVGs and generated SVGs whose IDs begin with `mermaid-`, deduplicates them, and compares the result against the exact source-diagram count.
+- The corrected `waitForFunction` call now passes the expected count as the argument and the 15-second timeout as the options object.
 
 ### Interpretation
 
-- A full bounded timeout with zero SVGs is not evidence for increasing the timeout.
-- Moving Mermaid retrieval to build time converts runtime CDN failure into a visible build failure and makes browser validation representative of the deployed asset graph.
-- The remaining uncaught promise rejection may disappear with same-origin loading or may expose a separate Mermaid initialization or diagram-syntax issue.
+- The screenshot establishes that the page rendered a diagram even though the detector reported zero; this was an observability mismatch rather than evidence of a blank diagram.
+- Browser validation should assert the user-visible generated SVG, not one implementation-specific DOM nesting arrangement.
+- Exact source-count equality remains necessary so that recognizing generated SVGs cannot allow partial rendering to pass.
+- The remaining `pageerror: Object` may still identify a separate initialization or post-render rejection and remains fatal until explained.
 
 ### Historical
 
@@ -56,15 +58,16 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - The 16:51 run added representative browser validation.
 - The 17:52 and 18:52 runs corrected unsupported console-origin assumptions and added durable JSONL diagnostics.
 - The 19:50 run added bounded Mermaid readiness.
-- The 20:49 run followed the documented fallback and moved Mermaid from browser-runtime CDN loading to a pinned build-time local asset.
+- The 20:49 run moved Mermaid from browser-runtime CDN loading to a pinned build-time local asset.
+- The 21:51 run corrected the generated-SVG detector after the retained screenshot contradicted the zero-render assertion.
 - Workflow run `29481384561` established pinned CPU_REPACK evidence: twenty AVX2-confirmed ASan/LSan processes with stable NMSE `3.82787e-16`.
 
 ### Open questions
 
-- Whether all eight route/viewport combinations pass with same-origin Mermaid.
-- Whether the uncaught promise rejection is solely a dependency-load failure or a separate diagram problem.
+- Whether all eight route/viewport combinations pass with the corrected generated-SVG detector.
+- Whether `pageerror: Object` persists after visible rendering is recognized.
 - Whether the external GitHub releases-API 404 should be fixed independently.
-- Whether a content checksum should be pinned after the first successful build preserves the exact Mermaid bytes.
+- Whether a content checksum should be pinned after the first successful browser run preserves the exact Mermaid bytes.
 - Whether the post-merge Pages deployment serves the merged Architecture pages correctly.
 - Whether axe-core and explicit dark-palette contrast/focus checks should be added after the smoke lane stabilizes.
 - Whether current upstream `8ee54c8` still admits the exact CPU_REPACK fixture at runtime.
@@ -72,11 +75,11 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-inspect the first same-origin Mermaid Chromium result
-  → confirm the full eight-case matrix or inspect the now-local exception
-  → keep the rendered-SVG requirement strict
-  → fix diagram syntax or initialization if the local asset still fails
-  → after passing, add axe-core or computed contrast/focus-style coverage
+inspect the corrected generated-SVG detector result
+  → confirm the full eight-case matrix or isolate the remaining page exception
+  → keep exact source-count equality and the 15-second bound strict
+  → if pageerror remains, preserve the exact Mermaid rejection object
+  → after passing, pin the asset checksum and add axe-core or contrast/focus coverage
 ```
 
 ## In progress
@@ -92,21 +95,21 @@ inspect the first same-origin Mermaid Chromium result
 
 - PR #1 merged to `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
 - Current increment is on PR #2 branch `automation/accessibility-ci-result`.
-- Added detailed note `logs/research/2026-07-16/2049-vendored-mermaid-build-asset.md`.
-- Added `scripts/prepare_mermaid_asset.sh`; updated `mkdocs.yml`, Documentation CI, Pages, README living TODOs, project state, and research log.
+- Added detailed note `logs/research/2026-07-16/2151-mermaid-render-detector.md`.
+- Updated `scripts/validate_browser_smoke.mjs`, README living TODOs, project state, and research log.
 - Research ledger unchanged because no external source was added or reclassified.
-- The same-origin Mermaid policy awaits its commit-scoped Documentation CI result.
+- The corrected generated-SVG detector awaits its commit-scoped Documentation CI result.
 
 ## Known blockers and caveats
 
-- **Current browser result:** the same-origin Mermaid build has not yet produced authoritative workflow evidence.
+- **Current browser result:** the corrected Mermaid detector has not yet produced authoritative workflow evidence.
 - **Live-site verification:** direct Pages access remains unavailable, so production HTTP status and deployed rendering cannot be independently tested.
 - **Local validation:** cloning the repository is blocked by DNS resolution for `github.com` in the current runtime.
 - **Pages workflow visibility:** commit-scoped workflow lookup exposes pull-request-triggered runs and does not surface the post-merge `main` Pages run.
 - **Accessibility scope:** the smoke lane does not prove computed contrast, complete keyboard order, visible focus quality for every control, axe-core compliance, or deep interactive-state behavior.
-- **Build-time dependency:** Mermaid is still fetched externally during CI and Pages builds, but publication now fails visibly if the pinned asset cannot be prepared.
+- **Build-time dependency:** Mermaid is still fetched externally during CI and Pages builds, but publication fails visibly if the pinned asset cannot be prepared.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the fixture has not yet been compiled and executed against that exact current revision.
-- **Evidence retention:** CPU_REPACK artifact `8368782428` expires on 2026-08-15; browser artifact `8383341340` expires on 2026-07-30.
+- **Evidence retention:** CPU_REPACK artifact `8368782428` expires on 2026-08-15; browser artifacts `8383341340` and `8385027631` expire on 2026-07-30.
 - **Hardware scope:** the passing CPU_REPACK evidence is AVX2-specific and does not cover ARM, KleidiAI, AMX, or SpacemiT.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
 - Mapping, allocation, residency, representation validity, command completion, event ownership, reset, and release remain distinct states.
