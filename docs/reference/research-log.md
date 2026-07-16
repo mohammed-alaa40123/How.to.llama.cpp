@@ -200,3 +200,27 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Upstreaming the fixture as a permanent regression target.
 - Extending the same methodology to ARM repack, KleidiAI, AMX, and SpacemiT.
+
+## 2026-07-16 12:50 — CPU_REPACK upstream-suitability decision
+
+**Verified**
+
+- Reviewed current upstream commit `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6`.
+- Current `tests/CMakeLists.txt` still supports a dedicated `llama_build_and_test()` target and groups direct-backend tests under `if (NOT GGML_BACKEND_DL)`.
+- Current `ggml/src/ggml-cpu/repack.h` still declares the internal `ggml_backend_cpu_repack_buffer_type()` entry point.
+- Staged `docs/reference/upstream-cpu-repack-lifetime-fixture-proposal.md` with the proposed two-file patch, title, body, guards, path proof, teardown sequence, and validation requirements.
+
+**Interpretation**
+
+- The passing fixture is suitable for upstream review as a narrow dedicated test.
+- The project generator and twenty-process evidence workflow should remain project-side; the first upstream patch should contain only the C++ test and CMake registration.
+- Ordinary cross-platform CI may skip without AVX2, but at least one sanitizer lane must require AVX2 and successful CPU_REPACK admission.
+
+**Historical**
+
+- This decision follows source audit, deterministic fixture construction, exact pinned compilation, and the first passing twenty-process ASan/LSan evidence.
+
+**Open questions**
+
+- Current-tree runtime admission and compilation at `8ee54c8`.
+- The authoritative upstream AVX2 sanitizer lane and preferred path-proof observable.
