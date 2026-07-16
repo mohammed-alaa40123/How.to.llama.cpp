@@ -104,3 +104,24 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 - Whether to extract shared test helpers or duplicate a bounded subset.
 - Which existing Q4_0 tolerance should be reused.
 - Whether ARM NEON+dotprod should be the immediate second fixture.
+
+## 2026-07-16 06:49 — CPU repack fixture patch generator
+
+**Verified**
+
+- Added a deterministic, pinned-revision generator for the candidate `test-cpu-extra-buffer-lifetime.cpp` and CMake patch.
+- Added focused tests for revision scope, minimal dimensions, AVX2 gate, exact repack path-proof tokens, teardown order, CMake registration, and deterministic output.
+- The generated C++ skeleton intentionally exits with status 2, preventing structural validation from being misreported as successful runtime lifetime evidence.
+
+**Interpretation**
+
+- This is a safe intermediate implementation artifact: the fixture contract is now executable as deterministic patch generation, while pinned-tree compilation, numerical comparison, and ASan/LSan remain explicit requirements.
+
+**Historical**
+
+- The previous two increments selected the integration point and exact admitted shape; this increment materializes them into reproducible patch output.
+
+**Open questions**
+
+- Exact pinned graph/allocation implementation and Q4_0 tolerance.
+- AVX2 availability on the authoritative sanitizer runner.
