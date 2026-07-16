@@ -111,6 +111,8 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/architecture/backend-teardown-audit-method.md` | Reusable completion/ownership audit worksheet |
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | CPU optional-buffer lifetime fixture specification and executable evidence |
 | `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL lifecycle and ownership audit |
+| `docs/publication/two-week-execution-plan.md` | July 17-31 executable-learning milestones and acceptance gates |
+| `docs/labs/legal-fixture-decision.md` | Model-free Lab 0, synthetic GGUF, and learner-provided inference boundary |
 
 <!-- PROJECT-TODOS:START -->
 ## Living TODO list
@@ -119,6 +121,9 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
+- [ ] Implement the deterministic synthetic GGUF generator, manifest, golden parser output, SHA-256, alignment/range assertions, and bounded corruption fixtures defined in `docs/labs/legal-fixture-decision.md`.
+- [ ] Define the Lab 0 machine-readable checker interface with distinct environment, configure, compile, executable-launch, model-load, and inference states; never report model-free launch as inference.
+- [ ] Add machine-readable trace, media-manifest, and learner-progress schemas with focused validators.
 - [ ] Inspect and fix the first generated-HTML accessibility validation result; document any narrow Material-theme exceptions rather than weakening checks globally.
 - [ ] Generate and compile the staged two-file CPU_REPACK lifetime candidate against current upstream `8ee54c8`, requiring AVX2, exact path admission, numerical agreement, and ASan/LSan-clean backend-before-buffer teardown.
 - [ ] Open or manually stage the current-tree CPU_REPACK regression pull request after runtime validation; connected GitHub App upstream write permission may remain blocked.
@@ -161,6 +166,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Define the initial legal fixture boundary: mandatory model-free Lab 0 checks, optional learner-provided inference, deterministic project-owned synthetic GGUF for Lab 1, and explicit trace evidence kinds.
+- [x] Add the dependency-ordered July 17-31 executable-learning plan with learning contracts and acceptance gates.
 - [x] Add a dependency-free built-site accessibility structure check for language metadata, main landmarks, top-level headings, image alternatives, iframe titles, and button names, with focused tests and Documentation CI integration.
 - [x] Add an Architecture section index with six goal-based entry points, concise summaries for all Architecture pages, and ordered paths for beginners, mmap/copy/page-fault research, scheduling, and teardown.
 - [x] Group the flat Architecture navigation into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends without changing page routes.

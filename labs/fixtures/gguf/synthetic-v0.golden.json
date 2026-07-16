@@ -1,0 +1,45 @@
+{
+  "alignment": 32,
+  "data_offset": 384,
+  "file_sha256": "688d0ef28c83d6972e291cc0342e695540eae8496b3ec8e92bdbb91e3982a564",
+  "file_size": 428,
+  "format": "GGUF",
+  "metadata": {
+    "fixture.tags": [
+      "synthetic",
+      "non-model"
+    ],
+    "fixture.title": "How.to.llama.cpp GGUF anatomy",
+    "fixture.version": 1,
+    "general.alignment": 32,
+    "general.architecture": "educational"
+  },
+  "metadata_count": 5,
+  "tensor_count": 2,
+  "tensors": [
+    {
+      "absolute_offset": 384,
+      "dimensions": [
+        2,
+        2
+      ],
+      "name": "demo.matrix",
+      "relative_offset": 0,
+      "sha256": "ad73b9acd6e4a74b2f5bb5386658ce3bb146cd040a1867646ab3b973fb6632b1",
+      "size": 16,
+      "type": "F32"
+    },
+    {
+      "absolute_offset": 416,
+      "dimensions": [
+        3
+      ],
+      "name": "demo.vector",
+      "relative_offset": 32,
+      "sha256": "ee0053802d7a5ad4b883a2e76a4532e5a14f60b6e177f580886a3b5b82bce78e",
+      "size": 12,
+      "type": "F32"
+    }
+  ],
+  "version": 3
+}

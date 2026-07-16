@@ -163,3 +163,32 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Whether generated Material pages need narrow documented exceptions, and whether the next increment should audit standalone explorers or add a representative axe-core browser lane.
+
+## 2026-07-16 23:00 — Executable-learning two-week plan
+
+**Verified**
+
+- Added the July 17-31 dependency-ordered plan for Lab 0, GGUF Anatomy, and Executable Lecture 0.
+- Defined browser, local-native, and cloud-container tiers; deterministic technical-media authority; trace evidence kinds; local-first progress; validation; accessibility; privacy; and milestone gates.
+
+**Interpretation**
+
+- Architecture, fixture, validation, and evidence boundaries should precede broad implementation.
+
+## 2026-07-17 00:00 — Initial legal fixture decision
+
+**Verified**
+
+- Mandatory Lab 0 now requires no redistributed model and separates build/executable-launch evidence from real inference.
+- Optional inference uses a learner-provided local GGUF path and remains a distinct outcome.
+- Lab 1 will use deterministically generated project-owned GGUF bytes with educational metadata, tensor descriptors, alignment, offsets, and non-model payloads.
+- No external source, model weights, corpus, personal data, paid API, or ordinary-CI network download was introduced.
+
+**Interpretation**
+
+- Separate build, format, and inference evidence paths are safer and more educationally precise than one third-party tiny model fixture.
+
+**Open questions**
+
+- Exact synthetic fixture fields and whether its binary is committed or generated from a committed script and manifest.
+- The smallest stable pinned GGUF-loading path for Executable Lecture 0.

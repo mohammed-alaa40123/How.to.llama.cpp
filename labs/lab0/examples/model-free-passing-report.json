@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-07-17T01:45:00+03:00",
+  "revisions": {
+    "course": "786489c",
+    "llama_cpp": "8ee54c8"
+  },
+  "platform": {
+    "os": "linux",
+    "architecture": "x86_64",
+    "execution_tier": "local_native"
+  },
+  "model_input": {
+    "kind": "none"
+  },
+  "phases": {
+    "environment": {"state": "passed", "command": "uv sync --locked", "exit_code": 0, "duration_ms": 1000, "evidence": "locked environment ready"},
+    "configure": {"state": "passed", "command": "cmake -S llama.cpp -B build -G Ninja", "exit_code": 0, "duration_ms": 2000, "evidence": "configuration completed"},
+    "compile": {"state": "passed", "command": "cmake --build build --target llama-cli", "exit_code": 0, "duration_ms": 12000, "evidence": "bounded target compiled"},
+    "executable_launch": {"state": "passed", "command": "build/bin/llama-cli --help", "exit_code": 0, "duration_ms": 25, "evidence": "help text emitted"},
+    "model_load": {"state": "not_attempted", "evidence": "mandatory path is model-free"},
+    "inference": {"state": "not_attempted", "evidence": "no model was supplied"}
+  },
+  "claims": {
+    "environment_ready": true,
+    "native_configured": true,
+    "native_compiled": true,
+    "executable_launched": true,
+    "model_loaded": false,
+    "inference_succeeded": false
+  }
+}
