@@ -19,7 +19,44 @@ class CpuRepackLifetimeFixtureGeneratorTest(unittest.TestCase):
             "ggml_backend_buffer_get_base(buffer)",
             "ggml_backend_buffer_get_alignment(buffer)",
             "ggml_backend_tensor_alloc(buffer, tensor, addr) == GGML_STATUS_SUCCESS",
-            "allocate_single_tensor(repack_buft,",
+            "allocate_single_tensor(weight_buft, f.weight)",
+        ]
+        for token in required:
+            with self.subTest(token=token):
+                self.assertIn(token, patch)
+
+    def test_patch_contains_complete_graph_execution(self):
+        patch = render_patch()
+        required = [
+            "ggml_init_params params = {};",
+            "params.no_alloc = true;",
+            "ggml_new_tensor_2d(f.ctx, GGML_TYPE_Q4_0, k, m)",
+            "ggml_new_tensor_2d(f.ctx, GGML_TYPE_F32,  k, n)",
+            "ggml_mul_mat(f.ctx, f.weight, f.input)",
+            "ggml_build_forward_expand(f.graph, f.output)",
+            "ggml_gallocr_new(ordinary_buft)",
+            "ggml_gallocr_alloc_graph(f.allocator, f.graph)",
+            "ggml_backend_graph_compute(reference_backend, reference.graph)",
+            "ggml_backend_graph_compute(tested_backend, tested.graph)",
+            "read_output(reference.output)",
+            "read_output(tested.output)",
+        ]
+        for token in required:
+            with self.subTest(token=token):
+                self.assertIn(token, patch)
+
+    def test_patch_uses_identical_deterministic_inputs_and_nmse(self):
+        patch = render_patch()
+        required = [
+            "make_q4_0_weights()",
+            "ggml_quantize_chunk(",
+            "written == quantized.size()",
+            "ggml_backend_tensor_set(reference.weight, weights.data(), 0, weights.size())",
+            "ggml_backend_tensor_set(tested.weight, weights.data(), 0, weights.size())",
+            "ggml_backend_tensor_set(reference.input, input.data()",
+            "ggml_backend_tensor_set(tested.input, input.data()",
+            "const double error = nmse(reference_output, tested_output);",
+            "error <= 1e-7",
         ]
         for token in required:
             with self.subTest(token=token):
@@ -30,17 +67,24 @@ class CpuRepackLifetimeFixtureGeneratorTest(unittest.TestCase):
         required = [
             "ggml_cpu_has_avx2()",
             "ggml_backend_cpu_repack_buffer_type()",
-            "tested_weight->buffer->buft == repack_buft",
-            "tested_weight->extra != nullptr",
-            "ggml_backend_supports_op(tested_backend, tested_mul_mat)",
-            "normalized mean squared error <= 1e-7",
+            "tested.weight->buffer->buft == repack_buft",
+            "tested.weight->extra != nullptr",
+            "ggml_backend_supports_op(tested_backend, tested.output)",
             "ggml_backend_free(tested_backend);",
+            "ggml_gallocr_free(tested.allocator);",
+            "ggml_free(tested.ctx);",
             "ggml_backend_buffer_free(repack_buffer);",
-            "return 2;",
+            "PASS: CPU_REPACK path executed",
+            "return 0;",
         ]
         for token in required:
             with self.subTest(token=token):
                 self.assertIn(token, patch)
+
+        self.assertLess(
+            patch.index("ggml_backend_free(tested_backend);"),
+            patch.index("ggml_backend_buffer_free(repack_buffer);"),
+        )
 
     def test_patch_encodes_minimal_shape_and_cmake_target(self):
         patch = render_patch()
@@ -53,10 +97,10 @@ class CpuRepackLifetimeFixtureGeneratorTest(unittest.TestCase):
         )
         self.assertIn("${PROJECT_SOURCE_DIR}/ggml/src", patch)
 
-    def test_skeleton_cannot_create_false_success_evidence(self):
+    def test_incomplete_boundary_is_removed(self):
         patch = render_patch()
-        self.assertIn("INCOMPLETE: generated fixture skeleton", patch)
-        self.assertNotIn("return 0;\n+}", patch.split("INCOMPLETE:", 1)[1])
+        self.assertNotIn("INCOMPLETE:", patch)
+        self.assertNotIn("return 2;", patch)
 
 
 if __name__ == "__main__":
