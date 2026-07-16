@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 18:52 Africa/Cairo_
+_Last updated: 2026-07-16 19:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -27,52 +27,50 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Architecture navigation grouping and audience-based Architecture landing page.
 - Generated-HTML accessibility structure validator and first passing authoritative run.
 - Representative Chromium smoke lane covering four routes at desktop and mobile widths.
-- Two evidence-driven browser-diagnostic corrections without removing routes, viewports, or functional assertions.
+- Three evidence-driven browser-smoke corrections that preserve the route matrix and functional assertions.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Documentation CI run `29509089935` passed every stage through strict MkDocs build, generated-site accessibility validation, and Playwright installation, then failed only at the first Chromium case.
-- Failure artifact `8379817149` has digest `sha256:dc05c0e186b03edf770871de7546fb76c7e116ea607214c99b60f88c674bac9f` and expires on 2026-07-30.
-- Its server log contains HTTP 200 responses for the homepage, Material assets, project CSS and JavaScript, sitemap, search index, and search worker, with no same-origin 404 before failure.
-- The previous classifier treated an empty console source URL as same-origin.
-- `scripts/validate_browser_smoke.mjs` now distinguishes `same-origin`, `cross-origin`, and `unlocated` records.
-- Explicit same-origin console errors, same-origin failed requests, page exceptions, route failures, missing Mermaid SVGs, landmarks, headings, search, overflow, reduced motion, iframe titles, and focus failures remain hard failures.
-- Cross-origin and unlocated records are warnings and are durably written to `browser-smoke-artifacts/diagnostics.jsonl` with route, viewport, outcome, failure message, and classified records.
+- Documentation CI run `29513543532` passed all pre-browser stages and failed only at `home/desktop` with `rendered 0 of 1 Mermaid diagrams`.
+- The browser step started at 15:59:04 UTC and failed at 15:59:07 UTC, so the SVG assertion sampled the DOM before bounded application-level render readiness was established.
+- Artifact `8381667636` was retained with digest `sha256:08294cbc09e5699e261abafd6c4b5e3153a2fadf2b4b6586303ec413e1cdbf81`.
+- `scripts/validate_browser_smoke.mjs` now waits up to 15 seconds for every Mermaid container under `main` to contain an SVG.
+- After the wait, exact rendered/count equality remains mandatory. A timeout still fails with the observed counts.
+- Same-origin console and request failures, page exceptions, HTTP failures, landmarks, headings, search, horizontal overflow, reduced motion, iframe titles, keyboard focus, and the complete four-route by two-viewport matrix remain hard failures.
 
 ### Interpretation
 
-- An empty console location is ambiguous and should not be treated as proof of a local-site failure.
-- The three-way classifier strengthens attribution while preserving user-visible functional contracts.
-- Durable JSONL evidence closes the earlier gap where the exact triggering console record existed only in ephemeral job output.
+- Playwright `networkidle` is a network-quiet signal, not proof that asynchronous Mermaid DOM rendering has completed.
+- Waiting for the exact visible postcondition is stronger than adding an arbitrary sleep and less flaky than immediate sampling.
+- This distinguishes a readiness race from a true render failure without weakening the rendering contract.
 
 ### Historical
 
-- The 13:16 run identified accessibility verification as a major site-quality gap.
-- The 13:52 run improved Architecture discoverability.
-- The 14:51 run added the generated-HTML accessibility guard.
-- The 15:51 run preserved its first passing result.
-- The 16:51 run added the representative browser-preview fallback.
-- The 17:52 run separated same-origin and cross-origin diagnostics.
-- The 18:52 run removed the remaining empty-location-as-local assumption and added durable per-case diagnostics.
-- Workflow run `29481384561` established the pinned CPU_REPACK executable evidence: twenty AVX2-confirmed ASan/LSan processes with stable NMSE `3.82787e-16`.
+- The 13:16 and 13:52 runs improved website information architecture.
+- The 14:51 and 15:51 runs added and validated generated-HTML accessibility checks.
+- The 16:51 run added representative browser validation.
+- The 17:52 and 18:52 runs corrected unsupported console-origin assumptions and added durable JSONL diagnostics.
+- The 19:50 run identified the first genuine functional race and added bounded Mermaid readiness.
+- Workflow run `29481384561` established pinned CPU_REPACK evidence: twenty AVX2-confirmed ASan/LSan processes with stable NMSE `3.82787e-16`.
 
 ### Open questions
 
-- Whether all eight route/viewport combinations pass under the three-way classifier.
-- Which exact unlocated diagnostic recurs; the next artifact will preserve it.
-- Whether recurring Mermaid diagnostics justify vendoring Mermaid locally.
-- Whether the post-merge Pages deployment succeeded and serves the merged Architecture pages.
+- Whether all eight route/viewport combinations pass with bounded Mermaid readiness.
+- Whether recurring CDN delays or failures justify vendoring Mermaid locally.
+- Which cross-origin or unlocated diagnostics recur after the matrix advances beyond the first case.
+- Whether the post-merge Pages deployment serves the merged Architecture pages correctly.
 - Whether axe-core and explicit dark-palette contrast/focus checks should be added after the smoke lane stabilizes.
 - Whether current upstream `8ee54c8` still admits the exact CPU_REPACK fixture at runtime.
 
 ## Immediate next task
 
 ```text
-inspect the three-way-classifier Chromium workflow result
-  → inspect diagnostics.jsonl for recurring unlocated/cross-origin records
-  → preserve explicit same-origin and functional failures as hard failures
+inspect the bounded Mermaid-readiness Chromium result
+  → confirm the full eight-case matrix or inspect retained diagnostics
+  → keep the rendered-SVG requirement strict
+  → vendor Mermaid locally if bounded readiness still fails from CDN behavior
   → after passing, add axe-core or computed contrast/focus-style coverage
 ```
 
@@ -89,21 +87,21 @@ inspect the three-way-classifier Chromium workflow result
 
 - PR #1 merged to `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
 - Current increment is on PR #2 branch `automation/accessibility-ci-result`.
-- Added detailed note `logs/research/2026-07-16/1852-browser-smoke-unlocated-diagnostics.md`.
+- Added detailed note `logs/research/2026-07-16/1950-browser-smoke-mermaid-readiness.md`.
 - Updated the browser validator, README living TODOs, project state, and research log.
 - Research ledger unchanged because no external source was added or reclassified.
-- The three-way browser policy awaits its commit-scoped Documentation CI result.
+- The bounded Mermaid-readiness policy awaits its commit-scoped Documentation CI result.
 
 ## Known blockers and caveats
 
-- **Three-way browser result:** the latest classifier has not yet produced authoritative workflow evidence.
-- **Previous diagnostic evidence:** run `29509089935` did not retain the exact console record; the new JSONL artifact closes this gap for future runs.
+- **Current browser result:** the readiness-aware validator has not yet produced authoritative workflow evidence.
 - **Live-site verification:** direct Pages access remains unavailable, so production HTTP status and deployed rendering cannot be independently tested.
+- **Local validation:** cloning the repository is blocked by DNS resolution for `github.com` in the current runtime.
 - **Pages workflow visibility:** commit-scoped workflow lookup exposes pull-request-triggered runs and does not surface the post-merge `main` Pages run.
 - **Accessibility scope:** the smoke lane does not prove computed contrast, complete keyboard order, visible focus quality for every control, axe-core compliance, or deep interactive-state behavior.
 - **External-resource sensitivity:** Mermaid is loaded from a CDN; rendered SVGs remain required.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the fixture has not yet been compiled and executed against that exact current revision.
-- **Evidence retention:** CPU_REPACK artifact `8368782428` expires on 2026-08-15; browser artifact `8379817149` expires on 2026-07-30.
+- **Evidence retention:** CPU_REPACK artifact `8368782428` expires on 2026-08-15; browser artifact `8381667636` is retained for 14 days.
 - **Hardware scope:** the passing CPU_REPACK evidence is AVX2-specific and does not cover ARM, KleidiAI, AMX, or SpacemiT.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
 - Mapping, allocation, residency, representation validity, command completion, event ownership, reset, and release remain distinct states.
