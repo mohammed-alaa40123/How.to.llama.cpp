@@ -148,3 +148,28 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Confirm the exact pinned per-tensor allocation API before emitting the final C++ body.
 - AVX2 availability on the authoritative sanitizer runner.
+
+## 2026-07-16 08:51 — CPU repack per-tensor allocation API
+
+**Verified**
+
+- Pinned `ggml_backend_tensor_alloc(buffer, tensor, addr)` takes an address inside an already allocated backend buffer, not an offset.
+- Pinned `ggml_tallocr_alloc()` demonstrates the required backend-specific size query, buffer-base/alignment calculation, and tensor initialization sequence.
+- Updated the generator with a concrete one-tensor-per-buffer helper using `ggml_backend_buft_get_alloc_size()`, `ggml_backend_buft_alloc_buffer()`, the aligned buffer base, and a `GGML_STATUS_SUCCESS` check.
+- Updated focused tests to enforce the complete allocation API sequence.
+- The ordinary graph allocator recognizes externally buffered tensors as already allocated, allowing only the tested Q4_0 weight to use CPU_REPACK.
+
+**Interpretation**
+
+- Direct per-tensor allocation is suitable and clearer than a separate weight-only context for this fixture.
+- Backend-specific allocation size must be used because repacked physical storage may differ from ordinary Q4_0 bytes.
+
+**Historical**
+
+- This closes the allocation-API question left by the previous graph/allocation design increment.
+
+**Open questions**
+
+- Complete graph execution, deterministic upload, readback, and `1e-7` NMSE comparison.
+- Confirm final graph allocation preserves the externally allocated repack weight.
+- AVX2 availability on the authoritative sanitizer runner.
