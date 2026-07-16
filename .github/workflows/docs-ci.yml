@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Check out documentation repository
         uses: actions/checkout@v4
@@ -28,6 +28,11 @@ jobs:
         with:
           python-version: '3.12'
           cache: pip
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
       - name: Read README and current project context
         env:
@@ -80,3 +85,36 @@ jobs:
 
       - name: Validate built-site accessibility structure
         run: python3 scripts/validate_built_site_accessibility.py site
+
+      - name: Install browser smoke dependency
+        run: |
+          npm install --no-save playwright@1.54.1
+          npx playwright install --with-deps chromium
+
+      - name: Validate representative routes in Chromium
+        env:
+          BASE_URL: http://127.0.0.1:8000
+          BROWSER_SMOKE_ARTIFACT_DIR: browser-smoke-artifacts
+        run: |
+          python3 -m http.server 8000 --directory site > browser-smoke-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8000/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8000/ >/dev/null
+          node scripts/validate_browser_smoke.mjs
+
+      - name: Upload browser smoke failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-smoke-failure-${{ github.sha }}
+          path: |
+            browser-smoke-artifacts/
+            browser-smoke-server.log
+          if-no-files-found: ignore
+          retention-days: 14
