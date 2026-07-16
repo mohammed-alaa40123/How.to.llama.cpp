@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 08:51 Africa/Cairo_
+_Last updated: 2026-07-16 09:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -27,46 +27,47 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ### Verified
 
-- The pinned `ggml_backend_tensor_alloc()` signature is `(buffer, tensor, addr)`: its third argument is an address inside an already allocated backend buffer, not an offset.
-- Pinned `ggml_tallocr_alloc()` queries backend-specific allocation size, obtains an aligned address from the buffer base, and passes that address to `ggml_backend_tensor_alloc()`.
-- A one-weight CPU_REPACK fixture can allocate exactly one buffer using `ggml_backend_buft_get_alloc_size(repack_buft, tested_weight)`, use the buffer base as the aligned address, and initialize the tested weight directly.
-- The generator now emits a concrete `allocate_single_tensor()` helper and focused tests enforce allocation-size, buffer-allocation, base-address, alignment, and initialization-status calls.
-- The graph allocator recognizes externally buffered tensors as already allocated, so ordinary graph allocation can still own tested activation/output while leaving the repack weight untouched.
+- The deterministic CPU_REPACK generator now emits a complete two-graph candidate test instead of returning status 2.
+- The generated reference and tested graphs use the same Q4_0 `[32, 8]` weight bytes and F32 `[32, 1]` activation values.
+- Only the tested weight is explicitly allocated from `ggml_backend_cpu_repack_buffer_type()`; activation and output are allocated through an ordinary CPU graph allocator.
+- The candidate asserts exact repack buffer identity, non-null repack traits, and `ggml_backend_supports_op()` before execution.
+- Both graphs are computed, outputs are read back, and normalized mean squared error must be `<= 1e-7`.
+- The tested CPU backend wrapper is freed before the retained repack buffer.
+- Seven focused Python tests passed and now forbid the former `INCOMPLETE`/`return 2` boundary.
 
 ### Interpretation
 
-- Direct per-tensor allocation is simpler and more explicit than a separate weight-only context for this bounded fixture.
-- Use backend-specific allocation size rather than `ggml_nbytes(weight)`, because CPU_REPACK physical storage may differ from ordinary Q4_0 bytes.
-- The resulting ownership split is exact: repack buffer owns the tested weight storage/traits; ordinary CPU allocation owns activation/output; the CPU backend wrapper executes but does not own the repack buffer.
+- The generator-level implementation gap is closed, but this is not runtime lifetime proof until the candidate compiles and runs against the pinned llama.cpp tree.
+- Exact path proof remains necessary because numerically correct output alone could come from ordinary CPU fallback.
+- The next authoritative evidence must combine compiler validation, AVX2 confirmation, successful CPU_REPACK admission, repeated execution, and ASan/LSan.
 
 ### Historical
 
-- Prior runs selected the dedicated executable, minimal Q4_0 `[32, 8]` × F32 `[32, 1]` AVX2 case, deterministic generator, two-graph topology, identical quantized inputs, and `1e-7` NMSE contract.
-- This run closes the remaining allocation-API question and advances the generator from comments to a concrete allocation helper.
+- Prior runs selected the dedicated executable, minimal Q4_0 `[32, 8]` × F32 `[32, 1]` AVX2 case, two-graph topology, identical quantized inputs, `1e-7` NMSE contract, and address-based per-tensor allocation API.
+- This run combines those decisions into a complete generated C++ body.
 
 ### Open questions
 
-- Complete graph construction, ordinary activation/output allocation, deterministic quantization/upload, compute, readback, and NMSE comparison.
-- Verify the final graph allocator does not replace or reinitialize the externally allocated repack weight.
+- Whether the exact pinned compiler accepts every generated API spelling and graph-overhead sizing choice.
+- Whether the graph allocator preserves the externally allocated repack weight exactly as expected at runtime.
 - Whether GitHub-hosted Ubuntu exposes AVX2 consistently enough for authoritative sanitizer coverage.
+- Whether repetition should occur inside the test executable or through repeated CTest invocations.
 
 ## Immediate next task
 
 ```text
-complete two no-alloc graphs
-  → preallocate tested Q4_0 weight with allocate_single_tensor(repack_buft, ...)
-  → allocate activation/output from ordinary CPU storage
-  → quantize deterministic F32 weight once and upload identical Q4_0 bytes
-  → upload identical deterministic F32 activation
-  → prove buffer identity, non-null traits, and supports_op
-  → execute both graphs and compare NMSE <= 1e-7
-  → free tested backend wrapper before retained repack buffer
-  → repeat under ASan/LSan on AVX2-confirmed CI
+materialize generated patch in pinned llama.cpp tree
+  → compile dedicated test target
+  → correct any pinned-API mismatch
+  → prove AVX2 and CPU_REPACK admission
+  → execute repeatedly under ASan/LSan
+  → fail on skip when AVX2 is present
+  → preserve backend-wrapper-before-buffer teardown
 ```
 
 ## In progress
 
-- First CPU repack lifetime fixture graph execution and sanitizer CI.
+- Pinned-tree compilation and sanitizer CI for the first CPU repack lifetime fixture.
 - Manual/upstream submission of the reviewed 46-release OpenCL ownership correction; GitHub App write access to upstream is blocked.
 - Source-index regeneration with pinned line-aware symbol inventory.
 - Hardware-specific lifetime extensions for KleidiAI, AMX, and SpacemiT.
@@ -75,14 +76,14 @@ complete two no-alloc graphs
 ## Publication and validation state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-16/0851-cpu-repack-per-tensor-allocation-api.md`.
+- Added detailed note `logs/research/2026-07-16/0951-cpu-repack-complete-generated-fixture.md`.
 - Updated the generator, focused tests, README living TODOs, this project checkpoint, and the concise research log.
 - Research ledger unchanged: this increment used the already-recorded pinned llama.cpp primary source.
 - Final-head workflow results must be checked after all context commits.
 
 ## Known blockers and caveats
 
-- **Runtime proof:** the generated source still intentionally exits nonzero until graph execution and comparison are implemented.
+- **Runtime proof:** the complete generated source has not yet been compiled or executed against the pinned tree.
 - **Hardware gate:** successful skip on a non-AVX2 runner does not validate repack lifetime ordering.
 - **Path proof:** correct numerical output alone is insufficient because ordinary CPU fallback can produce the same answer.
 - **Sanitizer scope:** process-static dispatch metadata should be documented separately, not hidden with broad leak suppression.
