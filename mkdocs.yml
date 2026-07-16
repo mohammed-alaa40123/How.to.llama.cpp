@@ -77,32 +77,36 @@ nav:
       - llama_model: objects/llama-model.md
       - llama_context: objects/llama-context.md
   - Architecture:
-      - Repository map: architecture/repository-map.md
-      - Public API and minimal example: architecture/public-api-minimal-example.md
-      - Model and GGUF loader Pass A: architecture/model-gguf-loader-pass-a.md
-      - Runtime context and memory Pass A: architecture/runtime-context-memory-pass-a.md
-      - Context memory implementations: architecture/context-memory-implementations.md
-      - Backend scheduler Pass A: architecture/backend-scheduler-pass-a.md
-      - System ownership and execution map: architecture/system-ownership-and-execution-map.md
-      - Model and context teardown order: architecture/model-context-teardown-order.md
-      - Scheduler core teardown: architecture/scheduler-teardown-core.md
-      - Backend teardown audit method: architecture/backend-teardown-audit-method.md
-      - Backend teardown comparison: architecture/backend-teardown-comparison.md
-      - CPU backend teardown: architecture/cpu-backend-teardown.md
-      - CPU repack extra-buffer lifetime: architecture/cpu-repack-extra-buffer-lifetime.md
-      - CPU AMX extra-buffer lifetime: architecture/cpu-amx-extra-buffer-lifetime.md
-      - CPU KleidiAI extra-buffer lifetime: architecture/cpu-kleidiai-extra-buffer-lifetime.md
-      - CPU SpacemiT IME extra-buffer lifetime: architecture/cpu-spacemit-ime-extra-buffer-lifetime.md
-      - CPU extra-buffer comparison: architecture/cpu-extra-buffer-comparison.md
-      - CPU extra-buffer destruction harness: architecture/cpu-extra-buffer-destruction-harness.md
-      - CUDA backend teardown: architecture/cuda-backend-teardown.md
-      - Metal backend teardown: architecture/metal-backend-teardown.md
-      - Vulkan command lifetimes: architecture/vulkan-command-lifetime.md
-      - Vulkan backend teardown: architecture/vulkan-backend-teardown.md
-      - SYCL backend teardown: architecture/sycl-backend-teardown.md
-      - RPC backend teardown: architecture/rpc-backend-teardown.md
-      - CANN backend teardown: architecture/cann-backend-teardown.md
-      - OpenCL build and buffer lifetimes: architecture/opencl-build-and-buffer-lifetimes.md
+      - Core architecture:
+          - Repository map: architecture/repository-map.md
+          - Public API and minimal example: architecture/public-api-minimal-example.md
+          - Model and GGUF loader Pass A: architecture/model-gguf-loader-pass-a.md
+          - Runtime context and memory Pass A: architecture/runtime-context-memory-pass-a.md
+          - Context memory implementations: architecture/context-memory-implementations.md
+          - Backend scheduler Pass A: architecture/backend-scheduler-pass-a.md
+          - System ownership and execution map: architecture/system-ownership-and-execution-map.md
+      - Ownership and teardown:
+          - Model and context teardown order: architecture/model-context-teardown-order.md
+          - Scheduler core teardown: architecture/scheduler-teardown-core.md
+          - Backend teardown audit method: architecture/backend-teardown-audit-method.md
+          - Backend teardown comparison: architecture/backend-teardown-comparison.md
+          - CPU backend teardown: architecture/cpu-backend-teardown.md
+      - CPU optional buffers:
+          - CPU repack extra-buffer lifetime: architecture/cpu-repack-extra-buffer-lifetime.md
+          - CPU AMX extra-buffer lifetime: architecture/cpu-amx-extra-buffer-lifetime.md
+          - CPU KleidiAI extra-buffer lifetime: architecture/cpu-kleidiai-extra-buffer-lifetime.md
+          - CPU SpacemiT IME extra-buffer lifetime: architecture/cpu-spacemit-ime-extra-buffer-lifetime.md
+          - CPU extra-buffer comparison: architecture/cpu-extra-buffer-comparison.md
+          - CPU extra-buffer destruction harness: architecture/cpu-extra-buffer-destruction-harness.md
+      - Accelerator backends:
+          - CUDA backend teardown: architecture/cuda-backend-teardown.md
+          - Metal backend teardown: architecture/metal-backend-teardown.md
+          - Vulkan command lifetimes: architecture/vulkan-command-lifetime.md
+          - Vulkan backend teardown: architecture/vulkan-backend-teardown.md
+          - SYCL backend teardown: architecture/sycl-backend-teardown.md
+          - RPC backend teardown: architecture/rpc-backend-teardown.md
+          - CANN backend teardown: architecture/cann-backend-teardown.md
+          - OpenCL build and buffer lifetimes: architecture/opencl-build-and-buffer-lifetimes.md
   - Inference lifecycle:
       - Guided inference atlas: lifecycle/inference-atlas.md
       - Brief end to end: lifecycle/end-to-end.md
