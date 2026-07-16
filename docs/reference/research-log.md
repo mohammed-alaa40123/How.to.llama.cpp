@@ -186,3 +186,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Post-merge Pages deployment, deployed responsive/keyboard behavior, and standalone interactive explorer accessibility remain unverified.
+
+## 2026-07-16 16:51 — Representative browser smoke lane
+
+**Verified**
+
+- Added `scripts/validate_browser_smoke.mjs` and integrated pinned Playwright/Chromium execution into Documentation CI.
+- The homepage, Architecture index, ownership diagram page, and interactive inference workflow are tested at desktop and mobile widths.
+- Checks cover HTTP navigation, landmarks/headings, search discoverability, horizontal overflow, reduced-motion propagation, visible keyboard focus, Architecture links, iframe titles, and browser errors.
+- Failure screenshots and the local HTTP server log are retained as workflow evidence.
+- PR #2's preceding head passed Documentation CI run `29500081175`.
+
+**Interpretation**
+
+- Preview-browser testing supplies deterministic responsive and interaction-shell evidence while production Pages remains unreachable.
+- It complements rather than replaces static structural validation or a full accessibility audit.
+
+**Historical**
+
+- This implements the fallback proposed after the first passing static accessibility result.
+
+**Open questions**
+
+- The first browser-lane workflow result, external Mermaid behavior, selector stability, explicit contrast checks, axe-core coverage, and deep standalone-explorer keyboard operation.
