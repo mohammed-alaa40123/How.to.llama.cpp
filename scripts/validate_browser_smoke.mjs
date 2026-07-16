@@ -4,6 +4,7 @@ import { chromium } from "playwright";
 const baseUrl = (process.env.BASE_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
 const artifactDir = process.env.BROWSER_SMOKE_ARTIFACT_DIR ?? "browser-smoke-artifacts";
 const diagnosticsPath = `${artifactDir}/diagnostics.jsonl`;
+const mermaidRenderTimeoutMs = Number(process.env.MERMAID_RENDER_TIMEOUT_MS ?? 15_000);
 
 const routes = [
   { path: "/", name: "home" },
@@ -35,6 +36,37 @@ function classifyUrl(url) {
 async function writeDiagnostics(record) {
   await mkdir(artifactDir, { recursive: true });
   await appendFile(diagnosticsPath, `${JSON.stringify(record)}\n`, "utf8");
+}
+
+async function waitForMermaid(page, routeName, viewportName) {
+  const count = await page.locator("main .mermaid").count();
+  if (count === 0) return { count: 0, rendered: 0 };
+
+  try {
+    await page.waitForFunction(
+      () => {
+        const diagrams = [...document.querySelectorAll("main .mermaid")];
+        return diagrams.length > 0 && diagrams.every(diagram => diagram.querySelector("svg") !== null);
+      },
+      { timeout: mermaidRenderTimeoutMs },
+    );
+  } catch {
+    // The detailed assertion below reports the observed rendered/count state.
+  }
+
+  const state = await page.evaluate(() => {
+    const diagrams = [...document.querySelectorAll("main .mermaid")];
+    return {
+      count: diagrams.length,
+      rendered: diagrams.filter(diagram => diagram.querySelector("svg") !== null).length,
+    };
+  });
+
+  assert(
+    state.rendered === state.count,
+    `${routeName}/${viewportName}: rendered ${state.rendered} of ${state.count} Mermaid diagrams after ${mermaidRenderTimeoutMs} ms`,
+  );
+  return state;
 }
 
 async function inspectRoute(browser, route, viewport) {
@@ -110,17 +142,7 @@ async function inspectRoute(browser, route, viewport) {
       assert(title.length > 0, `${route.name}/${viewport.name}: iframe has no accessible title`);
     }
 
-    const mermaidState = await page.evaluate(() => {
-      const diagrams = [...document.querySelectorAll("main .mermaid")];
-      return {
-        count: diagrams.length,
-        rendered: diagrams.filter(diagram => diagram.querySelector("svg") !== null).length,
-      };
-    });
-    assert(
-      mermaidState.rendered === mermaidState.count,
-      `${route.name}/${viewport.name}: rendered ${mermaidState.rendered} of ${mermaidState.count} Mermaid diagrams`,
-    );
+    await waitForMermaid(page, route.name, viewport.name);
 
     await page.keyboard.press("Tab");
     const focusState = await page.evaluate(() => {
