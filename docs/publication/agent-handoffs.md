@@ -148,3 +148,29 @@ This increment turns the fixture-policy decision into an auditable educational a
 ### Next dependency
 
 Add machine-readable trace, media-manifest, and learner-progress schemas with focused validators, unless the orchestrator ranks the Lab 0 checker interface first.
+
+## 2026-07-17 01:58 — Documentation Builder
+
+### Assignment status
+
+`orchestrator-state.md` and `evidence-backlog.md` remain unavailable. The repository TODO ranked the Lab 0 checker interface ahead of the remaining schema package, so this run selected that bounded dependency.
+
+### Bounded increment completed
+
+Added the Lab 0 learning contract, JSON Schema, dependency-free semantic validator, a valid model-free example report, five focused unit tests, and [`../../logs/research/2026-07-17/0158-lab0-checker-interface.md`](../../logs/research/2026-07-17/0158-lab0-checker-interface.md).
+
+The interface separates `environment`, `configure`, `compile`, `executable_launch`, `model_load`, and `inference`. It rejects impossible success chains and prevents a model-free executable launch from being represented as model loading or inference.
+
+### Truth labels
+
+- **Verified:** the committed validator encodes explicit dependency and claim-consistency invariants.
+- **Interpretation:** the report makes setup evidence auditable and turns a predicted learner misconception into a machine-checkable assessment artifact.
+- **Open question:** the exact bounded build target, diagnostic taxonomy, platform matrix, and command runner remain unimplemented.
+
+### Validation and safety
+
+Five focused tests were added, but this connector environment could not execute them locally. CI is the remaining validation authority for the branch head. No model, prompt, generated output, telemetry, credential, paid API, or personal data was introduced.
+
+### Next dependency
+
+Add the trace schema and authored sample trace contract unless the orchestrator publishes a different dependency order.
