@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 01:00 Africa/Cairo_
+_Last updated: 2026-07-17 01:58 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -31,35 +31,34 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - EAAI July 17-31 executable-learning plan and initial agent handoff ledger on draft PR #3.
 - Legal-fixture decision separating model-free Lab 0 checks, learner-provided optional inference, and a project-owned synthetic GGUF for Lab 1.
 - Deterministic synthetic GGUF v0 generator, manifest, golden parse, SHA-256, alignment/range checks, and three bounded corruption variants.
+- Lab 0 machine-readable checker contract, JSON Schema, dependency-free semantic validator, model-free example report, and focused invariant tests.
 
 ## Latest concrete findings
 
 ### Verified
 
-- `scripts/generate_synthetic_gguf.py` deterministically emits a 428-byte little-endian GGUF v3 fixture.
-- The fixture contains five metadata records, including string, `uint32`, and string-array values, plus two F32 tensor descriptors with different shapes.
-- Tensor data begins at absolute offset 384; the second tensor begins at relative offset 32 under 32-byte alignment.
-- Whole-file SHA-256 is `688d0ef28c83d6972e291cc0342e695540eae8496b3ec8e92bdbb91e3982a564`.
-- Golden parsing, checksum, alignment/range assertions, and rejection of bad magic, misaligned offset, and truncated payload pass in focused tests.
-- The generator and tests use only project-authored numeric payloads and perform no model download, paid API call, telemetry, or learner-data collection.
+- The Lab 0 report has six distinct phases: environment, configure, compile, executable launch, model load, and inference.
+- The validator enforces configure→compile→launch→model-load→inference dependencies.
+- Model-free reports must leave model loading and inference not attempted or not applicable.
+- Claim booleans must exactly match passed phase states; a passing `--help` launch cannot claim model loading or inference.
+- Learner-provided model metadata accepts only a redacted basename and optional checksum, not a full path.
 
 ### Interpretation
 
-- Generator plus manifest and golden output are stronger review artifacts than an opaque committed binary; binaries and corruption variants can be regenerated deterministically for labs and tests.
-- The fixture validates format understanding, not llama.cpp model loading or inference.
-- The bounded fixture is now suitable as the shared source for the first browser parser and authored GGUF-loading trace.
+- The checker contract makes setup evidence auditable and turns the build-equals-inference misconception into a machine-checkable formative assessment.
+- The contract is deliberately narrower than a full Lab 0 runner: it freezes evidence semantics before platform-specific commands and diagnostics are implemented.
 
 ### Historical
 
 - Earlier work established source-pinned documentation, executable lifetime regressions, accessibility guards, and browser-level CI work.
-- The 2026-07-16 23:00 run froze the two-week executable-learning plan; the 2026-07-17 00:00 run closed its fixture policy; the 01:00 run implemented the first fixture package.
+- The 23:00 run froze the two-week plan; the 00:00 run closed fixture policy; the 01:00 run implemented the synthetic GGUF; the 01:58 run defined the Lab 0 checker contract.
 
 ### Open questions
 
-- Browser/Python parser agreement is not yet implemented.
-- Native acceptance through pinned llama.cpp `gguf_init_from_file` is not yet tested in ordinary CI.
-- Which bounded llama.cpp parser entry path yields the clearest first trace with stable source links.
+- Which bounded llama.cpp target and command matrix should the first runner execute.
 - Which operating systems and container targets belong in the first reproducibility matrix.
+- Which diagnostic codes are stable and educationally useful.
+- Browser/Python parser agreement and pinned native GGUF-reader acceptance remain unimplemented.
 
 ## Immediate next task
 
@@ -70,8 +69,6 @@ add machine-readable executable-learning schemas
   → local progress schema
   → focused malformed-input validators
 ```
-
-If the orchestrator ranks it higher, define the Lab 0 checker interface before environment automation.
 
 ## In progress
 
@@ -85,22 +82,21 @@ If the orchestrator ranks it higher, define the Lab 0 checker interface before e
 ## Publication and validation state
 
 - Draft PR #3 is based on `agent/eaai-two-week-execution-plan`.
-- The branch now contains the two-week plan, handoff ledger, legal-fixture decision, deterministic GGUF fixture package, focused tests, and durable run notes.
-- Focused local validation passed for the exact generator/test contents before repository write.
-- No external source was newly introduced; the official GGUF specification was already recorded in the research ledger.
+- The branch now contains the two-week plan, handoff ledger, legal-fixture decision, deterministic GGUF fixture package, Lab 0 checker contract, focused tests, and durable run notes.
+- No external source was newly introduced in this increment.
 - Final-head workflow results must be checked after context updates complete.
 
 ## Known blockers and caveats
 
 - **Orchestrator files:** `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are not yet available on the active branch, so dependency-safe recommendations are being followed.
+- **Execution validation:** this connector environment could not execute the new Python tests; Documentation CI is the remaining authority.
+- **Lab 0 runner:** the interface is defined, but no platform-specific build command runner exists yet.
 - **Browser agreement:** no browser parser yet proves agreement with the Python golden output.
-- **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be a valid inference model; pinned native GGUF-reader acceptance is a separate future check.
-- **Inference scope:** mandatory Lab 0 does not prove model loading or token generation; those require the separately labelled learner-provided-model extension.
-- **Live-site verification:** direct Pages access remains unavailable in this environment, so production rendering cannot be independently tested here.
+- **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be a valid inference model.
+- **Live-site verification:** direct Pages access remains unavailable in this environment.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the CPU_REPACK fixture has not yet been compiled and executed against that exact current revision.
 - **Evidence retention:** artifact `8368782428` expires on 2026-08-15.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
-- Mapping, allocation, residency, representation validity, command completion, event ownership, reset, and release remain distinct states.
 
 ## Definition of done for the executable-learning foundation phase
 
