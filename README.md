@@ -16,7 +16,7 @@ How.to.llama.cpp explains the path from a GGUF file to generated tokens: backend
 - Clickable foundations and inference explorers.
 - A research ledger for official docs, PRs, discussions, papers, talks, videos, blogs, and technical posts.
 - Scripts for source mirroring, indexing, context loading, validation, and site health checks.
-- GitHub Actions for context validation, upstream indexing, strict documentation CI, pinned/current OpenCL evidence, CPU_REPACK sanitizer evidence, and Pages deployment.
+- GitHub Actions for context validation, upstream indexing, strict documentation CI, generated-site browser smoke checks, pinned/current OpenCL evidence, CPU_REPACK sanitizer evidence, and Pages deployment.
 
 Current progress lives in [`docs/reference/project-state.md`](docs/reference/project-state.md).
 
@@ -56,7 +56,7 @@ Start a local run with:
 | Manual and extractor changes | `.github/workflows/opencl-lifecycle-report.yml` | Preserve and validate pinned OpenCL lifecycle evidence |
 | Manual and current-audit changes | `.github/workflows/current-opencl-lifecycle-audit.yml` | Regenerate exact current-upstream OpenCL ownership evidence |
 | CPU_REPACK fixture changes | `.github/workflows/cpu-repack-lifetime-sanitizer.yml` | Compile and repeatedly execute the pinned fixture under ASan/LSan on AVX2 |
-| Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, strict MkDocs output, and built-site accessibility structure |
+| Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, strict MkDocs output, accessibility structure, and representative Chromium routes |
 | Every push to `main` | `.github/workflows/pages.yml` | Build, deploy, and verify the public site |
 
 ## Implementation method
@@ -83,8 +83,11 @@ python3 scripts/validate_interactive_links.py
 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 -m py_compile scripts/*.py tests/*.py
 bash -n scripts/*.sh
+./scripts/prepare_mermaid_asset.sh
 mkdocs build --strict
 python3 scripts/validate_built_site_accessibility.py site
+python3 -m http.server 8000 --directory site
+BASE_URL=http://127.0.0.1:8000 node scripts/validate_browser_smoke.mjs
 ./scripts/check_site.sh
 ```
 
@@ -119,14 +122,14 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Inspect and fix the first generated-HTML accessibility validation result; document any narrow Material-theme exceptions rather than weakening checks globally.
+- [ ] Inspect the corrected Mermaid generated-SVG detector result across the full four-route by two-viewport matrix.
+- [ ] If visible rendering is recognized but `pageerror: Object` remains, preserve the exact Mermaid rejection object before deciding whether it is a real site failure.
+- [ ] Fix or explicitly classify the external GitHub releases-API 404 observed in browser diagnostics.
+- [ ] Verify the post-merge Pages deployment and audit the homepage, Architecture index, grouped navigation, search, diagrams, iframe interactions, keyboard access, card layout, and responsive behavior.
 - [ ] Generate and compile the staged two-file CPU_REPACK lifetime candidate against current upstream `8ee54c8`, requiring AVX2, exact path admission, numerical agreement, and ASan/LSan-clean backend-before-buffer teardown.
 - [ ] Open or manually stage the current-tree CPU_REPACK regression pull request after runtime validation; connected GitHub App upstream write permission may remain blocked.
-- [ ] Verify the Architecture index, grouped navigation, search, diagrams, iframe interactions, keyboard access, card layout, and responsive behavior on the deployed Pages site after PR #1 merges.
 - [ ] Add an admitted ARM NEON+dotprod or KleidiAI optional-buffer lifetime fixture with the same exact-path, numerical, teardown, and sanitizer requirements.
 - [ ] Submit or manually stage the reviewed 46-release current-upstream OpenCL ownership correction; upstream GitHub App write permission is currently blocked.
-- [ ] Decide whether a move-only OpenCL event owner is worthwhile after the narrow explicit-release correction.
-- [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement.
 - [ ] Regenerate the pinned source inventory with line-aware `symbol_locations`, pinned links, and unsupported-syntax counts.
 - [ ] Extend CPU extra-buffer lifetime fixtures to KleidiAI, AMX, and SpacemiT hardware paths.
 - [ ] Verify SpacemiT worker cleanup and process-level Spine pool, huge-page mapping, device-fd, and TCM shutdown.
@@ -139,17 +142,19 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 - [ ] Map architecture-specific graph-builder downcasts to `llama_memory_context_i` subtypes and exact state tensors.
 - [ ] Add runtime evidence for page faults, copies, event waits, KV/recurrent growth, activation peaks, synchronization, and teardown.
 - [ ] Verify latest Documentation CI, pinned/current OpenCL workflows, Pages deployment, and hourly context checks.
-- [ ] Verify the public Pages site returns HTTP 200 and renders branch-added architecture pages after PR #1 merges.
 
 ### Future improvements
 
-- [ ] Add a browser-based accessibility lane for representative routes, computed contrast, keyboard focus, accessible names, and reduced motion.
-- [ ] Audit standalone interactive explorers for keyboard operation, visible focus, text equivalents, and iframe/fullscreen fallbacks.
-- [ ] Add an Inference lifecycle section index if deployed review confirms the same cross-section discoverability gap.
+- [ ] Add a pinned checksum for the prepared Mermaid asset after the first successful same-origin browser run establishes the exact bytes.
+- [ ] Add axe-core and explicit computed-contrast/focus-style checks after the representative browser matrix stabilizes.
+- [ ] Audit standalone interactive explorers for complete keyboard operation, visible focus, text equivalents, and iframe/fullscreen fallbacks.
+- [ ] Add an Inference lifecycle section index if deployed review confirms the same discoverability gap.
 - [ ] Remove or explicitly explain the duplicate Foundations explorer navigation entry.
 - [ ] Add text equivalents, legends, fullscreen/static fallbacks, and mobile variants for major diagrams and interactive explorers.
 - [ ] Add repeated CPU_REPACK executions inside one process to complement the passing twenty-process teardown coverage.
 - [ ] Document ordinary `ggml_backend_tensor_set()` completion semantics explicitly or record a deliberate weaker contract.
+- [ ] Decide whether a move-only OpenCL event owner is worthwhile after the narrow explicit-release correction.
+- [ ] Decide whether deterministic OpenCL registry/process-exit teardown should be documented as an upstream improvement.
 - [ ] Rename the three OpenCL classifier records to `return_boundary_expansion_completion`.
 - [ ] Add sanitizer regression tests for backend-before-scheduler destruction.
 - [ ] Extend interactive-link validation to built HTML IDs, generated routes, assets, and plugin-generated anchors.
@@ -161,22 +166,18 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
-- [x] Add a dependency-free built-site accessibility structure check for language metadata, main landmarks, top-level headings, image alternatives, iframe titles, and button names, with focused tests and Documentation CI integration.
-- [x] Add an Architecture section index with six goal-based entry points, concise summaries for all Architecture pages, and ordered paths for beginners, mmap/copy/page-fault research, scheduling, and teardown.
-- [x] Group the flat Architecture navigation into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends without changing page routes.
-- [x] Complete a structured website UX review covering information architecture, discoverability, diagrams, interaction, accessibility, consistency, and live-verification blockers.
-- [x] Decide upstream suitability of the passing CPU_REPACK fixture and stage a narrow two-file proposal at `docs/reference/upstream-cpu-repack-lifetime-fixture-proposal.md`, reviewed against current upstream `8ee54c8`.
-- [x] Preserve the first passing CPU_REPACK workflow evidence: run `29481384561`, twenty AVX2-confirmed ASan/LSan processes, stable NMSE `3.82787e-16`, no skip, and artifact `8368782428` with digest `sha256:ef4f0a36e27f7811b106e0a870c278724f1e620aed991807b7f2c3e443d1efaf`.
-- [x] Update the CPU optional-buffer destruction-harness page with the executable CPU_REPACK result and bounded ownership conclusion.
-- [x] Add a pinned-source AVX2-confirmed ASan/LSan workflow that materializes, compiles, and requires twenty non-skipped executions of the generated CPU_REPACK fixture.
-- [x] Replace the generated CPU_REPACK fixture's intentional status-2 boundary with complete two-graph construction, deterministic shared Q4_0/F32 inputs, compute/readback, `1e-7` NMSE, exact path proof, and backend-before-buffer teardown.
-- [x] Confirm the pinned per-tensor allocation API: allocate a backend buffer using `ggml_backend_buft_get_alloc_size()`, pass an aligned address from its base to `ggml_backend_tensor_alloc()`, and preserve explicit buffer ownership.
-- [x] Resolve the pinned CPU_REPACK fixture's no-allocation graph/allocation topology and reuse the backend-op `1e-7` NMSE contract for identical quantized inputs.
-- [x] Add a deterministic pinned-revision generator and structural tests for the CPU_REPACK lifetime fixture patch.
-- [x] Select the first CPU repack regression's exact pinned case: Q4_0 `[32, 8]` × F32 `[32, 1]` on AVX2, with pointer-identity, trait, and operation-admission guards.
-- [x] Identify `tests/test-cpu-extra-buffer-lifetime.cpp` as the dedicated integration point and reuse the backend-op harness approach.
-- [x] Audit current upstream OpenCL ownership and generate/review a behavior-preserving 46-release patch preserving all waits.
-- [x] Resolve the pinned OpenCL wait groups, synchronous tensor-set contract, event ownership, queue/context lifetime, and Adreno library lifetime.
+- [x] Inspect the first same-origin Mermaid Chromium result: run `29521791301` retained a screenshot with a visibly rendered flowchart while the detector reported zero; correct the detector to recognize generated Mermaid SVGs while preserving exact source-diagram counts.
+- [x] Move Mermaid from browser-runtime CDN loading to a pinned build-time local asset shared by Documentation CI and Pages after the full readiness bound still produced zero SVGs.
+- [x] Inspect the third representative Chromium failure: run `29513543532` reached the real Mermaid assertion and failed `0 of 1` about 2.6 seconds after browser start; the validator now waits for the exact SVG postcondition for up to 15 seconds while preserving a hard bounded failure.
+- [x] Inspect the second representative Chromium failure and replace empty-location-as-local with same-origin, cross-origin, and unlocated diagnostic classes plus per-case JSONL evidence.
+- [x] Inspect the first representative Chromium failure and keep same-origin errors and functional Mermaid rendering strict while treating external diagnostics as warnings.
+- [x] Add a representative Chromium smoke lane for four routes at desktop and mobile widths with retained failure evidence.
+- [x] Add and validate a dependency-free built-site accessibility structure guard.
+- [x] Add an Architecture section index and task-oriented navigation grouping.
+- [x] Complete a structured website UX review.
+- [x] Decide upstream suitability of the passing CPU_REPACK fixture and stage a narrow two-file proposal.
+- [x] Preserve twenty passing AVX2-confirmed CPU_REPACK ASan/LSan processes with stable NMSE `3.82787e-16`.
+- [x] Audit current upstream OpenCL ownership and generate a behavior-preserving 46-release correction.
 - [x] Add source indexing, canonical GGUF/model/context/graph/scheduler/memory pages, inference atlas, teardown audit method, and CPU optional-buffer destruction specification.
 <!-- PROJECT-TODOS:END -->
 

@@ -44,6 +44,9 @@ jobs:
           python3 -m py_compile scripts/*.py
           test -s docs/assets/interactive/inference-flow.html
 
+      - name: Prepare pinned Mermaid asset
+        run: bash scripts/prepare_mermaid_asset.sh
+
       - name: Install documentation dependencies
         run: pip install -r requirements.txt
 

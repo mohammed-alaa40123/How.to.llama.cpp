@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 14:51 Africa/Cairo_
+_Last updated: 2026-07-16 21:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -22,52 +22,64 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Source indexing, strict documentation CI, Pages deployment workflow, health checks, and durable run context.
 - Generic scheduler plus CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown audits.
 - CPU repack, AMX, KleidiAI, and SpacemiT extra-buffer ownership comparison and destruction-harness specification.
-- Complete pinned/current OpenCL event-ownership audit, generated 46-release correction, synchronous tensor-set contract analysis, and upstream proposal staging.
+- Complete pinned/current OpenCL event-ownership audit and generated 46-release correction.
 - First executable CPU_REPACK lifetime regression with exact path proof, numerical comparison, and repeated ASan/LSan evidence.
-- Upstream-suitability decision and staged two-file CPU_REPACK regression proposal.
-- Website UX review with task-oriented Architecture navigation grouping.
-- Architecture landing page with six goal-based entry points, concise page summaries, and ordered reading paths.
-- Dependency-free generated-HTML accessibility structure validator with focused tests and Documentation CI integration.
+- Architecture navigation grouping and audience-based Architecture landing page.
+- Generated-HTML accessibility structure validator and first passing authoritative run.
+- Representative Chromium smoke lane covering four routes at desktop and mobile widths.
+- Evidence-driven browser-smoke corrections preserving the route matrix and functional assertions.
+- Pinned build-time Mermaid asset preparation for both Documentation CI and Pages.
+- Generated-SVG-aware Mermaid browser detector preserving exact source-diagram counts.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Documentation CI previously stopped after `mkdocs build --strict`; it did not inspect generated HTML accessibility structure.
-- `scripts/validate_built_site_accessibility.py` now checks generated documentation pages for a non-empty `html[lang]`, exactly one `<main>`, exactly one `<h1>`, image `alt` attributes, non-empty iframe titles, and button accessible names.
-- Standalone `assets/interactive/` HTML is excluded because it does not use the MkDocs page shell and needs a separate interaction-focused audit.
-- The validator fails on a missing or empty site directory.
-- Four focused tests cover passing output, combined structural failures, interactive-asset exclusion, and missing/empty site handling.
-- Documentation CI runs the validator after the strict MkDocs build.
+- Documentation CI run `29521791301` passed every stage before representative Chromium validation and failed only at `home/desktop`.
+- Pinned Mermaid preparation, strict MkDocs output, generated-site accessibility validation, and Playwright installation all passed.
+- Artifact `8385027631` has digest `sha256:7e65774799d6fa713cb85d9c82db28c02d165a1817d8349292ff51dac7850954` and expires on 2026-07-30.
+- Its `diagnostics.jsonl` reports `rendered 0 of 1 Mermaid diagrams after 15000 ms`, `pageerror: Object`, and the separate external GitHub releases-API 404.
+- The retained full-page screenshot visibly contains a complete rendered flowchart with nodes, labels, and edges.
+- The old detector only accepted an SVG nested inside the original `main .mermaid` container.
+- `scripts/validate_browser_smoke.mjs` now recognizes nested Mermaid SVGs and generated SVGs whose IDs begin with `mermaid-`, deduplicates them, and compares the result against the exact source-diagram count.
+- The corrected `waitForFunction` call now passes the expected count as the argument and the 15-second timeout as the options object.
 
 ### Interpretation
 
-- This is a high-confidence regression guard, not a WCAG conformance claim.
-- Static generated-HTML checks complement Markdown/link validation and can catch structural accessibility regressions before deployment.
-- Computed contrast, focus visibility, keyboard order, responsive layout, reduced motion, and script-driven interactions still require browser-level testing.
+- The screenshot establishes that the page rendered a diagram even though the detector reported zero; this was an observability mismatch rather than evidence of a blank diagram.
+- Browser validation should assert the user-visible generated SVG, not one implementation-specific DOM nesting arrangement.
+- Exact source-count equality remains necessary so that recognizing generated SVGs cannot allow partial rendering to pass.
+- The remaining `pageerror: Object` may still identify a separate initialization or post-render rejection and remains fatal until explained.
 
 ### Historical
 
-- The 13:16 run identified accessibility verification as a major site-quality gap.
-- The 13:52 run improved Architecture discoverability; the 14:51 run implements the first automated built-output accessibility guard.
-- Current upstream commit `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6` still defines `llama_build_and_test()` and retains the internal CPU_REPACK buffer-type entry point.
-- Workflow run `29481384561` established the pinned CPU_REPACK executable evidence: twenty AVX2-confirmed ASan/LSan processes with stable NMSE `3.82787e-16`.
+- The 13:16 and 13:52 runs improved website information architecture.
+- The 14:51 and 15:51 runs added and validated generated-HTML accessibility checks.
+- The 16:51 run added representative browser validation.
+- The 17:52 and 18:52 runs corrected unsupported console-origin assumptions and added durable JSONL diagnostics.
+- The 19:50 run added bounded Mermaid readiness.
+- The 20:49 run moved Mermaid from browser-runtime CDN loading to a pinned build-time local asset.
+- The 21:51 run corrected the generated-SVG detector after the retained screenshot contradicted the zero-render assertion.
+- Workflow run `29481384561` established pinned CPU_REPACK evidence: twenty AVX2-confirmed ASan/LSan processes with stable NMSE `3.82787e-16`.
 
 ### Open questions
 
-- Whether all generated Material pages satisfy the new invariants without narrow documented exceptions.
-- Whether standalone interactive explorers provide complete keyboard operation, visible focus, and text equivalents.
-- Whether a browser-based axe-core lane should run on every pull request or a representative route subset.
-- Whether Mermaid and custom card colors meet contrast requirements in both palettes.
+- Whether all eight route/viewport combinations pass with the corrected generated-SVG detector.
+- Whether `pageerror: Object` persists after visible rendering is recognized.
+- Whether the external GitHub releases-API 404 should be fixed independently.
+- Whether a content checksum should be pinned after the first successful browser run preserves the exact Mermaid bytes.
+- Whether the post-merge Pages deployment serves the merged Architecture pages correctly.
+- Whether axe-core and explicit dark-palette contrast/focus checks should be added after the smoke lane stabilizes.
 - Whether current upstream `8ee54c8` still admits the exact CPU_REPACK fixture at runtime.
 
 ## Immediate next task
 
 ```text
-wait for the first Documentation CI accessibility result
-  → inspect and fix genuine generated-HTML failures
-  → document narrow theme exceptions rather than weakening checks globally
-  → add standalone-interactive or browser-based accessibility coverage
+inspect the corrected generated-SVG detector result
+  → confirm the full eight-case matrix or isolate the remaining page exception
+  → keep exact source-count equality and the 15-second bound strict
+  → if pageerror remains, preserve the exact Mermaid rejection object
+  → after passing, pin the asset checksum and add axe-core or contrast/focus coverage
 ```
 
 ## In progress
@@ -77,24 +89,27 @@ wait for the first Documentation CI accessibility result
 - Source-index regeneration with pinned line-aware symbol inventory.
 - Hardware-specific lifetime extensions for KleidiAI, AMX, SpacemiT, and ARM repack.
 - Runtime overlays for mmap/page faults, scheduler copies, events, KV/recurrent growth, and backend queues.
-- Website browser-level accessibility and deployed verification.
+- Website deployed verification and browser-level accessibility validation.
 
 ## Publication and validation state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added `scripts/validate_built_site_accessibility.py`, `tests/test_validate_built_site_accessibility.py`, and detailed note `logs/research/2026-07-16/1451-built-site-accessibility-guard.md`.
-- Updated Documentation CI, README living TODOs, project state, and research log.
+- PR #1 merged to `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
+- Current increment is on PR #2 branch `automation/accessibility-ci-result`.
+- Added detailed note `logs/research/2026-07-16/2151-mermaid-render-detector.md`.
+- Updated `scripts/validate_browser_smoke.mjs`, README living TODOs, project state, and research log.
 - Research ledger unchanged because no external source was added or reclassified.
-- Final-head workflow results must be checked after context updates complete.
+- The corrected generated-SVG detector awaits its commit-scoped Documentation CI result.
 
 ## Known blockers and caveats
 
-- **Final-head CI:** the first generated-HTML validator run must complete before its real-site behavior is established.
-- **Live-site verification:** direct Pages access remains unavailable in this environment, so HTTP status, rendered navigation, search, responsive layout, keyboard behavior, computed contrast, and interactive assets cannot be independently tested.
-- **Deployment scope:** branch-added changes cannot appear on production Pages until PR #1 merges.
-- **Accessibility scope:** static parsing does not prove keyboard order, focus visibility, computed contrast, reduced-motion behavior, responsive layout, or script-driven accessible names.
+- **Current browser result:** the corrected Mermaid detector has not yet produced authoritative workflow evidence.
+- **Live-site verification:** direct Pages access remains unavailable, so production HTTP status and deployed rendering cannot be independently tested.
+- **Local validation:** cloning the repository is blocked by DNS resolution for `github.com` in the current runtime.
+- **Pages workflow visibility:** commit-scoped workflow lookup exposes pull-request-triggered runs and does not surface the post-merge `main` Pages run.
+- **Accessibility scope:** the smoke lane does not prove computed contrast, complete keyboard order, visible focus quality for every control, axe-core compliance, or deep interactive-state behavior.
+- **Build-time dependency:** Mermaid is still fetched externally during CI and Pages builds, but publication fails visibly if the pinned asset cannot be prepared.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the fixture has not yet been compiled and executed against that exact current revision.
-- **Evidence retention:** artifact `8368782428` expires on 2026-08-15.
+- **Evidence retention:** CPU_REPACK artifact `8368782428` expires on 2026-08-15; browser artifacts `8383341340` and `8385027631` expire on 2026-07-30.
 - **Hardware scope:** the passing CPU_REPACK evidence is AVX2-specific and does not cover ARM, KleidiAI, AMX, or SpacemiT.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
 - Mapping, allocation, residency, representation validity, command completion, event ownership, reset, and release remain distinct states.

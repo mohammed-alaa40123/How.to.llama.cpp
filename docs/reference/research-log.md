@@ -7,8 +7,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Verified**
 
 - Baseline pinned to `e3546c7948e3af463d0b401e6421d5a4c2faf565`.
-- Documented backend/model loading, tokenization, `llama_context`, decode, sampling, and token feedback.
-- Published canonical GGUF, model placement, `llama_model`, `llama_context`, graph/MoE, scheduler, memory, and backend pages.
+- Documented backend/model loading, tokenization, `llama_context`, decode, sampling, token feedback, GGUF, model placement, graph/MoE, scheduler, memory, and backends.
 - GGUF stores tensors and metadata, not an executable graph; architecture code builds GGML operations over loaded tensors.
 
 **Interpretation**
@@ -21,7 +20,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Verified**
 
 - Published file-by-file Pass A pages for public API, loader, context memory, scheduler, and persistent KV/recurrent implementations.
-- Added model/context, generic scheduler, CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown audits.
+- Added model/context and generic scheduler plus CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown audits.
 - Added line-aware source indexing with pinned file and symbol links.
 
 **Interpretation**
@@ -64,102 +63,121 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Direct upstream submission is blocked by connected GitHub App permission.
 
-## 2026-07-16 04:52–10:50 — CPU_REPACK fixture design and implementation
+## 2026-07-16 04:52–12:50 — CPU_REPACK fixture and upstream proposal
 
 **Verified**
 
-- Selected a dedicated `tests/test-cpu-extra-buffer-lifetime.cpp` executable and reused backend-op quantization, upload, graph, readback, and comparison patterns.
-- Selected the smallest admitted pinned x86 case: Q4_0 `[32, 8]` × F32 `[32, 1]` → F32 `[8, 1]`, with AVX2, exact buffer identity, non-null traits, and operation-admission guards.
-- Added a deterministic pinned-revision fixture generator and focused structural tests.
-- Resolved the two-graph no-allocation topology, identical one-time Q4_0 quantization, address-based per-tensor CPU_REPACK allocation, and `1e-7` NMSE contract.
-- Completed graph construction, deterministic uploads, compute/readback, exact path proof, and backend-wrapper-before-buffer teardown.
-- Added an AVX2-required ASan/LSan workflow that compiles the exact pinned target and requires twenty non-skipped process executions.
+- Selected a dedicated `tests/test-cpu-extra-buffer-lifetime.cpp` executable and the smallest admitted pinned x86 case: Q4_0 `[32, 8] × F32 [32, 1]`.
+- Added deterministic generation, two no-allocation graphs, exact CPU_REPACK allocation/path proof, shared quantized inputs, compute/readback, `1e-7` NMSE, and backend-before-buffer teardown.
+- Added an AVX2-required ASan/LSan workflow requiring twenty non-skipped process executions.
+- Workflow `29481384561` passed all twenty processes with stable NMSE `3.82787e-16`; artifact `8368782428` has digest `sha256:ef4f0a36e27f7811b106e0a870c278724f1e620aed991807b7f2c3e443d1efaf`.
+- Reviewed current upstream `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6` and staged a narrow two-file upstream proposal.
 
 **Interpretation**
 
 - Correct output alone does not prove CPU_REPACK ran; pointer identity, selected traits, and admission checks are required.
-- Separate process executions strengthen process-lifetime evidence but do not cover concurrency or every packed layout.
+- The bounded admitted case supports backend-wrapper-before-buffer teardown, not every packed layout, architecture, or concurrent use.
 
-## 2026-07-16 11:58 — First passing CPU_REPACK sanitizer evidence
-
-**Verified**
-
-- Workflow run `29481384561` passed checkout, AVX2 verification, exact pinned source, generation, sanitizer configuration, compilation, twenty executions, and artifact upload.
-- All twenty processes executed `q4_0_8x8` and reported stable NMSE `3.82787e-16`, with no skip or ASan/LSan diagnostic.
-- Artifact `8368782428` is retained as `cpu-repack-lifetime-sanitizer-e3546c7` with digest `sha256:ef4f0a36e27f7811b106e0a870c278724f1e620aed991807b7f2c3e443d1efaf`.
-- Updated the canonical CPU optional-buffer destruction-harness page with the bounded executable result.
-
-**Interpretation**
-
-- For this admitted pinned synchronous `MUL_MAT`, the CPU_REPACK buffer remains safely destructible after the tested CPU backend wrapper is freed.
-
-**Open questions**
-
-- Upstreaming the fixture and extending the method to ARM repack, KleidiAI, AMX, and SpacemiT.
-
-## 2026-07-16 12:50 — CPU_REPACK upstream-suitability decision
+## 2026-07-16 13:16–15:51 — Website information architecture and static accessibility
 
 **Verified**
 
-- Reviewed current upstream commit `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6`.
-- Current tests still support a dedicated `llama_build_and_test()` target, and the internal CPU_REPACK buffer-type entry point remains available.
-- Staged `docs/reference/upstream-cpu-repack-lifetime-fixture-proposal.md` with the proposed two-file patch and validation requirements.
+- Grouped 27 Architecture pages into task-oriented navigation categories and added an Architecture overview with six goal-based entry points and audience reading paths.
+- Added `scripts/validate_built_site_accessibility.py` for generated HTML language, main, H1, image-alt, iframe-title, and button-name checks.
+- Documentation CI run `29496291134` passed the strict MkDocs build and accessibility validator without exceptions.
+- PR #1 merged to `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
 
 **Interpretation**
 
-- The first upstream contribution should contain only the C++ test and CMake registration; project-specific generation and artifact retention should remain here.
+- Static structure validation is a regression guard, not full accessibility conformance.
 
-**Open questions**
-
-- Current-tree runtime admission at `8ee54c8` and the authoritative upstream AVX2 sanitizer lane.
-
-## 2026-07-16 13:16 — Website UX review and navigation grouping
+## 2026-07-16 16:51 — Representative browser smoke lane
 
 **Verified**
 
-- Reviewed the homepage, MkDocs configuration, interactive foundations page, custom stylesheet, living context, and prior CI state.
-- The homepage already offered four reading modes and strong Material search/navigation features.
-- Grouped 27 Architecture entries into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends while preserving routes.
-- Recorded a prioritized backlog for deployment verification, indexes, accessibility, diagram equivalents, interaction fallbacks, and consistency.
+- Added Playwright/Chromium validation for the homepage, Architecture index, a diagram-heavy page, and an interactive page at desktop and mobile widths.
+- Checks cover HTTP success, landmarks/headings, search, overflow, reduced motion, keyboard focus, Architecture links, iframe titles, Mermaid rendering, and browser errors.
+- Failure screenshots, server logs, and per-case JSONL diagnostics are retained.
 
-**Interpretation**
-
-- The strongest immediate UX issue was navigation reflecting page-addition history rather than reader tasks.
-
-## 2026-07-16 13:52 — Architecture section index
+## 2026-07-16 17:52–18:52 — Browser diagnostic attribution corrections
 
 **Verified**
 
-- Added `docs/architecture/index.md` as the canonical orientation page for the 27-page section.
-- Added six goal-based entry cards, concise summaries for every page, and ordered paths for beginners, mmap/copy/page-fault investigators, scheduler investigators, and teardown investigators.
-- Added `Architecture → Overview` without changing existing routes.
+- Runs `29504440262` and `29509089935` passed every pre-browser stage and failed only on the first Chromium case.
+- Evidence showed successful local resources and no same-origin HTTP failure.
+- The validator now classifies console/request records as same-origin, cross-origin, or unlocated.
+- Same-origin failures and all functional assertions remain fatal; cross-origin and unlocated records are retained warnings.
 
 **Interpretation**
 
-- Navigation grouping lowers scanning cost; the index explains how sections and pages map to reader goals.
+- Missing or external source attribution is not evidence of a local-site error; visible functionality must be checked directly.
 
-**Open questions**
-
-- Mobile layout, nested navigation, keyboard behavior, dark-mode contrast, deployed rendering, an Inference lifecycle index, and duplicate Foundations explorer cleanup.
-
-## 2026-07-16 14:51 — Built-site accessibility structure guard
+## 2026-07-16 19:50 — Mermaid readiness race
 
 **Verified**
 
-- Added `scripts/validate_built_site_accessibility.py`, a dependency-free generated-HTML validator.
-- It checks non-empty `html[lang]`, exactly one `<main>`, exactly one `<h1>`, image `alt` attributes, non-empty iframe titles, and accessible button names.
-- It fails for missing or empty site output and excludes standalone `assets/interactive/` HTML for a separate interaction audit.
-- Added four focused tests and integrated the validator after `mkdocs build --strict` in Documentation CI.
+- Documentation CI run `29513543532` passed all pre-browser stages and failed at `home/desktop` with `rendered 0 of 1 Mermaid diagrams`.
+- The browser step failed about 2.6 seconds after starting, before bounded application-level render readiness was established.
+- Artifact `8381667636` has digest `sha256:08294cbc09e5699e261abafd6c4b5e3153a2fadf2b4b6586303ec413e1cdbf81`.
+- The validator now waits up to 15 seconds for every `main .mermaid` container to contain an SVG, then enforces exact rendered/count equality.
+- The timeout is configurable through `MERMAID_RENDER_TIMEOUT_MS`; timeout remains a hard failure.
+- The complete four-route by two-viewport matrix and every non-Mermaid assertion remain unchanged.
 
 **Interpretation**
 
-- This is a high-confidence structural regression guard, not a WCAG conformance claim.
-- Browser-level testing is still required for computed contrast, focus visibility/order, responsive layout, reduced motion, and script-driven interactions.
+- `networkidle` proves network quiet, not completion of asynchronous Mermaid DOM rendering.
+- Waiting for the exact SVG postcondition is stronger than an arbitrary sleep and distinguishes delayed readiness from a true bounded render failure.
 
 **Historical**
 
-- This implements the first automated accessibility item from the 13:16 UX review after the 13:52 discoverability improvement.
+- The two prior failures removed unsupported console-origin assumptions; the third exposed the first genuine functional readiness race.
+
+## 2026-07-16 20:49 — Pinned same-origin Mermaid build asset
+
+**Verified**
+
+- Documentation CI run `29517576858` still produced zero of one Mermaid SVG after the full 15-second readiness bound.
+- Artifact `8383341340` retained `diagnostics.jsonl`, which records the timeout, an uncaught promise rejection, and a separate external releases-API 404.
+- The local server log showed successful responses for every same-origin page and asset requested before failure.
+- Added `scripts/prepare_mermaid_asset.sh`, pinning Mermaid `11.16.0` and downloading it before strict builds.
+- Documentation CI and Pages now prepare the same asset before `mkdocs build --strict`.
+- `mkdocs.yml` now loads Mermaid from `assets/javascripts/vendor/mermaid.min.js` instead of a browser-runtime CDN URL.
+- The existing bounded SVG, route, viewport, focus, overflow, iframe, landmark, heading, search, reduced-motion, and same-origin error checks remain strict.
+
+**Interpretation**
+
+- A full timeout with zero SVGs does not justify a longer wait.
+- Build-time retrieval converts a runtime CDN failure into a visible build failure and gives CI and deployed Pages the same-origin asset graph.
+
+**Historical**
+
+- This implements the fallback explicitly recorded by the preceding run: vendor Mermaid locally if bounded readiness still fails.
 
 **Open questions**
 
-- Whether generated Material pages need narrow documented exceptions, and whether the next increment should audit standalone explorers or add a representative axe-core browser lane.
+- Whether all eight route/viewport cases pass with the same-origin Mermaid asset.
+- Whether the uncaught promise rejection disappears or reveals a separate initialization or diagram-syntax failure.
+- Whether the releases-API 404 should be corrected independently.
+- Whether the prepared asset should gain a pinned checksum after the first successful build.
+
+## 2026-07-16 21:51 — Generated Mermaid SVG detector
+
+**Verified**
+
+- Documentation CI run `29521791301` passed all pre-browser stages and failed only at `home/desktop`.
+- Artifact `8385027631` has digest `sha256:7e65774799d6fa713cb85d9c82db28c02d165a1817d8349292ff51dac7850954`.
+- Its JSONL record reported zero of one rendered diagrams, but the retained full-page screenshot visibly contains the complete flowchart.
+- The old detector only recognized an SVG nested inside the original `.mermaid` element.
+- The corrected detector counts source diagrams, recognizes nested and generated `svg[id^="mermaid-"]` output, deduplicates SVG nodes, and requires exact rendered/source equality within the same 15-second bound.
+- The Playwright wait now uses the correct function-argument and options positions and reports source and processed-container counts on failure.
+
+**Interpretation**
+
+- The screenshot proves a detector/output mismatch rather than a blank-page failure.
+- The correct browser-level postcondition is the generated diagram visible to readers, not one library-specific nesting arrangement.
+
+**Open questions**
+
+- Whether the full eight-case matrix now passes.
+- Whether `pageerror: Object` remains after rendering is recognized and requires explicit Mermaid rejection instrumentation.
+- Whether the external releases-API 404 should be fixed independently.
