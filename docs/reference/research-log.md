@@ -176,3 +176,27 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Compiler/runtime corrections exposed by the first pinned workflow run.
 - Consistent AVX2 exposure on `ubuntu-latest` and any narrow process-static leak classification required by LSan.
+
+## 2026-07-16 11:58 — First passing CPU_REPACK sanitizer evidence
+
+**Verified**
+
+- Workflow run `29481384561` passed every checkout, AVX2, pinned-source, generation, sanitizer-configure, compile, twenty-process execution, and artifact-upload step.
+- All twenty processes executed `q4_0_8x8` CPU_REPACK and reported NMSE `3.82787e-16` with no skip or ASan/LSan diagnostic.
+- The exact tested shape was Q4_0 `[32, 8]` × F32 `[32, 1]` → F32 `[8, 1]`.
+- Artifact `8368782428` is retained as `cpu-repack-lifetime-sanitizer-e3546c7` with digest `sha256:ef4f0a36e27f7811b106e0a870c278724f1e620aed991807b7f2c3e443d1efaf`.
+- Updated the canonical CPU optional-buffer destruction-harness page with the executable evidence and bounded ownership result.
+
+**Interpretation**
+
+- For this admitted pinned synchronous `MUL_MAT`, the CPU_REPACK buffer remains safely destructible after the tested CPU backend wrapper is freed.
+- The result is bounded to one AVX2 shape and does not prove other layouts, concurrency, or other optional CPU buffer implementations.
+
+**Historical**
+
+- This closes the first CPU_REPACK fixture sequence from source audit through exact-revision runtime sanitizer evidence.
+
+**Open questions**
+
+- Upstreaming the fixture as a permanent regression target.
+- Extending the same methodology to ARM repack, KleidiAI, AMX, and SpacemiT.
