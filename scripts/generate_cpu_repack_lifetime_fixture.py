@@ -31,6 +31,25 @@ static void require(bool condition, const char * message) {
     }
 }
 
+// Pinned ggml_backend_tensor_alloc() takes an address inside an already
+// allocated backend buffer, not a byte offset.  This helper keeps one tensor
+// per buffer so the ownership boundary under test remains explicit.
+static ggml_backend_buffer_t allocate_single_tensor(
+        ggml_backend_buffer_type_t buft,
+        ggml_tensor * tensor) {
+    const size_t alloc_size = ggml_backend_buft_get_alloc_size(buft, tensor);
+    ggml_backend_buffer_t buffer = ggml_backend_buft_alloc_buffer(buft, alloc_size);
+    require(buffer != nullptr, "single-tensor backend buffer allocation");
+
+    void * addr = ggml_backend_buffer_get_base(buffer);
+    require(addr != nullptr, "single-tensor backend buffer base");
+    require(reinterpret_cast<uintptr_t>(addr) % ggml_backend_buffer_get_alignment(buffer) == 0,
+            "single-tensor backend buffer alignment");
+    require(ggml_backend_tensor_alloc(buffer, tensor, addr) == GGML_STATUS_SUCCESS,
+            "single-tensor backend tensor initialization");
+    return buffer;
+}
+
 int main() {
     if (!ggml_cpu_has_avx2()) {
         std::puts("SKIP: AVX2 is unavailable; CPU_REPACK lifetime was not exercised");
@@ -51,10 +70,14 @@ int main() {
     ggml_backend_buffer_type_t repack_buft = ggml_backend_cpu_repack_buffer_type();
     require(repack_buft != nullptr, "CPU_REPACK buffer type");
 
-    // The final upstream implementation should construct identical no-alloc
-    // graphs, allocate only the tested weight from repack_buft, upload the same
-    // Q4_0 bytes to both weights, and compare F32 outputs.  These assertions are
-    // mandatory path proof rather than diagnostic-name matching:
+    // The final pinned-tree implementation should construct identical no-alloc
+    // graphs.  Allocate the tested weight with allocate_single_tensor(repack_buft,
+    // tested_weight), then let an ordinary CPU graph allocator allocate the
+    // activation and output while recognizing the weight as externally allocated.
+    // Upload the same Q4_0 bytes to both weights and compare F32 outputs with
+    // normalized mean squared error <= 1e-7.
+    //
+    // These assertions are mandatory path proof rather than diagnostic-name matching:
     //
     //   tested_weight->buffer->buft == repack_buft
     //   tested_weight->extra != nullptr
@@ -68,16 +91,17 @@ int main() {
     //
     // The executable remains deliberately incomplete until compiled against
     // the pinned source tree; returning success here would create false lifetime
-    // evidence, so fail loudly after proving the hardware gate and API surface.
+    // evidence, so fail loudly after proving the hardware gate and allocation API.
     (void) k;
     (void) m;
     (void) n;
     (void) repack_buft;
+    (void) allocate_single_tensor;
 
     ggml_backend_free(tested_backend);
     ggml_backend_free(reference_backend);
     std::fprintf(stderr,
-        "INCOMPLETE: generated fixture skeleton requires pinned-tree graph/allocation integration\n");
+        "INCOMPLETE: generated fixture skeleton requires pinned-tree graph integration\n");
     return 2;
 }
 '''
