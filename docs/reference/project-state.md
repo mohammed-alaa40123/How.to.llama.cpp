@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 00:00 Africa/Cairo_
+_Last updated: 2026-07-17 01:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -30,44 +30,48 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Dependency-free generated-HTML accessibility structure validator with focused tests and Documentation CI integration.
 - EAAI July 17-31 executable-learning plan and initial agent handoff ledger on draft PR #3.
 - Legal-fixture decision separating model-free Lab 0 checks, learner-provided optional inference, and a project-owned synthetic GGUF for Lab 1.
+- Deterministic synthetic GGUF v0 generator, manifest, golden parse, SHA-256, alignment/range checks, and three bounded corruption variants.
 
 ## Latest concrete findings
 
 ### Verified
 
-- The initial executable-learning plan now declares complete learning contracts for Lab 0, Lab 1, and Executable Lecture 0.
-- `docs/labs/legal-fixture-decision.md` requires no redistributed model for mandatory Lab 0 validation.
-- Optional inference must use a learner-provided local GGUF path and remain a distinct outcome from build or executable launch.
-- Lab 1 will use deterministically generated project-owned GGUF bytes containing educational metadata, tensor descriptors, alignment, offsets, and non-model payloads.
-- Ordinary CI must not download model weights or call paid generation APIs.
+- `scripts/generate_synthetic_gguf.py` deterministically emits a 428-byte little-endian GGUF v3 fixture.
+- The fixture contains five metadata records, including string, `uint32`, and string-array values, plus two F32 tensor descriptors with different shapes.
+- Tensor data begins at absolute offset 384; the second tensor begins at relative offset 32 under 32-byte alignment.
+- Whole-file SHA-256 is `688d0ef28c83d6972e291cc0342e695540eae8496b3ec8e92bdbb91e3982a564`.
+- Golden parsing, checksum, alignment/range assertions, and rejection of bad magic, misaligned offset, and truncated payload pass in focused tests.
+- The generator and tests use only project-authored numeric payloads and perform no model download, paid API call, telemetry, or learner-data collection.
 
 ### Interpretation
 
-- Build/toolchain validation, GGUF format education, and real model inference are different evidence paths and should not be collapsed into a single “smoke test.”
-- A synthetic GGUF is safer and more precise for browser parsing than a mutable third-party tiny model.
-- The first executable lecture should prefer a bounded GGUF-loading path unless source-link feasibility identifies a smaller graph-construction trace.
+- Generator plus manifest and golden output are stronger review artifacts than an opaque committed binary; binaries and corruption variants can be regenerated deterministically for labs and tests.
+- The fixture validates format understanding, not llama.cpp model loading or inference.
+- The bounded fixture is now suitable as the shared source for the first browser parser and authored GGUF-loading trace.
 
 ### Historical
 
 - Earlier work established source-pinned documentation, executable lifetime regressions, accessibility guards, and browser-level CI work.
-- The 2026-07-16 23:00 run froze the two-week executable-learning plan; the 2026-07-17 00:00 run closed its first fixture-policy dependency.
+- The 2026-07-16 23:00 run froze the two-week executable-learning plan; the 2026-07-17 00:00 run closed its fixture policy; the 01:00 run implemented the first fixture package.
 
 ### Open questions
 
-- Exact metadata fields, tensor types/shapes, alignment, and payload pattern for synthetic GGUF v0.
-- Whether the binary fixture should be committed or generated during tests from a committed generator and manifest.
+- Browser/Python parser agreement is not yet implemented.
+- Native acceptance through pinned llama.cpp `gguf_init_from_file` is not yet tested in ordinary CI.
 - Which bounded llama.cpp parser entry path yields the clearest first trace with stable source links.
 - Which operating systems and container targets belong in the first reproducibility matrix.
 
 ## Immediate next task
 
 ```text
-implement deterministic synthetic GGUF generator
-  → define manifest and fixture-format version
-  → produce golden parser output and SHA-256
-  → add alignment/range and corruption tests
-  → validate browser/Python agreement
+add machine-readable executable-learning schemas
+  → trace schema and authored sample trace contract
+  → media manifest/provenance schema
+  → local progress schema
+  → focused malformed-input validators
 ```
+
+If the orchestrator ranks it higher, define the Lab 0 checker interface before environment automation.
 
 ## In progress
 
@@ -81,15 +85,16 @@ implement deterministic synthetic GGUF generator
 ## Publication and validation state
 
 - Draft PR #3 is based on `agent/eaai-two-week-execution-plan`.
-- Added `docs/publication/two-week-execution-plan.md`, `docs/publication/agent-handoffs.md`, and `docs/labs/legal-fixture-decision.md` plus durable run notes.
-- No external source, paid API, model weight, participant data, or server-side learner state was introduced by the fixture decision.
-- Research ledger unchanged because no external source was added or reclassified.
+- The branch now contains the two-week plan, handoff ledger, legal-fixture decision, deterministic GGUF fixture package, focused tests, and durable run notes.
+- Focused local validation passed for the exact generator/test contents before repository write.
+- No external source was newly introduced; the official GGUF specification was already recorded in the research ledger.
 - Final-head workflow results must be checked after context updates complete.
 
 ## Known blockers and caveats
 
 - **Orchestrator files:** `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are not yet available on the active branch, so dependency-safe recommendations are being followed.
-- **Fixture implementation:** the decision is complete, but no binary/generator, manifest, golden parser output, or corruption variants exist yet.
+- **Browser agreement:** no browser parser yet proves agreement with the Python golden output.
+- **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be a valid inference model; pinned native GGUF-reader acceptance is a separate future check.
 - **Inference scope:** mandatory Lab 0 does not prove model loading or token generation; those require the separately labelled learner-provided-model extension.
 - **Live-site verification:** direct Pages access remains unavailable in this environment, so production rendering cannot be independently tested here.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the CPU_REPACK fixture has not yet been compiled and executed against that exact current revision.
