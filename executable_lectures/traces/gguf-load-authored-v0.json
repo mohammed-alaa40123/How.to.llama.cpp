@@ -1,0 +1,126 @@
+{
+  "schema_version": "0.1.0",
+  "trace_id": "gguf-load-authored-v0",
+  "lesson_id": "executable-lecture-00",
+  "title": "Authored GGUF loading trace contract",
+  "source": {
+    "repository": "ggml-org/llama.cpp",
+    "revision": "e3546c7948e3af463d0b401e6421d5a4c2faf565",
+    "capture_kind": "authored-example",
+    "fixture_sha256": "688d0ef28c83d6972e291cc0342e695540eae8496b3ec8e92bdbb91e3982a564"
+  },
+  "steps": [
+    {
+      "sequence": 0,
+      "step_id": "open-file",
+      "phase": "entry",
+      "location": {
+        "file": "ggml/src/gguf.cpp",
+        "line": 1100,
+        "function": "gguf_init_from_file_impl"
+      },
+      "call_stack": [],
+      "runtime_objects": [
+        {
+          "object_id": "fixture-file",
+          "type": "synthetic GGUF file",
+          "summary": "Project-owned teaching fixture selected for deterministic format validation.",
+          "evidence_kind": "authored-example"
+        }
+      ],
+      "memory_events": [
+        {
+          "event": "read",
+          "summary": "The lecture represents opening and bounded header inspection; it is not a native runtime capture.",
+          "evidence_kind": "authored-example"
+        }
+      ],
+      "explanation_id": "gguf-load.open-file",
+      "evidence_kind": "authored-example",
+      "prediction_prompt": "Which evidence label should be shown before any runtime instrumentation exists?",
+      "static_summary": "The viewer begins at the pinned parser entry and explicitly labels this step as an authored example rather than captured execution."
+    },
+    {
+      "sequence": 1,
+      "step_id": "inspect-header",
+      "phase": "header",
+      "location": {
+        "file": "ggml/src/gguf.cpp",
+        "line": 1110,
+        "function": "gguf_init_from_file_impl"
+      },
+      "call_stack": [
+        {
+          "file": "ggml/src/gguf.cpp",
+          "line": 1100,
+          "function": "gguf_init_from_file_impl"
+        }
+      ],
+      "runtime_objects": [
+        {
+          "object_id": "gguf-header",
+          "type": "GGUF v3 header",
+          "summary": "Expected header values are derived from the deterministic fixture manifest and golden parse.",
+          "evidence_kind": "source-derived"
+        }
+      ],
+      "tensor_shapes": [
+        {
+          "tensor_id": "demo.matrix",
+          "dimensions": [2, 2],
+          "element_type": "F32",
+          "evidence_kind": "source-derived"
+        },
+        {
+          "tensor_id": "demo.vector",
+          "dimensions": [3],
+          "element_type": "F32",
+          "evidence_kind": "source-derived"
+        }
+      ],
+      "memory_events": [],
+      "explanation_id": "gguf-load.inspect-header",
+      "evidence_kind": "source-derived",
+      "prediction_prompt": "Does parsing tensor descriptors prove that tensor pages are physically resident?",
+      "static_summary": "The deterministic fixture describes two F32 tensors, but descriptor parsing alone does not establish physical page residency or inference readiness."
+    },
+    {
+      "sequence": 2,
+      "step_id": "derive-layout",
+      "phase": "layout",
+      "location": {
+        "file": "ggml/src/gguf.cpp",
+        "line": 1260,
+        "function": "gguf_init_from_file_impl"
+      },
+      "call_stack": [
+        {
+          "file": "ggml/src/gguf.cpp",
+          "line": 1100,
+          "function": "gguf_init_from_file_impl"
+        }
+      ],
+      "runtime_objects": [],
+      "tensor_shapes": [],
+      "memory_events": [
+        {
+          "event": "read",
+          "summary": "The fixture's tensor-data region begins at byte 384 and is checked against 32-byte alignment.",
+          "bytes": 44,
+          "evidence_kind": "source-derived"
+        }
+      ],
+      "figures": [
+        {
+          "figure_id": "synthetic-gguf-layout",
+          "path": "media/generated/synthetic-gguf-layout.svg",
+          "alt_text": "Linear byte layout showing the GGUF header and metadata before an aligned tensor-data region containing a matrix and a vector.",
+          "evidence_kind": "source-derived"
+        }
+      ],
+      "explanation_id": "gguf-load.derive-layout",
+      "evidence_kind": "source-derived",
+      "static_summary": "The final authored trace step derives an aligned byte layout from committed fixture metadata and remains replayable without native instrumentation."
+    }
+  ]
+}

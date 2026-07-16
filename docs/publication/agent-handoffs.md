@@ -164,7 +164,7 @@ The interface separates `environment`, `configure`, `compile`, `executable_launc
 ### Truth labels
 
 - **Verified:** the committed validator encodes explicit dependency and claim-consistency invariants.
-- **Interpretation:** the report makes setup evidence auditable and turns a predicted learner misconception into a machine-checkable assessment artifact.
+- **Interpretation:** the report makes setup evidence auditable and turns the build-equals-inference misconception into a machine-checkable assessment artifact.
 - **Open question:** the exact bounded build target, diagnostic taxonomy, platform matrix, and command runner remain unimplemented.
 
 ### Validation and safety
@@ -174,3 +174,41 @@ Five focused tests were added, but this connector environment could not execute 
 ### Next dependency
 
 Add the trace schema and authored sample trace contract unless the orchestrator publishes a different dependency order.
+
+## 2026-07-17 02:06 — Validation Architect
+
+### Assignment status
+
+`orchestrator-state.md` and `evidence-backlog.md` remain unavailable. The highest dependency-safe evidence gap in the two-week plan and latest handoff was the machine-readable trace schema and authored sample-trace contract.
+
+### Bounded increment completed
+
+Added:
+
+- `schemas/executable-trace.schema.json`;
+- `scripts/validate_executable_trace.py`;
+- `executable_lectures/traces/gguf-load-authored-v0.json`;
+- `tests/test_validate_executable_trace.py`;
+- [`validation-plan.md`](validation-plan.md).
+
+The package pins the upstream revision, labels evidence at trace, step, and nested-object levels, bounds trace and collection sizes, requires safe repository-relative source/figure paths, requires alt text and a static summary, and defines contiguous zero-based sequences as the deterministic forward/back replay contract.
+
+### EAAI claim supported or falsified
+
+This increment tests whether repository-native agent work can produce source-pinned educational traces with machine-checkable evidence boundaries, replay order, provenance, and accessibility fallbacks. The claim is weakened if malformed traces can use mutable revisions, overstate native capture, reorder steps, traverse paths, omit static summaries, or exceed browser-review bounds.
+
+### Truth labels
+
+- **Verified:** the committed schema and semantic validator encode the invariants above, and seven focused test cases were added.
+- **Interpretation:** an authored GGUF-loading trace is the safest minimum contract before native instrumentation because it makes absent runtime evidence explicit.
+- **Open question:** source-link resolution against the pinned commit, viewer keyboard behavior, native capture, and browser performance remain unvalidated.
+
+### Validation and limitations
+
+- No model download, paid API, credential, telemetry, participant data, or server-side progress sync was introduced.
+- This connector environment could not execute the tests locally; CI is the validation authority for the branch.
+- The sample source lines are authored contract locations and must pass a later network source-link CI lane before publication.
+
+### Next dependency
+
+Review and merge the trace contract, then implement either the media manifest/provenance validator or local progress export/import schema according to the next orchestrator ranking. A minimal viewer must not begin until the trace contract is accepted.
