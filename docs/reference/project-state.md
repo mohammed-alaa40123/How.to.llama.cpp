@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 13:52 Africa/Cairo_
+_Last updated: 2026-07-16 13:58 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -80,15 +80,17 @@ wait for strict Documentation CI on the Architecture index
 ## Publication and validation state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Previous head `d376aef` added grouped Architecture navigation; commit-scoped CI must be checked.
+- Final content head before this state-only blocker update was `831ff65ed5854a1fd654a50ddf856fd2590d30e9`.
 - Added `docs/architecture/index.md` and detailed note `logs/research/2026-07-16/1352-architecture-section-index.md`.
 - Updated `mkdocs.yml`, README living TODOs, project state, and research log.
 - Research ledger unchanged because no external source was added or reclassified.
-- Final-head workflow results must be checked after all context commits.
+- GitHub returned no commit-scoped workflow runs and no combined status entries for `831ff65e` at the final check; CI is pending/unverified, not known to be failing.
+- PR #1 remained open and mergeable at `831ff65e`, with 343 commits and 100 changed files.
 
 ## Known blockers and caveats
 
-- **Live-site verification:** direct GitHub Pages retrieval has been blocked in the browsing environment, so HTTP status, rendered navigation, search, responsive layout, keyboard behavior, and interactive assets may remain independently untested.
+- **Final-head CI:** GitHub Actions had not exposed any commit-scoped runs or statuses for `831ff65e` at the final check, so strict MkDocs and link validation could not yet be confirmed or debugged.
+- **Live-site verification:** exact-site search returned no result and direct Pages opening was rejected by the browsing environment, so HTTP status, rendered navigation, search, responsive layout, keyboard behavior, and interactive assets could not be independently tested.
 - **Deployment scope:** branch-added navigation and the Architecture index cannot appear on production Pages until PR #1 merges.
 - **Accessibility scope:** source inspection does not prove internal keyboard behavior, focus visibility, contrast, or mobile card layout.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the fixture has not yet been compiled and executed against that exact current revision.
