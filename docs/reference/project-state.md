@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 09:51 Africa/Cairo_
+_Last updated: 2026-07-16 10:50 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -13,7 +13,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Active milestone
 
-**Foundations deepening — source-backed lifetime regressions for optional CPU buffers**
+**Foundations deepening — executable lifetime regressions for optional CPU buffers**
 
 ## Completed foundations
 
@@ -27,47 +27,46 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ### Verified
 
-- The deterministic CPU_REPACK generator now emits a complete two-graph candidate test instead of returning status 2.
-- The generated reference and tested graphs use the same Q4_0 `[32, 8]` weight bytes and F32 `[32, 1]` activation values.
-- Only the tested weight is explicitly allocated from `ggml_backend_cpu_repack_buffer_type()`; activation and output are allocated through an ordinary CPU graph allocator.
-- The candidate asserts exact repack buffer identity, non-null repack traits, and `ggml_backend_supports_op()` before execution.
-- Both graphs are computed, outputs are read back, and normalized mean squared error must be `<= 1e-7`.
-- The tested CPU backend wrapper is freed before the retained repack buffer.
-- Seven focused Python tests passed and now forbid the former `INCOMPLETE`/`return 2` boundary.
+- Added `.github/workflows/cpu-repack-lifetime-sanitizer.yml` as the first exact-revision compiler and sanitizer path for the generated CPU_REPACK fixture.
+- The workflow verifies the pinned llama.cpp SHA before materializing the generated C++ source and CMake target.
+- The hosted runner must expose AVX2; lack of AVX2 is a hard failure, not successful skipped evidence.
+- The target is configured with AddressSanitizer, LeakSanitizer leak detection, and frame pointers, then compiled independently.
+- The fixture must run in twenty separate processes, emit twenty exact CPU_REPACK success markers, and never emit `SKIP:`.
+- CPU capability, generated fixture source, and sanitizer output are uploaded as retained evidence.
+- The first workflow appeared as run `29481384561` and was queued at the initial status check.
 
 ### Interpretation
 
-- The generator-level implementation gap is closed, but this is not runtime lifetime proof until the candidate compiles and runs against the pinned llama.cpp tree.
-- Exact path proof remains necessary because numerically correct output alone could come from ordinary CPU fallback.
-- The next authoritative evidence must combine compiler validation, AVX2 confirmation, successful CPU_REPACK admission, repeated execution, and ASan/LSan.
+- The CI implementation boundary is now closed, but runtime lifetime proof still requires a passing first run.
+- Separate process invocations exercise initialization and process teardown repeatedly and avoid hiding process-static lifetime behavior inside one test process.
+- The first run should be treated as compiler/runtime discovery evidence; any pinned API or allocation mismatch must be corrected rather than worked around with a skip.
 
 ### Historical
 
-- Prior runs selected the dedicated executable, minimal Q4_0 `[32, 8]` × F32 `[32, 1]` AVX2 case, two-graph topology, identical quantized inputs, `1e-7` NMSE contract, and address-based per-tensor allocation API.
-- This run combines those decisions into a complete generated C++ body.
+- Prior runs selected and generated the complete two-graph Q4_0 `[32, 8]` × F32 `[32, 1]` fixture with identical inputs, `1e-7` NMSE, exact path proof, and backend-wrapper-before-buffer teardown.
+- This run moves that candidate into an exact pinned-tree AVX2-confirmed ASan/LSan workflow.
 
 ### Open questions
 
-- Whether the exact pinned compiler accepts every generated API spelling and graph-overhead sizing choice.
-- Whether the graph allocator preserves the externally allocated repack weight exactly as expected at runtime.
-- Whether GitHub-hosted Ubuntu exposes AVX2 consistently enough for authoritative sanitizer coverage.
-- Whether repetition should occur inside the test executable or through repeated CTest invocations.
+- Whether the generated source compiles unchanged against the pinned revision.
+- Whether `ubuntu-latest` consistently exposes AVX2.
+- Whether the graph allocator preserves the externally allocated repack weight at runtime.
+- Whether LSan reports process-static CPU dispatch allocations that require narrow documentation rather than broad suppression.
 
 ## Immediate next task
 
 ```text
-materialize generated patch in pinned llama.cpp tree
-  → compile dedicated test target
-  → correct any pinned-API mismatch
-  → prove AVX2 and CPU_REPACK admission
-  → execute repeatedly under ASan/LSan
-  → fail on skip when AVX2 is present
-  → preserve backend-wrapper-before-buffer teardown
+inspect first CPU_REPACK sanitizer run
+  → fetch failed job logs if compilation or execution fails
+  → correct exact pinned API/CMake/runtime issues
+  → rerun until AVX2-confirmed twenty-process ASan/LSan evidence passes
+  → preserve artifact identity and concrete NMSE results
+  → update the destruction-harness page with executable evidence
 ```
 
 ## In progress
 
-- Pinned-tree compilation and sanitizer CI for the first CPU repack lifetime fixture.
+- First pinned-tree compile and sanitizer CI run for the CPU repack lifetime fixture.
 - Manual/upstream submission of the reviewed 46-release OpenCL ownership correction; GitHub App write access to upstream is blocked.
 - Source-index regeneration with pinned line-aware symbol inventory.
 - Hardware-specific lifetime extensions for KleidiAI, AMX, and SpacemiT.
@@ -76,15 +75,17 @@ materialize generated patch in pinned llama.cpp tree
 ## Publication and validation state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added detailed note `logs/research/2026-07-16/0951-cpu-repack-complete-generated-fixture.md`.
-- Updated the generator, focused tests, README living TODOs, this project checkpoint, and the concise research log.
+- Added workflow `.github/workflows/cpu-repack-lifetime-sanitizer.yml`.
+- Added detailed note `logs/research/2026-07-16/1050-cpu-repack-pinned-sanitizer-workflow.md`.
+- Updated README living TODOs, this project checkpoint, and the concise research log.
 - Research ledger unchanged: this increment used the already-recorded pinned llama.cpp primary source.
+- First CPU_REPACK workflow run: `29481384561`, queued at initial verification.
 - Final-head workflow results must be checked after all context commits.
 
 ## Known blockers and caveats
 
-- **Runtime proof:** the complete generated source has not yet been compiled or executed against the pinned tree.
-- **Hardware gate:** successful skip on a non-AVX2 runner does not validate repack lifetime ordering.
+- **Runtime proof:** no passing sanitizer execution exists until run `29481384561` or a corrected successor completes.
+- **Hardware gate:** the new workflow intentionally fails when AVX2 is unavailable; a skip is not lifetime evidence.
 - **Path proof:** correct numerical output alone is insufficient because ordinary CPU fallback can produce the same answer.
 - **Sanitizer scope:** process-static dispatch metadata should be documented separately, not hidden with broad leak suppression.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
