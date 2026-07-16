@@ -56,7 +56,7 @@ Start a local run with:
 | Manual and extractor changes | `.github/workflows/opencl-lifecycle-report.yml` | Preserve and validate pinned OpenCL lifecycle evidence |
 | Manual and current-audit changes | `.github/workflows/current-opencl-lifecycle-audit.yml` | Regenerate exact current-upstream OpenCL ownership evidence |
 | CPU_REPACK fixture changes | `.github/workflows/cpu-repack-lifetime-sanitizer.yml` | Compile and repeatedly execute the pinned fixture under ASan/LSan on AVX2 |
-| Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, and `mkdocs build --strict` |
+| Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, strict MkDocs output, and built-site accessibility structure |
 | Every push to `main` | `.github/workflows/pages.yml` | Build, deploy, and verify the public site |
 
 ## Implementation method
@@ -84,6 +84,7 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 python3 -m py_compile scripts/*.py tests/*.py
 bash -n scripts/*.sh
 mkdocs build --strict
+python3 scripts/validate_built_site_accessibility.py site
 ./scripts/check_site.sh
 ```
 
@@ -118,6 +119,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
+- [ ] Inspect and fix the first generated-HTML accessibility validation result; document any narrow Material-theme exceptions rather than weakening checks globally.
 - [ ] Generate and compile the staged two-file CPU_REPACK lifetime candidate against current upstream `8ee54c8`, requiring AVX2, exact path admission, numerical agreement, and ASan/LSan-clean backend-before-buffer teardown.
 - [ ] Open or manually stage the current-tree CPU_REPACK regression pull request after runtime validation; connected GitHub App upstream write permission may remain blocked.
 - [ ] Verify the Architecture index, grouped navigation, search, diagrams, iframe interactions, keyboard access, card layout, and responsive behavior on the deployed Pages site after PR #1 merges.
@@ -141,7 +143,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Add a built-site accessibility check for headings, landmarks, keyboard focus, link names, color contrast, iframe titles, and reduced motion.
+- [ ] Add a browser-based accessibility lane for representative routes, computed contrast, keyboard focus, accessible names, and reduced motion.
+- [ ] Audit standalone interactive explorers for keyboard operation, visible focus, text equivalents, and iframe/fullscreen fallbacks.
 - [ ] Add an Inference lifecycle section index if deployed review confirms the same cross-section discoverability gap.
 - [ ] Remove or explicitly explain the duplicate Foundations explorer navigation entry.
 - [ ] Add text equivalents, legends, fullscreen/static fallbacks, and mobile variants for major diagrams and interactive explorers.
@@ -158,6 +161,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add a dependency-free built-site accessibility structure check for language metadata, main landmarks, top-level headings, image alternatives, iframe titles, and button names, with focused tests and Documentation CI integration.
 - [x] Add an Architecture section index with six goal-based entry points, concise summaries for all Architecture pages, and ordered paths for beginners, mmap/copy/page-fault research, scheduling, and teardown.
 - [x] Group the flat Architecture navigation into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends without changing page routes.
 - [x] Complete a structured website UX review covering information architecture, discoverability, diagrams, interaction, accessibility, consistency, and live-verification blockers.
