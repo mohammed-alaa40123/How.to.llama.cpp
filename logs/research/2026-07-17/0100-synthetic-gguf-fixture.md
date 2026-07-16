@@ -1,6 +1,7 @@
 # Synthetic GGUF v0 fixture implementation
 
 - **Starting commit:** `a795a4d8bb7246578fc247f97a5b050b0088efe0`
+- **Implementation ending commit:** `0df632d2fd66743ca3e4d55cba1b44a35bcada53`
 - **Assigned milestone:** Week 1 legal/small fixture implementation for Lab 1 GGUF Anatomy
 - **Learner outcome:** predict, parse, and explain GGUF metadata, tensor descriptors, alignment, relative offsets, absolute byte ranges, and corruption failures without downloading model weights
 - **Source baseline:** `ggml-org/llama.cpp@e3546c7948e3af463d0b401e6421d5a4c2faf565`
@@ -57,7 +58,11 @@ python3 scripts/generate_synthetic_gguf.py --check
 688d0ef28c83d6972e291cc0342e695540eae8496b3ec8e92bdbb91e3982a564
 ```
 
-These commands were executed against the exact file contents committed in this increment in an isolated local workspace. Repository-wide CI is checked separately after the final context update.
+These commands were executed against the exact file contents committed in this increment in an isolated local workspace.
+
+## CI inspection and integration fix
+
+Documentation CI run `29538414734` passed durable-context validation, interactive links, source-index tests, unit-test discovery, shell syntax, Python compilation, and required interactive assets. It failed only at `mkdocs build --strict` because the new executable-learning documentation pages were not represented in `mkdocs.yml` navigation. Commit `0df632d2fd66743ca3e4d55cba1b44a35bcada53` adds a bounded `Executable learning` navigation group for the legal fixture decision, two-week plan, literature map, and agent handoffs. A final-head workflow run had not appeared when this log was closed.
 
 ## Human review needs
 
@@ -71,7 +76,9 @@ These commands were executed against the exact file contents committed in this i
 - golden parser output and whole-file checksum;
 - alignment/range assertions;
 - bounded corruption rejection tests;
-- explicit non-model and non-inference boundary.
+- explicit non-model and non-inference boundary;
+- CI evidence showing the focused Python/test lanes passed before a documentation-navigation integration failure;
+- bounded MkDocs navigation repair.
 
 ## Next dependency
 
