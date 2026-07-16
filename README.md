@@ -116,7 +116,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Confirm the exact pinned per-tensor allocation API, then complete the generated two-graph `tests/test-cpu-extra-buffer-lifetime.cpp` fixture with deterministic shared Q4_0 bytes and `1e-7` NMSE comparison.
+- [ ] Complete the generated two-graph `tests/test-cpu-extra-buffer-lifetime.cpp` fixture using the verified address-based per-tensor CPU_REPACK allocation, deterministic shared Q4_0 bytes, and `1e-7` NMSE comparison.
 - [ ] Replace the intentional status-2 boundary with a real repeated ASan/LSan test; add an AVX2-confirmed workflow and fail when AVX2 is present but the pinned case is not admitted.
 - [ ] Submit or manually stage the reviewed 46-release current-upstream OpenCL ownership correction; upstream GitHub App write permission is currently blocked.
 - [ ] Decide whether a move-only OpenCL event owner is worthwhile after the narrow explicit-release correction.
@@ -150,6 +150,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Confirm the pinned per-tensor allocation API: allocate a backend buffer using `ggml_backend_buft_get_alloc_size()`, pass an aligned address from its base to `ggml_backend_tensor_alloc()`, and preserve explicit buffer ownership.
 - [x] Resolve the pinned CPU_REPACK fixture's no-allocation graph/allocation topology and reuse the backend-op `1e-7` NMSE contract for identical quantized inputs.
 - [x] Add a deterministic pinned-revision generator and structural tests for the CPU_REPACK lifetime fixture patch without claiming uncompiled runtime success.
 - [x] Select the first CPU repack regression's exact pinned case: Q4_0 `[32, 8]` × F32 `[32, 1]` on AVX2, with pointer-identity, trait, and operation-admission guards.
