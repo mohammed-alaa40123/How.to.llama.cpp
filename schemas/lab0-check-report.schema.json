@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mohammed-alaa40123.github.io/How.to.llama.cpp/schemas/lab0-check-report.schema.json",
+  "title": "How.to.llama.cpp Lab 0 checker report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "revisions", "platform", "model_input", "phases", "claims"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "revisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["course", "llama_cpp"],
+      "properties": {
+        "course": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"},
+        "llama_cpp": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"}
+      }
+    },
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "architecture", "execution_tier"],
+      "properties": {
+        "os": {"type": "string", "minLength": 1},
+        "architecture": {"type": "string", "minLength": 1},
+        "execution_tier": {"enum": ["local_native", "cloud_container"]}
+      }
+    },
+    "model_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["none", "learner_provided"]},
+        "redacted_basename": {"type": "string", "pattern": "^[^/\\\\]+$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "phases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment", "configure", "compile", "executable_launch", "model_load", "inference"],
+      "properties": {
+        "environment": {"$ref": "#/$defs/phase"},
+        "configure": {"$ref": "#/$defs/phase"},
+        "compile": {"$ref": "#/$defs/phase"},
+        "executable_launch": {"$ref": "#/$defs/phase"},
+        "model_load": {"$ref": "#/$defs/phase"},
+        "inference": {"$ref": "#/$defs/phase"}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment_ready", "native_configured", "native_compiled", "executable_launched", "model_loaded", "inference_succeeded"],
+      "properties": {
+        "environment_ready": {"type": "boolean"},
+        "native_configured": {"type": "boolean"},
+        "native_compiled": {"type": "boolean"},
+        "executable_launched": {"type": "boolean"},
+        "model_loaded": {"type": "boolean"},
+        "inference_succeeded": {"type": "boolean"}
+      }
+    }
+  },
+  "$defs": {
+    "phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": {"enum": ["not_attempted", "passed", "failed", "blocked", "not_applicable"]},
+        "command": {"type": "string"},
+        "exit_code": {"type": "integer"},
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "evidence": {"type": "string"},
+        "diagnostic_code": {"type": "string", "pattern": "^[A-Z0-9_]+$"}
+      }
+    }
+  }
+}
