@@ -156,3 +156,23 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Compiler validation of exact pinned API spelling and graph sizing.
 - AVX2 availability and successful CPU_REPACK admission on the sanitizer runner.
+
+## 2026-07-16 10:50 — Pinned CPU_REPACK sanitizer workflow
+
+**Verified**
+
+- Added `.github/workflows/cpu-repack-lifetime-sanitizer.yml`.
+- The workflow fetches the exact pinned llama.cpp revision, materializes the generated fixture, configures ASan/LSan, and compiles only the dedicated target.
+- The runner must expose AVX2; a missing feature is a hard failure rather than a successful skip.
+- The fixture must execute twenty times, emit twenty exact CPU_REPACK success markers, and never emit `SKIP:`.
+- CPU capability, generated source, and sanitizer output are retained as workflow artifacts.
+
+**Interpretation**
+
+- This closes the CI implementation boundary, but executable lifetime proof depends on the first workflow completing successfully.
+- Separate process invocations repeatedly exercise initialization and process teardown without hiding failures inside one long-lived process.
+
+**Open questions**
+
+- Compiler/runtime corrections exposed by the first pinned workflow run.
+- Consistent AVX2 exposure on `ubuntu-latest` and any narrow process-static leak classification required by LSan.
