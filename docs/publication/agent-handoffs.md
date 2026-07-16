@@ -70,3 +70,40 @@ Executable Lecture 0 may begin with a bounded GGUF-loading authored/source-deriv
 ### Next dependency
 
 Implement the deterministic synthetic GGUF generator, manifest schema, golden parser output, and bounded corruption variants. Do not add model downloads or call model-free launch checks “inference.”
+
+## 2026-07-17 00:02 — Literature and Venue Scout
+
+### Assignment status
+
+`orchestrator-state.md` and `evidence-backlog.md` remain absent from both `main` and the active executable-learning branch. The highest unresolved literature dependency in the two-week plan was therefore selected: evidence for the browser/local/cloud platform boundary.
+
+### Bounded increment completed
+
+Created [`literature-map.md`](literature-map.md) with a focused evidence map covering Stanford CS336 executable lectures, JupyterLite kernels and storage, `uv` locking/offline behavior, GitHub devcontainers and Codespaces prebuilds, Binder reproducibility guidance, and MLSysBook’s Predict–Discover–Explain labs. Updated the external-source ledger.
+
+### Verified findings
+
+- JupyterLite executes constrained browser kernels and is suitable for parsing, calculations, simulations, checkpoints, and trace replay; it is not evidence of native llama.cpp C++ execution.
+- `uv sync --locked` supports a reproducible Python-tooling contract but does not replace compiler, CMake/Ninja, or llama.cpp source pinning.
+- Devcontainers can standardize a native build environment; Codespaces prebuilds are optional, may incur storage cost, and should not be a Week 1 dependency.
+- CS336 demonstrates a trace-producing lecture program separated from a React/Vite trace viewer.
+- MLSysBook provides a concrete browser-first Predict–Discover–Explain pattern with persistent decision records.
+
+### Design recommendation
+
+Use intentionally unequal tiers: browser-first for concepts, local native as the authoritative runtime path, and a devcontainer as the reproducibility fallback. Reject presenting the three tiers as interchangeable runtimes. Require every result to identify whether it is browser-derived, native-captured, source-derived, or an authored example.
+
+### EAAI implication
+
+The useful contribution is the visible evidence boundary between simulation, authored explanation, source-derived structure, and native execution. Evaluation should test whether learners can distinguish these categories and trace code/runtime behavior, rather than treating one-click setup as the main educational outcome.
+
+### Validation and limitations
+
+- Sources are official documentation or primary project repositories and were checked on 2026-07-17.
+- No implementation, paid API, model download, or participant data was used.
+- Current service behavior, limits, and billing must be reverified before deployment.
+- Full MkDocs/CI and live-site checks remain pending because this connector run has no local checkout or Actions-log interface.
+
+### Next dependency
+
+The next distinct literature slice should verify the media pipeline from current official API documentation: OpenAI image/speech/realtime/video, Gemini image generation, NotebookLM automation limits, provenance, accessibility, licensing, caching, privacy, and human-review requirements.
