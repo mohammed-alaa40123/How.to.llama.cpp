@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 13:16 Africa/Cairo_
+_Last updated: 2026-07-16 13:52 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -14,7 +14,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Active milestone
 
-**Foundations deepening — executable lifetime regressions for optional CPU buffers**
+**Foundations deepening — executable lifetime regressions and reader-oriented architecture documentation**
 
 ## Completed foundations
 
@@ -26,44 +26,46 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - First executable CPU_REPACK lifetime regression with exact path proof, numerical comparison, and repeated ASan/LSan evidence.
 - Upstream-suitability decision and staged two-file CPU_REPACK regression proposal.
 - Website UX review with task-oriented Architecture navigation grouping.
+- Architecture landing page with six goal-based entry points, concise page summaries, and ordered reading paths.
 
 ## Latest concrete findings
 
 ### Verified
 
-- The homepage already provides four reading modes and links to interactive, overview, source-deep-dive, and systems-foundation entry points.
-- MkDocs Material enables instant navigation, sections, search suggestion/highlighting, palette switching, heading permalinks, code copy, tabs, and Mermaid.
-- The interactive foundations iframe has a descriptive title and is accompanied by prose and truth-labelled content.
-- The Architecture navigation previously exposed 27 pages in one flat list.
-- Architecture pages are now grouped under Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends without changing any route.
+- The Architecture section contains 27 detailed pages across core architecture, ownership/teardown, CPU optional buffers, and accelerator backends.
+- The new `docs/architecture/index.md` gives readers six task-based entry points instead of requiring them to infer a sequence from page titles.
+- It summarizes every Architecture page and provides ordered paths for beginners, mmap/copy/page-fault investigators, scheduler investigators, and ownership/teardown investigators.
+- `mkdocs.yml` adds one Overview entry while preserving every existing route.
+- The page states the pinned baseline, audience, recommended first read, truth-label meanings, and next page.
 
 ### Interpretation
 
-- Technical depth is strong, but navigation growth had begun to mirror repository history rather than reader tasks.
-- Grouping reduces scanning cost while preserving links and bookmarks.
-- The next major UX gain is a section index with audience-based reading paths and concise page descriptions.
-- The Foundations/Architecture/Inference lifecycle/Interactive distinction should be made more explicit, especially because the foundations explorer appears in two navigation locations.
+- Semantic navigation groups reduce scanning, but a section index is needed to explain how those groups relate to actual reader questions.
+- Cross-section links are appropriate because GGUF, memory, graph construction, scheduling, copying, and teardown span Foundations, Architecture, and Inference lifecycle.
+- The next UX priority is deployed verification, followed by built-site accessibility or an Inference lifecycle index depending on observed problems.
 
 ### Historical
 
-- The flat Architecture list was reasonable when the site contained fewer pages; teardown and optional-buffer research made it substantially denser.
+- The Architecture section grew from a small flat list to 27 pages as teardown and optional-buffer research expanded.
+- The 13:16 run grouped the menu; the 13:52 run added the reader-facing orientation layer.
 - Current upstream commit `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6` still defines `llama_build_and_test()` and retains the internal CPU_REPACK buffer-type entry point.
 - Workflow run `29481384561` established the pinned CPU_REPACK executable evidence: twenty AVX2-confirmed ASan/LSan processes with stable NMSE `3.82787e-16`.
 
 ### Open questions
 
-- Whether the grouped nested navigation remains comfortable on mobile.
+- Whether the card grid and nested Architecture navigation remain comfortable on mobile.
 - Whether interactive HTML assets provide complete keyboard navigation and visible focus states internally.
 - Whether Mermaid and custom diagram colors satisfy contrast requirements in both palettes.
+- Whether an Inference lifecycle index is needed after the Architecture index is deployed.
 - Whether current upstream `8ee54c8` still admits the exact CPU_REPACK fixture at runtime.
 
 ## Immediate next task
 
 ```text
-wait for strict Documentation CI on grouped navigation
-  → inspect and fix any MkDocs/nav failure
-  → add an Architecture section index with audience-based reading paths
-  → verify deployed desktop/mobile navigation, search, diagrams, iframe interaction, and keyboard access
+wait for strict Documentation CI on the Architecture index
+  → inspect and fix any MkDocs or internal-link failure
+  → verify deployed desktop/mobile navigation, cards, search, diagrams, iframe interaction, and keyboard access
+  → add a built-site accessibility check or Inference lifecycle index based on deployed findings
 ```
 
 ## In progress
@@ -78,17 +80,17 @@ wait for strict Documentation CI on grouped navigation
 ## Publication and validation state
 
 - Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Previous head `1c16b8f` passed Documentation CI, pinned/current OpenCL workflows, and CPU_REPACK sanitizer workflow.
-- Added detailed UX note `logs/research/2026-07-16/1316-website-ux-review.md`.
-- Updated `mkdocs.yml` to group Architecture navigation while preserving routes.
+- Previous head `d376aef` added grouped Architecture navigation; commit-scoped CI must be checked.
+- Added `docs/architecture/index.md` and detailed note `logs/research/2026-07-16/1352-architecture-section-index.md`.
+- Updated `mkdocs.yml`, README living TODOs, project state, and research log.
 - Research ledger unchanged because no external source was added or reclassified.
 - Final-head workflow results must be checked after all context commits.
 
 ## Known blockers and caveats
 
-- **Live-site verification:** direct GitHub Pages retrieval was blocked in the browsing environment, so HTTP status, rendered navigation, search, responsive layout, keyboard behavior, and interactive assets could not be independently tested.
-- **Deployment scope:** branch-added navigation cannot appear on production Pages until PR #1 merges.
-- **Accessibility scope:** source inspection confirms iframe titles and prose fallbacks, but does not prove internal keyboard behavior, focus visibility, or contrast.
+- **Live-site verification:** direct GitHub Pages retrieval has been blocked in the browsing environment, so HTTP status, rendered navigation, search, responsive layout, keyboard behavior, and interactive assets may remain independently untested.
+- **Deployment scope:** branch-added navigation and the Architecture index cannot appear on production Pages until PR #1 merges.
+- **Accessibility scope:** source inspection does not prove internal keyboard behavior, focus visibility, contrast, or mobile card layout.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the fixture has not yet been compiled and executed against that exact current revision.
 - **Evidence retention:** artifact `8368782428` expires on 2026-08-15.
 - **Hardware scope:** the passing CPU_REPACK evidence is AVX2-specific and does not cover ARM, KleidiAI, AMX, or SpacemiT.
