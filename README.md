@@ -121,7 +121,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Inspect and fix the first representative Chromium smoke result; preserve route, viewport, focus, overflow, iframe, reduced-motion, and browser-error checks unless a narrow exception is documented.
+- [ ] Inspect the revised representative Chromium result; preserve same-origin failures, Mermaid rendering, route, viewport, focus, overflow, iframe, reduced-motion, and browser-error checks.
 - [ ] Verify the post-merge Pages deployment and audit the homepage, Architecture index, grouped navigation, search, diagrams, iframe interactions, keyboard access, card layout, and responsive behavior.
 - [ ] Generate and compile the staged two-file CPU_REPACK lifetime candidate against current upstream `8ee54c8`, requiring AVX2, exact path admission, numerical agreement, and ASan/LSan-clean backend-before-buffer teardown.
 - [ ] Open or manually stage the current-tree CPU_REPACK regression pull request after runtime validation; connected GitHub App upstream write permission may remain blocked.
@@ -144,6 +144,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
+- [ ] Vendor Mermaid locally or otherwise remove the production CDN dependency after measuring its browser and Pages impact.
 - [ ] Add axe-core and explicit computed-contrast/focus-style checks to the representative browser route set after the smoke lane stabilizes.
 - [ ] Audit standalone interactive explorers for complete keyboard operation, visible focus, text equivalents, and iframe/fullscreen fallbacks.
 - [ ] Add an Inference lifecycle section index if deployed review confirms the same cross-section discoverability gap.
@@ -162,6 +163,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Inspect the first representative Chromium smoke failure: run `29504440262` reached only the browser step; retained evidence showed a rendered homepage, visible skip-link focus, rendered Mermaid, and no local HTTP failure, so cross-origin diagnostics are now warnings while same-origin errors and functional Mermaid rendering remain strict.
 - [x] Add a representative Chromium smoke lane for the homepage, Architecture index, a diagram-heavy page, and the interactive inference workflow at desktop and mobile widths, with failure screenshots retained by Documentation CI.
 - [x] Inspect the first generated-site accessibility result: Documentation CI run `29496291134` passed strict MkDocs output and the accessibility structure validator without a Material-theme exception.
 - [x] Add a dependency-free built-site accessibility structure check for language metadata, main landmarks, top-level headings, image alternatives, iframe titles, and button names, with focused tests and Documentation CI integration.
