@@ -7,7 +7,7 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Verified**
 
 - Baseline pinned to `e3546c7948e3af463d0b401e6421d5a4c2faf565`.
-- Documented the path from backend/model loading through tokenization, `llama_context`, decode, sampling, and token feedback.
+- Documented backend/model loading, tokenization, `llama_context`, decode, sampling, and token feedback.
 - Published canonical GGUF, model placement, `llama_model`, `llama_context`, graph/MoE, scheduler, memory, and backend pages.
 - GGUF stores tensors and metadata, not an executable graph; architecture code builds GGML operations over loaded tensors.
 
@@ -41,233 +41,125 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 **Verified**
 
-- Added an exact-line OpenCL lifecycle extractor with comment/string masking, bounded context, focused tests, and a pinned-source artifact workflow.
+- Added an exact-line OpenCL lifecycle extractor with masking, bounded context, focused tests, and a pinned-source artifact workflow.
 - Verified process-lifetime queue/context state, unsupported scheduler events, buffer-local deleters, and Adreno binary-library lifetime.
-- Audited all 51 direct waits: five waited events are released and 46 local command-event references are not.
-- Added machine-readable wait/release, blocking-read follow-up, set-tensor grouping, and release-only patch validation.
+- Audited 51 direct waits: five waited events are released and 46 local command-event references are not.
 - Classified 22 waits before same-queue blocking reads and 24 synchronous set-tensor waits.
-- Compared generic, CUDA, SYCL, and OpenCL tensor-set behavior and established a pinned de facto synchronous completion contract.
+- Established a pinned de facto synchronous tensor-set completion contract across generic, CUDA, SYCL, and OpenCL behavior.
 
 **Interpretation**
 
-- Event ownership repair and synchronization cleanup are separate changes.
-- The behavior-preserving first fix retains every wait and releases all 46 event references.
+- Event ownership repair and synchronization cleanup are separate changes; the first behavior-preserving fix retains every wait and releases all 46 event references.
 
 ## 2026-07-16 00:52–03:49 — Current-upstream OpenCL re-audit and proposal
 
 **Verified**
 
-- Added a current-upstream lifecycle workflow and audited exact revision `505b1ed15ca80e2a19f12ff4ac365e40fb374053`.
-- Current upstream retains the same 51 direct waits, 46 unmatched simple event references, and 22/24 split.
-- The generated current-source patch inserts 46 releases and reaches zero unmatched records without removing synchronization.
+- Audited exact revision `505b1ed15ca80e2a19f12ff4ac365e40fb374053` with a current-upstream workflow.
+- Current upstream retained 51 direct waits, 46 unmatched simple event references, and the 22/24 split.
+- The generated current-source patch inserted 46 releases and reached zero unmatched records without removing synchronization.
 - Reviewed all insertions and staged an upstream-ready issue/PR proposal.
 
 **Open question**
 
 - Direct upstream submission is blocked by connected GitHub App permission.
 
-## 2026-07-16 04:52 — CPU repack fixture integration point
+## 2026-07-16 04:52–10:50 — CPU_REPACK fixture design and implementation
 
 **Verified**
 
-- Existing `test-backend-ops.cpp` already provides quantization, upload, graph execution, readback, dequantization, and numerical comparison patterns.
-- The CPU extra-dispatch path is distinct from ordinary CPU fallback and must be proven through exact buffer identity and operation admission.
-- Selected `tests/test-cpu-extra-buffer-lifetime.cpp` as a dedicated executable so unusual teardown ordering does not affect the general backend-op runner.
+- Selected a dedicated `tests/test-cpu-extra-buffer-lifetime.cpp` executable and reused backend-op quantization, upload, graph, readback, and comparison patterns.
+- Selected the smallest admitted pinned x86 case: Q4_0 `[32, 8]` × F32 `[32, 1]` → F32 `[8, 1]`, with AVX2, exact buffer identity, non-null traits, and operation-admission guards.
+- Added a deterministic pinned-revision fixture generator and focused structural tests.
+- Resolved the two-graph no-allocation topology, identical one-time Q4_0 quantization, address-based per-tensor CPU_REPACK allocation, and `1e-7` NMSE contract.
+- Completed graph construction, deterministic uploads, compute/readback, exact path proof, and backend-wrapper-before-buffer teardown.
+- Added an AVX2-required ASan/LSan workflow that compiles the exact pinned target and requires twenty non-skipped process executions.
 
 **Interpretation**
 
-- Reuse backend-op helpers, but isolate backend-wrapper-before-buffer destruction and sanitizer repetition in a focused target.
-
-## 2026-07-16 05:51 — Minimal admitted CPU repack case
-
-**Verified**
-
-- Pinned CPU CMake always includes `ggml-cpu/repack.cpp`; runtime feature/layout admission controls use.
-- Pinned Q4_0 AVX2 traits require `weight->ne[1] % 8 == 0`.
-- The smallest bounded x86 case is Q4_0 weight `[32, 8]` × F32 activation `[32, 1]` → F32 `[8, 1]`.
-- Admission requires a two-dimensional weight allocated from the exact repack buffer type, non-null repack traits, host activation storage, and F32 activation type.
-- The fixture must assert buffer pointer identity, non-null `tensor->extra`, and `ggml_backend_supports_op()` before compute.
-
-**Interpretation**
-
-- This case is the smallest pinned x86 fixture that exercises repack initialization, upload, optional dispatch, correctness, synchronous completion, and backend-wrapper-before-buffer teardown.
-- Diagnostic name matching is insufficient; pointer identity and trait admission are the path proof.
-- A non-AVX2 skip is not lifetime evidence, so sanitizer CI needs an AVX2-confirmed runner.
-
-## 2026-07-16 06:49 — CPU repack fixture patch generator
-
-**Verified**
-
-- Added a deterministic, pinned-revision generator for the candidate `test-cpu-extra-buffer-lifetime.cpp` and CMake patch.
-- Added focused tests for revision scope, minimal dimensions, AVX2 gate, exact repack path-proof tokens, teardown order, CMake registration, and deterministic output.
-- The generated C++ skeleton intentionally exited with status 2, preventing structural validation from being misreported as successful runtime lifetime evidence.
-
-**Interpretation**
-
-- This was a safe intermediate implementation artifact while pinned-tree compilation, numerical comparison, and ASan/LSan remained explicit requirements.
-
-## 2026-07-16 07:52 — CPU repack graph, allocation, and tolerance contract
-
-**Verified**
-
-- The pinned backend-op harness uses no-allocation GGML contexts, verifies backend support, allocates storage, expands the graph, uploads inputs, and compares execution.
-- Its base comparison is normalized mean squared error with threshold `1e-7`.
-- The lifetime fixture should quantize one deterministic F32 weight source once and upload the exact same Q4_0 byte vector to both ordinary and repack weights.
-- A mixed ordinary/repack graph needs explicit per-tensor allocation or separate contexts because ordinary context allocation cannot place only one tensor in CPU_REPACK.
-
-**Interpretation**
-
-- Use two independent no-allocation graphs instead of backend graph cloning because ordinary Q4_0 and CPU_REPACK have different physical weight representations.
-- Compare outputs before unusual teardown, then free the tested backend wrapper before graph metadata and retained repack-buffer destruction.
-
-## 2026-07-16 08:51 — CPU repack per-tensor allocation API
-
-**Verified**
-
-- Pinned `ggml_backend_tensor_alloc(buffer, tensor, addr)` takes an address inside an already allocated backend buffer, not an offset.
-- Pinned `ggml_tallocr_alloc()` demonstrates the required backend-specific size query, buffer-base/alignment calculation, and tensor initialization sequence.
-- Updated the generator with a concrete one-tensor-per-buffer helper using `ggml_backend_buft_get_alloc_size()`, `ggml_backend_buft_alloc_buffer()`, the aligned buffer base, and a `GGML_STATUS_SUCCESS` check.
-- The ordinary graph allocator recognizes externally buffered tensors as already allocated, allowing only the tested Q4_0 weight to use CPU_REPACK.
-
-**Interpretation**
-
-- Direct per-tensor allocation is suitable and clearer than a separate weight-only context for this fixture.
-- Backend-specific allocation size must be used because repacked physical storage may differ from ordinary Q4_0 bytes.
-
-## 2026-07-16 09:51 — Complete generated CPU repack fixture
-
-**Verified**
-
-- Replaced the generator's intentional status-2 boundary with complete independent reference and CPU_REPACK graphs.
-- Added deterministic one-time Q4_0 quantization, identical weight/input uploads, graph compute, F32 readback, and `1e-7` NMSE comparison.
-- Preserved exact buffer-identity, non-null-trait, and operation-admission path proof.
-- Preserved backend-wrapper-before-repack-buffer teardown and added a success marker emitted only after execution and comparison.
-- Expanded focused tests to seven cases covering graph construction, allocation, deterministic inputs, compute, readback, NMSE, CMake registration, path proof, teardown order, and removal of the incomplete boundary.
-
-**Interpretation**
-
-- The generator-level implementation is complete, but runtime proof still requires compilation and repeated ASan/LSan execution against the exact pinned tree on an AVX2-confirmed runner.
-
-**Historical**
-
-- This combines the previously verified shape, topology, tolerance, and per-tensor allocation contract into one reviewable generated C++ candidate.
-
-**Open questions**
-
-- Compiler validation of exact pinned API spelling and graph sizing.
-- AVX2 availability and successful CPU_REPACK admission on the sanitizer runner.
-
-## 2026-07-16 10:50 — Pinned CPU_REPACK sanitizer workflow
-
-**Verified**
-
-- Added `.github/workflows/cpu-repack-lifetime-sanitizer.yml`.
-- The workflow fetches the exact pinned llama.cpp revision, materializes the generated fixture, configures ASan/LSan, and compiles only the dedicated target.
-- The runner must expose AVX2; a missing feature is a hard failure rather than a successful skip.
-- The fixture must execute twenty times, emit twenty exact CPU_REPACK success markers, and never emit `SKIP:`.
-- CPU capability, generated source, and sanitizer output are retained as workflow artifacts.
-
-**Interpretation**
-
-- This closes the CI implementation boundary, but executable lifetime proof depends on the first workflow completing successfully.
-- Separate process invocations repeatedly exercise initialization and process teardown without hiding failures inside one long-lived process.
-
-**Open questions**
-
-- Compiler/runtime corrections exposed by the first pinned workflow run.
-- Consistent AVX2 exposure on `ubuntu-latest` and any narrow process-static leak classification required by LSan.
+- Correct output alone does not prove CPU_REPACK ran; pointer identity, selected traits, and admission checks are required.
+- Separate process executions strengthen process-lifetime evidence but do not cover concurrency or every packed layout.
 
 ## 2026-07-16 11:58 — First passing CPU_REPACK sanitizer evidence
 
 **Verified**
 
-- Workflow run `29481384561` passed every checkout, AVX2, pinned-source, generation, sanitizer-configure, compile, twenty-process execution, and artifact-upload step.
-- All twenty processes executed `q4_0_8x8` CPU_REPACK and reported NMSE `3.82787e-16` with no skip or ASan/LSan diagnostic.
-- The exact tested shape was Q4_0 `[32, 8]` × F32 `[32, 1]` → F32 `[8, 1]`.
+- Workflow run `29481384561` passed checkout, AVX2 verification, exact pinned source, generation, sanitizer configuration, compilation, twenty executions, and artifact upload.
+- All twenty processes executed `q4_0_8x8` and reported stable NMSE `3.82787e-16`, with no skip or ASan/LSan diagnostic.
 - Artifact `8368782428` is retained as `cpu-repack-lifetime-sanitizer-e3546c7` with digest `sha256:ef4f0a36e27f7811b106e0a870c278724f1e620aed991807b7f2c3e443d1efaf`.
-- Updated the canonical CPU optional-buffer destruction-harness page with the executable evidence and bounded ownership result.
+- Updated the canonical CPU optional-buffer destruction-harness page with the bounded executable result.
 
 **Interpretation**
 
 - For this admitted pinned synchronous `MUL_MAT`, the CPU_REPACK buffer remains safely destructible after the tested CPU backend wrapper is freed.
-- The result is bounded to one AVX2 shape and does not prove other layouts, concurrency, or other optional CPU buffer implementations.
-
-**Historical**
-
-- This closes the first CPU_REPACK fixture sequence from source audit through exact-revision runtime sanitizer evidence.
 
 **Open questions**
 
-- Upstreaming the fixture as a permanent regression target.
-- Extending the same methodology to ARM repack, KleidiAI, AMX, and SpacemiT.
+- Upstreaming the fixture and extending the method to ARM repack, KleidiAI, AMX, and SpacemiT.
 
 ## 2026-07-16 12:50 — CPU_REPACK upstream-suitability decision
 
 **Verified**
 
 - Reviewed current upstream commit `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6`.
-- Current `tests/CMakeLists.txt` still supports a dedicated `llama_build_and_test()` target and groups direct-backend tests under `if (NOT GGML_BACKEND_DL)`.
-- Current `ggml/src/ggml-cpu/repack.h` still declares the internal `ggml_backend_cpu_repack_buffer_type()` entry point.
-- Staged `docs/reference/upstream-cpu-repack-lifetime-fixture-proposal.md` with the proposed two-file patch, title, body, guards, path proof, teardown sequence, and validation requirements.
+- Current tests still support a dedicated `llama_build_and_test()` target, and the internal CPU_REPACK buffer-type entry point remains available.
+- Staged `docs/reference/upstream-cpu-repack-lifetime-fixture-proposal.md` with the proposed two-file patch and validation requirements.
 
 **Interpretation**
 
-- The passing fixture is suitable for upstream review as a narrow dedicated test.
-- The project generator and twenty-process evidence workflow should remain project-side; the first upstream patch should contain only the C++ test and CMake registration.
-- Ordinary cross-platform CI may skip without AVX2, but at least one sanitizer lane must require AVX2 and successful CPU_REPACK admission.
-
-**Historical**
-
-- This decision follows source audit, deterministic fixture construction, exact pinned compilation, and the first passing twenty-process ASan/LSan evidence.
+- The first upstream contribution should contain only the C++ test and CMake registration; project-specific generation and artifact retention should remain here.
 
 **Open questions**
 
-- Current-tree runtime admission and compilation at `8ee54c8`.
-- The authoritative upstream AVX2 sanitizer lane and preferred path-proof observable.
+- Current-tree runtime admission at `8ee54c8` and the authoritative upstream AVX2 sanitizer lane.
 
 ## 2026-07-16 13:16 — Website UX review and navigation grouping
 
 **Verified**
 
-- Reviewed the homepage, MkDocs configuration, interactive foundations page, custom stylesheet, living project context, and prior green CI state.
-- The homepage already offers four reading modes and the site enables strong Material search/navigation features.
-- The Architecture menu had grown to 27 flat entries.
-- Grouped those pages into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends while preserving every route.
-- Recorded a prioritized UX backlog covering deployed verification, section indexes, accessibility checks, diagram text equivalents, interaction fallbacks, and consistency.
+- Reviewed the homepage, MkDocs configuration, interactive foundations page, custom stylesheet, living context, and prior CI state.
+- The homepage already offered four reading modes and strong Material search/navigation features.
+- Grouped 27 Architecture entries into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends while preserving routes.
+- Recorded a prioritized backlog for deployment verification, indexes, accessibility, diagram equivalents, interaction fallbacks, and consistency.
 
 **Interpretation**
 
 - The strongest immediate UX issue was navigation reflecting page-addition history rather than reader tasks.
-- The next bounded improvement should be an Architecture landing page with audience-based reading paths and concise page summaries.
-
-**Historical**
-
-- The flat menu was appropriate earlier, but became harder to scan as teardown and optional-buffer research expanded.
-
-**Open questions**
-
-- Mobile behavior of the grouped navigation, keyboard/focus behavior inside interactive HTML, dark/light contrast, and actual production Pages rendering remain unverified because the live site could not be fetched in this environment.
 
 ## 2026-07-16 13:52 — Architecture section index
 
 **Verified**
 
-- Added `docs/architecture/index.md` as the canonical orientation page for the 27-page Architecture section.
-- Added six goal-based entry cards for repository orientation, GGUF/model loading, memory/ownership, graphs/scheduling, CPU optional buffers, and accelerator comparison.
-- Added concise summaries for every Architecture page and ordered reading paths for beginners, mmap/copy/page-fault investigators, scheduler investigators, and teardown investigators.
-- Added `Architecture → Overview` to `mkdocs.yml` without changing any existing route.
-- Recorded the pinned baseline, audience, recommended prerequisite, truth labels, and next page on the index.
+- Added `docs/architecture/index.md` as the canonical orientation page for the 27-page section.
+- Added six goal-based entry cards, concise summaries for every page, and ordered paths for beginners, mmap/copy/page-fault investigators, scheduler investigators, and teardown investigators.
+- Added `Architecture → Overview` without changing existing routes.
 
 **Interpretation**
 
-- Navigation grouping lowers scanning cost; the index adds the missing explanation of how sections and pages map to reader goals.
-- Cross-section paths are necessary because GGUF, memory, graph construction, scheduling, copies, and teardown span multiple top-level navigation sections.
-
-**Historical**
-
-- This completes the two-step information-architecture improvement begun by the 13:16 navigation grouping.
+- Navigation grouping lowers scanning cost; the index explains how sections and pages map to reader goals.
 
 **Open questions**
 
-- Mobile card layout, nested navigation comfort, keyboard behavior, dark-mode contrast, and deployed rendering remain to be verified after merge or preview deployment.
-- An Inference lifecycle index and duplicate Foundations explorer cleanup remain candidate follow-ups.
+- Mobile layout, nested navigation, keyboard behavior, dark-mode contrast, deployed rendering, an Inference lifecycle index, and duplicate Foundations explorer cleanup.
+
+## 2026-07-16 14:51 — Built-site accessibility structure guard
+
+**Verified**
+
+- Added `scripts/validate_built_site_accessibility.py`, a dependency-free generated-HTML validator.
+- It checks non-empty `html[lang]`, exactly one `<main>`, exactly one `<h1>`, image `alt` attributes, non-empty iframe titles, and accessible button names.
+- It fails for missing or empty site output and excludes standalone `assets/interactive/` HTML for a separate interaction audit.
+- Added four focused tests and integrated the validator after `mkdocs build --strict` in Documentation CI.
+
+**Interpretation**
+
+- This is a high-confidence structural regression guard, not a WCAG conformance claim.
+- Browser-level testing is still required for computed contrast, focus visibility/order, responsive layout, reduced motion, and script-driven interactions.
+
+**Historical**
+
+- This implements the first automated accessibility item from the 13:16 UX review after the 13:52 discoverability improvement.
+
+**Open questions**
+
+- Whether generated Material pages need narrow documented exceptions, and whether the next increment should audit standalone explorers or add a representative axe-core browser lane.
