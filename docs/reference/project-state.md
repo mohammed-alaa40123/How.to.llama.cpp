@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 14:51 Africa/Cairo_
+_Last updated: 2026-07-16 15:51 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -28,46 +28,48 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Website UX review with task-oriented Architecture navigation grouping.
 - Architecture landing page with six goal-based entry points, concise page summaries, and ordered reading paths.
 - Dependency-free generated-HTML accessibility structure validator with focused tests and Documentation CI integration.
+- First authoritative generated-site accessibility run passed without Material-theme exceptions.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Documentation CI previously stopped after `mkdocs build --strict`; it did not inspect generated HTML accessibility structure.
-- `scripts/validate_built_site_accessibility.py` now checks generated documentation pages for a non-empty `html[lang]`, exactly one `<main>`, exactly one `<h1>`, image `alt` attributes, non-empty iframe titles, and button accessible names.
-- Standalone `assets/interactive/` HTML is excluded because it does not use the MkDocs page shell and needs a separate interaction-focused audit.
-- The validator fails on a missing or empty site directory.
-- Four focused tests cover passing output, combined structural failures, interactive-asset exclusion, and missing/empty site handling.
-- Documentation CI runs the validator after the strict MkDocs build.
+- Documentation CI run `29496291134` completed successfully for commit `bc98c6fcadeb2f5194686355f4c6d9a053669d28`.
+- `mkdocs build --strict` passed before the generated-site accessibility validator ran.
+- `Validate built-site accessibility structure` passed without an exception, suppression, or weakened rule.
+- The same Documentation CI job passed durable-context, link, source-index, unit-test discovery, shell, Python, and required-interactive-asset checks.
+- CPU_REPACK sanitizer run `29496291183`, pinned OpenCL lifecycle run `29496291154`, and current-upstream OpenCL audit run `29496291112` also passed on the same commit.
+- PR #1 was merged into `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
 
 ### Interpretation
 
-- This is a high-confidence regression guard, not a WCAG conformance claim.
-- Static generated-HTML checks complement Markdown/link validation and can catch structural accessibility regressions before deployment.
-- Computed contrast, focus visibility, keyboard order, responsive layout, reduced motion, and script-driven interactions still require browser-level testing.
+- The generated Material pages satisfy the validator's bounded structural contract: language metadata, one main landmark, one top-level heading, image alternative-text attributes, iframe titles, and button accessible names.
+- No theme exception is currently justified; the validator should remain strict.
+- Static generated-HTML success does not establish keyboard order, focus visibility, computed contrast, reduced-motion behavior, responsive layout, or script-driven interactions.
 
 ### Historical
 
 - The 13:16 run identified accessibility verification as a major site-quality gap.
-- The 13:52 run improved Architecture discoverability; the 14:51 run implements the first automated built-output accessibility guard.
-- Current upstream commit `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6` still defines `llama_build_and_test()` and retains the internal CPU_REPACK buffer-type entry point.
+- The 13:52 run improved Architecture discoverability.
+- The 14:51 run implemented the generated-HTML accessibility guard.
+- The 15:51 run closes its first-real-site-result TODO with passing workflow evidence.
 - Workflow run `29481384561` established the pinned CPU_REPACK executable evidence: twenty AVX2-confirmed ASan/LSan processes with stable NMSE `3.82787e-16`.
 
 ### Open questions
 
-- Whether all generated Material pages satisfy the new invariants without narrow documented exceptions.
+- Whether the post-merge Pages deployment succeeded and serves the merged Architecture pages.
+- Whether the deployed Architecture index, grouped navigation, search, diagrams, cards, and iframes behave correctly across desktop and mobile.
 - Whether standalone interactive explorers provide complete keyboard operation, visible focus, and text equivalents.
-- Whether a browser-based axe-core lane should run on every pull request or a representative route subset.
-- Whether Mermaid and custom card colors meet contrast requirements in both palettes.
+- Whether a representative browser-based accessibility lane should run on every pull request.
 - Whether current upstream `8ee54c8` still admits the exact CPU_REPACK fixture at runtime.
 
 ## Immediate next task
 
 ```text
-wait for the first Documentation CI accessibility result
-  → inspect and fix genuine generated-HTML failures
-  → document narrow theme exceptions rather than weakening checks globally
-  → add standalone-interactive or browser-based accessibility coverage
+verify post-merge Pages deployment
+  → audit homepage, Architecture index, one diagram-heavy page, and one interactive explorer
+  → check keyboard focus, accessible names, contrast, reduced motion, and responsive layout
+  → if live access remains blocked, add a representative preview/browser CI lane
 ```
 
 ## In progress
@@ -81,17 +83,17 @@ wait for the first Documentation CI accessibility result
 
 ## Publication and validation state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added `scripts/validate_built_site_accessibility.py`, `tests/test_validate_built_site_accessibility.py`, and detailed note `logs/research/2026-07-16/1451-built-site-accessibility-guard.md`.
-- Updated Documentation CI, README living TODOs, project state, and research log.
+- PR #1 has merged to `main` at `f33d16945433581e484c3b1112dc36c9f807861c`.
+- Current increment is on branch `automation/accessibility-ci-result`.
+- Added detailed note `logs/research/2026-07-16/1551-first-accessibility-ci-result.md`.
+- Updated README living TODOs, project state, and research log.
 - Research ledger unchanged because no external source was added or reclassified.
-- Final-head workflow results must be checked after context updates complete.
+- Documentation CI and all three technical evidence workflows passed on the accessibility-guard commit.
 
 ## Known blockers and caveats
 
-- **Final-head CI:** the first generated-HTML validator run must complete before its real-site behavior is established.
-- **Live-site verification:** direct Pages access remains unavailable in this environment, so HTTP status, rendered navigation, search, responsive layout, keyboard behavior, computed contrast, and interactive assets cannot be independently tested.
-- **Deployment scope:** branch-added changes cannot appear on production Pages until PR #1 merges.
+- **Live-site verification:** direct Pages access remains unavailable in this environment, so production HTTP status, rendered navigation, search, responsive layout, keyboard behavior, computed contrast, and interactive assets cannot be independently tested.
+- **Pages workflow visibility:** commit-scoped workflow lookup currently exposes pull-request-triggered runs, so the post-merge `main` Pages run was not available through that endpoint.
 - **Accessibility scope:** static parsing does not prove keyboard order, focus visibility, computed contrast, reduced-motion behavior, responsive layout, or script-driven accessible names.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the fixture has not yet been compiled and executed against that exact current revision.
 - **Evidence retention:** artifact `8368782428` expires on 2026-08-15.
