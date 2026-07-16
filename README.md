@@ -117,7 +117,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
-- [ ] Decide whether to propose the passing CPU_REPACK fixture upstream as a permanent regression target, and stage the narrow patch if appropriate.
+- [ ] Generate and compile the staged two-file CPU_REPACK lifetime candidate against current upstream `8ee54c8`, requiring AVX2, exact path admission, numerical agreement, and ASan/LSan-clean backend-before-buffer teardown.
+- [ ] Open or manually stage the current-tree CPU_REPACK regression pull request after runtime validation; connected GitHub App upstream write permission may remain blocked.
 - [ ] Add an admitted ARM NEON+dotprod or KleidiAI optional-buffer lifetime fixture with the same exact-path, numerical, teardown, and sanitizer requirements.
 - [ ] Submit or manually stage the reviewed 46-release current-upstream OpenCL ownership correction; upstream GitHub App write permission is currently blocked.
 - [ ] Decide whether a move-only OpenCL event owner is worthwhile after the narrow explicit-release correction.
@@ -151,6 +152,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Decide upstream suitability of the passing CPU_REPACK fixture and stage a narrow two-file proposal at `docs/reference/upstream-cpu-repack-lifetime-fixture-proposal.md`, reviewed against current upstream `8ee54c8`.
 - [x] Preserve the first passing CPU_REPACK workflow evidence: run `29481384561`, twenty AVX2-confirmed ASan/LSan processes, stable NMSE `3.82787e-16`, no skip, and artifact `8368782428` with digest `sha256:ef4f0a36e27f7811b106e0a870c278724f1e620aed991807b7f2c3e443d1efaf`.
 - [x] Update the CPU optional-buffer destruction-harness page with the executable CPU_REPACK result and bounded ownership conclusion.
 - [x] Add a pinned-source AVX2-confirmed ASan/LSan workflow that materializes, compiles, and requires twenty non-skipped executions of the generated CPU_REPACK fixture.
