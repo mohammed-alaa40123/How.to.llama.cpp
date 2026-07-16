@@ -22,6 +22,15 @@ function assert(condition, message) {
   }
 }
 
+function isSameOriginUrl(url) {
+  if (!url) return true;
+  try {
+    return new URL(url, baseUrl).origin === new URL(baseUrl).origin;
+  } catch {
+    return true;
+  }
+}
+
 async function inspectRoute(browser, route, viewport) {
   const context = await browser.newContext({
     viewport: { width: viewport.width, height: viewport.height },
@@ -29,12 +38,26 @@ async function inspectRoute(browser, route, viewport) {
     reducedMotion: "reduce",
   });
   const page = await context.newPage();
-  const browserErrors = [];
+  const siteErrors = [];
+  const externalWarnings = [];
 
-  page.on("pageerror", error => browserErrors.push(`pageerror: ${error.message}`));
+  page.on("pageerror", error => siteErrors.push(`pageerror: ${error.message}`));
   page.on("console", message => {
-    if (message.type() === "error") {
-      browserErrors.push(`console: ${message.text()}`);
+    if (message.type() !== "error") return;
+    const locationUrl = message.location().url ?? "";
+    const record = `console${locationUrl ? ` (${locationUrl})` : ""}: ${message.text()}`;
+    if (isSameOriginUrl(locationUrl)) {
+      siteErrors.push(record);
+    } else {
+      externalWarnings.push(record);
+    }
+  });
+  page.on("requestfailed", request => {
+    const record = `requestfailed (${request.url()}): ${request.failure()?.errorText ?? "unknown error"}`;
+    if (isSameOriginUrl(request.url())) {
+      siteErrors.push(record);
+    } else {
+      externalWarnings.push(record);
     }
   });
 
@@ -72,6 +95,18 @@ async function inspectRoute(browser, route, viewport) {
       assert(title.length > 0, `${route.name}/${viewport.name}: iframe has no accessible title`);
     }
 
+    const mermaidState = await page.evaluate(() => {
+      const diagrams = [...document.querySelectorAll("main .mermaid")];
+      return {
+        count: diagrams.length,
+        rendered: diagrams.filter(diagram => diagram.querySelector("svg") !== null).length,
+      };
+    });
+    assert(
+      mermaidState.rendered === mermaidState.count,
+      `${route.name}/${viewport.name}: rendered ${mermaidState.rendered} of ${mermaidState.count} Mermaid diagrams`,
+    );
+
     await page.keyboard.press("Tab");
     const focusState = await page.evaluate(() => {
       const element = document.activeElement;
@@ -90,7 +125,10 @@ async function inspectRoute(browser, route, viewport) {
     assert(focusState.width > 0 && focusState.height > 0, `${route.name}/${viewport.name}: focused element has no visible box`);
     assert(focusState.visibility !== "hidden" && focusState.display !== "none", `${route.name}/${viewport.name}: focused element is hidden`);
 
-    assert(browserErrors.length === 0, `${route.name}/${viewport.name}: browser errors:\n${browserErrors.join("\n")}`);
+    assert(siteErrors.length === 0, `${route.name}/${viewport.name}: site/browser errors:\n${siteErrors.join("\n")}`);
+    if (externalWarnings.length > 0) {
+      console.warn(`WARN ${route.name}/${viewport.name}: external resource diagnostics:\n${externalWarnings.join("\n")}`);
+    }
     console.log(`PASS ${route.name}/${viewport.name}: ${url}`);
   } catch (error) {
     await mkdir(artifactDir, { recursive: true });
