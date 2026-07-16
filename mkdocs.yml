@@ -77,6 +77,7 @@ nav:
       - llama_model: objects/llama-model.md
       - llama_context: objects/llama-context.md
   - Architecture:
+      - Overview: architecture/index.md
       - Core architecture:
           - Repository map: architecture/repository-map.md
           - Public API and minimal example: architecture/public-api-minimal-example.md
