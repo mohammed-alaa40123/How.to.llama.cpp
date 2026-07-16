@@ -11,6 +11,20 @@ class CpuRepackLifetimeFixtureGeneratorTest(unittest.TestCase):
         self.assertIn(PINNED_REVISION, first)
         self.assertIn("tests/test-cpu-extra-buffer-lifetime.cpp", first)
 
+    def test_patch_contains_exact_single_tensor_allocation_contract(self):
+        patch = render_patch()
+        required = [
+            "ggml_backend_buft_get_alloc_size(buft, tensor)",
+            "ggml_backend_buft_alloc_buffer(buft, alloc_size)",
+            "ggml_backend_buffer_get_base(buffer)",
+            "ggml_backend_buffer_get_alignment(buffer)",
+            "ggml_backend_tensor_alloc(buffer, tensor, addr) == GGML_STATUS_SUCCESS",
+            "allocate_single_tensor(repack_buft,",
+        ]
+        for token in required:
+            with self.subTest(token=token):
+                self.assertIn(token, patch)
+
     def test_patch_contains_path_proof_and_teardown_contract(self):
         patch = render_patch()
         required = [
@@ -19,9 +33,10 @@ class CpuRepackLifetimeFixtureGeneratorTest(unittest.TestCase):
             "tested_weight->buffer->buft == repack_buft",
             "tested_weight->extra != nullptr",
             "ggml_backend_supports_op(tested_backend, tested_mul_mat)",
+            "normalized mean squared error <= 1e-7",
             "ggml_backend_free(tested_backend);",
             "ggml_backend_buffer_free(repack_buffer);",
-            'return 2;',
+            "return 2;",
         ]
         for token in required:
             with self.subTest(token=token):
