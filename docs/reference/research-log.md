@@ -209,3 +209,27 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - The first browser-lane workflow result, external Mermaid behavior, selector stability, explicit contrast checks, axe-core coverage, and deep standalone-explorer keyboard operation.
+
+## 2026-07-16 17:52 — First browser-smoke failure and narrow correction
+
+**Verified**
+
+- Documentation CI run `29504440262` passed every stage before Chromium and failed only at the browser validator.
+- Artifact `8377864569` retained a fully rendered homepage/desktop screenshot with visible skip-link focus and rendered Mermaid, plus a local server log containing successful page and asset responses without a local 404.
+- The first validator treated every console error as fatal without considering its source URL.
+- Updated the validator so same-origin console errors, same-origin request failures, and uncaught page exceptions remain fatal while cross-origin diagnostics are printed as warnings.
+- Added a functional assertion that every Mermaid container under `main` contains a rendered SVG.
+- Preserved the complete four-route, two-viewport, landmark, search, overflow, reduced-motion, iframe-title, and focus matrix.
+
+**Interpretation**
+
+- The retained evidence is consistent with third-party console noise rather than a broken homepage, but the exact initial message was not retained separately.
+- The same-origin boundary plus explicit Mermaid-output assertion is narrower and stronger than globally ignoring browser errors.
+
+**Historical**
+
+- This is the first evidence-driven correction to the 16:51 browser lane.
+
+**Open questions**
+
+- The revised eight-case result, the exact recurring cross-origin diagnostic, whether Mermaid should be vendored locally, and when to add axe-core and computed contrast/focus checks.
