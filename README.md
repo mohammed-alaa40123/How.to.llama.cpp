@@ -106,6 +106,7 @@ Public site: `https://mohammed-alaa40123.github.io/How.to.llama.cpp/`
 | `docs/objects/llama-model.md` | Persistent model state and teardown |
 | `docs/objects/llama-context.md` | Mutable runtime state and lifetime |
 | `docs/ggml/graph-construction-and-moe.md` | Graph construction, reuse, MoE routing, and cache design |
+| `docs/architecture/index.md` | Audience-based Architecture reading paths and page summaries |
 | `docs/architecture/backend-teardown-audit-method.md` | Reusable completion/ownership audit worksheet |
 | `docs/architecture/cpu-extra-buffer-destruction-harness.md` | CPU optional-buffer lifetime fixture specification and executable evidence |
 | `docs/architecture/opencl-build-and-buffer-lifetimes.md` | OpenCL lifecycle and ownership audit |
@@ -119,8 +120,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 - [ ] Generate and compile the staged two-file CPU_REPACK lifetime candidate against current upstream `8ee54c8`, requiring AVX2, exact path admission, numerical agreement, and ASan/LSan-clean backend-before-buffer teardown.
 - [ ] Open or manually stage the current-tree CPU_REPACK regression pull request after runtime validation; connected GitHub App upstream write permission may remain blocked.
-- [ ] Verify the grouped Architecture navigation, search, diagrams, iframe interactions, keyboard access, and responsive layout on the deployed Pages site after PR #1 merges.
-- [ ] Add an Architecture section index with audience-based reading paths and concise page summaries.
+- [ ] Verify the Architecture index, grouped navigation, search, diagrams, iframe interactions, keyboard access, card layout, and responsive behavior on the deployed Pages site after PR #1 merges.
 - [ ] Add an admitted ARM NEON+dotprod or KleidiAI optional-buffer lifetime fixture with the same exact-path, numerical, teardown, and sanitizer requirements.
 - [ ] Submit or manually stage the reviewed 46-release current-upstream OpenCL ownership correction; upstream GitHub App write permission is currently blocked.
 - [ ] Decide whether a move-only OpenCL event owner is worthwhile after the narrow explicit-release correction.
@@ -142,6 +142,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 ### Future improvements
 
 - [ ] Add a built-site accessibility check for headings, landmarks, keyboard focus, link names, color contrast, iframe titles, and reduced motion.
+- [ ] Add an Inference lifecycle section index if deployed review confirms the same cross-section discoverability gap.
+- [ ] Remove or explicitly explain the duplicate Foundations explorer navigation entry.
 - [ ] Add text equivalents, legends, fullscreen/static fallbacks, and mobile variants for major diagrams and interactive explorers.
 - [ ] Add repeated CPU_REPACK executions inside one process to complement the passing twenty-process teardown coverage.
 - [ ] Document ordinary `ggml_backend_tensor_set()` completion semantics explicitly or record a deliberate weaker contract.
@@ -156,6 +158,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add an Architecture section index with six goal-based entry points, concise summaries for all Architecture pages, and ordered paths for beginners, mmap/copy/page-fault research, scheduling, and teardown.
 - [x] Group the flat Architecture navigation into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends without changing page routes.
 - [x] Complete a structured website UX review covering information architecture, discoverability, diagrams, interaction, accessibility, consistency, and live-verification blockers.
 - [x] Decide upstream suitability of the passing CPU_REPACK fixture and stage a narrow two-file proposal at `docs/reference/upstream-cpu-repack-lifetime-fixture-proposal.md`, reviewed against current upstream `8ee54c8`.
