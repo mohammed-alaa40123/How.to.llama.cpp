@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-16 14:51 Africa/Cairo_
+_Last updated: 2026-07-17 00:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -14,7 +14,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Active milestone
 
-**Foundations deepening — executable lifetime regressions and reader-oriented architecture documentation**
+**Executable-learning Week 1 foundation — contracts, legal fixtures, schemas, and smallest vertical slice**
 
 ## Completed foundations
 
@@ -28,81 +28,82 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Website UX review with task-oriented Architecture navigation grouping.
 - Architecture landing page with six goal-based entry points, concise page summaries, and ordered reading paths.
 - Dependency-free generated-HTML accessibility structure validator with focused tests and Documentation CI integration.
+- EAAI July 17-31 executable-learning plan and initial agent handoff ledger on draft PR #3.
+- Legal-fixture decision separating model-free Lab 0 checks, learner-provided optional inference, and a project-owned synthetic GGUF for Lab 1.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Documentation CI previously stopped after `mkdocs build --strict`; it did not inspect generated HTML accessibility structure.
-- `scripts/validate_built_site_accessibility.py` now checks generated documentation pages for a non-empty `html[lang]`, exactly one `<main>`, exactly one `<h1>`, image `alt` attributes, non-empty iframe titles, and button accessible names.
-- Standalone `assets/interactive/` HTML is excluded because it does not use the MkDocs page shell and needs a separate interaction-focused audit.
-- The validator fails on a missing or empty site directory.
-- Four focused tests cover passing output, combined structural failures, interactive-asset exclusion, and missing/empty site handling.
-- Documentation CI runs the validator after the strict MkDocs build.
+- The initial executable-learning plan now declares complete learning contracts for Lab 0, Lab 1, and Executable Lecture 0.
+- `docs/labs/legal-fixture-decision.md` requires no redistributed model for mandatory Lab 0 validation.
+- Optional inference must use a learner-provided local GGUF path and remain a distinct outcome from build or executable launch.
+- Lab 1 will use deterministically generated project-owned GGUF bytes containing educational metadata, tensor descriptors, alignment, offsets, and non-model payloads.
+- Ordinary CI must not download model weights or call paid generation APIs.
 
 ### Interpretation
 
-- This is a high-confidence regression guard, not a WCAG conformance claim.
-- Static generated-HTML checks complement Markdown/link validation and can catch structural accessibility regressions before deployment.
-- Computed contrast, focus visibility, keyboard order, responsive layout, reduced motion, and script-driven interactions still require browser-level testing.
+- Build/toolchain validation, GGUF format education, and real model inference are different evidence paths and should not be collapsed into a single “smoke test.”
+- A synthetic GGUF is safer and more precise for browser parsing than a mutable third-party tiny model.
+- The first executable lecture should prefer a bounded GGUF-loading path unless source-link feasibility identifies a smaller graph-construction trace.
 
 ### Historical
 
-- The 13:16 run identified accessibility verification as a major site-quality gap.
-- The 13:52 run improved Architecture discoverability; the 14:51 run implements the first automated built-output accessibility guard.
-- Current upstream commit `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6` still defines `llama_build_and_test()` and retains the internal CPU_REPACK buffer-type entry point.
-- Workflow run `29481384561` established the pinned CPU_REPACK executable evidence: twenty AVX2-confirmed ASan/LSan processes with stable NMSE `3.82787e-16`.
+- Earlier work established source-pinned documentation, executable lifetime regressions, accessibility guards, and browser-level CI work.
+- The 2026-07-16 23:00 run froze the two-week executable-learning plan; the 2026-07-17 00:00 run closed its first fixture-policy dependency.
 
 ### Open questions
 
-- Whether all generated Material pages satisfy the new invariants without narrow documented exceptions.
-- Whether standalone interactive explorers provide complete keyboard operation, visible focus, and text equivalents.
-- Whether a browser-based axe-core lane should run on every pull request or a representative route subset.
-- Whether Mermaid and custom card colors meet contrast requirements in both palettes.
-- Whether current upstream `8ee54c8` still admits the exact CPU_REPACK fixture at runtime.
+- Exact metadata fields, tensor types/shapes, alignment, and payload pattern for synthetic GGUF v0.
+- Whether the binary fixture should be committed or generated during tests from a committed generator and manifest.
+- Which bounded llama.cpp parser entry path yields the clearest first trace with stable source links.
+- Which operating systems and container targets belong in the first reproducibility matrix.
 
 ## Immediate next task
 
 ```text
-wait for the first Documentation CI accessibility result
-  → inspect and fix genuine generated-HTML failures
-  → document narrow theme exceptions rather than weakening checks globally
-  → add standalone-interactive or browser-based accessibility coverage
+implement deterministic synthetic GGUF generator
+  → define manifest and fixture-format version
+  → produce golden parser output and SHA-256
+  → add alignment/range and corruption tests
+  → validate browser/Python agreement
 ```
 
 ## In progress
 
+- Draft PR #3 for the EAAI executable-learning foundation.
 - Current-tree regeneration and sanitizer validation of the CPU_REPACK lifetime candidate.
 - Manual/upstream submission of the reviewed 46-release OpenCL ownership correction; GitHub App write access to upstream is blocked.
 - Source-index regeneration with pinned line-aware symbol inventory.
-- Hardware-specific lifetime extensions for KleidiAI, AMX, SpacemiT, and ARM repack.
 - Runtime overlays for mmap/page faults, scheduler copies, events, KV/recurrent growth, and backend queues.
 - Website browser-level accessibility and deployed verification.
 
 ## Publication and validation state
 
-- Work is published in PR #1 from branch `automation/backend-teardown-audit-method`.
-- Added `scripts/validate_built_site_accessibility.py`, `tests/test_validate_built_site_accessibility.py`, and detailed note `logs/research/2026-07-16/1451-built-site-accessibility-guard.md`.
-- Updated Documentation CI, README living TODOs, project state, and research log.
+- Draft PR #3 is based on `agent/eaai-two-week-execution-plan`.
+- Added `docs/publication/two-week-execution-plan.md`, `docs/publication/agent-handoffs.md`, and `docs/labs/legal-fixture-decision.md` plus durable run notes.
+- No external source, paid API, model weight, participant data, or server-side learner state was introduced by the fixture decision.
 - Research ledger unchanged because no external source was added or reclassified.
 - Final-head workflow results must be checked after context updates complete.
 
 ## Known blockers and caveats
 
-- **Final-head CI:** the first generated-HTML validator run must complete before its real-site behavior is established.
-- **Live-site verification:** direct Pages access remains unavailable in this environment, so HTTP status, rendered navigation, search, responsive layout, keyboard behavior, computed contrast, and interactive assets cannot be independently tested.
-- **Deployment scope:** branch-added changes cannot appear on production Pages until PR #1 merges.
-- **Accessibility scope:** static parsing does not prove keyboard order, focus visibility, computed contrast, reduced-motion behavior, responsive layout, or script-driven accessible names.
-- **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the fixture has not yet been compiled and executed against that exact current revision.
+- **Orchestrator files:** `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are not yet available on the active branch, so dependency-safe recommendations are being followed.
+- **Fixture implementation:** the decision is complete, but no binary/generator, manifest, golden parser output, or corruption variants exist yet.
+- **Inference scope:** mandatory Lab 0 does not prove model loading or token generation; those require the separately labelled learner-provided-model extension.
+- **Live-site verification:** direct Pages access remains unavailable in this environment, so production rendering cannot be independently tested here.
+- **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the CPU_REPACK fixture has not yet been compiled and executed against that exact current revision.
 - **Evidence retention:** artifact `8368782428` expires on 2026-08-15.
-- **Hardware scope:** the passing CPU_REPACK evidence is AVX2-specific and does not cover ARM, KleidiAI, AMX, or SpacemiT.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
 - Mapping, allocation, residency, representation validity, command completion, event ownership, reset, and release remain distinct states.
 
-## Definition of done for the foundations deepening phase
+## Definition of done for the executable-learning foundation phase
 
-- Comprehensive clickable system map and source-pinned end-to-end workflow.
-- Deep GGUF/model-loading, model/context, graph, scheduler, memory, and teardown documentation.
-- File-by-file source inventory grouped into subsystem explanations.
-- Prefill, decode, CPU-only, GPU-offload, multi-backend, KV/recurrent, and MoE variants.
-- Runtime evidence overlays and executable lifetime regressions where source reasoning alone is insufficient.
+- Complete learning contracts and dependency-ordered July 17-31 plan.
+- Legal fixture policy with no ambiguous model redistribution.
+- Deterministic synthetic GGUF generator, manifest, golden output, and validators.
+- Machine-readable trace, media-manifest, and progress schemas.
+- Authored sample trace with explicit evidence kinds and a narrow viewer shell.
+- Lab 0 checker interface and model-free environment/build report.
+- One deterministic technical figure from structured input.
+- Accessibility fallbacks, reproducibility evidence, and CI gates for every introduced artifact.
