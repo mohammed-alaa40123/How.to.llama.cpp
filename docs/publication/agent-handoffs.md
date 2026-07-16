@@ -107,3 +107,44 @@ The useful contribution is the visible evidence boundary between simulation, aut
 ### Next dependency
 
 The next distinct literature slice should verify the media pipeline from current official API documentation: OpenAI image/speech/realtime/video, Gemini image generation, NotebookLM automation limits, provenance, accessibility, licensing, caching, privacy, and human-review requirements.
+
+## 2026-07-17 01:00 — Documentation Builder
+
+### Assignment status
+
+`orchestrator-state.md` and `evidence-backlog.md` remain unavailable. The run followed the highest repository-ranked dependency in `project-state.md` and the previous Documentation Builder handoff: implement the deterministic synthetic GGUF fixture package.
+
+### Bounded increment completed
+
+Added:
+
+- `scripts/generate_synthetic_gguf.py`;
+- `labs/fixtures/gguf/synthetic-v0.manifest.json`;
+- `labs/fixtures/gguf/synthetic-v0.golden.json`;
+- `tests/test_generate_synthetic_gguf.py`;
+- [`../../logs/research/2026-07-17/0100-synthetic-gguf-fixture.md`](../../logs/research/2026-07-17/0100-synthetic-gguf-fixture.md).
+
+The generator creates a 428-byte, little-endian GGUF v3 teaching file with five typed metadata records, two F32 tensor descriptors, 32-byte alignment, deterministic project-authored payloads, and three bounded corruption variants.
+
+### Verified findings
+
+- Whole-file SHA-256: `688d0ef28c83d6972e291cc0342e695540eae8496b3ec8e92bdbb91e3982a564`.
+- Tensor data starts at absolute byte 384.
+- `demo.matrix` occupies bytes 384–399 at relative offset 0.
+- `demo.vector` occupies bytes 416–427 at relative offset 32.
+- Focused tests verify deterministic regeneration, manifest/golden agreement, aligned and bounded ranges, and rejection of bad magic, a misaligned descriptor offset, and a truncated payload.
+- No model weights, corpus, learner data, network download, telemetry, or paid API were introduced.
+
+### Truth labels
+
+- **Verified:** the exact committed generator and tests passed three focused unit tests and `--check` in an isolated local workspace before repository write.
+- **Interpretation:** generator plus manifest and golden output provide stronger provenance and reviewability than committing an opaque fixture binary as the primary artifact.
+- **Open question:** browser/Python agreement and pinned native `gguf_init_from_file` acceptance remain unimplemented.
+
+### EAAI evidence
+
+This increment turns the fixture-policy decision into an auditable educational artifact with explicit provenance, failure cases, deterministic expected output, and a clear boundary between format learning and inference. It can support or falsify claims about reproducibility, source-linked content generation, validator coverage, and human review burden.
+
+### Next dependency
+
+Add machine-readable trace, media-manifest, and learner-progress schemas with focused validators, unless the orchestrator ranks the Lab 0 checker interface first.
