@@ -38,35 +38,49 @@ async function writeDiagnostics(record) {
   await appendFile(diagnosticsPath, `${JSON.stringify(record)}\n`, "utf8");
 }
 
+async function mermaidState(page) {
+  return page.evaluate(() => {
+    const sourceContainers = [...document.querySelectorAll("main .mermaid")];
+    const renderedSvgs = new Set([
+      ...document.querySelectorAll("main .mermaid svg"),
+      ...document.querySelectorAll('main svg[id^="mermaid-"]'),
+    ]);
+    return {
+      sourceContainers: sourceContainers.length,
+      rendered: renderedSvgs.size,
+      processedContainers: sourceContainers.filter(container => container.getAttribute("data-processed") === "true").length,
+    };
+  });
+}
+
 async function waitForMermaid(page, routeName, viewportName) {
-  const count = await page.locator("main .mermaid").count();
-  if (count === 0) return { count: 0, rendered: 0 };
+  const initial = await mermaidState(page);
+  const expected = Math.max(initial.sourceContainers, initial.rendered);
+  if (expected === 0) return { expected: 0, rendered: 0, processedContainers: 0 };
 
   try {
     await page.waitForFunction(
-      () => {
-        const diagrams = [...document.querySelectorAll("main .mermaid")];
-        return diagrams.length > 0 && diagrams.every(diagram => diagram.querySelector("svg") !== null);
+      expectedCount => {
+        const renderedSvgs = new Set([
+          ...document.querySelectorAll("main .mermaid svg"),
+          ...document.querySelectorAll('main svg[id^="mermaid-"]'),
+        ]);
+        return renderedSvgs.size >= expectedCount;
       },
+      expected,
       { timeout: mermaidRenderTimeoutMs },
     );
   } catch {
-    // The detailed assertion below reports the observed rendered/count state.
+    // The detailed assertion below reports the observed rendered/source state.
   }
 
-  const state = await page.evaluate(() => {
-    const diagrams = [...document.querySelectorAll("main .mermaid")];
-    return {
-      count: diagrams.length,
-      rendered: diagrams.filter(diagram => diagram.querySelector("svg") !== null).length,
-    };
-  });
-
+  const state = await mermaidState(page);
   assert(
-    state.rendered === state.count,
-    `${routeName}/${viewportName}: rendered ${state.rendered} of ${state.count} Mermaid diagrams after ${mermaidRenderTimeoutMs} ms`,
+    state.rendered === expected,
+    `${routeName}/${viewportName}: rendered ${state.rendered} of ${expected} Mermaid diagrams after ${mermaidRenderTimeoutMs} ms ` +
+      `(source containers: ${state.sourceContainers}, processed containers: ${state.processedContainers})`,
   );
-  return state;
+  return { expected, ...state };
 }
 
 async function inspectRoute(browser, route, viewport) {
