@@ -224,3 +224,26 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 
 - Current-tree runtime admission and compilation at `8ee54c8`.
 - The authoritative upstream AVX2 sanitizer lane and preferred path-proof observable.
+
+## 2026-07-16 13:16 — Website UX review and navigation grouping
+
+**Verified**
+
+- Reviewed the homepage, MkDocs configuration, interactive foundations page, custom stylesheet, living project context, and prior green CI state.
+- The homepage already offers four reading modes and the site enables strong Material search/navigation features.
+- The Architecture menu had grown to 27 flat entries.
+- Grouped those pages into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends while preserving every route.
+- Recorded a prioritized UX backlog covering deployed verification, section indexes, accessibility checks, diagram text equivalents, interaction fallbacks, and consistency.
+
+**Interpretation**
+
+- The strongest immediate UX issue was navigation reflecting page-addition history rather than reader tasks.
+- The next bounded improvement should be an Architecture landing page with audience-based reading paths and concise page summaries.
+
+**Historical**
+
+- The flat menu was appropriate earlier, but became harder to scan as teardown and optional-buffer research expanded.
+
+**Open questions**
+
+- Mobile behavior of the grouped navigation, keyboard/focus behavior inside interactive HTML, dark/light contrast, and actual production Pages rendering remain unverified because the live site could not be fetched in this environment.
