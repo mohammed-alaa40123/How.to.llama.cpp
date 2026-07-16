@@ -1,8 +1,9 @@
-import { mkdir } from "node:fs/promises";
+import { appendFile, mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
 
 const baseUrl = (process.env.BASE_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
 const artifactDir = process.env.BROWSER_SMOKE_ARTIFACT_DIR ?? "browser-smoke-artifacts";
+const diagnosticsPath = `${artifactDir}/diagnostics.jsonl`;
 
 const routes = [
   { path: "/", name: "home" },
@@ -22,13 +23,18 @@ function assert(condition, message) {
   }
 }
 
-function isSameOriginUrl(url) {
-  if (!url) return true;
+function classifyUrl(url) {
+  if (!url) return "unlocated";
   try {
-    return new URL(url, baseUrl).origin === new URL(baseUrl).origin;
+    return new URL(url, baseUrl).origin === new URL(baseUrl).origin ? "same-origin" : "cross-origin";
   } catch {
-    return true;
+    return "unlocated";
   }
+}
+
+async function writeDiagnostics(record) {
+  await mkdir(artifactDir, { recursive: true });
+  await appendFile(diagnosticsPath, `${JSON.stringify(record)}\n`, "utf8");
 }
 
 async function inspectRoute(browser, route, viewport) {
@@ -40,28 +46,37 @@ async function inspectRoute(browser, route, viewport) {
   const page = await context.newPage();
   const siteErrors = [];
   const externalWarnings = [];
+  const unlocatedWarnings = [];
 
   page.on("pageerror", error => siteErrors.push(`pageerror: ${error.message}`));
   page.on("console", message => {
     if (message.type() !== "error") return;
     const locationUrl = message.location().url ?? "";
-    const record = `console${locationUrl ? ` (${locationUrl})` : ""}: ${message.text()}`;
-    if (isSameOriginUrl(locationUrl)) {
+    const record = `console${locationUrl ? ` (${locationUrl})` : " (unlocated)"}: ${message.text()}`;
+    const classification = classifyUrl(locationUrl);
+    if (classification === "same-origin") {
       siteErrors.push(record);
-    } else {
+    } else if (classification === "cross-origin") {
       externalWarnings.push(record);
+    } else {
+      unlocatedWarnings.push(record);
     }
   });
   page.on("requestfailed", request => {
     const record = `requestfailed (${request.url()}): ${request.failure()?.errorText ?? "unknown error"}`;
-    if (isSameOriginUrl(request.url())) {
+    const classification = classifyUrl(request.url());
+    if (classification === "same-origin") {
       siteErrors.push(record);
-    } else {
+    } else if (classification === "cross-origin") {
       externalWarnings.push(record);
+    } else {
+      unlocatedWarnings.push(record);
     }
   });
 
   const url = `${baseUrl}${route.path}`;
+  let outcome = "failure";
+  let failureMessage = null;
   try {
     const response = await page.goto(url, { waitUntil: "networkidle", timeout: 30_000 });
     assert(response !== null, `${route.name}/${viewport.name}: navigation returned no response`);
@@ -129,17 +144,33 @@ async function inspectRoute(browser, route, viewport) {
     if (externalWarnings.length > 0) {
       console.warn(`WARN ${route.name}/${viewport.name}: external resource diagnostics:\n${externalWarnings.join("\n")}`);
     }
+    if (unlocatedWarnings.length > 0) {
+      console.warn(`WARN ${route.name}/${viewport.name}: unlocated console diagnostics:\n${unlocatedWarnings.join("\n")}`);
+    }
+    outcome = "pass";
     console.log(`PASS ${route.name}/${viewport.name}: ${url}`);
   } catch (error) {
+    failureMessage = error.message;
     await mkdir(artifactDir, { recursive: true });
     const screenshotPath = `${artifactDir}/${route.name}-${viewport.name}.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true }).catch(() => {});
     throw new Error(`${error.message}\nFailure screenshot: ${screenshotPath}`);
   } finally {
+    await writeDiagnostics({
+      route: route.name,
+      viewport: viewport.name,
+      url,
+      outcome,
+      failureMessage,
+      siteErrors,
+      externalWarnings,
+      unlocatedWarnings,
+    });
     await context.close();
   }
 }
 
+await mkdir(artifactDir, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 try {
   for (const viewport of viewports) {
