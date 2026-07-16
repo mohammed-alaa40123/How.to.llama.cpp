@@ -247,3 +247,27 @@ This is the concise chronological ledger. Detailed notes live under `logs/resear
 **Open questions**
 
 - Mobile behavior of the grouped navigation, keyboard/focus behavior inside interactive HTML, dark/light contrast, and actual production Pages rendering remain unverified because the live site could not be fetched in this environment.
+
+## 2026-07-16 13:52 — Architecture section index
+
+**Verified**
+
+- Added `docs/architecture/index.md` as the canonical orientation page for the 27-page Architecture section.
+- Added six goal-based entry cards for repository orientation, GGUF/model loading, memory/ownership, graphs/scheduling, CPU optional buffers, and accelerator comparison.
+- Added concise summaries for every Architecture page and ordered reading paths for beginners, mmap/copy/page-fault investigators, scheduler investigators, and teardown investigators.
+- Added `Architecture → Overview` to `mkdocs.yml` without changing any existing route.
+- Recorded the pinned baseline, audience, recommended prerequisite, truth labels, and next page on the index.
+
+**Interpretation**
+
+- Navigation grouping lowers scanning cost; the index adds the missing explanation of how sections and pages map to reader goals.
+- Cross-section paths are necessary because GGUF, memory, graph construction, scheduling, copies, and teardown span multiple top-level navigation sections.
+
+**Historical**
+
+- This completes the two-step information-architecture improvement begun by the 13:16 navigation grouping.
+
+**Open questions**
+
+- Mobile card layout, nested navigation comfort, keyboard behavior, dark-mode contrast, and deployed rendering remain to be verified after merge or preview deployment.
+- An Inference lifecycle index and duplicate Foundations explorer cleanup remain candidate follow-ups.
