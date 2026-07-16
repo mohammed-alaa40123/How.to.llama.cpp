@@ -16,7 +16,7 @@ How.to.llama.cpp explains the path from a GGUF file to generated tokens: backend
 - Clickable foundations and inference explorers.
 - A research ledger for official docs, PRs, discussions, papers, talks, videos, blogs, and technical posts.
 - Scripts for source mirroring, indexing, context loading, validation, and site health checks.
-- GitHub Actions for context validation, upstream indexing, strict documentation CI, pinned/current OpenCL evidence, CPU_REPACK sanitizer evidence, and Pages deployment.
+- GitHub Actions for context validation, upstream indexing, strict documentation CI, generated-site browser smoke checks, pinned/current OpenCL evidence, CPU_REPACK sanitizer evidence, and Pages deployment.
 
 Current progress lives in [`docs/reference/project-state.md`](docs/reference/project-state.md).
 
@@ -56,7 +56,7 @@ Start a local run with:
 | Manual and extractor changes | `.github/workflows/opencl-lifecycle-report.yml` | Preserve and validate pinned OpenCL lifecycle evidence |
 | Manual and current-audit changes | `.github/workflows/current-opencl-lifecycle-audit.yml` | Regenerate exact current-upstream OpenCL ownership evidence |
 | CPU_REPACK fixture changes | `.github/workflows/cpu-repack-lifetime-sanitizer.yml` | Compile and repeatedly execute the pinned fixture under ASan/LSan on AVX2 |
-| Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, strict MkDocs output, and built-site accessibility structure |
+| Every push/PR | `.github/workflows/docs-ci.yml` | Validate context, links, scripts, tests, assets, strict MkDocs output, built-site accessibility structure, and representative Chromium routes |
 | Every push to `main` | `.github/workflows/pages.yml` | Build, deploy, and verify the public site |
 
 ## Implementation method
@@ -85,6 +85,8 @@ python3 -m py_compile scripts/*.py tests/*.py
 bash -n scripts/*.sh
 mkdocs build --strict
 python3 scripts/validate_built_site_accessibility.py site
+python3 -m http.server 8000 --directory site
+BASE_URL=http://127.0.0.1:8000 node scripts/validate_browser_smoke.mjs
 ./scripts/check_site.sh
 ```
 
@@ -119,8 +121,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Highest priority
 
+- [ ] Inspect and fix the first representative Chromium smoke result; preserve route, viewport, focus, overflow, iframe, reduced-motion, and browser-error checks unless a narrow exception is documented.
 - [ ] Verify the post-merge Pages deployment and audit the homepage, Architecture index, grouped navigation, search, diagrams, iframe interactions, keyboard access, card layout, and responsive behavior.
-- [ ] Add a representative browser-based accessibility lane if direct deployed-site verification remains blocked.
 - [ ] Generate and compile the staged two-file CPU_REPACK lifetime candidate against current upstream `8ee54c8`, requiring AVX2, exact path admission, numerical agreement, and ASan/LSan-clean backend-before-buffer teardown.
 - [ ] Open or manually stage the current-tree CPU_REPACK regression pull request after runtime validation; connected GitHub App upstream write permission may remain blocked.
 - [ ] Add an admitted ARM NEON+dotprod or KleidiAI optional-buffer lifetime fixture with the same exact-path, numerical, teardown, and sanitizer requirements.
@@ -142,7 +144,8 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Future improvements
 
-- [ ] Audit standalone interactive explorers for keyboard operation, visible focus, text equivalents, and iframe/fullscreen fallbacks.
+- [ ] Add axe-core and explicit computed-contrast/focus-style checks to the representative browser route set after the smoke lane stabilizes.
+- [ ] Audit standalone interactive explorers for complete keyboard operation, visible focus, text equivalents, and iframe/fullscreen fallbacks.
 - [ ] Add an Inference lifecycle section index if deployed review confirms the same cross-section discoverability gap.
 - [ ] Remove or explicitly explain the duplicate Foundations explorer navigation entry.
 - [ ] Add text equivalents, legends, fullscreen/static fallbacks, and mobile variants for major diagrams and interactive explorers.
@@ -159,6 +162,7 @@ Keep unfinished work in priority order. Remove duplicates and move old completio
 
 ### Completed
 
+- [x] Add a representative Chromium smoke lane for the homepage, Architecture index, a diagram-heavy page, and the interactive inference workflow at desktop and mobile widths, with failure screenshots retained by Documentation CI.
 - [x] Inspect the first generated-site accessibility result: Documentation CI run `29496291134` passed strict MkDocs output and the accessibility structure validator without a Material-theme exception.
 - [x] Add a dependency-free built-site accessibility structure check for language metadata, main landmarks, top-level headings, image alternatives, iframe titles, and button names, with focused tests and Documentation CI integration.
 - [x] Add an Architecture section index with six goal-based entry points, concise summaries for all Architecture pages, and ordered paths for beginners, mmap/copy/page-fault research, scheduling, and teardown.
