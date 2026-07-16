@@ -2,156 +2,164 @@
 
 This is the concise chronological ledger. Detailed notes live under `logs/research/`.
 
-## 2026-07-12 — Baseline, decode, scheduler, and backends
+## 2026-07-12 — Baseline, inference path, and core objects
 
 **Verified**
 
 - Baseline pinned to `e3546c7948e3af463d0b401e6421d5a4c2faf565`.
-- The minimal path loads backends/model, tokenizes, creates a context, decodes, samples, and feeds the next token back.
-- Decode delegates to `llama_context::decode()`; graph reuse requires specialized compatibility checks.
-- Scheduler allocation assigns backends, creates splits and copy-ring destinations, and execution uses events plus synchronized fallback copies.
-- CPU, CUDA, Metal, Vulkan, and SYCL execution/buffer/copy semantics are documented.
+- Documented backend/model loading, tokenization, `llama_context`, decode, sampling, and token feedback.
+- Published canonical GGUF, model placement, `llama_model`, `llama_context`, graph/MoE, scheduler, memory, and backend pages.
+- GGUF stores tensors and metadata, not an executable graph; architecture code builds GGML operations over loaded tensors.
 
 **Interpretation**
 
-- Reuse preserves compatible topology/allocation, not token values or outputs.
-- CPU-mapped addressability does not prove physical residency.
+- Graph reuse preserves compatible topology/allocation, not token values or outputs.
+- CPU addressability and logical cache state do not prove physical residency.
 
-## 2026-07-12 — Documentation architecture and core objects
-
-**Verified**
-
-- Added the documentation-quality roadmap and six-tab foundations explorer.
-- Published canonical `llama_context` and `llama_model` pages and linked their explorer entries.
-- The context stores a non-owning model reference while owning mutable runtime state, scheduler resources, outputs, and memory modules.
-- `llama_model` owns architecture/vocabulary state, persistent tensors, buffers, retained mappings, and architecture-specific graph dispatch.
-
-## 2026-07-12 — GGUF, model placement, graph construction, and MoE
+## 2026-07-13 — Subsystem synthesis and teardown audits
 
 **Verified**
 
-- Published canonical GGUF anatomy and model tensor-placement chapters.
-- GGUF stores tensors and metadata, not an executable graph; architecture code rebuilds GGML operations over loaded tensors.
-- Population paths include mapped alias, mapped copy/upload, direct read, asynchronous staging, and synchronous fallback.
+- Published file-by-file Pass A pages for public API, loader, context memory, scheduler, and persistent KV/recurrent implementations.
+- Added model/context, generic scheduler, CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown audits.
+- Added line-aware source indexing with pinned file and symbol links.
 
 **Interpretation**
 
-- `weights_map` joins physical GGUF layout to backend-aware tensor construction.
-- Cache-aware routing should generally bias selection scores before top-k when expert weights should remain based on original probabilities.
+- Backend-before-scheduler safety depends on queued-work completion and resource-deleter independence.
 
-## 2026-07-12 — Memory lifetimes and validation
-
-**Verified**
-
-- Published the memory-lifetime atlas and interactive ownership overlay.
-- Mapping, allocation, residency, validity, command completion, and ownership are distinct states.
-- Added static validation for interactive routes and Markdown anchors, fixture tests, and Documentation CI integration.
-
-## 2026-07-13 01:52–07:50 — File-by-file Pass A and subsystem synthesis
+## 2026-07-14 — Inference atlas, CPU optional buffers, and CI observability
 
 **Verified**
 
-- Published Pass A pages for the public API/minimal example, model/GGUF loader, runtime context/memory, backend scheduler, and concrete context-memory implementations.
-- Published the cross-subsystem ownership and execution map.
-- The pinned tree contains ordinary KV, iSWA, DSA, DSV4, recurrent, hybrid, and hybrid-iSWA persistent memory implementations.
-- Scheduler copy allocation, current-generation validity, and previous-consumer completion are separate states.
+- Added a clickable inference atlas and reusable teardown worksheet.
+- Audited CPU repack, AMX, KleidiAI, and SpacemiT optional-buffer lifetimes.
+- Added the CPU optional-buffer destruction-harness specification.
+- Split Documentation CI into named validators and expanded bounded C++ source-index tests.
+
+## 2026-07-15 — OpenCL lifecycle evidence and ownership
+
+**Verified**
+
+- Added an exact-line OpenCL lifecycle extractor with masking, bounded context, focused tests, and a pinned-source artifact workflow.
+- Verified process-lifetime queue/context state, unsupported scheduler events, buffer-local deleters, and Adreno binary-library lifetime.
+- Audited 51 direct waits: five waited events are released and 46 local command-event references are not.
+- Classified 22 waits before same-queue blocking reads and 24 synchronous set-tensor waits.
+- Established a pinned de facto synchronous tensor-set completion contract across generic, CUDA, SYCL, and OpenCL behavior.
 
 **Interpretation**
 
-- The loader is a transactional publisher, `llama_context` is a mutable session around a borrowed model, and the scheduler is an execution planner.
-- A per-batch memory context behaves like a transaction plan.
+- Event ownership repair and synchronization cleanup are separate changes; the first behavior-preserving fix retains every wait and releases all 46 event references.
 
-## 2026-07-13 08:50–18:51 — Teardown audits and OpenCL foundation
-
-**Verified**
-
-- Published model/context, generic scheduler, CPU, CUDA, Metal, Vulkan, SYCL, RPC, and CANN teardown audits.
-- Published the pinned OpenCL build, kernel deployment, platform scope, and initial `cl_mem` ownership map.
-
-**Interpretation**
-
-- Backend-before-scheduler safety depends on both resource-deleter independence and queued-work completion.
-- OpenCL buffer-local RAII does not itself prove command completion before release.
-
-## 2026-07-13 19:51 — Line-aware generated source index
+## 2026-07-16 00:52–03:49 — Current-upstream OpenCL re-audit and proposal
 
 **Verified**
 
-- `scripts/index_upstream.py` now emits untruncated, source-ordered `symbol_locations` records for every indexed file.
-- Each record includes approximate declaration `name`, `kind`, and 1-based `line`.
-- The legacy compact `symbols` field remains for compatibility.
-- Duplicate names remain visible in the line-aware list, and tests cover ordering, line calculation, scoped names, and conditional duplicates.
+- Audited exact revision `505b1ed15ca80e2a19f12ff4ac365e40fb374053` with a current-upstream workflow.
+- Current upstream retained 51 direct waits, 46 unmatched simple event references, and the 22/24 split.
+- The generated current-source patch inserted 46 releases and reached zero unmatched records without removing synchronization.
+- Reviewed all insertions and staged an upstream-ready issue/PR proposal.
+
+**Open question**
+
+- Direct upstream submission is blocked by connected GitHub App permission.
+
+## 2026-07-16 04:52–10:50 — CPU_REPACK fixture design and implementation
+
+**Verified**
+
+- Selected a dedicated `tests/test-cpu-extra-buffer-lifetime.cpp` executable and reused backend-op quantization, upload, graph, readback, and comparison patterns.
+- Selected the smallest admitted pinned x86 case: Q4_0 `[32, 8]` × F32 `[32, 1]` → F32 `[8, 1]`, with AVX2, exact buffer identity, non-null traits, and operation-admission guards.
+- Added a deterministic pinned-revision fixture generator and focused structural tests.
+- Resolved the two-graph no-allocation topology, identical one-time Q4_0 quantization, address-based per-tensor CPU_REPACK allocation, and `1e-7` NMSE contract.
+- Completed graph construction, deterministic uploads, compute/readback, exact path proof, and backend-wrapper-before-buffer teardown.
+- Added an AVX2-required ASan/LSan workflow that compiles the exact pinned target and requires twenty non-skipped process executions.
 
 **Interpretation**
 
-- The change removes the navigation blocker for large files such as `ggml-opencl.cpp`, but remains a regex-based aid rather than a compiler-grade call graph.
+- Correct output alone does not prove CPU_REPACK ran; pointer identity, selected traits, and admission checks are required.
+- Separate process executions strengthen process-lifetime evidence but do not cover concurrency or every packed layout.
 
-**Historical**
+## 2026-07-16 11:58 — First passing CPU_REPACK sanitizer evidence
 
-- The previous format exposed only a deduplicated alphabetized list capped at 500 names per file.
+**Verified**
+
+- Workflow run `29481384561` passed checkout, AVX2 verification, exact pinned source, generation, sanitizer configuration, compilation, twenty executions, and artifact upload.
+- All twenty processes executed `q4_0_8x8` and reported stable NMSE `3.82787e-16`, with no skip or ASan/LSan diagnostic.
+- Artifact `8368782428` is retained as `cpu-repack-lifetime-sanitizer-e3546c7` with digest `sha256:ef4f0a36e27f7811b106e0a870c278724f1e620aed991807b7f2c3e443d1efaf`.
+- Updated the canonical CPU optional-buffer destruction-harness page with the bounded executable result.
+
+**Interpretation**
+
+- For this admitted pinned synchronous `MUL_MAT`, the CPU_REPACK buffer remains safely destructible after the tested CPU backend wrapper is freed.
 
 **Open questions**
 
-- Generate direct pinned source-line links and decide whether to add parser-assisted extraction for methods, templates, macros, and destructors.
+- Upstreaming the fixture and extending the method to ARM repack, KleidiAI, AMX, and SpacemiT.
 
-## 2026-07-13 20:51 — Revision-pinned source-line links
-
-**Verified**
-
-- Generated file and symbol records can now carry pinned GitHub URLs.
-- Symbol links include line fragments and derive from the exact revision selected by `update_upstream.sh`.
-- Regression tests cover base normalization, absent-base behavior, line-fragment generation, and non-mutation.
-
-**Interpretation**
-
-- The generated index can now take reviewers directly from approximate symbol metadata to the candidate declaration at the pinned revision.
-
-**Historical**
-
-- The previous line-aware format required callers to construct source URLs themselves.
-
-**Open questions**
-
-- Regenerate the pinned inventory when upstream access is available, validate generated links, and use them to finish the OpenCL teardown audit.
-
-## 2026-07-13 21:49 — Cross-backend teardown comparison
+## 2026-07-16 12:50 — CPU_REPACK upstream-suitability decision
 
 **Verified**
 
-- Added a pinned comparison matrix covering ordinary CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and the current OpenCL gap.
-- The matrix separates execution completion from scheduler-resource independence and links every classification to its detailed audit.
-- Ordinary CPU, Metal, and Vulkan have the strongest audited source-level completion and lifetime classifications; CUDA, SYCL, RPC, and CANN retain specific conditional boundaries.
+- Reviewed current upstream commit `8ee54c8b32a1b0cf13c03fc5723142bc62c775f6`.
+- Current tests still support a dedicated `llama_build_and_test()` target, and the internal CPU_REPACK buffer-type entry point remains available.
+- Staged `docs/reference/upstream-cpu-repack-lifetime-fixture-proposal.md` with the proposed two-file patch and validation requirements.
 
 **Interpretation**
 
-- Backend-before-scheduler safety requires two independent proofs: command completion and valid later deleter state.
-- A single cross-backend table improves discoverability without replacing the backend-specific evidence pages.
-
-**Historical**
-
-- The comparison is revision-pinned and must be re-audited when queue models, registries, or destructor order change.
+- The first upstream contribution should contain only the C++ test and CMake registration; project-specific generation and artifact retention should remain here.
 
 **Open questions**
 
-- Finish OpenCL teardown, validate accelerator destruction with runtime tests, and audit optional CPU extra-buffer implementations.
+- Current-tree runtime admission at `8ee54c8` and the authoritative upstream AVX2 sanitizer lane.
 
-## 2026-07-14 01:52 — Guided end-to-end inference atlas
+## 2026-07-16 13:16 — Website UX review and navigation grouping
 
 **Verified**
 
-- Added a clickable pipeline linking GGUF, model loading, `llama_model`, `llama_context`, graph construction, scheduler execution, backends, sampling, and decode reuse.
-- Added a stage/lifetime table and reading paths for first-pass learning, memory/page faults, graphs/scheduler, backends/synchronization, and ownership/teardown.
-- Linked the atlas first under the Inference lifecycle navigation section.
+- Reviewed the homepage, MkDocs configuration, interactive foundations page, custom stylesheet, living context, and prior CI state.
+- The homepage already offered four reading modes and strong Material search/navigation features.
+- Grouped 27 Architecture entries into Core architecture, Ownership and teardown, CPU optional buffers, and Accelerator backends while preserving routes.
+- Recorded a prioritized backlog for deployment verification, indexes, accessibility, diagram equivalents, interaction fallbacks, and consistency.
 
 **Interpretation**
 
-- The atlas is a routing layer over canonical evidence pages, not a claim that the runtime is a single linear thread.
-- Persistent state, asynchronous queues, mappings/uploads, graph splits, and copy generations cross the simplified pipeline boundaries.
+- The strongest immediate UX issue was navigation reflecting page-addition history rather than reader tasks.
 
-**Historical**
+## 2026-07-16 13:52 — Architecture section index
 
-- The atlas reflects the current documentation structure and the pinned baseline; both remain revision-sensitive.
+**Verified**
+
+- Added `docs/architecture/index.md` as the canonical orientation page for the 27-page section.
+- Added six goal-based entry cards, concise summaries for every page, and ordered paths for beginners, mmap/copy/page-fault investigators, scheduler investigators, and teardown investigators.
+- Added `Architecture → Overview` without changing existing routes.
+
+**Interpretation**
+
+- Navigation grouping lowers scanning cost; the index explains how sections and pages map to reader goals.
 
 **Open questions**
 
-- Generate shared versioned metadata for the atlas and interactive workflow, add runtime overlays, and validate Mermaid click targets in the built site.
+- Mobile layout, nested navigation, keyboard behavior, dark-mode contrast, deployed rendering, an Inference lifecycle index, and duplicate Foundations explorer cleanup.
+
+## 2026-07-16 14:51 — Built-site accessibility structure guard
+
+**Verified**
+
+- Added `scripts/validate_built_site_accessibility.py`, a dependency-free generated-HTML validator.
+- It checks non-empty `html[lang]`, exactly one `<main>`, exactly one `<h1>`, image `alt` attributes, non-empty iframe titles, and accessible button names.
+- It fails for missing or empty site output and excludes standalone `assets/interactive/` HTML for a separate interaction audit.
+- Added four focused tests and integrated the validator after `mkdocs build --strict` in Documentation CI.
+
+**Interpretation**
+
+- This is a high-confidence structural regression guard, not a WCAG conformance claim.
+- Browser-level testing is still required for computed contrast, focus visibility/order, responsive layout, reduced motion, and script-driven interactions.
+
+**Historical**
+
+- This implements the first automated accessibility item from the 13:16 UX review after the 13:52 discoverability improvement.
+
+**Open questions**
+
+- Whether generated Material pages need narrow documented exceptions, and whether the next increment should audit standalone explorers or add a representative axe-core browser lane.

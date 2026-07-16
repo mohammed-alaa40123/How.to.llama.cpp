@@ -34,13 +34,41 @@ jobs:
           RUN_CONTEXT_OUT: ${{ runner.temp }}/how-to-llama-ci-context.md
         run: ./scripts/start_scheduled_run.sh documentation-ci
 
-      - name: Validate project context, interactive links, and scripts
+      - name: Validate durable project context
+        run: python3 scripts/validate_project_context.py
+
+      - name: Validate interactive links
+        run: python3 scripts/validate_interactive_links.py
+
+      - name: Test source indexing
+        run: python3 -m unittest -v tests.test_index_upstream
+
+      - name: Test source-index initializer boundaries
+        run: python3 -m unittest -v tests.test_index_upstream_initializer_boundaries
+
+      - name: Test source-index unsupported syntax
+        run: python3 -m unittest -v tests.test_index_upstream_unsupported_syntax
+
+      - name: Test source-index function try blocks
+        run: python3 -m unittest -v tests.test_index_upstream_function_try_blocks
+
+      - name: Test interactive-link validation
+        run: python3 -m unittest -v tests.test_validate_interactive_links
+
+      - name: Test OpenCL lifecycle extraction
+        run: python3 -m unittest -v tests.test_extract_opencl_lifecycle_calls
+
+      - name: Guard unit-test discovery
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Validate shell syntax
+        run: bash -n scripts/*.sh
+
+      - name: Compile Python sources
+        run: python3 -m py_compile scripts/*.py tests/*.py
+
+      - name: Validate required interactive assets
         run: |
-          python3 scripts/validate_project_context.py
-          python3 scripts/validate_interactive_links.py
-          python3 -m unittest discover -s tests -p 'test_*.py'
-          bash -n scripts/*.sh
-          python3 -m py_compile scripts/*.py tests/*.py
           test -s docs/assets/interactive/inference-flow.html
           test -s docs/assets/interactive/llama-foundations-explorer.html
 
@@ -49,3 +77,6 @@ jobs:
 
       - name: Build MkDocs site strictly
         run: mkdocs build --strict
+
+      - name: Validate built-site accessibility structure
+        run: python3 scripts/validate_built_site_accessibility.py site

@@ -1,12 +1,16 @@
 # OpenCL build and buffer lifetimes
 
-> **Evidence scope:** llama.cpp `e3546c7948e3af463d0b401e6421d5a4c2faf565`. This is a bounded foundation for the still-open full OpenCL teardown audit.
+> **Evidence scope:** llama.cpp `e3546c7948e3af463d0b401e6421d5a4c2faf565`. This page includes a bounded classification of the exact pinned lifecycle-call report, the complete source file preserved by GitHub Actions, and pinned `ggml/src/ggml-opencl/libdl.h`.
 
 ## Five-minute view
 
 The pinned OpenCL backend is not one precompiled GPU program. CMake builds a backend library around one large host-side implementation file and a catalog of OpenCL C kernels. Depending on configuration, those kernels are embedded into the backend binary or copied beside the executable. An optional Adreno binary-kernel library can replace selected source kernels when compatible binaries are available.
 
-At runtime, the first ownership primitive visible in the pinned host source is a small RAII wrapper around `cl_mem`. It creates storage with `clCreateBuffer()` and releases the previous or final allocation with `clReleaseMemObject()`. This proves buffer-local ownership, but it does **not** by itself prove queue completion before buffer release or complete backend-before-scheduler teardown safety.
+The complete pinned source resolves the central ownership question. Device discovery creates one `shared_context`, copies that handle into every supported `ggml_backend_opencl_device_context`, and stores those device contexts in a static vector whose source comment explicitly says the devices and contexts live as long as the process. Each device lazily creates one `ggml_backend_opencl_context`, stores it permanently in `dev_ctx->backend_ctx`, and creates one queue in that context. Individual backend wrappers only increment and decrement `ref_count`; wrapper free calls `clFinish(queue)` first, but does not delete the per-device context or release the queue/context handles.
+
+The optional Adreno binary-kernel library follows the same effective process-lifetime policy, but through missing ownership rather than an explicit owner. `ggml_cl_init()` loads the library into a block-local raw `dl_handle *`, stores only the exported `get_adreno_kernels` function pointer, and never closes the library. Pinned `libdl.h` defines a deleter that would call `FreeLibrary()` or `dlclose()`, but the loader does not use it. This keeps the function pointer and library-provided binary storage valid for later lazy lookup, while omitting deterministic unload and leaking even a library that loads successfully but lacks the expected symbol.
+
+This makes backend-wrapper destruction structurally independent from the persistent OpenCL owner. It also means deterministic OpenCL and binary-library release is omitted: final cleanup is left to process/loader/ICD teardown rather than explicit backend code.
 
 ```mermaid
 flowchart TD
@@ -17,44 +21,113 @@ flowchart TD
     E -->|ON| EH[generated embedded headers]
     E -->|OFF| KF[kernel files beside executable]
     C --> B{Adreno binary kernels enabled?}
-    B -->|yes and compatible| BK[external binary-kernel library]
+    B -->|yes| DL[dl_load_library raw handle]
+    DL --> SYM[store exported function pointer only]
+    SYM --> BIN[get binary pointer and size]
+    BIN --> CPB[clCreateProgramWithBinary]
+    CPB --> CK[clCreateKernel]
+    CK --> RP[release temporary program reference]
     B -->|no or unavailable| SK[source-built kernels]
-    H --> M[cl_mem allocations]
+    H --> SC[clCreateContext → shared_context]
+    SC --> DV[copy handle into process-lifetime device contexts]
+    DV --> BC[lazy per-device backend_ctx]
+    BC --> Q[clCreateCommandQueue → backend_ctx->queue]
+    Q --> W[backend wrapper ref_count++]
+    W --> F[wrapper free: clFinish then ref_count--]
+    F --> P[context, queue, kernels and library remain process-lifetime]
+    H --> M[buffer-local cl_mem allocations]
     M --> R[clReleaseMemObject on replacement/destruction]
 ```
 
-## Verified
+## Exact pinned lifecycle inventory
+
+The source-bearing GitHub Actions artifact contains 558 selected direct API calls:
+
+| API | Direct calls | First-pass role |
+|---|---:|---|
+| `clReleaseMemObject` | 343 | Buffer, sub-buffer, image, temporary, and pooled-view release |
+| `clReleaseProgram` | 121 | Mostly release after kernel creation plus compile-failure cleanup |
+| `clWaitForEvents` | 51 | Explicit completion for profiling, barriers, copies, kernels, conversions, and readback paths |
+| `clReleaseKernel` | 23 | Error/fallback cleanup and rejected optional-kernel candidates |
+| `clFinish` | 11 | Shared free path, readback/debug paths, allocation retry, and temporary allocation cleanup |
+| `clReleaseEvent` | 6 | Profiling, blocking copy, synchronization, and selected kernel/readback paths |
+| `clFlush` | 1 | Cross-device marker publication before a dependent barrier |
+| `clCreateContext` | 1 | Creates `shared_context` at pinned line 5545 |
+| `clCreateCommandQueue` | 1 | Creates `backend_ctx->queue` at pinned line 5902 |
+| `clCreateContextFromType` | 0 | No direct call found by the bounded extractor |
+| `clCreateCommandQueueWithProperties` | 0 | No direct call found by the bounded extractor |
+| `clRetainContext` | 0 | No direct retain found by the bounded extractor |
+| `clRetainCommandQueue` | 0 | No direct retain found by the bounded extractor |
+| `clReleaseCommandQueue` | 0 | No direct release found by the bounded extractor |
+| `clReleaseContext` | 0 | No direct release found by the bounded extractor |
+
+The artifact also preserves the complete `ggml-opencl.cpp` used to generate the report and a two-entry SHA-256 manifest. The report and source hashes were independently recomputed after download and matched the manifest.
+
+## Verified ownership chain
+
+1. `shared_context` is a local variable in OpenCL device registration.
+2. One `clCreateContext()` creates it for the selected platform and all candidate device IDs.
+3. The same handle is copied into each supported `ggml_backend_opencl_device_context::context`.
+4. Those device contexts are owned by `g_ggml_backend_opencl_dev_ctxs`, a static vector of `unique_ptr` objects.
+5. The adjacent source comment states that the registered devices and their contexts live as long as the process.
+6. `ggml_cl_init()` lazily allocates one `ggml_backend_opencl_context` per device and stores the raw pointer in `dev_ctx->backend_ctx`.
+7. `ggml_cl_init()` sets `ref_count = 0`; `ggml_backend_opencl_device_init()` increments it for each backend wrapper.
+8. `ggml_cl_free()` calls `ctx->free()`. That method performs `clFinish(queue)`, decrements `ref_count`, and releases pooled image/sub-buffer views only when the count reaches zero.
+9. `ctx->free()` does not delete `ctx`, release its queue, or release its context.
+10. The backend capability table advertises `events = false`, and the backend interface has null event-record/event-wait callbacks; no scheduler-owned OpenCL event object must survive wrapper destruction.
+
+## Adreno binary-library lifetime
+
+### Verified
+
+1. With `GGML_OPENCL_USE_ADRENO_BIN_KERNELS`, `ggml_cl_init()` calls `dl_load_library(KERNEL_LIB_NAME)` and stores the result only in block-local raw pointer `kernel_lib_handle`.
+2. Pinned `libdl.h` defines `dl_handle_deleter`: `FreeLibrary()` on Windows and `dlclose()` on POSIX.
+3. The loader does not wrap the handle in `std::unique_ptr<dl_handle, dl_handle_deleter>`, copy it into `ggml_backend_opencl_context`, or invoke the deleter.
+4. On successful lookup, only `get_adreno_bin_kernel_func` is retained in the process-lifetime backend context.
+5. If the library loads but the export is absent, the raw handle is also not closed before fallback to built-in kernels.
+6. Five pinned binary-kernel groups request bytes through the retained function pointer, call `clCreateProgramWithBinary()`, create a `cl_kernel`, and release the temporary `cl_program` reference.
+7. Accepted binary kernels persist with the never-deleted per-device backend context. The dynamic library also remains loaded until process teardown.
+
+### Interpretation
+
+The binary library is **process-lifetime by leaked raw handle**. This prevents a dangling exported function pointer and preserves any library-owned binary storage needed by later lookups, but it is not deterministic resource management. There is no close-before-kernel-destruction hazard because neither accepted kernels nor the library are explicitly destroyed. Instead, unload ordering is absent by construction.
+
+After `clCreateProgramWithBinary()` consumes a binary and `clCreateKernel()` succeeds, the OpenCL kernel's executable lifetime is governed by OpenCL object reference counting rather than the original host pointer. The library must nevertheless remain mapped for future calls through `get_adreno_bin_kernel_func`, which the pinned code achieves only by never closing it.
+
+## Other verified findings
 
 - The top-level build registers OpenCL through `ggml_add_backend(OpenCL)`.
 - The OpenCL subdirectory creates `ggml-opencl` from `ggml-opencl.cpp` and the public header, and links the discovered OpenCL libraries.
-- Python is a required build dependency because embedded kernels are converted into generated headers.
+- Python is required because embedded kernels are converted into generated headers.
 - `GGML_OPENCL_EMBED_KERNELS` controls whether kernel sources become generated headers or are copied to the runtime output directory.
-- The pinned kernel catalog includes ordinary elementwise operations, normalization, RoPE, convolution, attention, quantized matrix-vector and matrix-matrix kernels, and MoE-specific kernels such as expert sorting, reorder, combine, and `MUL_MAT_ID` variants.
-- `GGML_OPENCL_USE_ADRENO_KERNELS` selects Adreno-oriented source kernels. `GGML_OPENCL_USE_ADRENO_BIN_KERNELS` enables an optional external binary-kernel library.
-- The official backend guide describes OpenCL as primarily targeting Qualcomm Adreno, with some Intel GPU support, and documents Android, Windows Arm64, and Linux build paths.
-- The host source defines `ggml_cl_buffer`, which owns one `cl_mem`, releases it in its destructor, and releases an older allocation before replacing it with a larger one.
+- The pinned kernel catalog includes elementwise operations, normalization, RoPE, convolution, attention, quantized matrix-vector/matrix-matrix kernels, and MoE-specific sorting, reorder, combine, and `MUL_MAT_ID` variants.
+- `GGML_OPENCL_USE_ADRENO_KERNELS` selects Adreno-oriented source kernels. `GGML_OPENCL_USE_ADRENO_BIN_KERNELS` enables the optional external binary-kernel library.
+- `ggml_cl_buffer` owns one `cl_mem`, releases it in its destructor, and releases an older allocation before replacement.
+- Cross-device synchronization enqueues marker events on peer queues, calls `clFlush()` on those queues, enqueues a destination barrier with the collected wait list, and releases the event references.
+- Several temporary conversion/readback paths wait for completion before releasing temporary memory objects.
+- Program objects are commonly released after kernel creation; kernels retain the required program state under the OpenCL object model.
 
 ## Interpretation
 
-- The backend has two lifetimes that should not be conflated: **build/deployment lifetime** for kernel source or binary artifacts, and **runtime lifetime** for contexts, queues, programs, kernels, events, and memory objects.
-- The `ggml_cl_buffer` wrapper establishes local ownership of a memory object. It does not establish that all commands referencing that object have completed before `clReleaseMemObject()`.
-- Because the backend is a large single translation unit with generated or deployed kernel assets, future source indexing should expose symbol-level slices rather than treating the file as one opaque source node.
-- MoE support in the kernel catalog shows that OpenCL participates in more than generic tensor offload; it contains backend-specific routing and expert-compute kernels that deserve links from the graph/MoE chapter.
+- The pinned backend uses a process-lifetime host-object design: static device contexts retain the OpenCL context and the lazily created per-device backend context, queue, programs, kernels, and optional binary library after individual backend wrappers disappear.
+- Because wrapper free calls `clFinish(queue)`, work on that device queue completes before its wrapper reference is dropped and before final-reference pool cleanup.
+- Buffer destruction after wrapper destruction remains structurally valid in this design because the OpenCL context and per-device owner persist, and buffer deleters operate on buffer-local `cl_mem` handles.
+- This is not equivalent to deterministic cleanup. The absence of explicit queue/context/library release means tools may report process-lifetime resources, and repeated library load/unload inside one process is not proven clean.
+- The design avoids scheduler-event lifetime concerns by advertising no OpenCL events, but enqueue-then-release paths still require classification where host storage or wrapper-local state may be involved.
 
 ## Historical
 
 - OpenCL device support, kernel names, Adreno compiler compatibility, and binary-library coverage are revision-sensitive.
-- The official pinned guide lists specific tested Snapdragon and Intel configurations; these are evidence for that revision, not a universal hardware-support guarantee.
-- Kernel deployment can change between embedded source, runtime source files, and vendor binary libraries without changing the higher-level GGML graph.
+- The first generated report covered completion and release calls only. Later extraction located direct creation, and the source-bearing artifact exposed declarations and process-lifetime ownership.
+- Reading pinned `libdl.h` alongside the preserved OpenCL source resolved the earlier dynamic-library handle question.
+- Earlier documentation classified queue/context and Adreno handle ownership as unresolved because connector rendering truncated the large translation unit.
 
 ## Open questions
 
-- What is the exact backend/context destructor chain in the pinned host file?
-- Does backend free call `clFinish()`, wait on retained events, or otherwise prove completion before releasing queues, programs, kernels, buffers, and the context?
-- Are scheduler events implemented as independent `cl_event` objects, and can they be destroyed after the backend wrapper?
-- Do scheduler buffers retain enough context/device state to release `cl_mem` after backend destruction?
-- In what order are command queues, programs, kernels, events, memory objects, and the OpenCL context released?
-- Does the optional Adreno binary-kernel loader retain a dynamic-library handle, and when is that handle closed relative to kernel destruction?
+- Which enqueue-then-release sites rely solely on OpenCL command-retention semantics, and which also destroy host or wrapper state that requires explicit completion?
+- Should upstream add deterministic registry teardown for queues, contexts, programs, kernels, the lazily allocated backend contexts, and the optional Adreno library handle?
+- Should the invalid-symbol Adreno fallback close the just-opened library immediately?
+- Are repeated registration/unregistration or shared-library unload scenarios supported, or is one-process lifetime an intentional hard contract?
 - Which optional CPU extra-buffer types can coexist with OpenCL placement, and are their deleters independent of the ordinary CPU backend wrapper?
 
 ## Source map
@@ -64,11 +137,13 @@ Pinned primary sources:
 - [`ggml/src/CMakeLists.txt`](https://github.com/ggml-org/llama.cpp/blob/e3546c7948e3af463d0b401e6421d5a4c2faf565/ggml/src/CMakeLists.txt)
 - [`ggml/src/ggml-opencl/CMakeLists.txt`](https://github.com/ggml-org/llama.cpp/blob/e3546c7948e3af463d0b401e6421d5a4c2faf565/ggml/src/ggml-opencl/CMakeLists.txt)
 - [`ggml/src/ggml-opencl/ggml-opencl.cpp`](https://github.com/ggml-org/llama.cpp/blob/e3546c7948e3af463d0b401e6421d5a4c2faf565/ggml/src/ggml-opencl/ggml-opencl.cpp)
+- [`ggml/src/ggml-opencl/libdl.h`](https://github.com/ggml-org/llama.cpp/blob/e3546c7948e3af463d0b401e6421d5a4c2faf565/ggml/src/ggml-opencl/libdl.h)
 - [`docs/backend/OPENCL.md`](https://github.com/ggml-org/llama.cpp/blob/e3546c7948e3af463d0b401e6421d5a4c2faf565/docs/backend/OPENCL.md)
+- GitHub Actions artifact `opencl-lifecycle-pinned-e3546c7` from run `29392658206`, artifact ID `8333854723`.
 
 ## Teardown classification
 
-> **Not yet classified.** This increment verifies build composition, kernel deployment modes, and one buffer-local RAII path. A safe/conditional/unsafe backend-before-scheduler classification requires the remaining queue, event, program, kernel, context, and scheduler-resource free paths.
+> **Backend-wrapper order supported; deterministic process-exit release omitted; Adreno binary library process-lifetime by leaked handle.** Each backend-wrapper free explicitly finishes the per-device queue before decrementing the wrapper reference count. The queue, context, programs, kernels, lazily allocated per-device backend context, and optional Adreno binary library remain process-lifetime. OpenCL scheduler events are unsupported, and buffer-local `cl_mem` deleters do not depend on the destroyed wrapper. Complete deterministic cleanup and shared-library unload safety remain unimplemented or unverified.
 
 ## Next reading
 

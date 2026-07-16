@@ -1,0 +1,142 @@
+name: Audit current upstream OpenCL lifecycle
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/extract_opencl_lifecycle_calls.py"
+      - "scripts/annotate_opencl_wait_followups.py"
+      - "scripts/apply_opencl_event_release_fix.py"
+      - ".github/workflows/current-opencl-lifecycle-audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  audit-current-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out documentation repository
+        uses: actions/checkout@v4
+
+      - name: Resolve and fetch current llama.cpp master
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/current-upstream build/current-reports
+          git -C build/current-upstream init
+          git -C build/current-upstream remote add origin https://github.com/ggml-org/llama.cpp.git
+          git -C build/current-upstream fetch --depth=1 origin master
+          git -C build/current-upstream checkout --detach FETCH_HEAD
+          current_sha=$(git -C build/current-upstream rev-parse HEAD)
+          printf '%s\n' "$current_sha" | tee build/current-reports/llama-cpp-current-sha.txt
+          test -s build/current-upstream/ggml/src/ggml-opencl/ggml-opencl.cpp
+
+      - name: Generate current lifecycle report
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_path=build/current-upstream/ggml/src/ggml-opencl/ggml-opencl.cpp
+          report_path=build/current-reports/opencl-lifecycle-current.json
+          python3 scripts/extract_opencl_lifecycle_calls.py \
+            "$source_path" \
+            --context-lines 3 \
+            --out "$report_path"
+          python3 scripts/annotate_opencl_wait_followups.py "$source_path" "$report_path"
+          cp "$source_path" build/current-reports/ggml-opencl-current.cpp
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report_path = Path("build/current-reports/opencl-lifecycle-current.json")
+          data = json.loads(report_path.read_text(encoding="utf-8"))
+          summary = {
+              "resolved_upstream_sha": Path("build/current-reports/llama-cpp-current-sha.txt")
+                  .read_text(encoding="utf-8").strip(),
+              "direct_call_counts": data["counts"],
+              "simple_waited_event_counts": data["simple_waited_event_counts"],
+              "simple_waited_event_followup_counts": data["simple_waited_event_followup_counts"],
+              "simple_waited_event_total": len(data["simple_waited_events"]),
+          }
+          Path("build/current-reports/opencl-current-summary.json").write_text(
+              json.dumps(summary, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(summary, indent=2, sort_keys=True))
+          if not data["calls"]:
+              raise SystemExit("Current OpenCL lifecycle report unexpectedly contains no calls")
+          if Path("build/current-reports/ggml-opencl-current.cpp").stat().st_size < 100_000:
+              raise SystemExit("Current OpenCL source is unexpectedly small")
+          PY
+
+      - name: Generate current release-only candidate when needed
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(
+              Path("build/current-reports/opencl-lifecycle-current.json")
+              .read_text(encoding="utf-8")
+          )
+          unmatched = report["simple_waited_event_counts"].get("unmatched_in_scope", 0)
+          Path("build/current-reports/current-unmatched-count.txt").write_text(
+              f"{unmatched}\n", encoding="utf-8"
+          )
+          print(f"current unmatched simple waited events: {unmatched}")
+          PY
+
+          unmatched=$(cat build/current-reports/current-unmatched-count.txt)
+          if [ "$unmatched" -gt 0 ]; then
+            python3 scripts/apply_opencl_event_release_fix.py \
+              build/current-upstream/ggml/src/ggml-opencl/ggml-opencl.cpp \
+              build/current-reports/opencl-lifecycle-current.json \
+              --out build/current-reports/ggml-opencl-current-event-release-fixed.cpp \
+              --patch-out build/current-reports/opencl-event-release-current.patch \
+              --expected-fixes "$unmatched"
+
+            python3 scripts/extract_opencl_lifecycle_calls.py \
+              build/current-reports/ggml-opencl-current-event-release-fixed.cpp \
+              --context-lines 3 \
+              --out build/current-reports/opencl-lifecycle-current-event-release-fixed.json
+
+            python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(
+              Path("build/current-reports/opencl-lifecycle-current-event-release-fixed.json")
+              .read_text(encoding="utf-8")
+          )
+          if data["simple_waited_event_counts"].get("unmatched_in_scope", 0) != 0:
+              raise SystemExit("Current release-only candidate did not close all simple ownership gaps")
+          print(json.dumps(data["simple_waited_event_counts"], indent=2, sort_keys=True))
+          PY
+          else
+            printf '%s\n' 'No unmatched simple waited events; no patch generated.' \
+              > build/current-reports/opencl-event-release-current.txt
+          fi
+
+      - name: Create checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          (
+            cd build/current-reports
+            sha256sum * > opencl-current-artifact.sha256
+            grep -v 'opencl-current-artifact.sha256' opencl-current-artifact.sha256 \
+              > opencl-current-artifact.sha256.tmp
+            mv opencl-current-artifact.sha256.tmp opencl-current-artifact.sha256
+            sha256sum -c opencl-current-artifact.sha256
+          )
+
+      - name: Upload current-upstream evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencl-lifecycle-current-upstream
+          path: build/current-reports/
+          if-no-files-found: error
+          retention-days: 30

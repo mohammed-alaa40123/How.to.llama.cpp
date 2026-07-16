@@ -1,0 +1,38 @@
+{
+  "documentation_workflow_run": 29453611188,
+  "evidence_artifact_id": 8358479508,
+  "evidence_artifact_name": "opencl-lifecycle-current-upstream",
+  "evidence_artifact_sha256": "e2293f8a6aeaaa173c0430f4714d0b83ac564c7e2250298b9a7863338a84c30d",
+  "llama_cpp_revision": "505b1ed15ca80e2a19f12ff4ac365e40fb374053",
+  "direct_call_counts": {
+    "clCreateCommandQueue": 1,
+    "clCreateContext": 1,
+    "clFinish": 11,
+    "clFlush": 1,
+    "clReleaseEvent": 6,
+    "clReleaseKernel": 23,
+    "clReleaseMemObject": 343,
+    "clReleaseProgram": 121,
+    "clWaitForEvents": 51
+  },
+  "simple_waited_event_counts": {
+    "released_in_scope": 4,
+    "unmatched_in_scope": 46
+  },
+  "simple_waited_event_followup_counts": {
+    "other_unmatched": 24,
+    "unmatched_followed_by_same_queue_blocking_read": 22
+  },
+  "simple_waited_event_total": 50,
+  "generated_release_candidate": {
+    "inserted_releases": 46,
+    "post_patch_unmatched_in_scope": 0,
+    "synchronization_changed": false
+  },
+  "classification": {
+    "verified": "Current upstream retains the same bounded 51 direct waits, 46 unmatched simple waited-event references, and 22/24 follow-up split as the pinned baseline.",
+    "interpretation": "The release-only correction remains semantically applicable at this revision, but the generated current-source patch should be used instead of textually applying the pinned patch.",
+    "historical": "The pinned baseline e3546c7948e3af463d0b401e6421d5a4c2faf565 established the original reviewed counts.",
+    "open_question": "Whether current upstream maintainers prefer 46 explicit releases or a reusable event owner, and whether the patch should be submitted directly or first discussed in an issue."
+  }
+}

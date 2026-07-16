@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "upstream_repository": "ggml-org/llama.cpp",
+  "upstream_revision": "505b1ed15ca80e2a19f12ff4ac365e40fb374053",
+  "source_path": "ggml/src/ggml-opencl/ggml-opencl.cpp",
+  "evidence_artifact": {
+    "workflow_run": 29453611188,
+    "artifact_id": 8358479508,
+    "artifact_sha256": "e2293f8a6aeaaa173c0430f4714d0b83ac564c7e2250298b9a7863338a84c30d"
+  },
+  "review": {
+    "generated_insertions": 46,
+    "inserted_statement": "CL_CHECK(clReleaseEvent(evt));",
+    "all_insertions_immediately_follow_matching_wait": true,
+    "waits_removed": 0,
+    "post_patch_unmatched_simple_waits": 0,
+    "by_function": {
+      "ggml_backend_opencl_buffer_set_tensor": 24,
+      "ggml_backend_opencl_buffer_get_tensor": 22
+    },
+    "by_category": {
+      "synchronous_set_completion": 24,
+      "blocking_read_followup": 22
+    }
+  },
+  "insertions": [
+    {"wait_line": 7935, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 7936},
+    {"wait_line": 8044, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8045},
+    {"wait_line": 8083, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8084},
+    {"wait_line": 8178, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8179},
+    {"wait_line": 8216, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8217},
+    {"wait_line": 8308, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8309},
+    {"wait_line": 8343, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8344},
+    {"wait_line": 8364, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8365},
+    {"wait_line": 8396, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8397},
+    {"wait_line": 8484, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8485},
+    {"wait_line": 8516, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8517},
+    {"wait_line": 8551, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8552},
+    {"wait_line": 8617, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8618},
+    {"wait_line": 8647, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8648},
+    {"wait_line": 8720, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8721},
+    {"wait_line": 8749, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8750},
+    {"wait_line": 8835, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8836},
+    {"wait_line": 8938, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8939},
+    {"wait_line": 8981, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 8982},
+    {"wait_line": 9092, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 9093},
+    {"wait_line": 9129, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 9130},
+    {"wait_line": 9163, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 9164},
+    {"wait_line": 9267, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 9268},
+    {"wait_line": 9335, "event": "evt", "function": "ggml_backend_opencl_buffer_set_tensor", "category": "synchronous_set_completion", "insertion_line": 9336},
+    {"wait_line": 9460, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9461},
+    {"wait_line": 9480, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9481},
+    {"wait_line": 9529, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9530},
+    {"wait_line": 9593, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9594},
+    {"wait_line": 9627, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9628},
+    {"wait_line": 9697, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9698},
+    {"wait_line": 9733, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9734},
+    {"wait_line": 9801, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9802},
+    {"wait_line": 9838, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9839},
+    {"wait_line": 9912, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9913},
+    {"wait_line": 9946, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9947},
+    {"wait_line": 9966, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 9967},
+    {"wait_line": 10013, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 10014},
+    {"wait_line": 10033, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 10034},
+    {"wait_line": 10105, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 10106},
+    {"wait_line": 10151, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 10152},
+    {"wait_line": 10215, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 10216},
+    {"wait_line": 10261, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 10262},
+    {"wait_line": 10331, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 10332},
+    {"wait_line": 10372, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 10373},
+    {"wait_line": 10426, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 10427},
+    {"wait_line": 10455, "event": "evt", "function": "ggml_backend_opencl_buffer_get_tensor", "category": "blocking_read_followup", "insertion_line": 10456}
+  ],
+  "labels": {
+    "Verified": "The generated patch adds one release immediately after each of 46 unmatched literal count-one waits and removes no waits.",
+    "Interpretation": "This is a behavior-preserving event-ownership correction under the audited synchronous tensor-set contract.",
+    "Historical": "The pinned baseline and current revision have identical bounded 46-site ownership shape.",
+    "Open question": "Upstream may prefer explicit releases or a reusable event owner; this manifest reviews the explicit-release candidate only."
+  }
+}

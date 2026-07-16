@@ -1,0 +1,128 @@
+name: Validate pinned CPU_REPACK lifetime fixture
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/generate_cpu_repack_lifetime_fixture.py"
+      - "tests/test_generate_cpu_repack_lifetime_fixture.py"
+      - ".github/workflows/cpu-repack-lifetime-sanitizer.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  asan-lsan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out documentation repository
+        uses: actions/checkout@v4
+
+      - name: Confirm AVX2 runner capability
+        shell: bash
+        run: |
+          set -euo pipefail
+          lscpu | tee cpu-info.txt
+          grep -qw avx2 /proc/cpuinfo || {
+            echo "The authoritative CPU_REPACK sanitizer job requires AVX2." >&2
+            exit 1
+          }
+
+      - name: Fetch exact pinned llama.cpp tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/upstream
+          git -C build/upstream init
+          git -C build/upstream remote add origin https://github.com/ggml-org/llama.cpp.git
+          git -C build/upstream fetch --depth=1 origin e3546c7948e3af463d0b401e6421d5a4c2faf565
+          git -C build/upstream checkout --detach FETCH_HEAD
+          test "$(git -C build/upstream rev-parse HEAD)" = "e3546c7948e3af463d0b401e6421d5a4c2faf565"
+
+      - name: Materialize generated fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+
+          script = Path("scripts/generate_cpu_repack_lifetime_fixture.py")
+          spec = importlib.util.spec_from_file_location("cpu_repack_fixture", script)
+          module = importlib.util.module_from_spec(spec)
+          assert spec.loader is not None
+          spec.loader.exec_module(module)
+
+          upstream = Path("build/upstream")
+          fixture = upstream / "tests/test-cpu-extra-buffer-lifetime.cpp"
+          fixture.write_text(module.CPP_SOURCE, encoding="utf-8")
+
+          cmake = upstream / "tests/CMakeLists.txt"
+          text = cmake.read_text(encoding="utf-8")
+          marker = "llama_build_and_test(test-backend-ops.cpp)"
+          if marker not in text:
+              raise SystemExit(f"Pinned CMake marker not found: {marker}")
+          if "test-cpu-extra-buffer-lifetime.cpp" in text:
+              raise SystemExit("Pinned tree unexpectedly already contains the fixture target")
+          text = text.replace(marker, marker + "\n" + module.CMAKE_FRAGMENT.rstrip(), 1)
+          cmake.write_text(text, encoding="utf-8")
+          PY
+          test -s build/upstream/tests/test-cpu-extra-buffer-lifetime.cpp
+          grep -q 'test-cpu-extra-buffer-lifetime.cpp' build/upstream/tests/CMakeLists.txt
+
+      - name: Configure AddressSanitizer and LeakSanitizer build
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S build/upstream -B build/llama-asan \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address" \
+            -DGGML_NATIVE=ON \
+            -DLLAMA_BUILD_TESTS=ON \
+            -DLLAMA_BUILD_EXAMPLES=OFF \
+            -DLLAMA_BUILD_SERVER=OFF
+
+      - name: Compile dedicated fixture target
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake --build build/llama-asan --target test-cpu-extra-buffer-lifetime --parallel 2
+
+      - name: Execute CPU_REPACK lifetime fixture repeatedly
+        shell: bash
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:abort_on_error=1
+          LSAN_OPTIONS: exitcode=23
+        run: |
+          set -euo pipefail
+          binary=build/llama-asan/bin/test-cpu-extra-buffer-lifetime
+          test -x "$binary"
+          : > cpu-repack-sanitizer.log
+          for iteration in $(seq 1 20); do
+            echo "=== iteration $iteration ===" | tee -a cpu-repack-sanitizer.log
+            "$binary" 2>&1 | tee -a cpu-repack-sanitizer.log
+          done
+          if grep -q '^SKIP:' cpu-repack-sanitizer.log; then
+            echo "AVX2 was confirmed but the fixture skipped CPU_REPACK." >&2
+            exit 1
+          fi
+          pass_count=$(grep -c '^PASS: CPU_REPACK path executed;' cpu-repack-sanitizer.log)
+          test "$pass_count" -eq 20 || {
+            echo "Expected 20 successful CPU_REPACK executions, got $pass_count." >&2
+            exit 1
+          }
+
+      - name: Upload compiler and sanitizer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpu-repack-lifetime-sanitizer-e3546c7
+          path: |
+            cpu-info.txt
+            cpu-repack-sanitizer.log
+            build/upstream/tests/test-cpu-extra-buffer-lifetime.cpp
+          if-no-files-found: warn
+          retention-days: 30
