@@ -66,6 +66,44 @@ Sources were checked on 2026-07-17. Because platform behavior, product limits, a
 
 The defensible educational contribution is not “one-click llama.cpp.” It is a source-pinned learning design that makes the evidence boundary visible: learners can distinguish browser simulation, authored explanation, deterministic source-derived structure, and real native execution. Evaluation should test whether this distinction improves code-tracing and systems reasoning, not merely whether setup succeeds.
 
+## Slice 2 — EAAI-27 official venue requirements
+
+### Question
+
+What does the current official EAAI-27 call require, and which repository evidence gaps directly threaten an Experience Report and Innovative Practice submission?
+
+### Verified official facts
+
+| Source | Verified requirement | Repository implication |
+|---|---|---|
+| [Official EAAI-27 call](https://aaai.org/conference/aaai/aaai-27/eaai-27-call/) | Abstract deadline: **September 1, 2026, 11:59 PM UTC-12**; paper deadline: **September 8, 2026, 11:59 PM UTC-12**; notification: November 17, 2026; camera-ready: December 14, 2026; symposium: February 21-23, 2027 in Montréal. | Replace the prior “call unavailable” assumption. Keep a separate internal evidence-freeze date before September 1; do not borrow AAAI main-track July deadlines. |
+| Official EAAI-27 call | EAAI-27 is explicitly about **teaching and learning about AI**. Work using AI to teach unrelated programming or systems topics is outside scope. | Frame GGML/llama.cpp internals as AI-practitioner education: model formats, inference graphs, runtime evidence, and responsible AI-systems engineering. A generic C++ debugging framing would weaken venue fit. |
+| Official EAAI-27 call | Main-track Area 2 accepts Experience Reports and Innovative Practice describing design, development, use context, collected data, and rich reflection on what did or did not work and why. | Repository contracts and tools are insufficient alone. The submission needs actual use or an approved expert-usefulness pathway, retained failures/corrections, and a bounded longitudinal dataset. |
+| Official EAAI-27 call | Area 2 contributions must be grounded in relevant literature, clearly articulate novelty, and provide insights valuable to the broader AI education community. | Keep the source-level documentation gap as a hypothesis until audited. Generalization must be mechanism-level—evidence labels, source pinning, deterministic replay, and supervised maintenance—not “llama.cpp is universally representative.” |
+| Official EAAI-27 call | Review criteria include relevance, significance to the intended audience, prior work, novelty, technical soundness, clarity, evaluation of claims/results, and ethics/inclusivity. | Freeze one primary learner population, obtain independent technical review, complete accessibility checks, and evaluate only claims supported by approved evidence. |
+| Official EAAI-27 call | Empirical authors are encouraged, though not required, to use SIGSOFT Empirical Standards. | Structure retrospective repository analysis and any learner/expert study with an explicit study type, sampling frame, variables, missing-data rules, threats to validity, and artifact availability. |
+| Official EAAI-27 call | All submissions and supplementary materials are double-blind; papers are up to 7 pages plus up to 2 pages of references; supplementary material is separate and reviewers are not required to inspect it. | The main paper must carry the essential evidence and limitations. Public repository URLs, author-identifying logs, branch names, and acknowledgements need an anonymization plan; crucial claims cannot depend only on supplementary artifacts. |
+| Official EAAI-27 call | In-person presentation is required for accepted papers. | Add a human planning blocker for presenter availability, travel funding, visa timing, and accessible demo fallback before submission commitment. |
+| [Official AAAI-27 page](https://aaai.org/conference/aaai/aaai-27/) | The AAAI main-track July 21/28 deadlines are track-specific; the page links a separate EAAI-27 CFP. | Reject the earlier assumption that no official EAAI-27 call exists and reject using main-track dates for EAAI planning. |
+
+Sources were checked on **2026-07-17**.
+
+### EAAI framing implication
+
+**Verified:** the prospective work is within scope only when it is presented as education about AI systems and inference internals, not as AI-assisted teaching of generic programming.
+
+**Interpretation:** the strongest Area 2 framing is a coherent experience report about a source-linked executable environment plus the supervised repository-native process that maintained it. The multi-agent workflow is supporting experience evidence, not a substitute for educational use data.
+
+**Open question:** whether an expert-usefulness evaluation without a classroom deployment will provide sufficient “context of use” and “data collected” for a competitive Area 2 submission. This requires an approved evaluation pathway and later reviewer judgment; the call does not guarantee adequacy.
+
+### Concrete design requirement
+
+Before manuscript drafting, create a versioned **double-blind evidence-release plan** that maps every intended claim to evidence that can appear in the seven-page paper, identifies which repository artifacts require anonymized snapshots, and records which essential results cannot be delegated to supplementary material.
+
+### Rejected alternative
+
+Do not position the project as a Model AI Assignment merely because it includes labs. The contribution currently spans a learning environment, trace viewer, reproducibility architecture, and longitudinal maintenance case study; forcing it into the assignment track would discard the experience-report evidence structure and would require separate track-specific instructions.
+
 ## Next literature dependency
 
-Verify the first media-pipeline slice using current official API documentation: image, speech, realtime, and video generation; Gemini image generation; NotebookLM automation boundaries; provenance, accessibility, licensing, caching, privacy, and human-review requirements.
+Conduct the predefined systematic audit of official and community llama.cpp/GGML learning resources before strengthening the claimed gap between usage-oriented documentation and source-level systems understanding.
