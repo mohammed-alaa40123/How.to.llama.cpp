@@ -1,0 +1,135 @@
+{
+  "schema_version": "0.1.0",
+  "benchmark_id": "gguf-load-static-vs-viewer-v0",
+  "source_revision": "e3546c7948e3af463d0b401e6421d5a4c2faf565",
+  "trace_fixture": "executable_lectures/traces/gguf-load-authored-v0.json",
+  "conditions": [
+    {
+      "condition_id": "static-source-text",
+      "presentation": "Ordered pinned source excerpts, trace table, runtime-object text, tensor-shape text, memory-event text, evidence labels, prediction prompts, explanations and static figure alternative with no synchronized controls.",
+      "evidence_ids": [
+        "step:open-file",
+        "step:inspect-header",
+        "step:derive-layout",
+        "figure:synthetic-gguf-layout"
+      ],
+      "question_ids": [
+        "q1-next-phase",
+        "q2-residency-boundary",
+        "q3-layout-evidence",
+        "q4-transfer"
+      ],
+      "allowed_interface_features": [
+        "document-scroll",
+        "source-links",
+        "static-table",
+        "static-text-alternative"
+      ]
+    },
+    {
+      "condition_id": "interactive-viewer",
+      "presentation": "The same pinned source excerpts, trace evidence, prompts, explanations and static alternative, with synchronized previous/next navigation, coordinated highlighting and deterministic layout visualization.",
+      "evidence_ids": [
+        "step:open-file",
+        "step:inspect-header",
+        "step:derive-layout",
+        "figure:synthetic-gguf-layout"
+      ],
+      "question_ids": [
+        "q1-next-phase",
+        "q2-residency-boundary",
+        "q3-layout-evidence",
+        "q4-transfer"
+      ],
+      "allowed_interface_features": [
+        "previous-next-navigation",
+        "home-end-navigation",
+        "coordinated-source-highlighting",
+        "deterministic-layout-visualization",
+        "source-links",
+        "static-text-alternative"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "question_id": "q1-next-phase",
+      "task_type": "code-tracing",
+      "prompt": "After the authored open-file step, which bounded trace phase is shown next, and which pinned function remains active?",
+      "answer_key": [
+        "header",
+        "gguf_init_from_reader"
+      ],
+      "evidence_ids": [
+        "step:open-file",
+        "step:inspect-header"
+      ],
+      "points": 2
+    },
+    {
+      "question_id": "q2-residency-boundary",
+      "task_type": "evidence-boundary",
+      "prompt": "Does parsing the two tensor descriptors prove that their file-backed pages are physically resident? State the supported conclusion.",
+      "answer_key": [
+        "no",
+        "descriptor parsing establishes file layout metadata but not physical page residency"
+      ],
+      "evidence_ids": [
+        "step:inspect-header"
+      ],
+      "points": 2
+    },
+    {
+      "question_id": "q3-layout-evidence",
+      "task_type": "code-tracing",
+      "prompt": "At the derive-layout step, what absolute byte starts the tensor-data region, what alignment is checked, and how many payload bytes are represented?",
+      "answer_key": [
+        "384",
+        "32-byte alignment",
+        "44 bytes"
+      ],
+      "evidence_ids": [
+        "step:derive-layout",
+        "figure:synthetic-gguf-layout"
+      ],
+      "points": 3
+    },
+    {
+      "question_id": "q4-transfer",
+      "task_type": "transfer",
+      "prompt": "A later trace shows a tensor descriptor and a source line but no memory event. Which claim must remain unsupported until additional evidence is captured?",
+      "answer_key": [
+        "physical residency",
+        "native runtime access or page population"
+      ],
+      "evidence_ids": [
+        "step:inspect-header",
+        "step:derive-layout"
+      ],
+      "points": 3
+    }
+  ],
+  "scoring": {
+    "method": "frozen-exact-key",
+    "partial_credit": true,
+    "missing_response_points": 0,
+    "reporting": [
+      "total-correctness-points",
+      "item-level-correctness",
+      "timeout-status",
+      "completion-seconds",
+      "accessibility-mode"
+    ]
+  },
+  "timing": {
+    "clock": "monotonic",
+    "limit_seconds": 600,
+    "timeout_handling": "retain-responses-and-report-timeout-separately"
+  },
+  "accessibility": {
+    "keyboard": true,
+    "static_fallback": true,
+    "reduced_motion": true,
+    "screen_reader_text": true
+  }
+}
