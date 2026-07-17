@@ -74,7 +74,7 @@ STACK-01 human approval and canonical branch execution
 - Passing component CI establishes bounded contracts only; it does not establish combined deployability, learner benefit, native execution or independent correctness.
 - No participant data, telemetry, authenticated sync, restricted model weights, paid generation or manuscript prose were introduced.
 
-## Known blockers
+## Known blockers and caveats
 
 - no approved canonical progress-branch choice;
 - no canonical combined branch with passing CI;
