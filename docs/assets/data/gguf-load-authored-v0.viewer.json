@@ -1,0 +1,125 @@
+{
+  "lesson_id": "executable-lecture-00",
+  "source": {
+    "capture_kind": "authored-example",
+    "fixture_sha256": "688d0ef28c83d6972e291cc0342e695540eae8496b3ec8e92bdbb91e3982a564",
+    "repository": "ggml-org/llama.cpp",
+    "revision": "e3546c7948e3af463d0b401e6421d5a4c2faf565"
+  },
+  "steps": [
+    {
+      "call_stack": [],
+      "evidence_kind": "authored-example",
+      "location": {
+        "file": "ggml/src/gguf.cpp",
+        "function": "gguf_init_from_reader",
+        "line": 451
+      },
+      "memory_events": [
+        {
+          "event": "read",
+          "evidence_kind": "authored-example",
+          "summary": "The lecture represents opening and bounded header inspection; it is not a native runtime capture."
+        }
+      ],
+      "phase": "entry",
+      "prediction_prompt": "Which evidence label should be shown before any runtime instrumentation exists?",
+      "runtime_objects": [
+        {
+          "evidence_kind": "authored-example",
+          "object_id": "fixture-file",
+          "summary": "Project-owned teaching fixture selected for deterministic format validation.",
+          "type": "synthetic GGUF file"
+        }
+      ],
+      "sequence": 0,
+      "source_url": "https://github.com/ggml-org/llama.cpp/blob/e3546c7948e3af463d0b401e6421d5a4c2faf565/ggml/src/gguf.cpp#L451",
+      "static_summary": "The viewer begins at the pinned parser implementation and explicitly labels this step as an authored example rather than captured execution.",
+      "step_id": "open-file",
+      "tensor_shapes": []
+    },
+    {
+      "call_stack": [
+        {
+          "file": "ggml/src/gguf.cpp",
+          "function": "gguf_init_from_reader",
+          "line": 451
+        }
+      ],
+      "evidence_kind": "source-derived",
+      "location": {
+        "file": "ggml/src/gguf.cpp",
+        "function": "gguf_init_from_reader",
+        "line": 480
+      },
+      "memory_events": [],
+      "phase": "header",
+      "prediction_prompt": "Does parsing tensor descriptors prove that tensor pages are physically resident?",
+      "runtime_objects": [
+        {
+          "evidence_kind": "source-derived",
+          "object_id": "gguf-header",
+          "summary": "Expected header values are derived from the deterministic fixture manifest and golden parse.",
+          "type": "GGUF v3 header"
+        }
+      ],
+      "sequence": 1,
+      "source_url": "https://github.com/ggml-org/llama.cpp/blob/e3546c7948e3af463d0b401e6421d5a4c2faf565/ggml/src/gguf.cpp#L480",
+      "static_summary": "The deterministic fixture describes two F32 tensors, but descriptor parsing alone does not establish physical page residency or inference readiness.",
+      "step_id": "inspect-header",
+      "tensor_shapes": [
+        {
+          "dimensions": [
+            2,
+            2
+          ],
+          "element_type": "F32",
+          "evidence_kind": "source-derived",
+          "tensor_id": "demo.matrix"
+        },
+        {
+          "dimensions": [
+            3
+          ],
+          "element_type": "F32",
+          "evidence_kind": "source-derived",
+          "tensor_id": "demo.vector"
+        }
+      ]
+    },
+    {
+      "call_stack": [
+        {
+          "file": "ggml/src/gguf.cpp",
+          "function": "gguf_init_from_reader",
+          "line": 451
+        }
+      ],
+      "evidence_kind": "source-derived",
+      "location": {
+        "file": "ggml/src/gguf.cpp",
+        "function": "gguf_init_from_reader",
+        "line": 757
+      },
+      "memory_events": [
+        {
+          "bytes": 44,
+          "event": "read",
+          "evidence_kind": "source-derived",
+          "summary": "The fixture's tensor-data region begins at byte 384 and is checked against 32-byte alignment."
+        }
+      ],
+      "phase": "layout",
+      "prediction_prompt": "",
+      "runtime_objects": [],
+      "sequence": 2,
+      "source_url": "https://github.com/ggml-org/llama.cpp/blob/e3546c7948e3af463d0b401e6421d5a4c2faf565/ggml/src/gguf.cpp#L757",
+      "static_summary": "The final authored trace step derives an aligned byte layout from committed fixture metadata and remains replayable without native instrumentation.",
+      "step_id": "derive-layout",
+      "tensor_shapes": []
+    }
+  ],
+  "title": "Authored GGUF loading trace contract",
+  "trace_id": "gguf-load-authored-v0",
+  "viewer_data_version": "0.1.0"
+}
