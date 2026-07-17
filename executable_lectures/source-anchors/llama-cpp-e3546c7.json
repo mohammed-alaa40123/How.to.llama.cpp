@@ -1,0 +1,41 @@
+{
+  "schema_version": "0.1.0",
+  "repository": "ggml-org/llama.cpp",
+  "revision": "e3546c7948e3af463d0b401e6421d5a4c2faf565",
+  "verified_at": "2026-07-17",
+  "files": [
+    {
+      "path": "ggml/src/gguf.cpp",
+      "blob_sha1": "c3ffa1a13435bd531c259b6106a3a6763e4f2df9",
+      "functions": [
+        {
+          "name": "gguf_init_from_reader",
+          "start_line": 451,
+          "end_line": 817,
+          "anchors": [
+            {
+              "anchor_id": "reader-entry",
+              "line": 451,
+              "summary": "Pinned parser implementation entry."
+            },
+            {
+              "anchor_id": "header-read",
+              "line": 480,
+              "summary": "Pinned start of version and count header parsing."
+            },
+            {
+              "anchor_id": "data-alignment",
+              "line": 757,
+              "summary": "Pinned data-section alignment and offset derivation."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "method": "GitHub immutable-revision contents API",
+    "technical_claim": "The manifest verifies repository, revision, file blob and bounded function/line anchors only; it does not prove that an authored trace is a native runtime capture.",
+    "review_status": "human-review-required"
+  }
+}
