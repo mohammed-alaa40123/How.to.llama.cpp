@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mohammed-alaa40123.github.io/How.to.llama.cpp/schemas/learner-progress.schema.json",
+  "title": "How.to.llama.cpp local learner progress export",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "course_id",
+    "course_version",
+    "source_revision",
+    "exported_at",
+    "storage_scope",
+    "lessons"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "course_id": {"const": "how-to-llama-cpp"},
+    "course_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[a-z0-9.-]+)?$"
+    },
+    "source_revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "exported_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "storage_scope": {"const": "local-only"},
+    "lessons": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["lesson_id", "lesson_version", "status", "checkpoints"],
+        "properties": {
+          "lesson_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"
+          },
+          "lesson_version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[a-z0-9.-]+)?$"
+          },
+          "status": {
+            "enum": ["not-started", "in-progress", "completed"]
+          },
+          "last_step_id": {
+            "type": ["string", "null"],
+            "maxLength": 96
+          },
+          "checkpoints": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["checkpoint_id", "state", "attempt_count"],
+              "properties": {
+                "checkpoint_id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9._-]{2,95}$"
+                },
+                "state": {
+                  "enum": ["unanswered", "answered", "passed"]
+                },
+                "attempt_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
