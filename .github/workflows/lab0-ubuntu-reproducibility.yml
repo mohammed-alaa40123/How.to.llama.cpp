@@ -1,0 +1,60 @@
+name: Lab 0 Ubuntu reproducibility
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/lab0-03-ubuntu-measured-run
+    paths:
+      - ".github/workflows/lab0-ubuntu-reproducibility.yml"
+      - "scripts/run_lab0_ubuntu_reproducibility.py"
+      - "scripts/validate_lab0_reproducibility.py"
+      - "schemas/lab0-reproducibility-run.schema.json"
+      - "uv.lock"
+  pull_request:
+    paths:
+      - ".github/workflows/lab0-ubuntu-reproducibility.yml"
+      - "scripts/run_lab0_ubuntu_reproducibility.py"
+      - "scripts/validate_lab0_reproducibility.py"
+      - "schemas/lab0-reproducibility-run.schema.json"
+      - "uv.lock"
+
+permissions:
+  contents: read
+
+jobs:
+  measured-model-free-run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pinned uv tool
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.0"
+          enable-cache: true
+
+      - name: Record bounded model-free run
+        id: measured
+        continue-on-error: true
+        run: python3 scripts/run_lab0_ubuntu_reproducibility.py
+
+      - name: Validate retained report
+        if: always()
+        run: python3 scripts/validate_lab0_reproducibility.py artifacts/lab0-ubuntu-24.04-run.json
+
+      - name: Upload exact evidence record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab0-ubuntu-24.04-${{ github.sha }}
+          path: artifacts/lab0-ubuntu-24.04-run.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce successful validated path
+        if: steps.measured.outcome != 'success'
+        run: |
+          echo "The report was retained and validated, but the bounded Lab 0 path did not complete."
+          exit 1
