@@ -1,0 +1,64 @@
+{
+  "schema_version": "0.1.0",
+  "asset_id": "gguf-layout-deterministic-v0",
+  "asset_kind": "diagram",
+  "authority": "authoritative-technical",
+  "review_status": "accepted",
+  "publication": {
+    "publish": true
+  },
+  "source": {
+    "repository": "mohammed-alaa40123/How.to.llama.cpp",
+    "revision": "5bbc595b9e2d076ddbc8393514e2a9f26fab9fa8",
+    "input_paths": [
+      "labs/fixtures/gguf/synthetic-v0.golden.json"
+    ],
+    "input_sha256": [
+      "5ed19f7f152b16027f411aee6872fe44a7ef4f46d11ab9873cd5f1b3f249f5df"
+    ]
+  },
+  "generation": {
+    "mode": "deterministic",
+    "generator": "scripts/generate_gguf_layout_figure.py",
+    "generator_version": "0.1.0",
+    "model": null,
+    "prompt_path": null,
+    "prompt_sha256": null,
+    "storyboard_path": null,
+    "storyboard_sha256": null,
+    "manual_trigger": false,
+    "cached": true,
+    "ordinary_ci_allowed": true
+  },
+  "output": {
+    "path": "media/generated/gguf-layout-deterministic-v0.svg",
+    "mime_type": "image/svg+xml",
+    "sha256": "64311fe6cf4179ce1b6e263b05184fbddf55fd3a23e20256899f9e5b886f68f2",
+    "bytes": 4096
+  },
+  "accessibility": {
+    "alt_text": "A deterministic diagram of the synthetic GGUF file showing its header, metadata records, aligned tensor table, and bounded tensor payload ranges.",
+    "caption_path": null,
+    "transcript_path": null,
+    "static_fallback_path": "docs/labs/legal-fixture-decision.md",
+    "reduced_motion_safe": true
+  },
+  "technical_claims": [
+    {
+      "claim": "The synthetic teaching fixture separates GGUF metadata and tensor payload ranges using deterministic offsets and alignment.",
+      "evidence_kind": "verified"
+    }
+  ],
+  "licensing": {
+    "asset_license": "MIT",
+    "input_license_notes": "Project-owned synthetic fixture and deterministic rendering inputs only.",
+    "redistribution_allowed": true
+  },
+  "human_review": {
+    "required": true,
+    "approved": true,
+    "reviewer_role": "Documentation Builder technical review",
+    "reviewed_at": "2026-07-17T05:10:00+03:00",
+    "notes": "Contract example only; the generated SVG must be checksum-verified when FIG-01 is implemented."
+  }
+}

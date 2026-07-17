@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 04:02 Africa/Cairo_
+_Last updated: 2026-07-17 05:18 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -35,20 +35,24 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Executable-trace schema, authored GGUF-loading sample, semantic validator, and focused malformed-input tests.
 - Local-only learner-progress schema, semantic validator, example export, privacy constraints, and focused malformed-input tests.
 - Authoritative EAAI orchestration state, evidence backlog, roadmap, and readiness scorecard.
+- Strict MkDocs handoff-link repair verified by successful Documentation CI run `29546570700`.
+- Media asset manifest schema, dependency-free semantic validator, deterministic authoritative example, accessibility/licensing/review gates, stale-source detection, and focused malformed-input tests.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Documentation CI run `29544077919` passed project-context, interactive-link, source-index, unit-test discovery, shell-syntax, Python-compilation, and required-asset checks.
-- The same run failed only at `mkdocs build --strict` because two links in `docs/publication/agent-handoffs.md` targeted run records under repository-root `logs/research/`, outside MkDocs' `docs/` tree.
-- The exact affected paths were `logs/research/2026-07-17/0100-synthetic-gguf-fixture.md` and `logs/research/2026-07-17/0158-lab0-checker-interface.md`.
-- The repair preserves both run records and renders their paths as code rather than generated-site links.
+- Documentation CI run `29546570700` completed successfully for commit `5bbc595b9e2d076ddbc8393514e2a9f26fab9fa8`, closing the P0 strict-MkDocs integration blocker.
+- The media contract rejects generative assets as authoritative technical evidence.
+- Generative API manifests must be supplemental, cached, manually triggered, excluded from ordinary CI, prompt/storyboard hashed, and human-review gated.
+- Accepted or published assets require human approval and redistribution permission.
+- Audio/video assets require transcript fallbacks; video additionally requires captions and a static fallback.
+- The validator rejects unsafe repository paths, stale source revisions, oversized manifests, and credential-like fields.
 
 ### Interpretation
 
-- Repository run logs should remain outside the public documentation tree unless intentionally promoted into a reviewed documentation page.
-- Strict MkDocs is correctly acting as an integration gate by rejecting links that cannot resolve within the built site.
+- Deterministic figures derived from hashed structured inputs are the appropriate authoritative media layer because their transformation can be replayed and checksum-verified.
+- Human approval can permit publication of generated media but cannot convert it into technical evidence.
 
 ### Historical
 
@@ -56,7 +60,8 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ### Open questions
 
-- Whether the repaired branch obtains a passing commit-scoped Documentation CI result.
+- Provider-specific API, licensing, privacy, cost, and reproducibility constraints remain unverified pending the Literature Scout assignment.
+- The example media manifest points to the future deterministic GGUF layout SVG; actual generation and checksum verification remain under `FIG-01`.
 - Which bounded llama.cpp target and command matrix the first Lab 0 runner should execute.
 - Which operating systems and container targets belong in the first reproducibility matrix.
 - Browser/Python parser agreement and pinned native GGUF-reader acceptance remain unimplemented.
@@ -64,16 +69,16 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-verify strict MkDocs repair in commit-scoped CI
-  → if passing, close the P0 integration blocker
-  → implement media manifest/provenance schema and validator
-  → then proceed to the minimal keyboard-operable trace viewer after trace acceptance
+obtain commit-scoped CI for the media manifest contract
+  → if passing, mark MEDIA-01 evidenced
+  → implement FIG-01 deterministic GGUF layout generation
+  → then proceed to the minimal keyboard-operable trace viewer after TRACE-02 acceptance
 ```
 
 ## In progress
 
-- Draft PR stack #3–#6 for the EAAI executable-learning foundation and orchestration state.
-- Strict MkDocs repair branch based on PR #6.
+- Draft PR stack #3–#7 for the EAAI executable-learning foundation and orchestration state.
+- Media manifest/provenance validation branch based on PR #7.
 - Current-tree regeneration and sanitizer validation of the CPU_REPACK lifetime candidate.
 - Manual/upstream submission of the reviewed 46-release OpenCL ownership correction; GitHub App write access to upstream is blocked.
 - Source-index regeneration with pinned line-aware symbol inventory.
@@ -82,13 +87,15 @@ verify strict MkDocs repair in commit-scoped CI
 
 ## Publication and validation state
 
-- `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are now authoritative on the stacked branch.
-- The current P0 assignment is strict MkDocs repair; viewer and media feature expansion remain blocked until commit-scoped CI passes.
-- No external source, participant data, model, telemetry, credential, paid API call, or manuscript prose was introduced in this increment.
+- `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are authoritative on the stacked branch.
+- `CI-01` is evidenced by successful run `29546570700`.
+- `MEDIA-01` is implemented and awaiting commit-scoped CI on its final branch head.
+- No participant data, model, telemetry, credential, paid API call, generated media output, or manuscript prose was introduced in this increment.
 
 ## Known blockers and caveats
 
-- **CI closure:** the link repair is committed, but a passing workflow result for the final branch head is still required.
+- **Media CI closure:** the contract is committed, but a passing workflow result for the final branch head is still required.
+- **Provider selection:** no generated-media provider may be selected until the Literature Scout verifies current official constraints.
 - **Lab 0 runner:** the interface is defined, but no platform-specific build command runner exists yet.
 - **Browser agreement:** no browser parser yet proves agreement with the Python golden output.
 - **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be a valid inference model.
