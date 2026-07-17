@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.1.0",
+  "venue": "EAAI-27",
+  "submission_revision": "a4360913874766c95778d4f0194d2c79418d0136",
+  "release_mode": "private_anonymized_supplement",
+  "public_artifact": {
+    "root": "artifact/eaai27-anonymous/",
+    "source_anchor_policy": "opaque_id_plus_sha256",
+    "included": [
+      "anonymous static site build",
+      "synthetic GGUF fixture and checksums",
+      "authored trace with opaque source IDs",
+      "validators and deterministic figures",
+      "redacted retrospective aggregate tables"
+    ],
+    "excluded": [
+      "repository history and remote metadata",
+      "pull request and issue URLs",
+      "workflow URLs and account identifiers",
+      "raw conversations, prompts, emails and identities",
+      "private source-ID crosswalk",
+      "restricted model weights"
+    ]
+  },
+  "private_crosswalk": {
+    "location": "private:eaai27/source-anchor-crosswalk.json",
+    "custodian": "corresponding-author",
+    "contains_identity_mapping": true,
+    "published_before_decision": false
+  },
+  "checks": [
+    {"id": "IDENTITY_SCAN", "category": "identity", "status": "blocked", "evidence": "planned deterministic scan of built artifact and metadata", "blocker": "anonymous artifact has not been materialized"},
+    {"id": "REPO_METADATA", "category": "repository", "status": "pass", "evidence": "plan excludes .git, remotes, PR/issue URLs and workflow URLs"},
+    {"id": "OPAQUE_ANCHORS", "category": "provenance", "status": "pass", "evidence": "public anchors use opaque IDs plus immutable SHA-256; private crosswalk retains exact mapping"},
+    {"id": "SUPPLEMENT_BOUNDARY", "category": "supplement", "status": "pass", "evidence": "essential claims remain in the submission; supplement is optional supporting evidence"},
+    {"id": "LICENSE_REVIEW", "category": "licensing", "status": "blocked", "evidence": "fixture is project-authored and model redistribution is excluded", "blocker": "final anonymous bundle license inventory awaits human review"},
+    {"id": "PRIVACY_MINIMIZATION", "category": "privacy", "status": "pass", "evidence": "raw conversations, identity, telemetry and personal learner data are excluded"},
+    {"id": "ACCESSIBLE_FALLBACK", "category": "accessibility", "status": "blocked", "evidence": "static/text fallbacks are required by the release checklist", "blocker": "anonymous built artifact has not passed accessibility validation"},
+    {"id": "NO_PAID_REGEN", "category": "cost", "status": "pass", "evidence": "ordinary CI uses cached deterministic assets and cannot invoke paid generation"}
+  ],
+  "approvals": {
+    "author_anonymization_review": false,
+    "technical_evidence_review": false,
+    "licensing_review": false,
+    "ethics_privacy_review": false
+  },
+  "release_ready": false
+}
