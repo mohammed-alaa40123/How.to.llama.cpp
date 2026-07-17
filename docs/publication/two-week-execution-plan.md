@@ -1,6 +1,6 @@
 # Executable-learning two-week execution plan
 
-_Last updated: 2026-07-17 17:58 Africa/Cairo_
+_Last updated: 2026-07-18 00:01 Africa/Cairo_
 
 This dependency-ordered plan covers July 17-31, 2026. It is narrower than the long-term interactive-textbook roadmap and does not authorize manuscript drafting or participant recruitment.
 
@@ -48,12 +48,13 @@ No restricted model weights are redistributed. The core path is model-free; opti
 - local progress export/import and Lab 1 resume integration;
 - deterministic figure and media provenance/lifecycle validation;
 - information-equivalent static-versus-viewer benchmark contract;
-- first retrospective agent-workflow batch;
-- adversarial reviewer package.
+- first retrospective agent-workflow batch and broader-coding protocol;
+- adversarial reviewer package;
+- official EAAI-27 requirements, double-blind release contract and predefined documentation-gap audit protocol.
 
 ### Remaining Week 1 gate
 
-**STACK-01:** create a human-reviewable canonical merge map. The repository currently has a long stacked draft-PR chain and overlapping progress implementations. No component should be treated as an integrated demo until one canonical path is selected and passes CI.
+**STACK-01:** the canonical merge map exists, but the human progress-implementation choice and one passing combined branch do not. No component should be treated as an integrated demo until that choice is recorded and full CI passes on the reconciled head.
 
 ## Week 2 — Vertical slices and evidence, July 24-31
 
@@ -61,12 +62,12 @@ No restricted model weights are redistributed. The core path is model-free; opti
 
 Deliver:
 
-- dependency/merge map for the stacked PR chain;
-- explicit superseded, retained and human-choice branches;
+- explicit approval of PR #24 as the lowest-risk progress base or a documented alternative;
+- retained/superseded mapping for overlapping branches;
 - one canonical integration branch;
 - strict Documentation CI and accessibility-structure validation on that branch.
 
-Acceptance gate: no evidence is lost, duplicate progress implementations are resolved and the canonical branch is reviewable without reconstructing the full stack manually.
+Acceptance gate: no evidence is lost, duplicate progress implementations are resolved and the branch is reviewable without manually reconstructing the stack.
 
 ### W2.2 Measured Lab 0 reproducibility
 
@@ -85,7 +86,7 @@ Acceptance gate: both supported environments reach the expected bounded executab
 
 Deliver:
 
-- DEMO-01A acceptance checklist;
+- execution of the DEMO-01A checklist on the canonical head;
 - one learner route from setup concepts to GGUF inspection to source-path reconstruction;
 - save/export/clear/import/resume demonstration;
 - deterministic figure and media-manifest dry run;
@@ -98,11 +99,12 @@ Acceptance gate: the artifact is a learning progression, not a menu of disconnec
 
 Deliver:
 
-- independent technical review protocol and correction ledger;
-- DATA-01B coding/missing-value rules and broader bounded sample;
+- independent technical review and correction ledger;
+- DATA-01B broader bounded sample under the frozen coding/missing-value rules;
 - approved expert or learner evaluation pathway with ethics determination;
 - frozen baseline tasks retained unchanged until review;
-- official EAAI-27 requirements when published.
+- materialized anonymous release artifact only after canonical integration;
+- documentation audit only with retained results and two independent coders.
 
 Acceptance gate: no recruitment or personal-data collection occurs before approval; implementation contracts are not reported as educational outcomes.
 
@@ -112,7 +114,9 @@ Acceptance gate: no recruitment or personal-data collection occurs before approv
 - an independent llama.cpp/GGML reviewer has not been nominated;
 - overlapping progress PRs require a human canonical-choice decision;
 - learner/expert evaluation and ethics pathways are not approved;
-- no official EAAI-27 call has been verified.
+- no independent DATA-01B coder or approved study window exists;
+- no independent documentation-audit coder exists;
+- the double-blind plan exists, but no anonymous bundle or human approvals exist.
 
 ## Evidence to retain
 
@@ -124,4 +128,4 @@ The July demo excludes authenticated synchronization, mandatory paid media, broa
 
 ## Exact manuscript-start condition
 
-The Paper Integrator remains disabled until the canonical integrated demo, measured local/container Lab 0 evidence, broader audited retrospective dataset, completed fair baseline, independent correctness review, approved and completed evaluation, resolved fatal reviewer risks and current official EAAI requirements are all evidenced.
+The Paper Integrator remains disabled until the canonical integrated demo, measured local/container Lab 0 evidence, broader audited retrospective dataset, completed fair baseline, independent correctness review, approved and completed evaluation, resolved fatal reviewer risks, verified official EAAI requirements and a reviewed double-blind artifact are all evidenced.
