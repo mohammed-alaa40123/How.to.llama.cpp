@@ -9,12 +9,12 @@
   },
   "source": {
     "repository": "mohammed-alaa40123/How.to.llama.cpp",
-    "revision": "5bbc595b9e2d076ddbc8393514e2a9f26fab9fa8",
+    "revision": "bcb7555ef8b4e80817b5b812c35db6b1c6f7b9a9",
     "input_paths": [
       "labs/fixtures/gguf/synthetic-v0.golden.json"
     ],
     "input_sha256": [
-      "5ed19f7f152b16027f411aee6872fe44a7ef4f46d11ab9873cd5f1b3f249f5df"
+      "ae0fd013da8f7f463e79447978b5a2837e0a52b13029ad6bb23d2fcf3e150968"
     ]
   },
   "generation": {
@@ -33,11 +33,11 @@
   "output": {
     "path": "media/generated/gguf-layout-deterministic-v0.svg",
     "mime_type": "image/svg+xml",
-    "sha256": "64311fe6cf4179ce1b6e263b05184fbddf55fd3a23e20256899f9e5b886f68f2",
-    "bytes": 4096
+    "sha256": "3482f28bde713b4bf335007df8f2a1b73e0aaee8e88186a5c6419063e1b3b178",
+    "bytes": 2526
   },
   "accessibility": {
-    "alt_text": "A deterministic diagram of the synthetic GGUF file showing its header, metadata records, aligned tensor table, and bounded tensor payload ranges.",
+    "alt_text": "A deterministic diagram of the 428-byte synthetic GGUF file showing header and metadata bytes, aligned tensor data, and the bounded demo.matrix and demo.vector payload ranges.",
     "caption_path": null,
     "transcript_path": null,
     "static_fallback_path": "docs/labs/legal-fixture-decision.md",
@@ -58,7 +58,7 @@
     "required": true,
     "approved": true,
     "reviewer_role": "Documentation Builder technical review",
-    "reviewed_at": "2026-07-17T05:10:00+03:00",
-    "notes": "Contract example only; the generated SVG must be checksum-verified when FIG-01 is implemented."
+    "reviewed_at": "2026-07-17T05:50:00+03:00",
+    "notes": "The generated SVG was replayed from the golden JSON and its input hash, output hash, output size, accessibility metadata, and evidence boundary were verified by focused tests. Independent domain review remains required before publication claims rely on the figure."
   }
 }
