@@ -1,6 +1,6 @@
 # EAAI publication roadmap
 
-_Last updated: 2026-07-17 09:22 Africa/Cairo_
+_Last updated: 2026-07-17 12:03 Africa/Cairo_
 
 This roadmap turns repository milestones into evidence gates for an EAAI experience report. It does not authorize manuscript drafting.
 
@@ -17,21 +17,22 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 ### A2. Deterministic evidence foundations
 
 - Integrate legal fixture decision and deterministic synthetic GGUF.
-- Integrate Lab 0 report contract, trace schema/sample and local-progress schema.
+- Integrate Lab 0 report/reproducibility contracts, trace schema/sample and local-progress schema.
 - Add media manifest/provenance contract.
 - Maintain passing strict MkDocs and documentation CI.
 
-**Status:** evidenced on the current stacked viewer branch. Ordinary CI performs no paid API calls or model downloads.
+**Status:** evidenced as contracts and deterministic artifacts. Ordinary CI performs no paid API calls or model downloads.
 
 ### A3. Smallest vertical slice
 
 - Add a narrow keyboard-operable viewer for the authored GGUF trace.
 - Generate one deterministic technical figure from structured data.
 - Add source-link and replay validation.
+- Add the browser-first GGUF parser/checkpoint slice.
 
-**Status:** evidenced by immutable source anchors, deterministic trace replay, the generated GGUF-layout SVG, the static viewer and passing Documentation CI run `29559239071`.
+**Status:** evidenced by immutable source anchors, deterministic trace replay, the generated GGUF-layout SVG, the static viewer, the browser GGUF slice and passing commit-scoped CI.
 
-**Boundary:** this is an authored/source-derived prototype. Native capture, learner benefit and independent technical correctness remain unevidenced.
+**Boundary:** the viewer remains authored/source-derived and Lab 1 remains browser-derived. Native capture, learner benefit and independent technical correctness remain unevidenced.
 
 ## Phase B — Vertical slices, July 24-31, 2026
 
@@ -39,9 +40,13 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 
 - Require `uv sync --locked` for Python tooling.
 - Require CMake/Ninja native build and bounded executable-launch smoke test.
-- Add stable failure taxonomy, machine-readable report and time-to-ready instrumentation.
+- Use the validated stable failure taxonomy, machine-readable report and time-to-ready instrumentation.
 - Execute a supported local/container reproducibility matrix.
 - Keep optional learner-provided model loading and time-to-first-token separate from the model-free core.
+
+**Current status:** the reproducibility contract passed Documentation CI run `29565651085`. No real matrix row exists yet.
+
+**Next evidence:** Ubuntu 24.04 local-native first, then the devcontainer. Verify the pinned native target/options during the first run rather than treating the illustrative example as execution evidence.
 
 **Exit evidence:** clean supported environments reach expected output; model-free success is not called inference; optional model paths are not redistributed.
 
@@ -51,6 +56,8 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 - Verify browser/Python golden agreement.
 - Add Predict-Discover-Explain checkpoints, keyboard completion and static table/text fallback.
 - Persist local progress with export/import and corruption recovery.
+
+**Current status:** deterministic parsing, golden agreement and checkpoints are evidenced by run `29562479577`; progress persistence remains blocked on `PROGRESS-02`.
 
 **Exit evidence:** deterministic parsing, checkpoint logic, privacy-minimizing progress and explicit exclusion of native-runtime claims.
 
@@ -82,13 +89,21 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 
 ## Immediate dependency order
 
-1. `LAB0-02` reproducibility and diagnostics protocol.
-2. `DATA-01` retrospective extraction schema.
-3. `LAB1-01` browser GGUF vertical slice.
+1. `DATA-01` retrospective extraction schema.
+2. `LAB0-03` measured Ubuntu 24.04 local-native row.
+3. `LAB0-04` measured devcontainer row.
 4. `PROGRESS-02` local persistence/export/import.
 5. `REVIEW-02` active-stack adversarial review integration.
 6. Static-source/text baseline literature and benchmark design.
 7. `VENUE-01` official EAAI-27 verification.
+
+## Scope-control decisions
+
+- Do not add broad cloud polish before the local/devcontainer bounded path works.
+- Do not add native trace instrumentation before the authored viewer has a fair baseline and instrumentation risks are bounded.
+- Do not add authenticated progress synchronization in the July vertical slice.
+- Do not add optional generated media unless the deterministic core demo is complete and human review is available.
+- Do not treat contract examples, CI integration, or attractive visualizations as learner-outcome evidence.
 
 ## Generalization boundary
 
