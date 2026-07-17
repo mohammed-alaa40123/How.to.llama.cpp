@@ -33,8 +33,8 @@
   "output": {
     "path": "media/generated/gguf-layout-deterministic-v0.svg",
     "mime_type": "image/svg+xml",
-    "sha256": "3482f28bde713b4bf335007df8f2a1b73e0aaee8e88186a5c6419063e1b3b178",
-    "bytes": 2526
+    "sha256": "d93ab0a5eafe0fe7a4ee2db737ce077d2babb275a5c656c07b81105ae851cd25",
+    "bytes": 2525
   },
   "accessibility": {
     "alt_text": "A deterministic diagram of the 428-byte synthetic GGUF file showing header and metadata bytes, aligned tensor data, and the bounded demo.matrix and demo.vector payload ranges.",
