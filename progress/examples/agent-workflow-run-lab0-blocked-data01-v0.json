@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "2026-07-17T1203Z-lab0-blocked-data01",
+  "role": "validation_architect",
+  "assignment": {
+    "id": "DATA-01",
+    "priority": "P1",
+    "objective": "Define a privacy-minimizing retrospective evidence contract after the higher-priority real Lab 0 run was blocked.",
+    "dependency_state": "ready",
+    "selected_reason": "A real Ubuntu or devcontainer Lab 0 row was attempted first, but repository checkout was unavailable; DATA-01 was the next dependency-safe assignment.",
+    "blocker": "The execution environment could not resolve github.com, preventing repository and pinned llama.cpp checkout for a measured Lab 0 run."
+  },
+  "revisions": {
+    "starting_commit": "9d05719e25a25a1da644ec17237f2f3c5259afe1",
+    "ending_commit": "176729838aba05e1572feb4a24246cd994b0af65",
+    "base_branch": "agent/lab0-reproducibility-validation",
+    "working_branch": "agent/data01-retrospective-evidence-contract"
+  },
+  "outputs": [
+    {"path": "schemas/agent-workflow-run.schema.json", "kind": "schema", "decision": "accepted"},
+    {"path": "scripts/validate_agent_workflow_run.py", "kind": "validator", "decision": "accepted"},
+    {"path": "tests/test_validate_agent_workflow_run.py", "kind": "test", "decision": "accepted"},
+    {"path": "logs/research/2026-07-17/1203-data01-retrospective-evidence-contract.md", "kind": "run_log", "decision": "accepted"}
+  ],
+  "validation": {
+    "validators": ["python3 -m unittest tests.test_validate_agent_workflow_run", "Documentation CI"],
+    "failures": [
+      {"stage": "Lab 0 environment execution", "category": "dependency", "resolution": "blocked", "summary": "DNS resolution failure prevented cloning the repository and pinned llama.cpp source, so no measured environment row was claimed."}
+    ],
+    "ci_state": "passed",
+    "ci_run_id": 29568983813
+  },
+  "human_supervision": {
+    "required": true,
+    "decisions": ["Review the retrospective coding rules and first multi-run batch before using the dataset for publication analysis."],
+    "review_status": "pending"
+  },
+  "effort": {
+    "agent_turns": 1,
+    "tool_calls": 16,
+    "external_api_cost_usd": 0,
+    "paid_generation_calls": 0,
+    "human_minutes": 0
+  },
+  "claims": [
+    {"label": "Verified", "statement": "The retrospective evidence contract and semantic validator passed commit-scoped Documentation CI.", "evidence_paths": ["tests/test_validate_agent_workflow_run.py", "logs/research/2026-07-17/1203-data01-retrospective-evidence-contract.md"]},
+    {"label": "Verified", "statement": "The blocked Lab 0 execution was recorded without inflating it into a reproducibility result.", "evidence_paths": ["logs/research/2026-07-17/1203-data01-retrospective-evidence-contract.md"]},
+    {"label": "Open Question", "statement": "Measured Ubuntu and devcontainer Lab 0 rows remain unavailable.", "evidence_paths": []}
+  ]
+}
