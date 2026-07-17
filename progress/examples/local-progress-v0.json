@@ -1,0 +1,33 @@
+{
+  "schema_version": "0.1.0",
+  "course_id": "how-to-llama-cpp",
+  "course_version": "0.1.0",
+  "source_revision": "ce6e562127ab09886f7c239bd4142900d2f7b877",
+  "exported_at": "2026-07-17T00:03:21Z",
+  "storage_scope": "local-only",
+  "lessons": [
+    {
+      "lesson_id": "lab-01-gguf-anatomy",
+      "lesson_version": "0.1.0",
+      "status": "in-progress",
+      "last_step_id": "inspect-header",
+      "checkpoints": [
+        {
+          "checkpoint_id": "predict-graph-storage",
+          "state": "passed",
+          "attempt_count": 1
+        },
+        {
+          "checkpoint_id": "explain-mapping-vs-residency",
+          "state": "answered",
+          "attempt_count": 2
+        },
+        {
+          "checkpoint_id": "derive-alignment",
+          "state": "unanswered",
+          "attempt_count": 0
+        }
+      ]
+    }
+  ]
+}
