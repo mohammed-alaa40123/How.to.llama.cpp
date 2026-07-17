@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "2026-07-17T0822Z-viewer-success",
+  "role": "documentation_builder",
+  "assignment": {
+    "id": "VIEW-01",
+    "priority": "P1",
+    "objective": "Build the smallest keyboard-operable static viewer over the validated authored GGUF-loading trace.",
+    "dependency_state": "ready",
+    "selected_reason": "TRACE-02 had passed source-anchor and replay validation, so the narrow viewer dependency was satisfied."
+  },
+  "revisions": {
+    "starting_commit": "e2361200d80028c86205359979487a94b958f306",
+    "ending_commit": "d02656c7d5d745c77a68b23613cf42050b6518ac",
+    "base_branch": "agent/trace02-source-link-validation",
+    "working_branch": "agent/view01-static-trace-viewer"
+  },
+  "outputs": [
+    {"path": "trace_viewer/index.html", "kind": "implementation", "decision": "accepted"},
+    {"path": "trace_viewer/viewer.js", "kind": "implementation", "decision": "accepted"},
+    {"path": "tests/test_build_trace_viewer.py", "kind": "test", "decision": "accepted"},
+    {"path": "logs/research/2026-07-17/0822-view01-static-trace-viewer.md", "kind": "run_log", "decision": "accepted"}
+  ],
+  "validation": {
+    "validators": ["python3 -m unittest discover -s tests -p test_*.py", "mkdocs build --strict", "Documentation CI"],
+    "failures": [],
+    "ci_state": "passed",
+    "ci_run_id": 29559239071
+  },
+  "human_supervision": {
+    "required": true,
+    "decisions": ["Independent technical review and a fair static-source baseline remain required before educational-effectiveness claims."],
+    "review_status": "pending"
+  },
+  "effort": {
+    "agent_turns": 1,
+    "tool_calls": 20,
+    "external_api_cost_usd": 0,
+    "paid_generation_calls": 0,
+    "human_minutes": 0
+  },
+  "claims": [
+    {"label": "Verified", "statement": "The static viewer builds deterministically and exposes bounded keyboard navigation plus a transcript fallback.", "evidence_paths": ["tests/test_build_trace_viewer.py", "logs/research/2026-07-17/0822-view01-static-trace-viewer.md"]},
+    {"label": "Open Question", "statement": "The viewer has not yet been shown to improve code tracing over an information-equivalent static baseline.", "evidence_paths": []}
+  ]
+}
