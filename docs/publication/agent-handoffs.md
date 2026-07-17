@@ -233,3 +233,38 @@ Replaced two Markdown links from `docs/publication/agent-handoffs.md` to run not
 ### Validation and next dependency
 
 No runtime, schema, fixture, learner-data, model, paid API, or publication claim changed. After CI passes, the next Documentation Builder assignment is the media manifest/provenance validator.
+
+## 2026-07-17 19:04 — Documentation Builder
+
+### Assignment status
+
+The authoritative orchestrator ranked `STACK-01` as the highest-priority ready assignment. Measured Lab 0 runs, independent technical review, and evaluation remain blocked by environment or human dependencies.
+
+### Bounded increment completed
+
+Added [`canonical-integration-map.md`](canonical-integration-map.md), updated the evidence backlog and project state, and retained the full run record at `logs/research/2026-07-17/1904-stack01-canonical-integration-map.md`.
+
+The map:
+
+- nominates one canonical implementation spine;
+- retains PR #13 over overlapping PR #14;
+- recommends PR #24 as the lowest-risk progress default because PR #25 and later learner-facing work depend on it;
+- preserves PR #23 migration/recovery ideas as a possible bounded follow-up rather than silently merging two progress stores;
+- separates historical reviewer/orchestration snapshots from the single current authority state;
+- requires manual reconciliation of parallel PRs #30, #31, and #32;
+- defines the exact final combined-head validation gate.
+
+### Truth labels
+
+- **Verified:** the draft stack contains overlapping trace and progress implementations plus parallel authority/evidence descendants.
+- **Interpretation:** choosing #24 minimizes downstream adaptation and integration risk.
+- **Historical:** component CI passed on individual heads, but those results do not establish one integrated branch.
+- **Open question:** human approval of the progress choice and full combined-head CI.
+
+### Validation and repair
+
+The first branch run, `29595082233`, failed at durable context validation because the updated project-state heading used `Known blockers` instead of the required `Known blockers and caveats`. The heading was corrected without weakening validation. Final-head Documentation CI run `29595185398` passed on commit `9b83edb44c658a551563549edbe0511cdf769292` before this handoff append; a new final-head run is required for the handoff commit.
+
+### Next dependency
+
+Record the human canonical-progress decision and execute the integration branch. `DEMO-01A` is the next dependency-safe Documentation Builder task while `LAB0-03` and `LAB0-04` remain environment-blocked.
