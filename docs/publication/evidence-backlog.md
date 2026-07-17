@@ -1,12 +1,12 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 23:00 Africa/Cairo_
+_Last updated: 2026-07-17 23:58 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator, measured run or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
 | Priority | ID | Status | Owner | Dependency | Required evidence | Claim supported or falsified |
 |---|---|---|---|---|---|---|
-| P0 | STACK-01 | in progress | Human + Orchestrator | canonical progress choice | approved merge order, combined integration branch and passing full CI | The repository is one reviewable artifact rather than a stack of prototypes |
+| P0 | STACK-01 | in progress | Human + Orchestrator | human approval of pending decision record | pending decision schema/validator/example now exist; still require approved record, combined integration branch and passing full CI | The repository is one reviewable artifact rather than a stack of prototypes |
 | P0 | LAB0-03 | blocked | Validation Architect | clean Ubuntu 24.04 environment | measured model-free local-native record with revisions, commands, diagnostics and time-to-ready | The local-native tier completes the bounded path reproducibly |
 | P0 | LAB0-04 | blocked | Validation Architect | devcontainer execution environment | measured model-free devcontainer record using the same contract | The cloud-container tier completes the bounded path reproducibly |
 | P0 | REVIEW-01 | blocked | Human technical reviewer | reviewer nominated | signed/dated review and correction record for fixture, lab, trace, figure and benchmark | Technical correctness is independently supported |
@@ -32,8 +32,9 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 
 ## Dependency decisions
 
-- `STACK-01` remains implementation-critical and human-blocked; no new broad learner-facing feature should precede the canonical branch.
-- `DOC-AUDIT-01` was the authorized dependency-safe task. Its protocol now has commit-scoped CI evidence, but the audit result remains open until retained search results, two independent coders and adjudication exist.
+- `STACK-01` remains implementation-critical and human-blocked. A machine-checkable pending decision now freezes the reviewed spine, PR #24 choice, superseded work and preserved PR #23 follow-ups without inventing approval.
+- The pending decision record is not authorization to merge. `STACK-01` closes only after explicit human approval, one combined integration branch and passing full Documentation CI.
+- `DOC-AUDIT-01` was the prior authorized dependency-safe task. Its protocol has commit-scoped CI evidence, but the audit result remains open until retained search results, two independent coders and adjudication exist.
 - `DEMO-01A` is closed only as a specification. `DEMO-01` remains blocked until the route is executed on the canonical branch and measured tiers exist.
 - `VENUE-01` is closed because the official EAAI-27 call was verified. Venue monitoring continues only for author-kit changes.
 - `DATA-01B` protocol evidence is complete, but the case-study dataset is not. A protocol must not be reported as a longitudinal result.
@@ -50,6 +51,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 - Progress is local-only and anonymous; no server sync, identity or telemetry is approved.
 - Deterministic technical figures are authoritative. Optional generated media remains supplemental and outside the critical path.
 - The live repository is not a double-blind artifact; public review materials require a clean allowlisted export and private source crosswalk.
+- The pending canonical decision record records a proposal, not a human decision or integrated artifact.
 
 ## Fatal rejection-risk mapping
 
