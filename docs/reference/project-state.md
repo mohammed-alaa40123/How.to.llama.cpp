@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 17:06 Africa/Cairo_
+_Last updated: 2026-07-17 17:18 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -27,18 +27,19 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - DATA-01 contract and first three-archetype retrospective batch with passing parent CI.
 - PROGRESS-02 local adapter, deterministic export/import and Lab 1 integration with passing run `29579032392`.
 - BASE-01A information-equivalent static-versus-viewer benchmark with passing run `29583844938`.
+- MEDIA-02 deterministic accepted/revised/rejected lifecycle dry run with passing run `29587245436`.
 
 ## Latest bounded increment
 
 ### Verified
 
-- `BASE-01A` passed commit-scoped Documentation CI run `29583844938`.
-- Measured Ubuntu and devcontainer Lab 0 rows remain blocked by unavailable execution environments; no timing or success record was fabricated.
-- `MEDIA-02` now contains exactly one accepted, revised and rejected deterministic lifecycle record.
+- `MEDIA-02` contains exactly one accepted, revised and rejected deterministic lifecycle record.
 - Revised and rejected records remain unpublished and unapproved with explicit retained reasons.
 - The accepted specimen is approved, source-pinned, licensed and accessibility-described, but is explicitly only a lifecycle specimen rather than llama.cpp technical evidence.
 - The lifecycle validator reuses the individual media-manifest validator and recomputes committed input/output SHA-256 values and output byte counts.
 - Eight focused tests cover state coverage, duplicate identity, external-generation prohibition, generative-mode rejection, stale input/output checks and rejected-asset publication blocking.
+- Documentation CI run `29587245436` passed the lifecycle fixtures, validator, tests, strict site build and accessibility structure check.
+- Measured Ubuntu and devcontainer Lab 0 rows remain blocked by unavailable execution environments; no timing or success record was fabricated.
 
 ### Interpretation
 
@@ -52,7 +53,6 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ### Open questions
 
-- Does final-head CI pass for the lifecycle fixtures, validator, tests and documentation?
 - Should revision and rejection reasons use a controlled taxonomy before broader retrospective extraction?
 - Will any future supplemental generated asset pass technical, accessibility, licensing, privacy and pedagogical review?
 - Can Ubuntu 24.04 and the devcontainer complete the bounded model-free Lab 0 path?
@@ -60,18 +60,18 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-obtain commit-scoped CI for MEDIA-02
-  → if failing, repair only lifecycle validation or fixture provenance
-  → if passing, close MEDIA-02 and take REVIEW-02 or a bounded DATA-01 extension
+MEDIA-02 is evidenced
+  → take REVIEW-02 or a bounded DATA-01 extension
   → execute real Ubuntu and devcontainer Lab 0 rows when suitable environments exist
+  → retain deterministic figures as authoritative
   → do not call external media APIs from ordinary CI
 ```
 
 ## Publication and validation state
 
 - `docs/publication/orchestrator-state.md` is the single source of truth.
-- `docs/publication/evidence-backlog.md` records `MEDIA-02` as in progress pending final-head CI.
-- Passing CI can establish deterministic lifecycle integration, not generative-media usefulness or learner benefit.
+- `docs/publication/evidence-backlog.md` records `MEDIA-02` as evidenced.
+- Passing CI establishes deterministic lifecycle integration, not generative-media usefulness or learner benefit.
 - No participant data, learner identity, model weights, telemetry, credentials, paid API generation, native instrumentation or manuscript prose were introduced.
 
 ## Known blockers and caveats
