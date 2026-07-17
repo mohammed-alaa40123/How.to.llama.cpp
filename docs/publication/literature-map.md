@@ -1,6 +1,6 @@
 # EAAI literature map
 
-_Last updated: 2026-07-17_
+_Last updated: 2026-07-18_
 
 This file records verified primary or official sources that constrain the executable-learning architecture. It is not paper prose. Claims about a gap between usage-oriented documentation and source-level systems understanding remain a **hypothesis** until a systematic documentation audit is completed.
 
@@ -66,6 +66,55 @@ Sources were checked on 2026-07-17. Because platform behavior, product limits, a
 
 The defensible educational contribution is not “one-click llama.cpp.” It is a source-pinned learning design that makes the evidence boundary visible: learners can distinguish browser simulation, authored explanation, deterministic source-derived structure, and real native execution. Evaluation should test whether this distinction improves code-tracing and systems reasoning, not merely whether setup succeeds.
 
+## Slice 2 — official generative-media capability and lifecycle boundaries
+
+### Question
+
+Can current image, speech, realtime, video, Gemini image, or NotebookLM APIs satisfy the repository's authoritative technical-asset lifecycle, or should they remain optional reviewed supplements?
+
+### Official capability map
+
+| Service | Official capability verified on 2026-07-18 | Reproducibility and governance implication |
+|---|---|---|
+| [OpenAI Images API](https://platform.openai.com/docs/api-reference/images-streaming) | Image generation/editing can return final bytes and usage metadata; streaming can emit partial and completed images. | Store the exact prompt/storyboard, model identifier, API parameters, returned checksum and usage record. Partial outputs are previews, not accepted assets. Model output remains non-deterministic and cannot be the authoritative architecture diagram. |
+| [OpenAI text-to-speech](https://platform.openai.com/docs/api-reference/audio) | `/v1/audio/speech` generates audio from text with selected model, voice, format and speed. Custom voices require an audio sample and a consent recording and are limited to eligible customers. | Use built-in voices only unless a separate consent/licensing review approves a custom voice. Commit the transcript as authoritative, retain the exact voice/model/settings and checksum, and require caption/transcript parity review. |
+| [OpenAI Realtime API](https://platform.openai.com/docs/api-reference/realtime) | Realtime supports low-latency WebRTC/WebSocket/SIP sessions with speech-to-speech and text/image/audio I/O. Instructions guide behavior but are not guaranteed to be followed. | Reject Realtime as a canonical build dependency or deterministic narration generator. It may support an optional live companion, but session output must not replace reviewed scripts, traces or captions. |
+| [OpenAI Videos API](https://platform.openai.com/docs/api-reference/videos) | `/v1/videos` accepts a prompt and optional reference asset and creates an asynchronous video job using a named video model. | Video must be manually triggered, cost-capped, cached and reviewed frame-by-frame for technical claims. Store prompt, reference hashes, model/version, duration, size, job metadata, output checksum and transcript/captions. Do not regenerate on ordinary pushes. |
+| [OpenAI API data controls](https://platform.openai.com/docs/models/default-usage-policies-by-endpoint) | Official endpoint tables document retention and Zero Data Retention eligibility differences across images, audio, realtime and videos. | Every generation run needs a recorded data-classification decision. Do not upload private learner data, unpublished review identities or restricted model artifacts. Reverify endpoint retention before each approved generation batch. |
+| [Gemini image generation](https://ai.google.dev/gemini-api/docs/image-generation) | The Gemini API exposes Nano Banana image-generation/editing models; generated images include SynthID. Google documents model-specific resolution, grounding, batch and lifecycle differences. | Record the exact model code rather than the marketing family name, plus prompt, inputs, grounding setting, output checksum and SynthID-preserving handling. Grounded or high-fidelity text rendering does not make a generated technical diagram factual evidence. |
+| [NotebookLM Enterprise notebook API](https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks) | A preview API can create, retrieve, list, delete and share Enterprise notebooks; it requires Enterprise setup/licenses and is governed by Pre-GA terms. | NotebookLM may be an optional companion workspace, not a canonical CI dependency. Notebook management alone does not provide the repository's manifest, deterministic asset build, approval, checksum and stale-asset lifecycle. |
+| [NotebookLM Enterprise source API](https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks-sources) | The preview API can add and manage sources including files, raw text, web content and YouTube sources, with additional authorization requirements for some Google content. | Source ingestion introduces privacy, licensing, mutable-web and authorization risks. Any experiment must use an allowlist and retained source snapshot; no learner data or unpublished review material may be uploaded. |
+
+### Verified boundaries
+
+- API availability does not imply deterministic replay. Exact prompt and parameters can be retained while output bytes still vary across calls or model updates.
+- OpenAI API keys must remain server-side secrets; browser labs and ordinary static-site builds must never receive generation credentials.
+- Gemini's SynthID is useful provenance metadata but does not establish technical correctness, license clearance or accessibility.
+- NotebookLM Enterprise now has preview notebook/source-management APIs, but the official surfaces reviewed here do not replace this repository's required acceptance/revision/rejection ledger or deterministic technical-figure pipeline.
+
+### Interpretation for the EAAI case study
+
+The defensible design is a two-layer media system:
+
+1. **Authoritative layer:** deterministic SVG, Mermaid, D3, Graphviz or trace-derived figures generated from structured repository data and validated against source revisions.
+2. **Supplemental layer:** optional illustrations, narration, live companions or short videos generated only after a reviewed storyboard exists and accepted only after technical, accessibility, licensing/privacy and provenance review.
+
+Generated media may be evaluated for engagement, accessibility preference or explanatory support. It must not be counted as evidence that a GGML data structure, memory transition, call edge, tensor shape or runtime event is correct.
+
+### Concrete design requirement
+
+Every optional generation adapter must default to a **dry-run manifest mode** and require an explicit manual approval token or workflow dispatch before network/API execution. A generation record must include provider, exact model/version, generator version, prompt/storyboard hashes, input hashes, source revision, parameters, usage/cost record, output checksum, captions/transcript, license/privacy notes and human-review state. Ordinary pushes validate cached artifacts only.
+
+### Rejected alternative
+
+Do not use a generative image or video model to draw the canonical llama.cpp/GGML architecture, source call graph, tensor layout, memory-residency transition or benchmark result. Visual plausibility and text-rendering quality are not source-level correctness guarantees.
+
+### Limitations and revalidation triggers
+
+- Product names, model identifiers, availability, retention, pricing and preview status can change; reverify official documentation before an approved generation batch.
+- This slice verifies documented capabilities and restrictions only. It does not test output quality, factuality, accessibility, latency or cost.
+- No paid API call, NotebookLM workspace, generated asset or learner data was used in this review.
+
 ## Next literature dependency
 
-Verify the first media-pipeline slice using current official API documentation: image, speech, realtime, and video generation; Gemini image generation; NotebookLM automation boundaries; provenance, accessibility, licensing, caching, privacy, and human-review requirements.
+Retain the predefined `DOC-AUDIT-01` search-result frame and complete independent double-coding before strengthening the source-level documentation-gap hypothesis. A separate future slice should review empirical evidence on multimodal explanations and generated-diagram factuality rather than inferring educational benefit from API capability.
