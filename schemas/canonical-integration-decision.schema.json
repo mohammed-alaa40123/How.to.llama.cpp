@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://how-to-llama-cpp.example/schemas/canonical-integration-decision.schema.json",
+  "title": "Canonical integration decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "repository_revision",
+    "decision_id",
+    "progress_choice",
+    "merge_order",
+    "superseded_work",
+    "human_approval",
+    "integration_status"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "repository_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "decision_id": {"const": "STACK-01"},
+    "progress_choice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selected_pr", "rejected_pr", "rationale", "preserved_followups"],
+      "properties": {
+        "selected_pr": {"const": 24},
+        "rejected_pr": {"const": 23},
+        "rationale": {"type": "string", "minLength": 40},
+        "preserved_followups": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {"enum": ["schema-migration-0.0.1-to-0.1.0", "last-known-valid-recovery"]}
+        }
+      }
+    },
+    "merge_order": {
+      "type": "array",
+      "minItems": 19,
+      "uniqueItems": true,
+      "items": {"type": "integer", "minimum": 1}
+    },
+    "superseded_work": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["pr", "replacement_pr", "reason"],
+        "properties": {
+          "pr": {"type": "integer", "minimum": 1},
+          "replacement_pr": {"type": "integer", "minimum": 1},
+          "reason": {"type": "string", "minLength": 20}
+        }
+      }
+    },
+    "human_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approved", "reviewer", "approved_at", "notes"],
+      "properties": {
+        "approved": {"type": "boolean"},
+        "reviewer": {"type": ["string", "null"]},
+        "approved_at": {"type": ["string", "null"], "format": "date-time"},
+        "notes": {"type": "string"}
+      }
+    },
+    "integration_status": {
+      "enum": ["pending-human-approval", "approved-not-integrated", "integrating", "validated"]
+    }
+  }
+}

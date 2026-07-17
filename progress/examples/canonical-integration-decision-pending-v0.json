@@ -1,0 +1,34 @@
+{
+  "schema_version": "0.1.0",
+  "repository_revision": "b2a39213615e39852cbfd90f23296a493c8e63a2",
+  "decision_id": "STACK-01",
+  "progress_choice": {
+    "selected_pr": 24,
+    "rejected_pr": 23,
+    "rationale": "PR #24 is the lowest-risk canonical progress implementation because PR #25 and every later learner-facing branch in the reviewed spine already depend on its storage and validation contract.",
+    "preserved_followups": [
+      "schema-migration-0.0.1-to-0.1.0",
+      "last-known-valid-recovery"
+    ]
+  },
+  "merge_order": [3, 4, 5, 6, 7, 9, 11, 13, 15, 16, 17, 18, 21, 22, 24, 25, 27, 28, 29],
+  "superseded_work": [
+    {
+      "pr": 14,
+      "replacement_pr": 13,
+      "reason": "PR #13 is retained because the downstream viewer and Lab 1 branches were built from its corrected trace contract."
+    },
+    {
+      "pr": 23,
+      "replacement_pr": 24,
+      "reason": "PR #24 is retained because downstream progress integration already depends on it; unique recovery ideas remain explicit follow-ups."
+    }
+  ],
+  "human_approval": {
+    "approved": false,
+    "reviewer": null,
+    "approved_at": null,
+    "notes": "Pending explicit human approval. This record must not be used to create the canonical integration branch until approval is supplied."
+  },
+  "integration_status": "pending-human-approval"
+}
