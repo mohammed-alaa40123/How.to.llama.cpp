@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 21:11 Africa/Cairo_
+_Last updated: 2026-07-17 21:13 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator, measured run or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -15,7 +15,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P1 | DATA-01B | in progress | Validation Architect | approved immutable window; independent coder | frozen protocol/schema/validator now pass CI `29598733410`; still require broader extraction, double-coding and adjudication | The agent process is a longitudinal case study rather than selected anecdotes |
 | P1 | EVAL-01 | blocked | Human + Validation Architect | pathway and ethics decision | approved expert or learner protocol, instruments, consent/ethics determination and recruitment boundary | Educational usefulness can be evaluated rather than inferred |
 | P1 | BASE-01 | blocked | Validation Architect | EVAL-01; BASE-01A; REVIEW-01 | completed information-equivalent comparison with frozen scoring and limitations | Viewer benefit is measured rather than attributed to visual novelty |
-| P1 | BLIND-01 | ready | Literature Scout + Orchestrator | official EAAI-27 call | double-blind artifact-release, repository anonymization and supplement plan | Submission materials comply without destroying evidence provenance |
+| P1 | BLIND-01 | in progress | Literature Scout + Orchestrator | official EAAI-27 call | plan, schema, semantic validator and non-ready example now exist; still require anonymous bundle, identity scan, final license/accessibility checks and human approvals | Submission materials comply without destroying evidence provenance |
 | P1 | DOC-AUDIT-01 | ready | Literature Scout | predefined sampling protocol | systematic audit of official/community llama.cpp and GGML learning resources | The source-level documentation-gap hypothesis is supported, revised or rejected |
 | P2 | VENUE-01 | evidenced | Literature Scout | official call | official EAAI-27 dates, area, format and review constraints in PR #31 | Submission planning matches the current venue |
 | P2 | REVIEW-02 | evidenced | Adversarial Reviewer + Orchestrator | reviewer package | rejection-risk package and orchestration integration; CI-backed ancestors | Rejection risks drive ordering rather than feature expansion |
@@ -36,6 +36,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 - `DEMO-01A` is closed only as a specification. `DEMO-01` remains blocked until the route is executed on the canonical branch and measured tiers exist.
 - `VENUE-01` is closed because the official EAAI-27 call was verified. Venue monitoring continues only for author-kit changes.
 - `DATA-01B` protocol evidence is complete, but the case-study dataset is not. A protocol must not be reported as a longitudinal result.
+- `BLIND-01` now has a machine-checkable non-ready contract. It remains open until a clean anonymous bundle passes identity, licensing, accessibility and human-review gates.
 
 ## Current evidence boundaries
 
@@ -46,6 +47,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 - The first retrospective batch and coding protocol do not establish representativeness, inter-rater reliability or workflow superiority.
 - Progress is local-only and anonymous; no server sync, identity or telemetry is approved.
 - Deterministic technical figures are authoritative. Optional generated media remains supplemental and outside the critical path.
+- The live repository is not a double-blind artifact; public review materials require a clean allowlisted export and private source crosswalk.
 
 ## Fatal rejection-risk mapping
 
@@ -54,7 +56,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 3. **No measured native/cloud reproducibility:** `LAB0-03` and `LAB0-04`.
 4. **Selected agent anecdotes:** `DATA-01B` extraction, double-coding and adjudication.
 5. **Tool collection rather than progression:** `STACK-01`, `DEMO-01A` and executed `DEMO-01`.
-6. **Double-blind evidence leakage:** `BLIND-01`.
+6. **Double-blind evidence leakage:** complete `BLIND-01` with a scanned, reviewed anonymous bundle.
 
 ## Scope cuts retained
 
