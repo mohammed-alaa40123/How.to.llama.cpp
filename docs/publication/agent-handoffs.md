@@ -122,7 +122,7 @@ Added:
 - `labs/fixtures/gguf/synthetic-v0.manifest.json`;
 - `labs/fixtures/gguf/synthetic-v0.golden.json`;
 - `tests/test_generate_synthetic_gguf.py`;
-- [`../../logs/research/2026-07-17/0100-synthetic-gguf-fixture.md`](../../logs/research/2026-07-17/0100-synthetic-gguf-fixture.md).
+- run record `logs/research/2026-07-17/0100-synthetic-gguf-fixture.md`.
 
 The generator creates a 428-byte, little-endian GGUF v3 teaching file with five typed metadata records, two F32 tensor descriptors, 32-byte alignment, deterministic project-authored payloads, and three bounded corruption variants.
 
@@ -157,7 +157,7 @@ Add machine-readable trace, media-manifest, and learner-progress schemas with fo
 
 ### Bounded increment completed
 
-Added the Lab 0 learning contract, JSON Schema, dependency-free semantic validator, a valid model-free example report, five focused unit tests, and [`../../logs/research/2026-07-17/0158-lab0-checker-interface.md`](../../logs/research/2026-07-17/0158-lab0-checker-interface.md).
+Added the Lab 0 learning contract, JSON Schema, dependency-free semantic validator, a valid model-free example report, five focused unit tests, and run record `logs/research/2026-07-17/0158-lab0-checker-interface.md`.
 
 The interface separates `environment`, `configure`, `compile`, `executable_launch`, `model_load`, and `inference`. It rejects impossible success chains and prevents a model-free executable launch from being represented as model loading or inference.
 
@@ -212,3 +212,24 @@ This increment tests whether repository-native agent work can produce source-pin
 ### Next dependency
 
 Review and merge the trace contract, then implement either the media manifest/provenance validator or local progress export/import schema according to the next orchestrator ranking. A minimal viewer must not begin until the trace contract is accepted.
+
+## 2026-07-17 04:02 — Documentation Builder
+
+### Assignment status
+
+The authoritative orchestrator ranked strict MkDocs repair as the P0 dependency before viewer or media expansion. Documentation CI run `29544077919` failed only at `mkdocs build --strict`; all context, link, unit-test, shell, compilation, and asset checks before it passed.
+
+### Bounded increment completed
+
+Replaced two Markdown links from `docs/publication/agent-handoffs.md` to run notes outside the MkDocs `docs/` tree with explicit repository-path code references. The run notes remain durable repository evidence, but MkDocs no longer interprets them as documentation-page targets.
+
+### Truth labels
+
+- **Verified:** CI reported exactly two strict-mode warnings, for the `0100-synthetic-gguf-fixture.md` and `0158-lab0-checker-interface.md` links.
+- **Interpretation:** code-form repository paths are preferable here because the files intentionally live under `logs/research/`, outside the generated documentation site.
+- **Historical:** the warning existed across the stacked executable-learning branch before the orchestrator state was added.
+- **Open question:** the new branch must obtain a passing commit-scoped Documentation CI result before this blocker is closed.
+
+### Validation and next dependency
+
+No runtime, schema, fixture, learner-data, model, paid API, or publication claim changed. After CI passes, the next Documentation Builder assignment is the media manifest/provenance validator.
