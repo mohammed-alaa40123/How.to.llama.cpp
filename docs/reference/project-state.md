@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 05:18 Africa/Cairo_
+_Last updated: 2026-07-17 06:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -14,7 +14,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Active milestone
 
-**Executable-learning Week 1 foundation — contracts, legal fixtures, schemas, and smallest vertical slice**
+**Executable-learning Week 1 foundation — contracts, legal fixtures, schemas, deterministic media, and smallest vertical slice**
 
 ## Completed foundations
 
@@ -22,87 +22,73 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Source indexing, strict documentation CI, Pages deployment workflow, health checks, and durable run context.
 - Generic scheduler plus CPU, CUDA, Metal, Vulkan, SYCL, RPC, CANN, and OpenCL teardown audits.
 - CPU repack, AMX, KleidiAI, and SpacemiT extra-buffer ownership comparison and destruction-harness specification.
-- Complete pinned/current OpenCL event-ownership audit, generated 46-release correction, synchronous tensor-set contract analysis, and upstream proposal staging.
-- First executable CPU_REPACK lifetime regression with exact path proof, numerical comparison, and repeated ASan/LSan evidence.
-- Upstream-suitability decision and staged two-file CPU_REPACK regression proposal.
-- Website UX review with task-oriented Architecture navigation grouping.
-- Architecture landing page with six goal-based entry points, concise page summaries, and ordered reading paths.
-- Dependency-free generated-HTML accessibility structure validator with focused tests and Documentation CI integration.
-- EAAI July 17-31 executable-learning plan and initial agent handoff ledger on draft PR #3.
-- Legal-fixture decision separating model-free Lab 0 checks, learner-provided optional inference, and a project-owned synthetic GGUF for Lab 1.
-- Deterministic synthetic GGUF v0 generator, manifest, golden parse, SHA-256, alignment/range checks, and three bounded corruption variants.
-- Lab 0 machine-readable checker contract, JSON Schema, dependency-free semantic validator, model-free example report, and focused invariant tests.
-- Executable-trace schema, authored GGUF-loading sample, semantic validator, and focused malformed-input tests.
-- Local-only learner-progress schema, semantic validator, example export, privacy constraints, and focused malformed-input tests.
-- Authoritative EAAI orchestration state, evidence backlog, roadmap, and readiness scorecard.
-- Strict MkDocs handoff-link repair verified by successful Documentation CI run `29546570700`.
-- Media asset manifest schema, dependency-free semantic validator, deterministic authoritative example, accessibility/licensing/review gates, stale-source detection, and focused malformed-input tests.
+- Complete pinned/current OpenCL event-ownership audit and executable CPU_REPACK lifetime regression evidence.
+- Website UX review, Architecture navigation/index, and generated-HTML accessibility structure validation.
+- EAAI July 17-31 plan, legal fixture boundary, deterministic synthetic GGUF, Lab 0 report contract, trace contract, progress contract, orchestration state, and evidence backlog.
+- Strict MkDocs handoff-link repair verified by Documentation CI run `29546570700`.
+- Media asset manifest/provenance contract verified by Documentation CI run `29549208249`.
+- Deterministic 2526-byte GGUF-layout SVG generated from the golden fixture with exact replay, checksum, byte-count, accessibility and evidence-boundary tests.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Documentation CI run `29546570700` completed successfully for commit `5bbc595b9e2d076ddbc8393514e2a9f26fab9fa8`, closing the P0 strict-MkDocs integration blocker.
-- The media contract rejects generative assets as authoritative technical evidence.
-- Generative API manifests must be supplemental, cached, manually triggered, excluded from ordinary CI, prompt/storyboard hashed, and human-review gated.
-- Accepted or published assets require human approval and redistribution permission.
-- Audio/video assets require transcript fallbacks; video additionally requires captions and a static fallback.
-- The validator rejects unsafe repository paths, stale source revisions, oversized manifests, and credential-like fields.
+- `MEDIA-01` passed Documentation CI run `29549208249` for commit `bcb7555ef8b4e80817b5b812c35db6b1c6f7b9a9`.
+- The authoritative GGUF-layout figure is generated only from `labs/fixtures/gguf/synthetic-v0.golden.json`.
+- Input SHA-256 is `ae0fd013da8f7f463e79447978b5a2837e0a52b13029ad6bb23d2fcf3e150968`.
+- Output SHA-256 is `3482f28bde713b4bf335007df8f2a1b73e0aaee8e88186a5c6419063e1b3b178`; output size is 2526 bytes.
+- Focused tests require byte-for-byte regeneration, manifest checksum/size agreement, accessible SVG title/description metadata, and explicit non-inference/runtime-graph boundaries.
+- No generative model, model weight, external corpus, paid API, secret, telemetry or learner data is involved.
 
 ### Interpretation
 
 - Deterministic figures derived from hashed structured inputs are the appropriate authoritative media layer because their transformation can be replayed and checksum-verified.
-- Human approval can permit publication of generated media but cannot convert it into technical evidence.
+- The figure teaches storage layout only; using it to imply native GGUF loading, graph construction or inference would be evidence inflation.
 
 ### Historical
 
-- Earlier work established source-pinned documentation, executable lifetime regressions, accessibility guards, browser-level CI, legal fixture policy, synthetic GGUF evidence, Lab 0 reporting, trace validation, progress validation, and orchestration state.
+- Earlier work established source-pinned documentation, executable lifetime regressions, accessibility guards, legal fixtures, schemas, privacy constraints and orchestration state.
 
 ### Open questions
 
-- Provider-specific API, licensing, privacy, cost, and reproducibility constraints remain unverified pending the Literature Scout assignment.
-- The example media manifest points to the future deterministic GGUF layout SVG; actual generation and checksum verification remain under `FIG-01`.
-- Which bounded llama.cpp target and command matrix the first Lab 0 runner should execute.
-- Which operating systems and container targets belong in the first reproducibility matrix.
+- Independent GGUF/llama.cpp technical review remains required before correctness claims rely on the figure.
 - Browser/Python parser agreement and pinned native GGUF-reader acceptance remain unimplemented.
+- The exact bounded Lab 0 target, supported environment matrix and diagnostic taxonomy remain unresolved.
+- Provider-specific media API, licensing, privacy, cost and reproducibility constraints remain assigned to the Literature Scout.
 
 ## Immediate next task
 
 ```text
-obtain commit-scoped CI for the media manifest contract
-  → if passing, mark MEDIA-01 evidenced
-  → implement FIG-01 deterministic GGUF layout generation
-  → then proceed to the minimal keyboard-operable trace viewer after TRACE-02 acceptance
+obtain commit-scoped Documentation CI for FIG-01
+  → if passing, keep FIG-01 evidenced
+  → wait for TRACE-02 before implementing the keyboard-operable viewer
+  → proceed only to the next orchestrator-unblocked vertical-slice dependency
 ```
 
 ## In progress
 
-- Draft PR stack #3–#7 for the EAAI executable-learning foundation and orchestration state.
-- Media manifest/provenance validation branch based on PR #7.
+- Draft stacked PRs for the EAAI executable-learning foundation.
+- Validation Architect assignments `TRACE-02`, `LAB0-02`, and `DATA-01`.
+- Literature Scout assignments `LIT-02` and `VENUE-01`.
 - Current-tree regeneration and sanitizer validation of the CPU_REPACK lifetime candidate.
-- Manual/upstream submission of the reviewed 46-release OpenCL ownership correction; GitHub App write access to upstream is blocked.
-- Source-index regeneration with pinned line-aware symbol inventory.
-- Runtime overlays for mmap/page faults, scheduler copies, events, KV/recurrent growth, and backend queues.
 - Website browser-level accessibility and deployed verification.
 
 ## Publication and validation state
 
-- `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are authoritative on the stacked branch.
-- `CI-01` is evidenced by successful run `29546570700`.
-- `MEDIA-01` is implemented and awaiting commit-scoped CI on its final branch head.
-- No participant data, model, telemetry, credential, paid API call, generated media output, or manuscript prose was introduced in this increment.
+- `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are authoritative.
+- `CI-01`, `MEDIA-01`, and the implementation evidence for `FIG-01` are closed; final-head CI is still required for this branch.
+- No participant data, model, telemetry, credential, paid API call, generative-media output or manuscript prose was introduced.
 
 ## Known blockers and caveats
 
-- **Media CI closure:** the contract is committed, but a passing workflow result for the final branch head is still required.
-- **Provider selection:** no generated-media provider may be selected until the Literature Scout verifies current official constraints.
-- **Lab 0 runner:** the interface is defined, but no platform-specific build command runner exists yet.
+- **Figure CI closure:** focused tests and manifest evidence are committed, but the final branch head needs a passing Documentation CI result.
+- **Viewer dependency:** `VIEW-01` remains blocked until `TRACE-02` validates pinned source links and replay behavior.
+- **Provider selection:** no optional generated-media provider may be selected until current official constraints are verified.
+- **Lab 0 runner:** the report interface exists, but no platform-specific runner or reproducibility matrix exists.
 - **Browser agreement:** no browser parser yet proves agreement with the Python golden output.
-- **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be a valid inference model.
-- **Live-site verification:** Pages should be rechecked only after the stacked changes merge to `main` and deploy.
-- **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the CPU_REPACK fixture has not yet been compiled and executed against that exact current revision.
-- **Evidence retention:** artifact `8368782428` expires on 2026-08-15.
-- **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
+- **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be an inference model.
+- **Live-site verification:** Pages should be rechecked after the stacked changes merge to `main` and deploy.
+- **Independent review:** `REVIEW-01` remains blocked on a nominated human technical reviewer.
 
 ## Definition of done for the executable-learning foundation phase
 
