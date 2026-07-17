@@ -1,116 +1,148 @@
 # EAAI research orchestrator state
 
-_Last updated: 2026-07-17 09:22 Africa/Cairo_
+_Last updated: 2026-07-17 17:58 Africa/Cairo_
 
-This file is the single source of truth for the EAAI experience-report preparation. It coordinates bounded repository work; it does not authorize manuscript drafting.
+This file is the single source of truth for EAAI experience-report preparation. It coordinates bounded repository work and does not authorize manuscript drafting.
 
 ## Executive status
 
-**Phase:** Week 1 foundation — the smallest executable-learning vertical slice now exists as validated contracts, a deterministic fixture and figure, and a keyboard-operable authored trace viewer.
+**Phase:** Week 1 foundation transitioning to Week 2 vertical-slice evidence.
 
-**Overall judgment:** the repository now demonstrates a coherent evidence-labelled prototype rather than only architecture plans. The strongest evidence is deterministic provenance, source-revision pinning, replay validation, privacy boundaries, and passing integration CI. The weakest areas remain Lab 0 environment reproducibility, browser GGUF learning checkpoints, progress import/export, retrospective agent-workflow extraction, baseline comparison, independent correctness review, and approved educational evaluation.
+**Overall judgment:** the repository now contains a coherent, source-pinned prototype stack: legal synthetic GGUF fixtures, a browser GGUF slice, an authored/source-derived trace viewer, local-only progress portability, deterministic technical figures, media lifecycle validation, a Lab 0 evidence contract and a frozen information-equivalent benchmark. The adversarial review still recommends rejection in the current state because implementation contracts are ahead of measured educational, reproducibility and longitudinal evidence.
 
-**Current stacked branch:** `agent/view01-static-trace-viewer` at `d02656c7d5d745c77a68b23613cf42050b6518ac`.
+**Current stacked branch:** `agent/review02-adversarial-evidence-gates` at `4c72b8908c0d41941a7f61f2d041a2668a788af5`.
 
-**Current CI state:** Documentation CI run `29559239071` completed successfully for the viewer branch. This closes `VIEW-01` as an integrated prototype. The result proves deterministic build and site integration; it does not prove learner benefit, native capture, or independent technical correctness.
+**Current CI state:** dependencies through MEDIA-02 have passing commit-scoped Documentation CI. REVIEW-02 remains in progress until its final head passes CI. CI validates integration and deterministic contracts; it does not establish learner benefit, native execution, independent correctness or cross-environment reproducibility.
 
 ## Frozen educational framing
 
 ### Target audience
 
-Advanced undergraduate, graduate, and early-stage systems researchers who can read C/C++ and Python but cannot yet connect GGUF storage, virtual memory, GGML graph construction, backend scheduling, and token generation.
+Primary audience: advanced undergraduate and beginning graduate learners in systems, computer architecture or ML systems who can read C/C++ and Python but cannot yet connect GGUF storage, virtual memory, GGML graph construction, backend scheduling and token generation.
+
+Secondary audience: early-stage researchers onboarding to llama.cpp/GGML internals. Claims about benefit to experienced maintainers require separate evidence.
 
 ### Educational problem
 
-Existing usage-oriented material does not reliably teach learners to distinguish:
+The environment teaches learners to distinguish:
 
-- file format from runtime graph;
+- file format from executable graph;
 - mapped bytes from resident physical pages;
-- authored explanation from captured runtime evidence;
+- authored explanation from source-derived or native-captured runtime evidence;
 - build success from model loading and inference;
-- browser simulation from native llama.cpp execution.
+- browser-derived format inspection from native llama.cpp behavior.
 
-The claim that this gap is widespread remains a **hypothesis** until a systematic documentation audit is completed.
+The claim that existing documentation broadly fails to make these distinctions remains a **hypothesis** pending a systematic audit.
 
 ### Initial learning experiences
 
-1. **Lab 0 — Build and Run llama.cpp:** distinguish Python tooling, native configuration/compilation, executable launch, model load, and inference.
-2. **Lab 1 — GGUF Anatomy:** predict, parse, inspect, and explain a deterministic synthetic GGUF without implying that GGUF stores an executable graph.
-3. **Executable Lecture 0 — GGUF loading trace:** step through a source-pinned authored/source-derived trace before native instrumentation is attempted.
+1. **Lab 0 — Build and Run llama.cpp:** identify environment, configure, compile, executable-launch, model-load and inference stages; diagnose which stage owns a failure.
+2. **Lab 1 — GGUF Anatomy:** predict, parse, inspect and explain a deterministic synthetic GGUF while preserving browser/native boundaries.
+3. **Executable Lecture 0 — GGUF loading trace:** reconstruct a bounded source-pinned path using an authored/source-derived trace and a fair static-source/text baseline.
 
 ## Research questions
 
-- **RQ1 — Educational artifact:** Can source-pinned executable labs and evidence-labelled traces improve learners' ability to explain and trace difficult llama.cpp/GGML concepts?
-- **RQ2 — Evidence boundaries:** Can the environment make distinctions among browser-derived, source-derived, authored, and native-captured evidence understandable and machine-checkable?
-- **RQ3 — Development workflow:** What succeeds, fails, and requires human correction when role-specialized scheduled agents build and maintain the resource in a persistent repository?
-- **RQ4 — Reproducibility:** Which combination of browser, local-native, and cloud-container execution provides useful learning access without obscuring runtime differences?
+- **RQ1 — Educational artifact:** Does the integrated progression improve bounded setup diagnosis, GGUF reasoning and source-path reconstruction relative to fair baselines?
+- **RQ2 — Evidence boundaries:** Can learners and reviewers correctly distinguish browser-derived, authored, source-derived and native-captured evidence?
+- **RQ3 — Development workflow:** What work succeeds, fails, duplicates or requires human correction when scheduled specialist agents maintain an evolving systems-learning repository?
+- **RQ4 — Reproducibility:** Which browser, local-native and cloud-container paths are reproducible, and what educational tradeoffs arise from their unequal capabilities?
 
 These are planning questions, not answered claims.
 
 ## Defensible contributions under construction
 
-1. A revision-pinned executable-learning environment for source-level AI-systems education.
-2. Machine-checkable contracts for lab evidence, trace provenance/replay, local learner progress, and media provenance.
-3. A longitudinal, auditable case study of scheduled specialist agents operating with human supervision, deterministic tests, and repository memory.
-4. Design lessons about separating deterministic technical evidence from optional generated educational media.
+1. A revision-pinned executable-learning progression for difficult AI-systems internals.
+2. Machine-checkable contracts for fixtures, lab evidence, trace provenance/replay, local progress and media review.
+3. A repository-native longitudinal case study of human-supervised scheduled agents, including failures, corrections, rejected work, costs and maintenance burden.
+4. Design lessons about deterministic technical evidence, optional generated media and explicit browser/native boundaries.
 
-## Verified completed evidence
+The project must not be framed as a tool collection; DEMO-01 must show that the three experiences form one learning progression.
 
-- Dependency-ordered July 17-31 plan and lesson contracts.
-- Legal fixture decision: model-free Lab 0 core, learner-provided optional inference, and project-owned synthetic GGUF.
-- Deterministic 428-byte GGUF v3 generator, manifest, golden parse, checksum, alignment/range assertions, and corruption fixtures.
-- Lab 0 six-phase report contract and semantic validator.
-- Versioned executable-trace schema, immutable source anchors, corrected authored GGUF-loading trace, deterministic replay, and malformed-input tests.
-- Minimal static trace viewer with Previous/Next and Arrow/Home/End navigation, evidence labels, pinned source links, live text status, reduced-motion handling, and ordered transcript fallback.
-- Versioned local-only learner-progress schema and privacy-minimizing validator.
-- Media manifest/provenance schema and validator.
-- Deterministic GGUF-layout SVG with exact replay, checksums, alt text, and passing CI.
-- Official media/API capability review that keeps generated media supplemental and manually review-gated.
+## Evidence status
 
-## Current claim boundaries
+### Evidenced contracts and bounded artifacts
 
-- The viewer is authored/source-derived, not native-captured.
-- A passing model-free Lab 0 report proves environment/build/executable launch only, not model load or inference.
-- Browser parsing will be evidence about a synthetic fixture, not evidence of native llama.cpp execution.
-- Passing CI establishes deterministic integration, not educational effectiveness.
-- No learner or participant data has been collected.
+- legal fixture boundary and deterministic 428-byte GGUF fixture;
+- Lab 0 reproducibility/report contract and semantic validator;
+- browser-first GGUF parser/visualizer with Predict-Discover-Explain checkpoints;
+- versioned trace schema, immutable source anchors and deterministic replay;
+- keyboard-operable authored/source-derived viewer with transcript fallback;
+- local-only progress export/import, validation and Lab 1 resume-state integration;
+- deterministic technical figure and media provenance/lifecycle validators;
+- frozen information-equivalent static-versus-viewer benchmark contract;
+- first three-record agent-workflow batch;
+- adversarial claims-evidence, rejection-risk and scorecard package.
+
+### Unevidenced central claims
+
+- measured Ubuntu 24.04 and devcontainer Lab 0 reproducibility;
+- integrated end-to-end demo on a clean supported environment;
+- learner benefit or expert usefulness;
+- independent llama.cpp/GGML correctness;
+- native or faithfully captured trace provenance beyond authored/source-derived replay;
+- longitudinal representativeness of agent-workflow evidence;
+- generalization beyond llama.cpp;
+- current EAAI-27 venue requirements.
+
+## Reviewer disposition
+
+**Current adversarial disposition:** reject in current state; promising artifact, insufficient experience-report evidence.
+
+Fatal evidence gaps:
+
+1. no approved and completed learner or expert-usefulness evaluation;
+2. no independent technical correctness review;
+3. no measured Ubuntu 24.04 or devcontainer Lab 0 execution;
+4. no longitudinal agent dataset beyond the selected three-record sample.
 
 ## Venue state
 
-As of 2026-07-17, no official EAAI-27 call has been verified. The official AAAI-27 main-conference page lists Montréal, February 16-23, 2027, with main-track abstract and paper deadlines on July 21 and July 28, 2026; these dates must **not** be assumed to apply to EAAI. The latest verified EAAI call is EAAI-26, whose Experience Report and Innovative Practice area required development and use context, collected data, prior-literature motivation, novelty, and rich reflection on what worked, what did not, and why. Reverify the official EAAI-27 call before any submission decision.
-
-Official sources:
-
-- https://aaai.org/conference/aaai/aaai-27/
-- https://aaai.org/conference/aaai/aaai-26/eaai-26-call/
+As of 2026-07-17, no official EAAI-27 call has been verified. AAAI-27 main-conference dates must not be transferred to EAAI. EAAI-26 remains the latest verified experience-report call. Reverify only from official AAAI/EAAI sources before submission planning.
 
 ## Next 7 dependency-ordered actions
 
-1. **Validation Architect — `LAB0-02`:** define the supported-environment matrix, exact `uv`/compiler/CMake/Ninja checks, stable diagnostic taxonomy, and time-to-ready/time-to-first-token protocol.
-2. **Validation Architect — `DATA-01`:** define a retrospective extraction schema for assignments, commits, failures, corrections, validators, human-review decisions, cost proxies, and accepted/rejected outputs.
-3. **Documentation Builder — `LAB1-01`:** implement the narrow browser GGUF parser/visualizer with Predict-Discover-Explain checkpoints and explicit native-runtime exclusions.
-4. **Validation Architect — `PROGRESS-02`:** implement local export/import, migration, corruption recovery, and storage-adapter tests before connecting progress to Lab 1.
-5. **Adversarial Reviewer + Orchestrator — `REVIEW-02`:** integrate the reviewer package into the active stack and convert every major concern into a required evidence gate.
-6. **Literature and Venue Scout — source-comprehension baseline:** identify primary evidence for a fair static-source/text baseline and code-tracing outcome measures for the viewer.
-7. **Literature and Venue Scout — `VENUE-01`:** continue monitoring official EAAI-27 requirements without borrowing AAAI main-track dates.
+1. **Orchestrator + Documentation Builder — `STACK-01`:** produce a human-reviewable merge map for the stacked PR chain, identify superseded/overlapping progress branches and nominate one canonical integration path.
+2. **Validation Architect — `LAB0-03`:** run and retain one measured model-free Ubuntu 24.04 local-native record when a suitable environment is available.
+3. **Validation Architect — `LAB0-04`:** run the same bounded evidence contract in the devcontainer/Codespaces-compatible environment.
+4. **Documentation Builder + Validation Architect — `DEMO-01A`:** define the integrated demo acceptance checklist and exact cross-experience learner path without claiming deployment success.
+5. **Human technical reviewer — `REVIEW-01`:** review fixture, browser explanations, trace anchors, deterministic figure and benchmark answer key; record corrections.
+6. **Validation Architect — `DATA-01B`:** freeze missing-value and coding rules, then extract a broader bounded retrospective sample with independent coding review.
+7. **Human + Validation Architect — `EVAL-01`:** choose an expert-review or learner-evaluation pathway, determine ethics requirements and authorize no recruitment until approved.
+
+`VENUE-01` monitoring continues independently and does not borrow AAAI main-track dates.
+
+## Assignments by agent
+
+- **Documentation Builder:** STACK-01 and DEMO-01A only; no broad content expansion.
+- **Validation Architect:** LAB0-03, LAB0-04 and DATA-01B in dependency order; preserve failed runs and do not fabricate timings.
+- **Literature and Venue Scout:** official VENUE-01 monitoring and systematic documentation-gap audit design.
+- **Adversarial Reviewer:** review STACK-01/DEMO-01A for tool-collection framing, evidence inflation and unrealistic scope.
+- **Paper Integrator:** disabled.
 
 ## Human-action blockers
 
-- Approve the intended evaluation pathway before participant recruitment or personal-data collection.
-- Nominate an independent llama.cpp/GGML technical reviewer before correctness claims are made.
-- Decide whether any optional paid media API credentials may be used; no credential is needed for the deterministic core path.
-- Review and merge the stacked PR chain in dependency order after CI passes.
+- provide or approve access to clean Ubuntu 24.04 and devcontainer execution environments;
+- nominate an independent llama.cpp/GGML reviewer;
+- choose the canonical progress implementation and stacked-PR merge order;
+- approve an evaluation pathway and any required ethics review;
+- decide whether optional paid media credentials may ever be used; the core demo does not require them.
+
+## Readiness judgment
+
+**Coordination estimate:** 50% of pre-manuscript readiness.
+
+This rises only for validated vertical-slice contracts, progress integration, benchmark freezing, media lifecycle evidence and explicit reviewer gates. It gives no credit for learner benefit, independent correctness, measured native/container reproducibility or official EAAI-27 requirements.
 
 ## Manuscript-writing gate
 
-Do not activate the Paper Integrator until all conditions below are evidenced:
+Do not activate the Paper Integrator until all conditions below have durable evidence:
 
-- stable audience, educational problem, learning objectives, and research questions;
+- stable audience, learning progression, objectives and research questions;
 - frozen workflow/autonomy/human-supervision description;
-- passing integrated CI and reproducible Lab 0, GGUF lab, trace-viewer, progress, and media-manifest vertical slice;
-- retrospective repository dataset with agent runs, assignments, failures, corrections, costs, and accepted/rejected outputs;
-- at least one fair baseline comparison;
-- independent technical correctness review;
-- approved learner or expert evaluation pathway and, when applicable, ethics approval;
-- current official venue requirements;
-- no unresolved fatal or major reviewer concern that invalidates the central contribution.
+- one canonical integrated branch with passing CI and reproducible Lab 0, GGUF lab, viewer, progress and media vertical slice;
+- broader audited retrospective dataset with assignments, failures, corrections, human labor, costs and accepted/rejected outputs;
+- at least one completed fair baseline comparison;
+- independent technical correctness review with correction records;
+- approved and completed learner or expert evaluation pathway, with ethics approval when required;
+- current official EAAI requirements;
+- no unresolved fatal reviewer concern that invalidates the central contribution.
