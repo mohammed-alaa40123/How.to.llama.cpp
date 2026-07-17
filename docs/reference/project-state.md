@@ -1,8 +1,8 @@
 # Project state
 
-_Last updated: 2026-07-17 17:06 Africa/Cairo_
+_Last updated: 2026-07-17 17:58 Africa/Cairo_
 
-Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
+Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers and next priority.
 
 ## Source baseline
 
@@ -12,79 +12,83 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Active milestone
 
-**Executable-learning Week 1 foundation transitioning to Week 2 integration and measured evidence**
+**Executable-learning Week 1 foundation transitioning to canonical integration, measured Lab 0 evidence and independent review.**
 
-## Completed foundations
+## Completed bounded foundations
 
-- Source-pinned MkDocs documentation, strict CI, deployment checks and durable run context.
-- Frozen July 17-31 learning contracts for Lab 0, Lab 1 and Executable Lecture 0.
-- Legal model-free and learner-provided-model policy plus deterministic synthetic GGUF fixture.
-- Lab 0 phase and reproducibility contracts; real environment rows remain open.
-- Versioned trace, progress, media and retrospective-workflow schemas and validators.
-- Corrected source-pinned authored trace, deterministic replay and keyboard-operable static viewer.
-- Deterministic GGUF-layout figure with provenance and exact replay.
-- Browser-first GGUF Anatomy slice with Predict-Discover-Explain checkpoints.
-- DATA-01 contract and first three-archetype retrospective batch with passing parent CI.
-- PROGRESS-02 local adapter, deterministic export/import and Lab 1 integration with passing run `29579032392`.
-- BASE-01A information-equivalent static-versus-viewer benchmark with passing run `29583844938`.
+- Frozen learning contracts for Lab 0, Lab 1 and Executable Lecture 0.
+- Three-tier browser/local/cloud architecture and legal fixture boundary.
+- Deterministic synthetic GGUF, golden parser, browser GGUF slice and deterministic technical figure.
+- Lab 0 evidence/reproducibility contract and stable diagnostics taxonomy.
+- Trace schema, immutable anchors, authored/source-derived trace, deterministic replay and keyboard viewer.
+- Anonymous local progress export/import and Lab 1 resume-state integration.
+- Media provenance plus accepted/revised/rejected lifecycle validation.
+- Information-equivalent static-versus-viewer benchmark contract.
+- First three-record retrospective workflow batch.
+- Adversarial reviewer package with claims-evidence, rejection risks and reviewer scorecard.
 
 ## Latest bounded increment
 
 ### Verified
 
-- `BASE-01A` passed commit-scoped Documentation CI run `29583844938`.
-- Measured Ubuntu and devcontainer Lab 0 rows remain blocked by unavailable execution environments; no timing or success record was fabricated.
-- `MEDIA-02` now contains exactly one accepted, revised and rejected deterministic lifecycle record.
-- Revised and rejected records remain unpublished and unapproved with explicit retained reasons.
-- The accepted specimen is approved, source-pinned, licensed and accessibility-described, but is explicitly only a lifecycle specimen rather than llama.cpp technical evidence.
-- The lifecycle validator reuses the individual media-manifest validator and recomputes committed input/output SHA-256 values and output byte counts.
-- Eight focused tests cover state coverage, duplicate identity, external-generation prohibition, generative-mode rejection, stale input/output checks and rejected-asset publication blocking.
+- The adversarial review identifies four fatal evidence gaps: usefulness evaluation, independent technical correctness, measured Ubuntu/devcontainer Lab 0 runs and a broader longitudinal agent dataset.
+- Component dependencies through MEDIA-02 have passing commit-scoped Documentation CI.
+- The authoritative orchestration state, evidence queue, readiness scorecard, roadmap and two-week plan now use those reviewer gates to order work.
+- The coordination readiness estimate is 50%; the adversarial reviewer score remains 38/100. These measure different things and neither is a publication result.
 
 ### Interpretation
 
-- Retaining revised and rejected candidates may make human supervision and revision costs more visible than keeping only accepted outputs.
-- A deterministic no-cost lifecycle dry run is the safest prerequisite before any optional paid media generation.
+- The highest-value next repository increment is canonical integration planning, not another broad feature.
+- A coherent learning progression must be demonstrated explicitly or the contribution will appear to be a collection of tools.
 
 ### Historical
 
-- `MEDIA-01` established individual manifest boundaries and `FIG-01` established deterministic technical-figure replay.
-- `MEDIA-02` was selected after `BASE-01A` passed and the higher-value measured Lab 0 tasks remained environment-blocked.
+- Earlier orchestration files still described the project at the minimal-viewer stage even though Lab 1, progress, benchmark and media lifecycle work had advanced.
+- The current update corrects that state mismatch without claiming the reviewer concerns are resolved.
 
 ### Open questions
 
-- Does final-head CI pass for the lifecycle fixtures, validator, tests and documentation?
-- Should revision and rejection reasons use a controlled taxonomy before broader retrospective extraction?
-- Will any future supplemental generated asset pass technical, accessibility, licensing, privacy and pedagogical review?
-- Can Ubuntu 24.04 and the devcontainer complete the bounded model-free Lab 0 path?
+- Which overlapping progress branch is canonical?
+- What is the safe dependency/merge order for the stacked PR chain?
+- Can clean Ubuntu 24.04 and devcontainer environments complete the model-free Lab 0 path?
+- Who will perform independent llama.cpp/GGML review?
+- Which expert or learner evaluation pathway will be approved, and what ethics review is required?
+- When will official EAAI-27 requirements be published?
 
 ## Immediate next task
 
 ```text
-obtain commit-scoped CI for MEDIA-02
-  → if failing, repair only lifecycle validation or fixture provenance
-  → if passing, close MEDIA-02 and take REVIEW-02 or a bounded DATA-01 extension
-  → execute real Ubuntu and devcontainer Lab 0 rows when suitable environments exist
-  → do not call external media APIs from ordinary CI
+STACK-01 canonical integration map
+  → list every active stacked PR and dependency
+  → mark retained, superseded, overlapping and human-choice branches
+  → nominate one canonical merge path without merging automatically
+  → then execute LAB0-03 and LAB0-04 when suitable environments exist
+  → define DEMO-01A acceptance criteria on the canonical path
 ```
 
 ## Publication and validation state
 
-- `docs/publication/orchestrator-state.md` is the single source of truth.
-- `docs/publication/evidence-backlog.md` records `MEDIA-02` as in progress pending final-head CI.
-- Passing CI can establish deterministic lifecycle integration, not generative-media usefulness or learner benefit.
-- No participant data, learner identity, model weights, telemetry, credentials, paid API generation, native instrumentation or manuscript prose were introduced.
+- `docs/publication/orchestrator-state.md` is authoritative.
+- `docs/publication/evidence-backlog.md` now prioritizes STACK-01, measured Lab 0, independent review, broader DATA-01 and evaluation approval.
+- Passing CI establishes deterministic integration only.
+- No participant data, telemetry, authenticated sync, restricted model weights, paid generation or manuscript prose were introduced.
 
-## Known blockers and caveats
+## Known blockers
 
-- **Lab 0 execution:** no real Ubuntu/devcontainer row exists.
-- **Independent correctness:** fixture, trace, lab explanations, parser, figure and benchmark tasks still require independent technical review.
-- **Evaluation approval:** no recruitment or personal-data collection is authorized.
-- **Retrospective accuracy:** the first DATA-01 records require independent coding review.
-- **Live site:** verify Pages only after the stacked chain merges to `main` and deploys.
+- no real Ubuntu 24.04 or devcontainer Lab 0 record;
+- no independent technical reviewer;
+- overlapping progress branches and a long stacked draft-PR chain;
+- no approved evaluation/ethics pathway;
+- no official EAAI-27 call verified;
+- Pages verification applies only after canonical integration reaches `main` and deploys.
 
-## Definition of done for this phase
+## Definition of done for manuscript readiness
 
-- Complete learning contracts, legal fixture policy and three-tier platform boundaries.
-- Deterministic fixture, trace, figure, browser lab and model-free Lab 0 validation contracts.
-- Accessibility and privacy fallbacks for every introduced artifact.
-- Measured Lab 0 Ubuntu/devcontainer evidence, progress integrated into Lab 1, frozen fair benchmark, reviewed retrospective data, media lifecycle dry run and passing integrated CI.
+- one canonical integrated branch and end-to-end demo;
+- measured local/container Lab 0 evidence;
+- broader independently reviewed retrospective dataset;
+- completed fair baseline comparison;
+- independent technical correctness review;
+- approved and completed evaluation pathway;
+- resolved fatal reviewer concerns;
+- verified current venue requirements.
