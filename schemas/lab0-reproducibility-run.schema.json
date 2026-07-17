@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mohammed-alaa40123.github.io/How.to.llama.cpp/schemas/lab0-reproducibility-run.schema.json",
+  "title": "How.to.llama.cpp Lab 0 reproducibility run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "environment", "revisions", "toolchain", "commands", "timings", "result", "security"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "tier", "os", "architecture", "support_state", "offline_mode"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"},
+        "tier": {"enum": ["local_native", "cloud_container"]},
+        "os": {"enum": ["ubuntu-24.04", "macos-15", "windows-11-wsl2", "devcontainer-ubuntu-24.04"]},
+        "architecture": {"enum": ["x86_64", "arm64"]},
+        "support_state": {"enum": ["planned", "validated", "degraded", "unsupported"]},
+        "offline_mode": {"enum": ["not_tested", "ready_from_cache", "blocked_without_cache"]}
+      }
+    },
+    "revisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["course", "llama_cpp", "uv_lock_sha256"],
+      "properties": {
+        "course": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "llama_cpp": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "uv_lock_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uv", "python", "cmake", "ninja", "compiler"],
+      "properties": {
+        "uv": {"$ref": "#/$defs/tool"},
+        "python": {"$ref": "#/$defs/tool"},
+        "cmake": {"$ref": "#/$defs/tool"},
+        "ninja": {"$ref": "#/$defs/tool"},
+        "compiler": {"$ref": "#/$defs/tool"}
+      }
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python_sync", "configure", "compile", "launch"],
+      "properties": {
+        "python_sync": {"const": "uv sync --locked"},
+        "configure": {"type": "string", "pattern": "^cmake .* -G Ninja"},
+        "compile": {"type": "string", "pattern": "^cmake --build .* --target [A-Za-z0-9_.-]+"},
+        "launch": {"type": "string", "minLength": 1},
+        "optional_inference": {"type": "string"}
+      }
+    },
+    "timings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["started_monotonic_ms", "ready_monotonic_ms", "time_to_ready_ms"],
+      "properties": {
+        "started_monotonic_ms": {"type": "integer", "minimum": 0},
+        "ready_monotonic_ms": {"type": "integer", "minimum": 0},
+        "time_to_ready_ms": {"type": "integer", "minimum": 0},
+        "first_token_monotonic_ms": {"type": "integer", "minimum": 0},
+        "time_to_first_token_ms": {"type": "integer", "minimum": 0}
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["setup_success", "build_success", "launch_success", "model_kind", "inference_state", "diagnostics"],
+      "properties": {
+        "setup_success": {"type": "boolean"},
+        "build_success": {"type": "boolean"},
+        "launch_success": {"type": "boolean"},
+        "model_kind": {"enum": ["none", "learner_provided"]},
+        "inference_state": {"enum": ["not_attempted", "passed", "failed", "blocked"]},
+        "diagnostics": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["UV_MISSING", "UV_LOCK_DRIFT", "PYTHON_UNSUPPORTED", "CMAKE_MISSING", "NINJA_MISSING", "COMPILER_MISSING", "CONFIGURE_FAILED", "COMPILE_FAILED", "EXECUTABLE_MISSING", "MODEL_PATH_MISSING", "MODEL_LOAD_FAILED", "INFERENCE_FAILED", "OFFLINE_DEPENDENCY_MISS", "UNSUPPORTED_PLATFORM"]}
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_redistributed", "secrets_recorded", "personal_paths_recorded", "network_required_after_cache"],
+      "properties": {
+        "model_redistributed": {"const": false},
+        "secrets_recorded": {"const": false},
+        "personal_paths_recorded": {"const": false},
+        "network_required_after_cache": {"type": "boolean"}
+      }
+    }
+  },
+  "$defs": {
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "version", "passed"],
+      "properties": {
+        "command": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "passed": {"type": "boolean"}
+      }
+    }
+  }
+}

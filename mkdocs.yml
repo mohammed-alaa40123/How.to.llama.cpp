@@ -124,6 +124,7 @@ nav:
       - Metal backend semantics: lifecycle/metal-backend-semantics.md
   - Executable learning:
       - Legal fixture decision: labs/legal-fixture-decision.md
+      - Lab 0 reproducibility protocol: labs/lab0-reproducibility-protocol.md
       - Lab 1 GGUF Anatomy: labs/gguf-anatomy.md
       - Authored GGUF trace viewer: executable-lectures/trace-viewer.md
       - Trace source-link validation: executable-lectures/source-link-validation.md
