@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 11:04 Africa/Cairo_
+_Last updated: 2026-07-17 12:03 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -8,8 +8,10 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 |---|---|---|---|---|---|---|
 | P0 | CI-01 | evidenced | Documentation Builder | latest stacked branch | strict MkDocs root cause, narrow fix, passing final-head Documentation CI run `29546570700` | The executable-learning artifacts integrate without degrading the existing site |
 | P0 | COORD-01 | evidenced | Orchestrator | none | `orchestrator-state.md`, this backlog, roadmap, scorecard | Scheduled agents can share an explicit dependency order rather than infer work independently |
-| P1 | LAB0-02 | in progress | Validation Architect | Lab 0 report contract | reproducibility schema, semantic validator, supported-environment matrix, exact toolchain checks, diagnostic taxonomy, timing definitions, offline/security boundaries; final-head CI and real matrix runs pending | Setup/build evidence is comparable across supported environments |
-| P1 | DATA-01 | ready | Validation Architect | stable log formats | retrospective extraction schema for assignments, commits, failures, corrections, tests, cost proxies and accepted/rejected outputs | The multi-agent process can be analyzed as a longitudinal case study |
+| P1 | DATA-01 | ready | Validation Architect | stable log formats | retrospective extraction schema for assignments, commits, failures, corrections, validators, human decisions, cost proxies and accepted/rejected outputs | The multi-agent process can be analyzed as a longitudinal case study |
+| P1 | LAB0-02 | evidenced | Validation Architect | Lab 0 report contract | reproducibility schema, semantic validator, supported-environment matrix, exact toolchain checks, diagnostic taxonomy, timing definitions, offline/security boundaries; passing run `29565651085` | Comparable run records can be validated without inflating model-free launch into inference |
+| P1 | LAB0-03 | ready | Validation Architect | LAB0-02 | measured Ubuntu 24.04 local-native model-free row, pinned command/target verification, retained timings and diagnostics | The documented local-native path works in a clean supported environment |
+| P1 | LAB0-04 | blocked | Validation Architect | LAB0-03, devcontainer image | measured devcontainer model-free row and comparison against local-native semantics | The cloud-container tier reproduces the bounded build/launch contract |
 | P1 | MEDIA-01 | evidenced | Documentation Builder | CI-01 | schema, semantic validator, deterministic example, malformed-input tests, passing run `29549208249` | Generated educational media can be provenance- and review-gated without making it technical evidence |
 | P1 | TRACE-02 | evidenced | Validation Architect | trace schema accepted; CI-01 | pinned source-anchor manifest and validator, corrected authored trace, deterministic replay and missing-data tests; passing run `29556540213` | Trace provenance and navigation remain valid against immutable source |
 | P1 | FIG-01 | evidenced | Documentation Builder | MEDIA-01 | deterministic GGUF-layout SVG generated from fixture data plus recomputed manifest/input/output checksums and alt text; passing run `29553868078` | Authoritative technical figures are reproducible without generative models |
@@ -22,12 +24,13 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P2 | REVIEW-01 | blocked | Human | independent reviewer nominated | expert rubric and signed/dated review of fixture, trace, lab explanations and figure | Technical correctness is independently supported |
 | P2 | BASE-01 | blocked | Validation Architect | DATA-01, frozen benchmark tasks | fair comparison protocol: single authoring agent; author+reviewer; full repository-memory/validator workflow | Specialized scheduled workflow provides measurable benefit over simpler workflows |
 | P3 | EVAL-01 | blocked | Human + Validation Architect | evaluation pathway approval | learner or expert study protocol, instruments, consent/ethics decision | Educational usefulness is evaluated rather than inferred from implementation |
-| P3 | DEMO-01 | blocked | Orchestrator | LAB0-02, LAB1-01, PROGRESS-02 | reproducible end-to-end Lab 0 + GGUF lab + viewer + figure + progress demo | The proposed system exists as a coherent educational artifact |
+| P3 | DEMO-01 | blocked | Orchestrator | LAB0-03, LAB0-04, LAB1-01, PROGRESS-02 | reproducible end-to-end Lab 0 + GGUF lab + viewer + figure + progress demo | The proposed system exists as a coherent educational artifact |
 
 ## Closed evidence from the current stack
 
 - Legal fixture policy and deterministic synthetic GGUF package.
 - Lab 0 six-phase report schema and semantic checks.
+- Lab 0 reproducibility schema, diagnostics/timing semantics and passing run `29565651085`.
 - Executable-trace schema, immutable source anchors, corrected authored GGUF trace and deterministic replay.
 - Local-only learner-progress schema and privacy constraints.
 - Initial browser/local/cloud platform literature map.
@@ -37,9 +40,9 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 - Minimal keyboard-operable trace viewer with deterministic payload, evidence labels and transcript fallback; passing run `29559239071`.
 - Browser-first GGUF Anatomy slice with deterministic Python/browser agreement and passing run `29562479577`.
 
-## LAB0-02 evidence boundary
+## LAB0 evidence boundary
 
-The current branch defines a machine-checkable local-native/cloud-container reproducibility record, exact `uv sync --locked` and CMake/Ninja command requirements, monotonic time-to-ready and optional time-to-first-token semantics, a stable failure taxonomy, offline/degraded-mode states, and security/licensing constraints. The checked-in report is an illustrative deterministic contract, not evidence that every matrix row has been executed. Real Ubuntu, macOS, WSL2, and devcontainer runs remain required before cross-platform reproducibility claims.
+`LAB0-02` is evidenced only as a validation contract. The checked-in report remains illustrative. Cross-environment reproducibility requires measured `LAB0-03` and `LAB0-04` rows. A real row may establish environment, configure, compile and executable-launch behavior only; it must not claim model loading, inference or time-to-first-token unless a learner-provided model path is explicitly used and recorded.
 
 ## Viewer evidence boundary
 
