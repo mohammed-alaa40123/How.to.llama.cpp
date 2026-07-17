@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 05:18 Africa/Cairo_
+_Last updated: 2026-07-17 09:02 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -28,7 +28,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Website UX review with task-oriented Architecture navigation grouping.
 - Architecture landing page with six goal-based entry points, concise page summaries, and ordered reading paths.
 - Dependency-free generated-HTML accessibility structure validator with focused tests and Documentation CI integration.
-- EAAI July 17-31 executable-learning plan and initial agent handoff ledger on draft PR #3.
+- EAAI July 17-31 executable-learning plan and initial agent handoff ledger.
 - Legal-fixture decision separating model-free Lab 0 checks, learner-provided optional inference, and a project-owned synthetic GGUF for Lab 1.
 - Deterministic synthetic GGUF v0 generator, manifest, golden parse, SHA-256, alignment/range checks, and three bounded corruption variants.
 - Lab 0 machine-readable checker contract, JSON Schema, dependency-free semantic validator, model-free example report, and focused invariant tests.
@@ -36,71 +36,68 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Local-only learner-progress schema, semantic validator, example export, privacy constraints, and focused malformed-input tests.
 - Authoritative EAAI orchestration state, evidence backlog, roadmap, and readiness scorecard.
 - Strict MkDocs handoff-link repair verified by successful Documentation CI run `29546570700`.
-- Media asset manifest schema, dependency-free semantic validator, deterministic authoritative example, accessibility/licensing/review gates, stale-source detection, and focused malformed-input tests.
+- Media asset manifest schema and validator verified by successful Documentation CI run `29549208249`.
+- Deterministic GGUF-layout figure verified by successful Documentation CI run `29553868078`.
+- Immutable trace source anchors and deterministic replay verified by successful Documentation CI run `29556540213`.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Documentation CI run `29546570700` completed successfully for commit `5bbc595b9e2d076ddbc8393514e2a9f26fab9fa8`, closing the P0 strict-MkDocs integration blocker.
-- The media contract rejects generative assets as authoritative technical evidence.
-- Generative API manifests must be supplemental, cached, manually triggered, excluded from ordinary CI, prompt/storyboard hashed, and human-review gated.
-- Accepted or published assets require human approval and redistribution permission.
-- Audio/video assets require transcript fallbacks; video additionally requires captions and a static fallback.
-- The validator rejects unsafe repository paths, stale source revisions, oversized manifests, and credential-like fields.
+- TRACE-02 is closed by successful Documentation CI run `29556540213` for commit `e2361200d80028c86205359979487a94b958f306`.
+- The minimal viewer payload is deterministically generated from the validated authored trace rather than maintained as an independent narrative copy.
+- The viewer shell exposes Previous/Next controls, Arrow/Home/End navigation, pinned source links, evidence labels, live text status, and an ordered transcript fallback.
+- The viewer explicitly labels missing runtime collections as unrecorded authored-step data rather than evidence that native state is absent.
 
 ### Interpretation
 
-- Deterministic figures derived from hashed structured inputs are the appropriate authoritative media layer because their transformation can be replayed and checksum-verified.
-- Human approval can permit publication of generated media but cannot convert it into technical evidence.
+- A static browser shell is the smallest safe executable-lecture prototype because it tests source/state/explanation coordination without adding native instrumentation or a frontend framework.
+- The viewer can support a later code-tracing evaluation, but its existence alone does not establish learner benefit.
 
 ### Historical
 
-- Earlier work established source-pinned documentation, executable lifetime regressions, accessibility guards, browser-level CI, legal fixture policy, synthetic GGUF evidence, Lab 0 reporting, trace validation, progress validation, and orchestration state.
+- Earlier work established source-pinned documentation, executable lifetime regressions, accessibility guards, legal fixture policy, synthetic GGUF evidence, Lab 0 reporting, trace/progress/media contracts, deterministic figures, and orchestration state.
 
 ### Open questions
 
-- Provider-specific API, licensing, privacy, cost, and reproducibility constraints remain unverified pending the Literature Scout assignment.
-- The example media manifest points to the future deterministic GGUF layout SVG; actual generation and checksum verification remain under `FIG-01`.
-- Which bounded llama.cpp target and command matrix the first Lab 0 runner should execute.
-- Which operating systems and container targets belong in the first reproducibility matrix.
+- Independent technical review of the three pedagogical GGUF anchors remains required.
+- A fair static-source/text baseline and learner or expert evaluation pathway remain unapproved.
+- Native-captured trace evidence remains a separate Week 2 artifact.
 - Browser/Python parser agreement and pinned native GGUF-reader acceptance remain unimplemented.
 
 ## Immediate next task
 
 ```text
-obtain commit-scoped CI for the media manifest contract
-  → if passing, mark MEDIA-01 evidenced
-  → implement FIG-01 deterministic GGUF layout generation
-  → then proceed to the minimal keyboard-operable trace viewer after TRACE-02 acceptance
+obtain commit-scoped CI for VIEW-01
+  → if passing, mark the static authored trace viewer evidenced
+  → preserve the authored/source-derived boundary
+  → proceed to LAB1-01 only after progress integration and figure dependencies are present on one branch
 ```
 
 ## In progress
 
-- Draft PR stack #3–#7 for the EAAI executable-learning foundation and orchestration state.
-- Media manifest/provenance validation branch based on PR #7.
+- Draft PR stack for the EAAI executable-learning foundation.
+- `VIEW-01` static keyboard-operable trace viewer shell awaiting final-head CI.
+- Lab 0 reproducibility matrix and diagnostic taxonomy under `LAB0-02`.
+- Retrospective agent-workflow extraction contract under `DATA-01`.
 - Current-tree regeneration and sanitizer validation of the CPU_REPACK lifetime candidate.
-- Manual/upstream submission of the reviewed 46-release OpenCL ownership correction; GitHub App write access to upstream is blocked.
-- Source-index regeneration with pinned line-aware symbol inventory.
-- Runtime overlays for mmap/page faults, scheduler copies, events, KV/recurrent growth, and backend queues.
 - Website browser-level accessibility and deployed verification.
 
 ## Publication and validation state
 
-- `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are authoritative on the stacked branch.
-- `CI-01` is evidenced by successful run `29546570700`.
-- `MEDIA-01` is implemented and awaiting commit-scoped CI on its final branch head.
-- No participant data, model, telemetry, credential, paid API call, generated media output, or manuscript prose was introduced in this increment.
+- `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` remain authoritative.
+- `CI-01`, `MEDIA-01`, `FIG-01`, and `TRACE-02` have passing commit-scoped CI evidence.
+- `VIEW-01` is implemented on this branch and remains in progress until final-head CI passes.
+- No participant data, model, telemetry, credential, paid API call, generated media output, native instrumentation, or manuscript prose was introduced in this increment.
 
 ## Known blockers and caveats
 
-- **Media CI closure:** the contract is committed, but a passing workflow result for the final branch head is still required.
-- **Provider selection:** no generated-media provider may be selected until the Literature Scout verifies current official constraints.
+- **Viewer correctness:** final-head Documentation CI is required; independent llama.cpp/GGML review remains separate.
+- **Educational effectiveness:** no learner-benefit claim is permitted before an approved evaluation pathway and baseline comparison.
 - **Lab 0 runner:** the interface is defined, but no platform-specific build command runner exists yet.
 - **Browser agreement:** no browser parser yet proves agreement with the Python golden output.
 - **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be a valid inference model.
 - **Live-site verification:** Pages should be rechecked only after the stacked changes merge to `main` and deploy.
-- **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the CPU_REPACK fixture has not yet been compiled and executed against that exact current revision.
 - **Evidence retention:** artifact `8368782428` expires on 2026-08-15.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
 
