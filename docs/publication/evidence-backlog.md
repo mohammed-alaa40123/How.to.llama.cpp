@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 09:22 Africa/Cairo_
+_Last updated: 2026-07-17 10:03 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -16,7 +16,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P1 | VIEW-01 | evidenced | Documentation Builder | TRACE-02 | keyboard-operable static viewer, deterministic payload, evidence labels, transcript fallback, focused tests; passing run `29559239071` | A narrow executable lecture can expose source, state and explanation without evidence inflation |
 | P1 | LIT-02 | evidenced | Literature Scout | none | official media/API capability matrix with provenance, privacy, accessibility, licensing, cost and caching implications | Optional media choices are evidence-based and reproducible enough for an experience report |
 | P1 | VENUE-01 | in progress | Literature Scout | official publication | verified EAAI-27 call, deadlines, area, format, review criteria | Submission plan matches the current venue rather than prior-year assumptions |
-| P2 | LAB1-01 | ready | Documentation Builder | progress contract; FIG-01; VIEW-01 | browser parser/visualizer, Python/golden agreement, Predict-Discover-Explain checkpoints, static fallback | Learners can inspect GGUF layout in-browser without confusing it with native inference |
+| P2 | LAB1-01 | in progress | Documentation Builder | progress contract; FIG-01; VIEW-01 | browser parser/visualizer, Python/golden agreement, Predict-Discover-Explain checkpoints, static fallback; final-head CI pending | Learners can inspect GGUF layout in-browser without confusing it with native inference |
 | P2 | PROGRESS-02 | ready | Validation Architect | progress schema | import/export round trip, migration, corruption recovery, local storage adapter tests | Local-first progress is portable and privacy-minimizing |
 | P2 | REVIEW-02 | in progress | Adversarial Reviewer + Orchestrator | PR #8 integration | integrate reviewer notes, claims-evidence table, rejection risks and scorecard into the active stack | Major rejection risks are visible and drive dependency ordering |
 | P2 | REVIEW-01 | blocked | Human | independent reviewer nominated | expert rubric and signed/dated review of fixture, trace, lab explanations and figure | Technical correctness is independently supported |
@@ -35,6 +35,10 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 - Media manifest/provenance schema, semantic validator and passing commit-scoped CI.
 - Deterministic GGUF-layout figure with exact replay and passing commit-scoped CI.
 - Minimal keyboard-operable trace viewer with deterministic payload, evidence labels and transcript fallback; passing run `29559239071`.
+
+## LAB1-01 evidence boundary
+
+The current branch adds a bounded browser parser for the project-owned 428-byte synthetic GGUF, compares canonical parsed fields against the Python golden record, renders a text tensor-layout table, and provides three Predict–Discover–Explain checkpoints plus a static fallback. It remains in progress until final-head CI passes. It does not execute llama.cpp, load a model, invoke `mmap`, prove page residency, construct a GGML graph, or establish learner benefit.
 
 ## Viewer evidence boundary
 
