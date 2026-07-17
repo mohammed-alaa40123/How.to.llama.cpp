@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 11:04 Africa/Cairo_
+_Last updated: 2026-07-17 12:03 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -8,8 +8,8 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 |---|---|---|---|---|---|---|
 | P0 | CI-01 | evidenced | Documentation Builder | latest stacked branch | strict MkDocs root cause, narrow fix, passing final-head Documentation CI run `29546570700` | The executable-learning artifacts integrate without degrading the existing site |
 | P0 | COORD-01 | evidenced | Orchestrator | none | `orchestrator-state.md`, this backlog, roadmap, scorecard | Scheduled agents can share an explicit dependency order rather than infer work independently |
-| P1 | LAB0-02 | in progress | Validation Architect | Lab 0 report contract | reproducibility schema, semantic validator, supported-environment matrix, exact toolchain checks, diagnostic taxonomy, timing definitions, offline/security boundaries; final-head CI and real matrix runs pending | Setup/build evidence is comparable across supported environments |
-| P1 | DATA-01 | ready | Validation Architect | stable log formats | retrospective extraction schema for assignments, commits, failures, corrections, tests, cost proxies and accepted/rejected outputs | The multi-agent process can be analyzed as a longitudinal case study |
+| P1 | LAB0-02 | in progress | Validation Architect | Lab 0 report contract | reproducibility schema, semantic validator, supported-environment matrix, exact toolchain checks, diagnostic taxonomy, timing definitions, offline/security boundaries; contract CI passed in run `29565651085`; real matrix runs pending | Setup/build evidence is comparable across supported environments |
+| P1 | DATA-01 | in progress | Validation Architect | stable log formats | versioned retrospective schema, semantic validator, example extraction, focused tests and final-head CI; historical extraction coverage pending | The multi-agent process can be analyzed as a longitudinal case study |
 | P1 | MEDIA-01 | evidenced | Documentation Builder | CI-01 | schema, semantic validator, deterministic example, malformed-input tests, passing run `29549208249` | Generated educational media can be provenance- and review-gated without making it technical evidence |
 | P1 | TRACE-02 | evidenced | Validation Architect | trace schema accepted; CI-01 | pinned source-anchor manifest and validator, corrected authored trace, deterministic replay and missing-data tests; passing run `29556540213` | Trace provenance and navigation remain valid against immutable source |
 | P1 | FIG-01 | evidenced | Documentation Builder | MEDIA-01 | deterministic GGUF-layout SVG generated from fixture data plus recomputed manifest/input/output checksums and alt text; passing run `29553868078` | Authoritative technical figures are reproducible without generative models |
@@ -36,10 +36,15 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 - Deterministic GGUF-layout figure with exact replay and passing commit-scoped CI.
 - Minimal keyboard-operable trace viewer with deterministic payload, evidence labels and transcript fallback; passing run `29559239071`.
 - Browser-first GGUF Anatomy slice with deterministic Python/browser agreement and passing run `29562479577`.
+- Lab 0 reproducibility contract integration with passing run `29565651085`; real environment rows remain open.
+
+## DATA-01 evidence boundary
+
+The current branch makes retrospective run evidence machine-checkable: immutable revisions, explicit assignment/dependency choice, accepted/revised/rejected outputs, validator failures and resolutions, CI state, human-review status, effort/cost proxies and truth-labelled claims. The example is a hand-authored extraction of one completed run, not proof of complete historical coverage or workflow superiority. Full extraction, quality review and `BASE-01` remain required.
 
 ## LAB0-02 evidence boundary
 
-The current branch defines a machine-checkable local-native/cloud-container reproducibility record, exact `uv sync --locked` and CMake/Ninja command requirements, monotonic time-to-ready and optional time-to-first-token semantics, a stable failure taxonomy, offline/degraded-mode states, and security/licensing constraints. The checked-in report is an illustrative deterministic contract, not evidence that every matrix row has been executed. Real Ubuntu, macOS, WSL2, and devcontainer runs remain required before cross-platform reproducibility claims.
+The current stack defines a machine-checkable local-native/cloud-container reproducibility record, exact `uv sync --locked` and CMake/Ninja command requirements, monotonic time-to-ready and optional time-to-first-token semantics, a stable failure taxonomy, offline/degraded-mode states, and security/licensing constraints. Contract CI passed, but real Ubuntu, macOS, WSL2 and devcontainer runs remain required before cross-platform reproducibility claims.
 
 ## Viewer evidence boundary
 

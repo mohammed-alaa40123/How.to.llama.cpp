@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "2026-07-17T1003Z-lab1-browser-slice",
+  "role": "documentation_builder",
+  "assignment": {
+    "id": "LAB1-01",
+    "priority": "P2",
+    "objective": "Implement a bounded browser-first GGUF Anatomy slice with explicit native-runtime exclusions.",
+    "dependency_state": "ready",
+    "selected_reason": "The orchestrator marked the trace viewer and deterministic fixture dependencies as evidenced before this slice began."
+  },
+  "revisions": {
+    "starting_commit": "17d6da2c269df7d1e524cd4f5b94f677d90e9c32",
+    "ending_commit": "0c70d9d4dec118095b2049b7442cfee6818c0f07",
+    "base_branch": "agent/eaai-orchestrator-refresh-view01",
+    "working_branch": "agent/lab1-browser-gguf-slice"
+  },
+  "outputs": [
+    {"path": "scripts/build_browser_gguf_lab.py", "kind": "implementation", "decision": "revised", "reason": "The initial import path failed during CI discovery and was corrected without changing parser logic."},
+    {"path": "docs/labs/gguf-anatomy-browser.md", "kind": "documentation", "decision": "accepted"},
+    {"path": "tests/test_browser_gguf_lab.py", "kind": "test", "decision": "accepted"},
+    {"path": "logs/research/2026-07-17/1003-lab1-browser-gguf-slice.md", "kind": "run_log", "decision": "accepted"}
+  ],
+  "validation": {
+    "validators": ["python3 -m unittest discover -s tests -p test_*.py", "mkdocs build --strict", "Documentation CI"],
+    "failures": [
+      {"stage": "unit-test discovery", "category": "tooling", "resolution": "fixed", "summary": "The builder could not resolve its sibling fixture-generator module until scripts was added to the import path."}
+    ],
+    "ci_state": "passed",
+    "ci_run_id": 29562479577
+  },
+  "human_supervision": {
+    "required": true,
+    "decisions": ["Independent GGUF and llama.cpp correctness review remains required before technical correctness claims."],
+    "review_status": "pending"
+  },
+  "effort": {
+    "agent_turns": 1,
+    "tool_calls": 18,
+    "external_api_cost_usd": 0,
+    "paid_generation_calls": 0,
+    "human_minutes": 0
+  },
+  "claims": [
+    {"label": "Verified", "statement": "The browser payload agrees with the deterministic Python golden parser for the bounded synthetic fixture.", "evidence_paths": ["tests/test_browser_gguf_lab.py", "logs/research/2026-07-17/1003-lab1-browser-gguf-slice.md"]},
+    {"label": "Interpretation", "statement": "Predict-Discover-Explain checkpoints may help expose misconceptions about graph storage and page residency.", "evidence_paths": []},
+    {"label": "Open Question", "statement": "Learner benefit and independent technical correctness remain unevidenced.", "evidence_paths": []}
+  ]
+}
