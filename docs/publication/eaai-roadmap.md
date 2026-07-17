@@ -1,6 +1,6 @@
 # EAAI publication roadmap
 
-_Last updated: 2026-07-17 09:22 Africa/Cairo_
+_Last updated: 2026-07-17 15:00 Africa/Cairo_
 
 This roadmap turns repository milestones into evidence gates for an EAAI experience report. It does not authorize manuscript drafting.
 
@@ -12,26 +12,27 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 - Maintain authoritative orchestrator state, evidence backlog, handoff ledger and readiness scorecard.
 - Keep browser, local-native and cloud-container tiers intentionally unequal and explicitly labelled.
 
-**Status:** substantially evidenced. Reviewer-package integration and a systematic documentation-gap audit remain.
+**Status:** substantially evidenced. Active-stack reviewer integration and a systematic documentation-gap audit remain.
 
 ### A2. Deterministic evidence foundations
 
 - Integrate legal fixture decision and deterministic synthetic GGUF.
-- Integrate Lab 0 report contract, trace schema/sample and local-progress schema.
+- Integrate Lab 0 report/reproducibility contracts, trace schema/sample, local-progress schema and retrospective-workflow schema.
 - Add media manifest/provenance contract.
 - Maintain passing strict MkDocs and documentation CI.
 
-**Status:** evidenced on the current stacked viewer branch. Ordinary CI performs no paid API calls or model downloads.
+**Status:** evidenced as contracts and bounded fixtures. Ordinary CI performs no paid API calls or model downloads.
 
 ### A3. Smallest vertical slice
 
 - Add a narrow keyboard-operable viewer for the authored GGUF trace.
 - Generate one deterministic technical figure from structured data.
 - Add source-link and replay validation.
+- Add a browser-first GGUF parser with Predict-Discover-Explain checkpoints.
 
-**Status:** evidenced by immutable source anchors, deterministic trace replay, the generated GGUF-layout SVG, the static viewer and passing Documentation CI run `29559239071`.
+**Status:** evidenced by immutable source anchors, deterministic replay, the generated GGUF-layout SVG, the static viewer and the browser GGUF slice. Parent commit-scoped CI passed for these artifacts.
 
-**Boundary:** this is an authored/source-derived prototype. Native capture, learner benefit and independent technical correctness remain unevidenced.
+**Boundary:** the viewer is authored/source-derived and the browser lab uses a synthetic fixture. Native capture, learner benefit and independent technical correctness remain unevidenced.
 
 ## Phase B — Vertical slices, July 24-31, 2026
 
@@ -39,34 +40,49 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 
 - Require `uv sync --locked` for Python tooling.
 - Require CMake/Ninja native build and bounded executable-launch smoke test.
-- Add stable failure taxonomy, machine-readable report and time-to-ready instrumentation.
-- Execute a supported local/container reproducibility matrix.
+- Retain stable failure taxonomy, machine-readable report and time-to-ready instrumentation.
+- Execute Ubuntu 24.04 local-native and devcontainer rows first.
 - Keep optional learner-provided model loading and time-to-first-token separate from the model-free core.
 
-**Exit evidence:** clean supported environments reach expected output; model-free success is not called inference; optional model paths are not redistributed.
+**Current status:** the contract is evidenced; measured execution is blocked in connector-only runtimes. No environment row has been fabricated.
+
+**Exit evidence:** clean supported environments reach expected model-free output; model-free success is not called inference; optional model paths are not redistributed.
 
 ### B2. Browser GGUF Anatomy lab
 
-- Parse the synthetic fixture in-browser.
-- Verify browser/Python golden agreement.
-- Add Predict-Discover-Explain checkpoints, keyboard completion and static table/text fallback.
-- Persist local progress with export/import and corruption recovery.
+- Preserve deterministic browser/Python golden agreement.
+- Preserve Predict-Discover-Explain checkpoints, keyboard completion and static table/text fallback.
+- Connect one checkpoint to local save/export/clear/import/resume after PROGRESS-02 passes.
+- Verify the integrated controls in a real browser accessibility pass.
+
+**Current status:** parser/checkpoints are evidenced; local progress implementation exists separately and awaits final-head CI plus integration.
 
 **Exit evidence:** deterministic parsing, checkpoint logic, privacy-minimizing progress and explicit exclusion of native-runtime claims.
 
 ### B3. Executable lecture and media dry run
 
 - Preserve the validated authored/source-derived viewer as the baseline artifact.
-- Add one bounded real or faithfully captured path only after instrumentation and trace-size risks are reviewed.
-- Define a fair static-source/text comparison before claiming that the viewer improves code tracing.
+- Freeze an information-equivalent static-source/text benchmark before educational comparison.
+- Add one bounded faithful/native trace only after instrumentation and trace-size risks are reviewed.
 - Run deterministic media-manifest acceptance/revision/rejection and stale-asset checks.
+
+**Current status:** the viewer and deterministic figure are evidenced; BASE-01A and MEDIA-02 are ready bounded tasks.
 
 **Exit evidence:** coherent local/deployed demo with no paid generation in ordinary CI and no evidence-kind inflation.
 
+### B4. Retrospective workflow evidence
+
+- Review the first three-archetype DATA-01 batch against source logs, commits and CI identifiers.
+- Freeze coding and missing-value rules.
+- Expand only a bounded sample before attempting full historical extraction.
+- Retain failures, corrections, blocked reassignments, human decisions and cost proxies.
+
+**Current status:** schema and first batch are integrated with passing parent CI; independent coding review remains.
+
 ## Phase C — Evidence development, August-September 2026
 
-- Extract a retrospective repository dataset from scheduled runs, commits, tests, CI failures, corrections and handoffs.
-- Freeze benchmark tasks and run fair workflow baselines.
+- Complete a reviewed retrospective repository dataset.
+- Freeze benchmark tasks and run fair artifact/workflow comparisons.
 - Obtain independent llama.cpp/GGML correctness review.
 - Pilot expert or learner evaluation only after approval and any required ethics review.
 - Record negative results, failed generations, human labor, infrastructure maintenance and cost proxies.
@@ -82,13 +98,13 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 
 ## Immediate dependency order
 
-1. `LAB0-02` reproducibility and diagnostics protocol.
-2. `DATA-01` retrospective extraction schema.
-3. `LAB1-01` browser GGUF vertical slice.
-4. `PROGRESS-02` local persistence/export/import.
-5. `REVIEW-02` active-stack adversarial review integration.
-6. Static-source/text baseline literature and benchmark design.
-7. `VENUE-01` official EAAI-27 verification.
+1. Obtain final-head CI for PROGRESS-02; repair only that bounded implementation if needed.
+2. `PROGRESS-03`: connect one Lab 1 checkpoint to export/import/resume.
+3. `LAB0-03`: measured Ubuntu 24.04 model-free run when a network-capable environment is available.
+4. `LAB0-04`: measured devcontainer model-free run.
+5. `BASE-01A`: freeze information-equivalent static-versus-viewer benchmark fixture and scoring.
+6. `MEDIA-02`: deterministic accepted/revised/rejected lifecycle dry run plus stale-asset check.
+7. `REVIEW-02`, `REVIEW-01` and `VENUE-01`: integrate rejection risks, independent technical review and official venue monitoring.
 
 ## Generalization boundary
 
