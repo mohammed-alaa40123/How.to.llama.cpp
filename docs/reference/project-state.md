@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 01:58 Africa/Cairo_
+_Last updated: 2026-07-17 04:02 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -32,47 +32,48 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Legal-fixture decision separating model-free Lab 0 checks, learner-provided optional inference, and a project-owned synthetic GGUF for Lab 1.
 - Deterministic synthetic GGUF v0 generator, manifest, golden parse, SHA-256, alignment/range checks, and three bounded corruption variants.
 - Lab 0 machine-readable checker contract, JSON Schema, dependency-free semantic validator, model-free example report, and focused invariant tests.
+- Executable-trace schema, authored GGUF-loading sample, semantic validator, and focused malformed-input tests.
+- Local-only learner-progress schema, semantic validator, example export, privacy constraints, and focused malformed-input tests.
+- Authoritative EAAI orchestration state, evidence backlog, roadmap, and readiness scorecard.
 
 ## Latest concrete findings
 
 ### Verified
 
-- The Lab 0 report has six distinct phases: environment, configure, compile, executable launch, model load, and inference.
-- The validator enforces configure→compile→launch→model-load→inference dependencies.
-- Model-free reports must leave model loading and inference not attempted or not applicable.
-- Claim booleans must exactly match passed phase states; a passing `--help` launch cannot claim model loading or inference.
-- Learner-provided model metadata accepts only a redacted basename and optional checksum, not a full path.
+- Documentation CI run `29544077919` passed project-context, interactive-link, source-index, unit-test discovery, shell-syntax, Python-compilation, and required-asset checks.
+- The same run failed only at `mkdocs build --strict` because two links in `docs/publication/agent-handoffs.md` targeted run records under repository-root `logs/research/`, outside MkDocs' `docs/` tree.
+- The exact affected paths were `logs/research/2026-07-17/0100-synthetic-gguf-fixture.md` and `logs/research/2026-07-17/0158-lab0-checker-interface.md`.
+- The repair preserves both run records and renders their paths as code rather than generated-site links.
 
 ### Interpretation
 
-- The checker contract makes setup evidence auditable and turns the build-equals-inference misconception into a machine-checkable formative assessment.
-- The contract is deliberately narrower than a full Lab 0 runner: it freezes evidence semantics before platform-specific commands and diagnostics are implemented.
+- Repository run logs should remain outside the public documentation tree unless intentionally promoted into a reviewed documentation page.
+- Strict MkDocs is correctly acting as an integration gate by rejecting links that cannot resolve within the built site.
 
 ### Historical
 
-- Earlier work established source-pinned documentation, executable lifetime regressions, accessibility guards, and browser-level CI work.
-- The 23:00 run froze the two-week plan; the 00:00 run closed fixture policy; the 01:00 run implemented the synthetic GGUF; the 01:58 run defined the Lab 0 checker contract.
+- Earlier work established source-pinned documentation, executable lifetime regressions, accessibility guards, browser-level CI, legal fixture policy, synthetic GGUF evidence, Lab 0 reporting, trace validation, progress validation, and orchestration state.
 
 ### Open questions
 
-- Which bounded llama.cpp target and command matrix should the first runner execute.
+- Whether the repaired branch obtains a passing commit-scoped Documentation CI result.
+- Which bounded llama.cpp target and command matrix the first Lab 0 runner should execute.
 - Which operating systems and container targets belong in the first reproducibility matrix.
-- Which diagnostic codes are stable and educationally useful.
 - Browser/Python parser agreement and pinned native GGUF-reader acceptance remain unimplemented.
 
 ## Immediate next task
 
 ```text
-add machine-readable executable-learning schemas
-  → trace schema and authored sample trace contract
-  → media manifest/provenance schema
-  → local progress schema
-  → focused malformed-input validators
+verify strict MkDocs repair in commit-scoped CI
+  → if passing, close the P0 integration blocker
+  → implement media manifest/provenance schema and validator
+  → then proceed to the minimal keyboard-operable trace viewer after trace acceptance
 ```
 
 ## In progress
 
-- Draft PR #3 for the EAAI executable-learning foundation.
+- Draft PR stack #3–#6 for the EAAI executable-learning foundation and orchestration state.
+- Strict MkDocs repair branch based on PR #6.
 - Current-tree regeneration and sanitizer validation of the CPU_REPACK lifetime candidate.
 - Manual/upstream submission of the reviewed 46-release OpenCL ownership correction; GitHub App write access to upstream is blocked.
 - Source-index regeneration with pinned line-aware symbol inventory.
@@ -81,19 +82,17 @@ add machine-readable executable-learning schemas
 
 ## Publication and validation state
 
-- Draft PR #3 is based on `agent/eaai-two-week-execution-plan`.
-- The branch now contains the two-week plan, handoff ledger, legal-fixture decision, deterministic GGUF fixture package, Lab 0 checker contract, focused tests, and durable run notes.
-- No external source was newly introduced in this increment.
-- Final-head workflow results must be checked after context updates complete.
+- `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are now authoritative on the stacked branch.
+- The current P0 assignment is strict MkDocs repair; viewer and media feature expansion remain blocked until commit-scoped CI passes.
+- No external source, participant data, model, telemetry, credential, paid API call, or manuscript prose was introduced in this increment.
 
 ## Known blockers and caveats
 
-- **Orchestrator files:** `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are not yet available on the active branch, so dependency-safe recommendations are being followed.
-- **Execution validation:** this connector environment could not execute the new Python tests; Documentation CI is the remaining authority.
+- **CI closure:** the link repair is committed, but a passing workflow result for the final branch head is still required.
 - **Lab 0 runner:** the interface is defined, but no platform-specific build command runner exists yet.
 - **Browser agreement:** no browser parser yet proves agreement with the Python golden output.
 - **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be a valid inference model.
-- **Live-site verification:** direct Pages access remains unavailable in this environment.
+- **Live-site verification:** Pages should be rechecked only after the stacked changes merge to `main` and deploy.
 - **Current-tree runtime evidence:** source/API compatibility at `8ee54c8` is verified, but the CPU_REPACK fixture has not yet been compiled and executed against that exact current revision.
 - **Evidence retention:** artifact `8368782428` expires on 2026-08-15.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
