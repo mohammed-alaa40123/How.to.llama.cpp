@@ -1,6 +1,7 @@
 (() => {
   "use strict";
   const UINT32 = 4, STRING = 8, ARRAY = 9, F32 = 0;
+  const PROGRESS_MODULE = new URL("./progress-store.mjs", document.currentScript.src).href;
 
   class Reader {
     constructor(bytes) {
@@ -99,9 +100,53 @@
     table.appendChild(body); output.appendChild(table);
   }
 
+  function newProgress(sourceRevision) {
+    return {
+      schema_version: "0.1.0", course_id: "how-to-llama-cpp", course_version: "0.1.0",
+      source_revision: sourceRevision, exported_at: new Date().toISOString(), storage_scope: "local-only",
+      lessons: [{
+        lesson_id: "lab1-gguf-anatomy", lesson_version: "0.1.0", status: "in-progress",
+        last_step_id: "browser-parse-complete",
+        checkpoints: ["graph-storage", "tensor-offsets", "mapping-residency"].map((checkpoint_id) => ({ checkpoint_id, state: "unanswered", attempt_count: 0 }))
+      }]
+    };
+  }
+
+  async function downloadProgress(adapter) {
+    const text = adapter.export();
+    const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+    const anchor = document.createElement("a");
+    anchor.href = url; anchor.download = "how-to-llama-cpp-progress.json"; anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
   document.querySelectorAll(".gguf-lab").forEach((root) => {
     const button = root.querySelector("[data-gguf-run]"), status = root.querySelector("[data-gguf-status]"), output = root.querySelector("[data-gguf-output]");
+    const progressStatus = root.querySelector("[data-progress-status]"), exportButton = root.querySelector("[data-progress-export]"), importInput = root.querySelector("[data-progress-import]");
     if (!button || !status || !output) return;
+
+    let adapterPromise = null;
+    const getAdapter = async () => {
+      if (!adapterPromise) adapterPromise = import(PROGRESS_MODULE).then(({ createLocalStorageAdapter }) => createLocalStorageAdapter(window.localStorage));
+      return adapterPromise;
+    };
+
+    if (exportButton && progressStatus) {
+      exportButton.addEventListener("click", async () => {
+        try { await downloadProgress(await getAdapter()); progressStatus.textContent = "Local progress exported as versioned JSON."; }
+        catch (error) { progressStatus.textContent = `Export unavailable: ${error.message}`; }
+      });
+    }
+    if (importInput && progressStatus) {
+      importInput.addEventListener("change", async () => {
+        const file = importInput.files && importInput.files[0];
+        if (!file) return;
+        try { (await getAdapter()).import(await file.text()); progressStatus.textContent = "Progress imported and validated locally."; }
+        catch (error) { progressStatus.textContent = `Import rejected; existing progress was preserved: ${error.message}`; }
+        finally { importInput.value = ""; }
+      });
+    }
+
     button.addEventListener("click", async () => {
       button.disabled = true; status.textContent = "Parsing bounded browser fixture…";
       try {
@@ -113,6 +158,14 @@
         if (JSON.stringify(canonical(result)) !== JSON.stringify(canonical(payload.golden))) throw new Error("browser parse disagrees with Python golden output");
         render(output, result);
         status.textContent = "Parse complete. Browser-derived result matches the Python golden record.";
+        try {
+          const adapter = await getAdapter();
+          const existing = adapter.load();
+          if (!existing || !existing.lessons.some((lesson) => lesson.lesson_id === "lab1-gguf-anatomy")) adapter.save(newProgress(payload.source_revision.revision));
+          if (progressStatus) progressStatus.textContent = "Resume state saved locally. Checkpoint answers remain unrecorded.";
+        } catch (error) {
+          if (progressStatus) progressStatus.textContent = `Parse succeeded, but local progress was unavailable: ${error.message}`;
+        }
       } catch (error) {
         output.replaceChildren(); status.textContent = `Parser failed: ${error.message}`;
       } finally { button.disabled = false; }

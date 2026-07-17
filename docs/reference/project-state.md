@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 14:04 Africa/Cairo_
+_Last updated: 2026-07-17 15:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -25,42 +25,44 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Deterministic GGUF-layout figure with provenance and exact replay.
 - Browser-first GGUF Anatomy slice with Predict-Discover-Explain checkpoints.
 - DATA-01 contract and first three-archetype retrospective batch with passing parent CI.
+- PROGRESS-02 local adapter, deterministic export/import and passing commit-scoped CI run `29575542793`.
 
 ## Latest bounded increment
 
 ### Verified
 
-- The first DATA-01 batch passed commit-scoped Documentation CI run `29572506104`.
-- Real Lab 0 execution was retried first but remained blocked because this runtime could not resolve `github.com`; no environment row was fabricated.
-- `progress/progress-store.mjs` now implements deterministic export, bounded import, explicit version handling and a framework-free `localStorage`-compatible adapter.
-- Import validates before mutation, so corrupt, oversized, privacy-unsafe or unsupported input cannot replace existing local state.
-- Focused Node-backed tests cover deterministic round trip, storage preservation after corrupt import, unsupported versions, privacy-sensitive fields, clear behavior and empty export.
+- The PROGRESS-02 local progress MVP passed Documentation CI run `29575542793`.
+- Real Lab 0 execution was retried as the higher-priority task but remains blocked in this connector-only runtime; no environment row or timing result was fabricated.
+- Lab 1 now loads the validated local progress adapter from a statically published module, stores anonymous resume state after a successful browser parse, and exposes keyboard-operable JSON export/import controls.
+- The stored lesson remains `in-progress`; all three formative checkpoints remain `unanswered`. Reaching the parser output is not converted into correctness or mastery.
+- Import validation occurs before mutation, and rejected files preserve existing local state.
+- Focused integration tests require the published module to match the canonical module byte-for-byte and reject telemetry or external synchronization hooks.
 
 ### Interpretation
 
-- Local progress can be portable and privacy-minimizing without introducing accounts, telemetry or server dependencies.
-- This is implementation evidence for resume-state handling, not evidence that completion implies learning or that browser storage provides authenticated sync.
+- A browser lab can provide portable anonymous resume state without accounts, telemetry or a server dependency.
+- Separating “step reached” from “checkpoint passed” reduces the risk of treating navigation or completion as educational evidence.
 
 ### Historical
 
-- The storage behavior was added only after the `0.1.0` schema and privacy contract were frozen.
-- The design intentionally rejects implicit migration and requires a future explicit migration function for every new schema version.
+- Lab 1 integration was added only after the progress schema, privacy contract, storage adapter and commit-scoped CI were established.
+- The source revision retained in the progress export is the immutable course revision embedded in the deterministic Lab 1 payload.
 
 ### Open questions
 
-- Final-head CI must pass for the progress implementation.
-- Lab 1 is not connected to the adapter in this bounded increment.
-- Browser-level keyboard, screen-reader and corruption-recovery verification remains part of the integrated demo.
+- Final-head CI must pass for this integration branch.
+- Real-browser testing must verify storage denial, quota failure, keyboard flow and screen-reader announcements.
+- Checkpoint answer capture and scoring remain deliberately unimplemented.
 - Real Ubuntu and devcontainer Lab 0 measurements remain absent.
 - Independent technical review and an approved educational evaluation pathway remain required.
 
 ## Immediate next task
 
 ```text
-obtain commit-scoped CI for PROGRESS-02
-  → connect the validated adapter to Lab 1 without adding telemetry
+obtain commit-scoped CI for the Lab 1 progress integration
   → execute real Ubuntu and devcontainer Lab 0 rows when network access exists
   → freeze the information-equivalent BASE-01 benchmark fixture
+  → add browser accessibility evidence without collecting participant data
   → do not claim learner benefit or workflow superiority before evaluation
 ```
 
@@ -72,12 +74,12 @@ obtain commit-scoped CI for PROGRESS-02
 
 ## Known blockers and caveats
 
-- **Lab 0 execution:** this runtime still cannot resolve `github.com`; no real environment row was fabricated.
+- **Lab 0 execution:** this runtime cannot perform the required real native environment run; no real environment row was fabricated.
 - **Retrospective accuracy:** historical tool-call and human-minute values may be incomplete and must never be guessed.
 - **Independent review:** the three-run batch requires a human coding check before publication analysis.
 - **Workflow comparison:** DATA-01 enables analysis but does not replace BASE-01.
 - **Educational effectiveness:** no learner-benefit claim is permitted before an approved evaluation and fair baseline.
-- **Progress integration:** this increment provides the adapter, but Lab 1 does not yet save learner answers.
+- **Progress semantics:** local state records parser-step reachability only; it does not infer answers or mastery.
 - **Live site:** verify Pages only after the stacked chain merges to `main` and deploys.
 
 ## Definition of done for this phase

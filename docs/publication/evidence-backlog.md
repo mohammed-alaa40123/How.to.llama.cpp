@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 14:04 Africa/Cairo_
+_Last updated: 2026-07-17 15:00 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -17,43 +17,16 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P1 | LIT-02 | evidenced | Literature Scout | none | official media/API capability matrix with provenance, privacy, accessibility, licensing, cost and caching implications | Optional media choices are evidence-based and reproducible enough for an experience report |
 | P1 | VENUE-01 | in progress | Literature Scout | official publication | verified EAAI-27 call, deadlines, area, format, review criteria | Submission plan matches the current venue rather than prior-year assumptions |
 | P2 | LAB1-01 | evidenced | Documentation Builder | progress contract; FIG-01; VIEW-01 | browser parser/visualizer, Python/golden agreement, Predict-Discover-Explain checkpoints, static fallback; passing run `29562479577` | Learners can inspect GGUF layout in-browser without confusing it with native inference |
-| P2 | PROGRESS-02 | in progress | Validation Architect | progress schema | framework-free local storage adapter, deterministic export/import, explicit version gate, corruption-preserving import, privacy checks and focused tests; final-head CI and Lab 1 connection pending | Local-first progress is portable and privacy-minimizing |
+| P2 | PROGRESS-02 | in progress | Validation Architect | progress schema; LAB1-01 | local adapter/export/import passed run `29575542793`; Lab 1 now stores anonymous resume state and exposes validated export/import; final-head integration CI and real-browser accessibility/storage checks pending | Local-first progress is portable and privacy-minimizing without treating step completion as mastery |
 | P2 | REVIEW-02 | in progress | Adversarial Reviewer + Orchestrator | PR #8 integration | integrate reviewer notes, claims-evidence table, rejection risks and scorecard into the active stack | Major rejection risks are visible and drive dependency ordering |
 | P2 | REVIEW-01 | blocked | Human | independent reviewer nominated | expert rubric and signed/dated review of fixture, trace, lab explanations and figure | Technical correctness is independently supported |
 | P2 | BASE-01 | blocked | Validation Architect | DATA-01, frozen benchmark tasks | fair comparison protocol: single authoring agent; author+reviewer; full repository-memory/validator workflow | Specialized scheduled workflow provides measurable benefit over simpler workflows |
 | P3 | EVAL-01 | blocked | Human + Validation Architect | evaluation pathway approval | learner or expert study protocol, instruments, consent/ethics decision | Educational usefulness is evaluated rather than inferred from implementation |
 | P3 | DEMO-01 | blocked | Orchestrator | LAB0-02, LAB1-01, PROGRESS-02 | reproducible end-to-end Lab 0 + GGUF lab + viewer + figure + progress demo | The proposed system exists as a coherent educational artifact |
 
-## Closed evidence from the current stack
+## Current PROGRESS-02 evidence boundary
 
-- Legal fixture policy and deterministic synthetic GGUF package.
-- Lab 0 six-phase report schema and semantic checks.
-- Executable-trace schema, immutable source anchors, corrected authored GGUF trace and deterministic replay.
-- Local-only learner-progress schema and privacy constraints.
-- Initial browser/local/cloud platform literature map.
-- Strict MkDocs handoff-link repair with passing commit-scoped CI.
-- Media manifest/provenance schema, semantic validator and passing commit-scoped CI.
-- Deterministic GGUF-layout figure with exact replay and passing commit-scoped CI.
-- Minimal keyboard-operable trace viewer with deterministic payload, evidence labels and transcript fallback; passing run `29559239071`.
-- Browser-first GGUF Anatomy slice with deterministic Python/browser agreement and passing run `29562479577`.
-- Lab 0 reproducibility contract integration with passing run `29565651085`; real environment rows remain open.
-- DATA-01 contract integration with passing run `29568983813` and first-batch integration with passing run `29572506104`.
-
-## PROGRESS-02 evidence boundary
-
-The current branch adds a framework-free browser storage contract for deterministic JSON export, bounded import, explicit schema-version handling, local save/load/clear, and validation-before-mutation corruption recovery. It does not connect Lab 1 to storage, provide account or cloud synchronization, collect research telemetry, prove cross-browser compatibility, or establish that saved completion represents mastery. Final-head CI and an integrated Lab 1 round trip remain required.
-
-## DATA-01 evidence boundary
-
-The current stack contains a first bounded retrospective batch: one clean successful increment, one CI repair that retained strict validation, and one blocked higher-priority task followed by a dependency-safe reassignment. This is evidence of representational coverage, not proof of complete history, extraction reliability, workflow superiority or educational benefit. Independent coding review and broader extraction remain required.
-
-## LAB0-02 evidence boundary
-
-The current stack defines a machine-checkable local-native/cloud-container reproducibility record, exact `uv sync --locked` and CMake/Ninja command requirements, monotonic time-to-ready and optional time-to-first-token semantics, a stable failure taxonomy, offline/degraded-mode states, and security/licensing constraints. Contract CI passed, but real Ubuntu, macOS, WSL2 and devcontainer runs remain required before cross-platform reproducibility claims.
-
-## Viewer evidence boundary
-
-The viewer consumes a deterministic payload generated from the validated trace, provides bounded Previous/Next and Arrow/Home/End navigation, exposes evidence labels and pinned source links, and retains a complete static transcript. Passing CI establishes integration and deterministic replay. It does not establish native capture, technical correctness beyond the pinned source anchors, or educational benefit over a static source-and-text baseline.
+The canonical local adapter has passing commit-scoped CI and is now connected to Lab 1. A successful parse stores only anonymous resume state: the lesson is `in-progress`, the last reached step is recorded, and all formative checkpoints remain `unanswered`. Export/import is local, versioned and validation-gated. This does not establish cross-browser persistence, checkpoint correctness, mastery, learner benefit, account sync or server-side storage. Final-head integration CI and real-browser accessibility/storage-denial checks remain required.
 
 ## Rejection-risk mapping
 
