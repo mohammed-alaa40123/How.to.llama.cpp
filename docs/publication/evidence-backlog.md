@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-18 00:01 Africa/Cairo_
+_Last updated: 2026-07-18 00:58 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator, measured run or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -33,6 +33,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 ## Dependency decisions
 
 - `STACK-01` remains the only P0 integration task. The default recommendation is PR #24 because the downstream learner-facing stack depends on it; a human must approve it or record an alternative.
+- Documentation CI run `29613524451` passed for orchestration head `f7f856c96e2ed1e4b45186bd444f129f9cd9edf9`. This validates the reconciled coordination files only; it is not the required combined implementation-branch CI and does not close `STACK-01`.
 - `LAB0-03` and `LAB0-04` resume immediately when suitable environments exist. Exact failed runs are valid evidence; fabricated timings are not.
 - `DEMO-01A` is a specification only. `DEMO-01` remains blocked until the accepted route executes on the canonical branch and measured tiers exist.
 - `BLIND-01` and `DOC-AUDIT-01` have validated contracts but must not displace integration, reproducibility, independent review or evaluation.
