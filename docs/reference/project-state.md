@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 17:06 Africa/Cairo_
+_Last updated: 2026-07-17 18:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -27,51 +27,50 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - DATA-01 contract and first three-archetype retrospective batch with passing parent CI.
 - PROGRESS-02 local adapter, deterministic export/import and Lab 1 integration with passing run `29579032392`.
 - BASE-01A information-equivalent static-versus-viewer benchmark with passing run `29583844938`.
+- MEDIA-02 accepted/revised/rejected deterministic lifecycle with passing run `29587245436`.
 
 ## Latest bounded increment
 
 ### Verified
 
-- `BASE-01A` passed commit-scoped Documentation CI run `29583844938`.
-- Measured Ubuntu and devcontainer Lab 0 rows remain blocked by unavailable execution environments; no timing or success record was fabricated.
-- `MEDIA-02` now contains exactly one accepted, revised and rejected deterministic lifecycle record.
-- Revised and rejected records remain unpublished and unapproved with explicit retained reasons.
-- The accepted specimen is approved, source-pinned, licensed and accessibility-described, but is explicitly only a lifecycle specimen rather than llama.cpp technical evidence.
-- The lifecycle validator reuses the individual media-manifest validator and recomputes committed input/output SHA-256 values and output byte counts.
-- Eight focused tests cover state coverage, duplicate identity, external-generation prohibition, generative-mode rejection, stale input/output checks and rejected-asset publication blocking.
+- `REVIEW-02` produced an adversarial reviewer package, but its head `4c72b8908c0d41941a7f61f2d041a2668a788af5` had no visible commit-scoped workflow run when this increment was selected.
+- The next dependency-safe `DATA-01` task adds a versioned coverage declaration for the first three retrospective records.
+- The coverage validator requires immutable source revision, unique run IDs, all core evidence dimensions, repository evidence for observed fields and explicit reasons for unavailable fields.
+- Tool-call totals and human minutes are classified as not reconstructable from the retained first-batch evidence; zero-valued fields must not be treated as measured absence of work.
+- Seven focused tests cover valid coverage, evidence inflation, duplicate fields, missing required dimensions, falsely complete coverage and duplicate record IDs.
 
 ### Interpretation
 
-- Retaining revised and rejected candidates may make human supervision and revision costs more visible than keeping only accepted outputs.
-- A deterministic no-cost lifecycle dry run is the safest prerequisite before any optional paid media generation.
+- Explicit missingness is more defensible than silently interpreting unknown effort as zero.
+- This policy improves transparency but does not establish longitudinal coverage, inter-rater reliability or workflow superiority.
 
 ### Historical
 
-- `MEDIA-01` established individual manifest boundaries and `FIG-01` established deterministic technical-figure replay.
-- `MEDIA-02` was selected after `BASE-01A` passed and the higher-value measured Lab 0 tasks remained environment-blocked.
+- The adversarial reviewer identified selected-sample bias, hidden human labor and insufficient longitudinal evidence as major rejection risks.
+- The first DATA-01 batch remains three records: one success, one CI repair and one blocked reassignment.
 
 ### Open questions
 
-- Does final-head CI pass for the lifecycle fixtures, validator, tests and documentation?
-- Should revision and rejection reasons use a controlled taxonomy before broader retrospective extraction?
-- Will any future supplemental generated asset pass technical, accessibility, licensing, privacy and pedagogical review?
+- Does commit-scoped CI pass for the coverage schema, validator, fixture, tests and documentation?
+- Who will independently code the first batch and approve the missing-value taxonomy?
+- Should future scheduled runs capture tool calls and human minutes prospectively?
 - Can Ubuntu 24.04 and the devcontainer complete the bounded model-free Lab 0 path?
 
 ## Immediate next task
 
 ```text
-obtain commit-scoped CI for MEDIA-02
-  → if failing, repair only lifecycle validation or fixture provenance
-  → if passing, close MEDIA-02 and take REVIEW-02 or a bounded DATA-01 extension
+obtain commit-scoped CI for the DATA-01 coverage package
+  → if failing, repair only schema/validator/test integration
+  → if passing, request independent coding review of the first batch
+  → expand the sample only after missing-value and coding rules are approved
   → execute real Ubuntu and devcontainer Lab 0 rows when suitable environments exist
-  → do not call external media APIs from ordinary CI
 ```
 
 ## Publication and validation state
 
-- `docs/publication/orchestrator-state.md` is the single source of truth.
-- `docs/publication/evidence-backlog.md` records `MEDIA-02` as in progress pending final-head CI.
-- Passing CI can establish deterministic lifecycle integration, not generative-media usefulness or learner benefit.
+- `docs/publication/orchestrator-state.md` remains the single source of truth and still needs REVIEW-02 integration after reviewer-head CI is available.
+- `docs/publication/evidence-backlog.md` records the bounded DATA-01 missingness increment.
+- Passing CI can establish deterministic coverage-contract integration, not retrospective accuracy, educational effectiveness or agent-workflow benefit.
 - No participant data, learner identity, model weights, telemetry, credentials, paid API generation, native instrumentation or manuscript prose were introduced.
 
 ## Known blockers and caveats
@@ -79,7 +78,8 @@ obtain commit-scoped CI for MEDIA-02
 - **Lab 0 execution:** no real Ubuntu/devcontainer row exists.
 - **Independent correctness:** fixture, trace, lab explanations, parser, figure and benchmark tasks still require independent technical review.
 - **Evaluation approval:** no recruitment or personal-data collection is authorized.
-- **Retrospective accuracy:** the first DATA-01 records require independent coding review.
+- **Retrospective accuracy:** the first DATA-01 records and missingness classifications require independent coding review.
+- **Integration:** the long stacked PR chain and overlapping progress implementations require human merge decisions.
 - **Live site:** verify Pages only after the stacked chain merges to `main` and deploys.
 
 ## Definition of done for this phase
@@ -87,4 +87,4 @@ obtain commit-scoped CI for MEDIA-02
 - Complete learning contracts, legal fixture policy and three-tier platform boundaries.
 - Deterministic fixture, trace, figure, browser lab and model-free Lab 0 validation contracts.
 - Accessibility and privacy fallbacks for every introduced artifact.
-- Measured Lab 0 Ubuntu/devcontainer evidence, progress integrated into Lab 1, frozen fair benchmark, reviewed retrospective data, media lifecycle dry run and passing integrated CI.
+- Measured Lab 0 Ubuntu/devcontainer evidence, progress integrated into Lab 1, frozen fair benchmark, independently reviewed retrospective data, media lifecycle dry run and passing integrated CI.

@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0.0",
+  "batch_id": "data01-first-batch-coverage-v0",
+  "source_revision": "4c72b8908c0d41941a7f61f2d041a2668a788af5",
+  "records": [
+    "2026-07-17T0822Z-viewer-success",
+    "2026-07-17T0721Z-figure-ci-repair",
+    "2026-07-17T1203Z-lab0-blocked-data01"
+  ],
+  "dimensions": [
+    {
+      "field": "assignment.selection_reason",
+      "status": "observed",
+      "reason": "Each retained record states why its assignment was selected relative to dependencies and blockers.",
+      "evidence_paths": [
+        "progress/examples/agent-workflow-run-viewer-success-v0.json",
+        "progress/examples/agent-workflow-run-figure-ci-repair-v0.json",
+        "progress/examples/agent-workflow-run-lab0-blocked-data01-v0.json"
+      ]
+    },
+    {
+      "field": "revisions.starting_commit",
+      "status": "observed",
+      "reason": "Every record retains an immutable starting commit in the versioned workflow contract.",
+      "evidence_paths": ["progress/examples/agent-workflow-run-viewer-success-v0.json"]
+    },
+    {
+      "field": "revisions.ending_commit",
+      "status": "observed",
+      "reason": "Every record retains an immutable ending commit in the versioned workflow contract.",
+      "evidence_paths": ["progress/examples/agent-workflow-run-viewer-success-v0.json"]
+    },
+    {
+      "field": "validation.ci_state",
+      "status": "observed",
+      "reason": "Commit-scoped CI states and run identifiers are retained in the three workflow records.",
+      "evidence_paths": [
+        "progress/examples/agent-workflow-run-viewer-success-v0.json",
+        "progress/examples/agent-workflow-run-figure-ci-repair-v0.json"
+      ]
+    },
+    {
+      "field": "validation.failures",
+      "status": "observed",
+      "reason": "The repair and blocked-reassignment records retain failure categories, summaries and resolutions.",
+      "evidence_paths": [
+        "progress/examples/agent-workflow-run-figure-ci-repair-v0.json",
+        "progress/examples/agent-workflow-run-lab0-blocked-data01-v0.json"
+      ]
+    },
+    {
+      "field": "human_supervision.decisions",
+      "status": "observed",
+      "reason": "Each workflow record retains pending human decisions and claim boundaries.",
+      "evidence_paths": [
+        "progress/examples/agent-workflow-run-viewer-success-v0.json",
+        "progress/examples/agent-workflow-run-lab0-blocked-data01-v0.json"
+      ]
+    },
+    {
+      "field": "effort.agent_turns",
+      "status": "observed",
+      "reason": "The scheduled-run unit is represented consistently as one retained agent turn per record.",
+      "evidence_paths": ["progress/examples/agent-workflow-run-viewer-success-v0.json"]
+    },
+    {
+      "field": "effort.tool_calls",
+      "status": "not_reconstructable",
+      "reason": "The historical run logs do not provide a complete, independently auditable tool-call transcript, so recorded counts cannot yet support comparative claims.",
+      "evidence_paths": []
+    },
+    {
+      "field": "effort.human_minutes",
+      "status": "not_reconstructable",
+      "reason": "No contemporaneous human time log exists for the first batch; zero-valued record fields must not be interpreted as measured absence of human labor.",
+      "evidence_paths": []
+    },
+    {
+      "field": "effort.external_api_cost_usd",
+      "status": "observed",
+      "reason": "The retained records declare zero paid generation and zero external API cost for these deterministic increments.",
+      "evidence_paths": [
+        "progress/examples/agent-workflow-run-viewer-success-v0.json",
+        "progress/examples/agent-workflow-run-figure-ci-repair-v0.json",
+        "progress/examples/agent-workflow-run-lab0-blocked-data01-v0.json"
+      ]
+    },
+    {
+      "field": "outputs.decisions",
+      "status": "observed",
+      "reason": "Accepted and revised output decisions are retained with reasons where the contract requires them.",
+      "evidence_paths": [
+        "progress/examples/agent-workflow-run-viewer-success-v0.json",
+        "progress/examples/agent-workflow-run-figure-ci-repair-v0.json"
+      ]
+    }
+  ],
+  "claim_boundary": "This declaration exposes which first-batch fields are evidenced and which cannot be reconstructed. It does not validate the accuracy of every historical value, estimate total human labor, establish longitudinal coverage, or support workflow-superiority claims."
+}
