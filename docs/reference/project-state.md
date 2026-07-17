@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 19:04 Africa/Cairo_
+_Last updated: 2026-07-17 19:58 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers and next priority.
 
@@ -12,7 +12,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Active milestone
 
-**Executable-learning Week 1 foundation transitioning to canonical integration, measured Lab 0 evidence and independent review.**
+**Executable-learning Week 1 foundation transitioning to canonical integration, measured Lab 0 evidence and independently reviewable longitudinal evidence.**
 
 ## Completed bounded foundations
 
@@ -27,51 +27,49 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - First three-record retrospective workflow batch.
 - Adversarial reviewer package with claims-evidence, rejection risks and reviewer scorecard.
 
-## Latest bounded increment — STACK-01 merge map
+## Latest bounded increment — DATA-01B coding protocol
 
 ### Verified
 
-- `docs/publication/canonical-integration-map.md` proposes one explicit retained implementation spine and a separate reconciliation order for parallel evidence/state branches.
-- PRs #13/#14 overlap on trace anchor/replay correction; PR #13 is the retained downstream dependency and PR #14 is proposed as superseded after preservation review.
-- PRs #23/#24 overlap on local progress; PR #25 and later learner-facing work depend on PR #24.
-- PRs #30, #31 and #32 are parallel descendants of PR #29 and require authority-state reconciliation rather than blind sequential merging.
-- Historical component CI identifiers are recorded, but no combined-head CI claim is made.
+- `docs/publication/retrospective-analysis.md` freezes an all-eligible-run sampling preference, explicit exclusions, categorical codebook, double-coding workflow, adjudication rule, privacy boundary and non-causal analysis plan.
+- `schemas/retrospective-coding-batch.schema.json` and `scripts/validate_retrospective_coding_batch.py` require immutable source revisions, unique run IDs and evidence paths, explicit missingness and retained coding disagreements.
+- The validator rejects blocked rows whose blocker detail is missing and adjudicated rows without a rationale.
+- Nine focused tests, the example validator run and Python compilation passed in an isolated local workspace.
 
 ### Interpretation
 
-- PR #24 is the lowest-risk canonical progress default because it preserves the tested Lab 1 integration and later benchmark/media/reviewer stack.
-- Unique migration and last-known-valid recovery semantics from PR #23 should be reconsidered only as a later bounded follow-up after the canonical branch is stable.
-- One current authority state plus retained durable run logs is more reviewable than independently merging every orchestration snapshot.
+- Freezing the codebook before broader extraction reduces post-hoc outcome coding and convenience-sampling risk.
+- The protocol can expose duplication, failure, missing labor/cost evidence and supervision burden; it does not predetermine a favorable agent-workflow conclusion.
 
 ### Historical
 
-- The draft stack grew through bounded specialist increments while clean Ubuntu and devcontainer execution remained unavailable.
-- Earlier reviewer and orchestration snapshots remain useful longitudinal evidence but are not current authority.
+- DATA-01 previously established a three-record success/repair/blocked-reassignment contract, not longitudinal representativeness.
+- LAB0-03 and LAB0-04 remain blocked because the connected runtime cannot execute a clean Ubuntu 24.04 or devcontainer path.
 
 ### Open questions
 
-- Human approval of PR #24 as the canonical progress implementation.
-- Whether PR #14 or PR #23 contains a uniquely stronger invariant that should become a later follow-up.
-- Full CI and deployed-site verification for one combined integration head.
+- Which immutable revision and UTC study window will define the broader DATA-01B extraction.
+- Who will perform independent double-coding and adjudication.
+- Human approval of PR #24 as the canonical progress implementation and full combined-head CI.
 - Clean Ubuntu 24.04 and devcontainer Lab 0 execution, independent technical review and evaluation approval.
 
 ## Immediate next task
 
 ```text
-STACK-01 human approval and canonical branch execution
-  → approve the PR #24 progress default or choose PR #23 explicitly
-  → apply the retained spine and evidence side branches once
-  → reconcile one current orchestration state
-  → run the full Documentation CI suite on one combined head
-  → then execute LAB0-03/LAB0-04 when environments exist
-  → DEMO-01A may proceed as the next dependency-safe documentation task
+LAB0-03 / LAB0-04 when suitable environments become available
+  → otherwise freeze the DATA-01B study window at one immutable revision
+  → extract every eligible durable run or declare a systematic interval in advance
+  → validate all rows
+  → obtain independent double-coding and retain disagreements
+  → adjudicate without overwriting the original codes
+  → keep STACK-01 human approval and canonical branch execution as the integration gate
 ```
 
 ## Publication and validation state
 
 - `docs/publication/orchestrator-state.md` remains authoritative.
-- `docs/publication/evidence-backlog.md` records STACK-01 as in progress: the proposed map exists, but human approval and passing combined-head CI do not.
-- Passing component CI establishes bounded contracts only; it does not establish combined deployability, learner benefit, native execution or independent correctness.
+- `docs/publication/evidence-backlog.md` records DATA-01B as in progress: the protocol and validator exist, but broader extraction and independent review do not.
+- Passing component CI establishes bounded contracts only; it does not establish combined deployability, learner benefit, native execution, longitudinal representativeness or independent correctness.
 - No participant data, telemetry, authenticated sync, restricted model weights, paid generation or manuscript prose were introduced.
 
 ## Known blockers and caveats
@@ -79,7 +77,8 @@ STACK-01 human approval and canonical branch execution
 - no approved canonical progress-branch choice;
 - no canonical combined branch with passing CI;
 - no real Ubuntu 24.04 or devcontainer Lab 0 record;
-- no independent technical reviewer;
+- no independent llama.cpp/GGML technical reviewer;
+- no independent DATA-01B coder or approved retrospective study window;
 - no approved evaluation/ethics pathway;
 - authority-state updates from official venue and retrospective side branches still require reconciliation;
 - Pages verification applies only after canonical integration reaches `main` and deploys.
