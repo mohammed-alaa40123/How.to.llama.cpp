@@ -161,7 +161,7 @@
         try {
           const adapter = await getAdapter();
           const existing = adapter.load();
-          if (!existing || !existing.lessons.some((lesson) => lesson.lesson_id === "lab1-gguf-anatomy")) adapter.save(newProgress(payload.course_revision));
+          if (!existing || !existing.lessons.some((lesson) => lesson.lesson_id === "lab1-gguf-anatomy")) adapter.save(newProgress(payload.source_revision.revision));
           if (progressStatus) progressStatus.textContent = "Resume state saved locally. Checkpoint answers remain unrecorded.";
         } catch (error) {
           if (progressStatus) progressStatus.textContent = `Parse succeeded, but local progress was unavailable: ${error.message}`;
