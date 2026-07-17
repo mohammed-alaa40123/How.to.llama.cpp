@@ -1,66 +1,55 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 17:15 Africa/Cairo_
+_Last updated: 2026-07-17 17:58 Africa/Cairo_
 
-This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
+This queue is dependency-aware. Close an item only with a durable artifact, validator, measured run or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
 | Priority | ID | Status | Owner | Dependency | Required evidence | Claim supported or falsified |
 |---|---|---|---|---|---|---|
-| P0 | CI-01 | evidenced | Documentation Builder | latest stacked branch | strict MkDocs root cause, narrow fix and passing commit-scoped CI for integrated artifacts | The executable-learning artifacts integrate without degrading the existing site |
-| P0 | COORD-01 | evidenced | Orchestrator | none | authoritative state, dependency-aware queue, roadmap, scorecard and run handoffs | Scheduled agents can share an explicit dependency order rather than infer work independently |
-| P1 | LAB0-02 | evidenced | Validation Architect | Lab 0 report contract | reproducibility schema, semantic validator, exact toolchain checks, diagnostic taxonomy, timing definitions and security boundaries; contract CI passed in run `29565651085` | Setup/build evidence has a comparable machine-readable contract |
-| P1 | LAB0-03 | blocked | Validation Architect | network-capable Ubuntu 24.04 environment | measured model-free local-native record with exact revisions, tools, commands, diagnostics and time-to-ready | The local-native tier can complete the bounded path reproducibly |
-| P1 | LAB0-04 | blocked | Validation Architect | devcontainer execution environment | measured model-free devcontainer record using the same contract fields | The cloud-container tier can complete the bounded path reproducibly |
-| P1 | DATA-01 | in progress | Validation Architect | stable log formats | schema, semantic validator and first three-run batch with passing run `29572506104`; independent coding review and broader bounded extraction pending | The multi-agent process can be analyzed as a longitudinal case study |
-| P1 | MEDIA-01 | evidenced | Documentation Builder | CI-01 | schema, semantic validator, deterministic example, malformed-input tests and passing run `29549208249` | Generated educational media can be provenance- and review-gated without making it technical evidence |
-| P1 | TRACE-02 | evidenced | Validation Architect | trace schema accepted; CI-01 | pinned source-anchor manifest, corrected authored trace, deterministic replay and missing-data tests; passing run `29556540213` | Trace provenance and navigation remain valid against immutable source |
-| P1 | FIG-01 | evidenced | Documentation Builder | MEDIA-01 | deterministic GGUF-layout SVG, manifest checksums, alt text and passing run `29553868078` | Authoritative technical figures are reproducible without generative models |
-| P1 | VIEW-01 | evidenced | Documentation Builder | TRACE-02 | keyboard-operable static viewer, deterministic payload, evidence labels, transcript fallback and passing run `29559239071` | A narrow executable lecture can expose source, state and explanation without evidence inflation |
-| P1 | LIT-02 | evidenced | Literature Scout | none | official media/API capability matrix with provenance, privacy, accessibility, licensing, cost and caching implications | Optional media choices are evidence-based and reviewable |
-| P1 | VENUE-01 | in progress | Literature Scout | official publication | verified EAAI-27 call, deadlines, area, format and review criteria | Submission planning matches the current venue rather than prior-year assumptions |
-| P2 | LAB1-01 | evidenced | Documentation Builder | FIG-01; VIEW-01 | browser parser/visualizer, Python/golden agreement, Predict-Discover-Explain checkpoints, static fallback and passing run `29562479577` | Learners can inspect GGUF layout in-browser without confusing it with native inference |
-| P2 | PROGRESS-02 | evidenced | Documentation Builder / Validation Architect | progress schema; LAB1-01 | local storage adapter, deterministic export/import, version gate, corruption-preserving import, privacy checks and Lab 1 resume-state integration; passing run `29579032392` | Local-first progress is portable and privacy-minimizing at the application-contract level |
-| P2 | BASE-01A | evidenced | Validation Architect | information-equivalent baseline design; stable VIEW-01 fixture | versioned static-versus-viewer benchmark fixture, exact tasks, answer key, scoring, timeout, source revision, accessibility fallbacks and semantic validator; passing run `29583741909` | The viewer can be evaluated without confounding information availability |
-| P2 | REVIEW-02 | in progress | Adversarial Reviewer + Orchestrator | active stack | reviewer notes, claims-evidence table, ranked rejection risks and review scorecard added on `agent/review02-adversarial-evidence-gates`; final-head CI and orchestrator integration pending | Major rejection risks are explicit and can drive dependency ordering rather than feature expansion |
-| P2 | REVIEW-01 | blocked | Human | independent reviewer nominated | signed/dated expert review of fixture, trace, lab explanations, browser parser, figure and benchmark answer key | Technical correctness is independently supported |
-| P2 | MEDIA-02 | evidenced | Validation Architect | MEDIA-01; FIG-01 | deterministic accepted/revised/rejected dry run, retained decision reasons, exact input/output hashes and stale-asset tests; passing run `29587245436` | The media lifecycle is auditable without ordinary CI regeneration |
-| P3 | BASE-01 | blocked | Validation Architect | DATA-01 review; BASE-01A frozen; evaluation approval | completed comparison using the frozen information-equivalent benchmark and approved pathway | Viewer or workflow benefits are measured rather than inferred |
-| P3 | EVAL-01 | blocked | Human + Validation Architect | evaluation pathway approval | learner or expert study protocol, instruments, consent/ethics decision and approved recruitment path | Educational usefulness is evaluated rather than inferred from implementation |
-| P3 | DEMO-01 | blocked | Orchestrator | LAB0-03, LAB0-04, PROGRESS-02, MEDIA-02 | reproducible end-to-end Lab 0 + GGUF lab + viewer + figure + progress demo | The proposed system exists as a coherent educational artifact |
+| P0 | STACK-01 | ready | Orchestrator + Documentation Builder | current stacked PR chain | canonical merge map, superseded/overlap decisions, exact dependency order, CI state and human choices | The repository can become one reviewable artifact rather than an unmerged sequence of prototypes |
+| P0 | REVIEW-02 | in progress | Adversarial Reviewer + Orchestrator | final-head CI | reviewer package plus authoritative-state integration and passing commit-scoped CI | Rejection risks drive work ordering rather than broad feature expansion |
+| P0 | LAB0-03 | blocked | Validation Architect | clean Ubuntu 24.04 environment | measured model-free local-native record with exact revisions, commands, diagnostics and time-to-ready | The local-native tier completes the bounded path reproducibly |
+| P0 | LAB0-04 | blocked | Validation Architect | devcontainer execution environment | measured model-free devcontainer record using the same contract | The cloud-container tier completes the bounded path reproducibly |
+| P0 | REVIEW-01 | blocked | Human technical reviewer | reviewer nominated | signed/dated review and correction record for fixture, lab, trace, figure and benchmark | Technical correctness is independently supported |
+| P1 | DEMO-01A | ready | Documentation Builder + Validation Architect | STACK-01; existing vertical slices | integrated-demo acceptance checklist and cross-experience learner path | The contribution is a coherent learning progression rather than a tool collection |
+| P1 | DATA-01B | ready | Validation Architect | DATA-01 contract and first batch | frozen coding/missing-value rules, broader bounded sample and independent coding review | The agent process is analyzable as a longitudinal case study rather than selected anecdotes |
+| P1 | EVAL-01 | blocked | Human + Validation Architect | pathway and ethics decision | approved expert or learner protocol, instruments, consent/ethics determination and recruitment boundary | Educational usefulness can be evaluated rather than inferred |
+| P1 | BASE-01 | blocked | Validation Architect | EVAL-01; BASE-01A; REVIEW-01 | completed information-equivalent comparison with frozen scoring and limitations | Viewer benefit is measured rather than attributed to visual novelty |
+| P1 | VENUE-01 | in progress | Literature Scout | official publication | verified EAAI-27 call, deadlines, area, format and review criteria | Submission planning matches the current venue |
+| P2 | LAB0-02 | evidenced | Validation Architect | Lab 0 report contract | schema, validator, toolchain checks, diagnostic taxonomy, timing definitions and security boundaries; CI `29565651085` | Setup/build evidence has a comparable machine-readable contract |
+| P2 | LAB1-01 | evidenced | Documentation Builder | deterministic fixture | browser parser/visualizer, golden agreement, checkpoints and static fallback; CI `29562479577` | Browser GGUF inspection is bounded and does not imply native inference |
+| P2 | PROGRESS-02 | evidenced | Documentation Builder / Validation Architect | LAB1-01 | local export/import, version gate, corruption-preserving import and Lab 1 resume state; CI `29579032392` | Anonymous local progress is portable at the application-contract level |
+| P2 | TRACE-02 | evidenced | Validation Architect | trace schema | immutable source anchors, authored trace, deterministic replay and malformed-input tests; CI `29556540213` | Trace provenance and replay are machine-checkable |
+| P2 | VIEW-01 | evidenced | Documentation Builder | TRACE-02 | keyboard viewer, evidence labels, source links and transcript fallback; CI `29559239071` | A narrow authored/source-derived executable lecture can coordinate source, state and explanation |
+| P2 | BASE-01A | evidenced | Validation Architect | VIEW-01 | information-equivalent fixture, tasks, answer key, scoring, timing and accessibility validator; CI `29583741909` | A fair comparison can avoid information-availability confounding |
+| P2 | MEDIA-01 | evidenced | Documentation Builder | none | media schema, provenance validator and secret-safe optional-generation boundary; CI `29549208249` | Generated supplements can be review-gated without becoming technical evidence |
+| P2 | FIG-01 | evidenced | Documentation Builder | MEDIA-01 | deterministic SVG, exact replay, checksums and alt text; CI `29553868078` | Authoritative technical figures need not depend on generative models |
+| P2 | MEDIA-02 | evidenced | Validation Architect | MEDIA-01; FIG-01 | accepted/revised/rejected lifecycle, reasons, exact hashes and stale detection; CI `29587245436` | Media decisions are auditable without ordinary-CI regeneration |
+| P2 | DATA-01 | evidenced | Validation Architect | stable log format | schema, validator and first three-archetype batch; CI `29572506104` | The retrospective contract represents success, repair and blocked reassignment |
+| P3 | DEMO-01 | blocked | Orchestrator | STACK-01; LAB0-03; LAB0-04; DEMO-01A | clean integrated end-to-end execution and deployed or locally reproducible artifact | The system exists as one coherent educational experience |
 
 ## Current evidence boundaries
 
-### REVIEW-02
+- Passing CI proves deterministic integration, not learning, native execution or independent correctness.
+- The browser GGUF lab uses a synthetic teaching fixture and does not execute llama.cpp, `mmap`, GGML graph construction or inference.
+- The viewer replays authored/source-derived evidence and is not yet a native capture.
+- The Lab 0 contract is evidenced, but no measured Ubuntu or devcontainer row exists.
+- The first retrospective batch demonstrates schema coverage, not representativeness or workflow superiority.
+- Progress is local-only and anonymous; no server sync, identity or telemetry is approved.
+- Deterministic technical figures are authoritative. Optional generated media remains supplemental, cached, review-gated and unnecessary for the core demo.
 
-The adversarial package classifies four current fatal flaws: no usefulness evaluation, no independent technical review, no measured local/cloud Lab 0 runs and no longitudinal agent dataset. It also identifies evidence inflation, broad audience definition, authored-versus-captured trace ambiguity, visual novelty, stacked-PR integration and accessibility as major risks. The package is a review artifact, not evidence that the risks are resolved.
+## Fatal rejection-risk mapping
 
-### MEDIA-02
+1. **No usefulness evidence:** EVAL-01 and BASE-01.
+2. **No independent correctness:** REVIEW-01 and retained correction records.
+3. **No measured native/cloud reproducibility:** LAB0-03 and LAB0-04.
+4. **Selected agent anecdotes:** DATA-01B and independent coding review.
+5. **Tool collection rather than learning progression:** STACK-01, DEMO-01A and DEMO-01.
 
-The deterministic dry run contains exactly one accepted, revised and rejected record. Revised and rejected candidates remain cached but unpublished, with explicit human-review reasons. The validator recomputes committed input/output hashes and byte counts and rejects external generation in ordinary CI. Passing CI establishes lifecycle-contract integration only; it does not establish generative-media usefulness, technical correctness or educational benefit.
+## Scope cuts retained
 
-### BASE-01A
-
-The frozen fixture gives both conditions the same ordered source-derived evidence and the same four questions. The viewer may add only synchronized navigation, coordinated highlighting and deterministic visualization. The validator rejects information inequivalence, mutable source revisions, unknown evidence, missing transfer tasks, scoring/timing drift and missing accessibility fallbacks. Passing CI establishes the pre-evaluation contract; it does not demonstrate learner benefit.
-
-### PROGRESS-02
-
-The canonical local adapter has passing commit-scoped CI and is connected to Lab 1. A successful parse stores only anonymous resume state: the lesson is `in-progress`, the last reached step is recorded, and formative checkpoints remain `unanswered`. This does not establish cross-browser persistence, checkpoint correctness, mastery, learner benefit, account sync or server-side storage.
-
-### DATA-01
-
-The first bounded retrospective batch contains one clean success, one CI repair retaining strict validation, and one blocked higher-priority task followed by dependency-safe reassignment. This shows representational coverage only. Independent coding review, missing-value rules and broader extraction remain required.
-
-### LAB0
-
-The comparison contract is evidenced, but no measured Ubuntu or devcontainer record exists. Model-free launch must never be labelled model loading or inference.
-
-## Rejection-risk mapping
-
-- **No educational evidence:** require EVAL-01 and BASE-01; contract coverage is not a substitute.
-- **Incorrect technical content:** require REVIEW-01 and correction records.
-- **Unmeasured reproducibility:** require LAB0-03 and LAB0-04.
-- **Agent anecdotes rather than case-study data:** expand and audit DATA-01.
-- **Only a tool collection:** require DEMO-01 plus a cross-experience learning progression.
-- **Visual novelty without learning value:** BASE-01A supplies the fair comparison contract; BASE-01 remains required for measured evidence.
-- **Unreproducible AI media:** deterministic figures remain authoritative; optional generated assets require manifest review and lifecycle evidence.
-- **Unrealistic scope:** paid media, authenticated synchronization, full native instrumentation and cloud polish remain cut before the core demo.
+- no authenticated synchronization;
+- no participant recruitment before approval;
+- no paid media dependency for the core path;
+- no full native instrumentation before bounded provenance and size review;
+- no manuscript drafting before the explicit gate in `orchestrator-state.md`.
