@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 05:18 Africa/Cairo_
+_Last updated: 2026-07-17 06:00 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -12,7 +12,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P1 | TRACE-02 | ready | Validation Architect | trace schema accepted; CI-01 | pinned source-link resolver, deterministic replay tests, missing-field tests, 500-step/2 MiB browser bound | Trace provenance and navigation remain valid against immutable source |
 | P1 | VIEW-01 | blocked | Documentation Builder | CI-01, TRACE-02 | keyboard-operable viewer shell, step forward/back, evidence labels, transcript/static fallback | A narrow executable lecture can expose source, state and explanation without evidence inflation |
 | P1 | LAB0-02 | ready | Validation Architect | Lab 0 report contract | reproducibility matrix, toolchain checks, diagnostic taxonomy, time-to-ready protocol | Setup/build evidence is comparable across supported environments |
-| P1 | LIT-02 | ready | Literature Scout | none | official media/API capability matrix with provenance, privacy, accessibility, licensing, cost and caching implications | Optional media choices are evidence-based and reproducible enough for an experience report |
+| P1 | LIT-02 | evidenced | Literature Scout | none | official media/API capability matrix plus `docs/media/pipeline-design.md` with provenance, privacy, accessibility, licensing, cost/caching and human-review requirements | Optional media choices are evidence-based and constrained enough for an experience report |
 | P1 | VENUE-01 | in progress | Literature Scout | official publication | verified EAAI-27 call, deadlines, area, format, review criteria | Submission plan matches the current venue rather than prior-year assumptions |
 | P2 | FIG-01 | blocked | Documentation Builder | MEDIA-01 | one deterministic figure generated from structured trace/fixture data plus manifest/checksum/alt text | Authoritative technical figures are reproducible without generative models |
 | P2 | LAB1-01 | blocked | Documentation Builder | CI-01, progress contract integrated | browser parser/visualizer, Python/golden agreement, Predict-Discover-Explain checkpoints, static fallback | Learners can inspect GGUF layout in-browser without confusing it with native inference |
@@ -31,6 +31,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 - Local-only learner-progress schema and privacy constraints.
 - Initial browser/local/cloud platform literature map.
 - Strict MkDocs handoff-link repair with passing commit-scoped CI.
+- Official OpenAI, Gemini/Nano Banana and NotebookLM media-capability review with deterministic-authority, caching, privacy, accessibility and human-review requirements.
 
 ## Rejection-risk mapping
 
@@ -38,5 +39,5 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 - **No educational evidence:** require EVAL-01 and formative-assessment artifacts in Lab 0/Lab 1/viewer.
 - **Incorrect technical content:** require REVIEW-01 and pinned source-link validation.
 - **Visual novelty without learning value:** viewer and media work must state measurable code-tracing or misconception outcomes.
-- **Unreproducible AI media:** deterministic figures are authoritative; optional generated assets require MEDIA-01.
+- **Unreproducible AI media:** deterministic figures are authoritative; optional generated assets require MEDIA-01 and the LIT-02 lifecycle constraints.
 - **Unclear agent contribution:** retain assignments, failures, corrections, human decisions and costs through DATA-01.
