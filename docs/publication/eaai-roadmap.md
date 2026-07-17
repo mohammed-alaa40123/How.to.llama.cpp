@@ -1,6 +1,6 @@
 # EAAI publication roadmap
 
-_Last updated: 2026-07-17 03:06 Africa/Cairo_
+_Last updated: 2026-07-17 06:01 Africa/Cairo_
 
 This roadmap turns repository milestones into evidence gates for an EAAI experience report. It does not authorize manuscript drafting.
 
@@ -11,6 +11,7 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 - Freeze target audience, educational problem, three lesson contracts and research questions.
 - Maintain authoritative orchestrator state, evidence backlog, handoff ledger and readiness scorecard.
 - Keep browser, local-native and cloud-container tiers intentionally unequal and explicitly labelled.
+- Integrate adversarial-review findings into dependency ordering without treating parallel PR artifacts as merged evidence.
 
 **Exit evidence:** coordination files exist; each artifact has an owner, dependency, validator, non-goals and accessibility fallback.
 
@@ -18,18 +19,28 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 
 - Integrate legal fixture decision and deterministic synthetic GGUF.
 - Integrate Lab 0 report contract, trace schema/sample and local-progress schema.
-- Add media manifest/provenance contract.
-- Repair strict MkDocs integration and obtain passing final-head CI.
+- Integrate media manifest/provenance contract.
+- Maintain passing strict MkDocs and commit-scoped Documentation CI.
+
+**Current status:** contract stack through `agent/media-manifest-validation` passed Documentation CI run `29549208249`.
 
 **Exit evidence:** all schemas have valid examples, malformed-input tests and passing CI; ordinary CI performs no paid API calls or model downloads.
 
 ### A3. Smallest vertical slice
 
-- Add a narrow keyboard-operable viewer for the authored GGUF trace.
-- Generate one deterministic technical figure from structured data.
-- Add source-link and replay validation.
+- Validate source links, replay semantics, missing-data behavior and browser bounds before viewer expansion.
+- Generate one deterministic GGUF-layout figure from structured fixture data with recomputed checksums.
+- Add a narrow keyboard-operable viewer for the authored GGUF trace only after trace validation passes.
 
 **Exit evidence:** deterministic local reproduction; evidence labels visible; transcript/static fallback; no native-capture overclaim.
+
+### A4. Case-study evidence foundation
+
+- Freeze a retrospective extraction schema for assignments, commits, failures, corrections, CI outcomes, human decisions, cost proxies and accepted/rejected outputs.
+- Preserve failed generations, duplicated work, blocked runs and integration repairs rather than reporting only successful artifacts.
+- Define the future baseline tasks before running comparative conditions.
+
+**Exit evidence:** one machine-readable retrospective dataset extraction can be reproduced from repository history without participant data.
 
 ## Phase B — Vertical slices, July 24-31, 2026
 
@@ -53,7 +64,7 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 
 ### B3. Executable lecture and media dry run
 
-- Connect viewer to one real or faithfully captured bounded path after authored-trace validation.
+- Connect viewer to one real or faithfully captured bounded path only after authored-trace validation and accessible viewer behavior are established.
 - Validate source links, evidence kinds, replay, size bounds and missing fields.
 - Run deterministic figure/media manifest pipeline; optional AI media only with credentials, caching, provenance and human approval.
 
@@ -75,6 +86,13 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 - Freeze claims-evidence table and limitations.
 - Resolve fatal and major adversarial-review concerns.
 - Activate Paper Integrator only after the gate in `orchestrator-state.md` is met.
+
+## July 17-31 scope cuts
+
+- Optional generated image, narration and video samples are noncritical.
+- Hosted/authenticated progress synchronization is out of scope.
+- Codespaces polish must not displace one reproducible devcontainer and local-native path.
+- Native trace instrumentation must not precede source-link, replay, keyboard and static-fallback validation.
 
 ## Generalization boundary
 
