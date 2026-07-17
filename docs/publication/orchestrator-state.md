@@ -1,18 +1,18 @@
 # EAAI research orchestrator state
 
-_Last updated: 2026-07-17 21:11 Africa/Cairo_
+_Last updated: 2026-07-18 00:01 Africa/Cairo_
 
 This file is the single source of truth for EAAI experience-report preparation. It coordinates bounded repository work and does not authorize manuscript drafting.
 
 ## Executive status
 
-**Phase:** Week 1 foundation transitioning to Week 2 integration and measured evidence.
+**Phase:** Week 1 foundation is substantially complete; the critical path is canonical integration, measured reproducibility and independently reviewed evidence.
 
-**Overall judgment:** the repository contains a coherent set of source-pinned, deterministic vertical-slice components and increasingly rigorous evidence contracts. However, the prospective experience report remains rejectable because the components are not yet integrated on one canonical branch, local/cloud Lab 0 reproducibility is unmeasured, independent technical correctness and evaluation pathways are absent, and the longitudinal agent dataset is not yet broadly extracted or independently coded.
+**Overall judgment:** the repository contains a coherent set of source-pinned, deterministic vertical-slice components and rigorous evidence contracts. The prospective experience report remains rejectable because those components are still distributed across stacked draft PRs, local/cloud Lab 0 reproducibility is unmeasured, independent technical correctness and evaluation pathways are absent, and the longitudinal agent dataset has not been broadly extracted or independently coded.
 
-**Current coordination head:** `agent/data01b-retrospective-coding-protocol` at `9bd3e9cac12ea55909709ba0c1951e82f05e9eb0`; Documentation CI run `29598733410` passed.
+**Current coordination base:** `agent/doc-audit01-ci-attestation` at `b2a39213615e39852cbfd90f23296a493c8e63a2`. The predecessor documentation-audit protocol passed Documentation CI run `29606172245`; final-head CI for this reconciliation is required.
 
-**Stack state:** `STACK-01` produced a canonical merge map, `DEMO-01A` produced the integrated learner-route acceptance contract, `VENUE-01` verified the official EAAI-27 call, and the first bounded `DATA-01B` protocol passed CI. These artifacts remain distributed across stacked/parallel draft PRs and must be reconciled into one canonical integration branch.
+**Stack state:** `STACK-01` has a canonical merge map, but the human choice between overlapping progress implementations is still unresolved. `DEMO-01A`, `BLIND-01` and `DOC-AUDIT-01` now have bounded contracts; none of those contracts substitutes for an executed integrated demo, anonymous release artifact or completed systematic audit.
 
 ## Frozen educational framing
 
@@ -32,7 +32,7 @@ The environment teaches learners to distinguish:
 - build success from model loading and inference;
 - browser-derived format inspection from native llama.cpp behavior.
 
-The claim that existing documentation broadly fails to make these distinctions remains a **hypothesis** pending a systematic documentation audit.
+The claim that existing documentation broadly fails to make these distinctions remains an **Open Question** pending execution of the predefined documentation audit.
 
 ### Initial learning experiences
 
@@ -40,7 +40,7 @@ The claim that existing documentation broadly fails to make these distinctions r
 2. **Lab 1 — GGUF Anatomy:** predict, parse, inspect and explain a deterministic synthetic GGUF while preserving browser/native boundaries.
 3. **Executable Lecture 0 — GGUF loading trace:** reconstruct a bounded source-pinned path using authored/source-derived evidence and a fair static-source/text baseline.
 
-`DEMO-01A` freezes a single learner route joining these experiences, local progress portability and evidence-kind synthesis. It is an acceptance specification, not evidence that the route has been executed end to end.
+`DEMO-01A` freezes one learner route joining these experiences, local progress portability and evidence-kind synthesis. It is an acceptance specification, not evidence that the route has been executed end to end.
 
 ## Research questions
 
@@ -75,7 +75,9 @@ The project must not be framed as a tool collection. `DEMO-01` must execute the 
 - three-record agent-workflow batch, explicit missing-data rules and frozen DATA-01B coding protocol;
 - adversarial claims-evidence, rejection-risk and scorecard package;
 - canonical integration map and integrated-demo acceptance specification;
-- official EAAI-27 call verification in `VENUE-01`.
+- official EAAI-27 call verification;
+- machine-checkable double-blind release contract with a deliberately non-ready example;
+- predefined documentation-gap audit protocol with commit-scoped CI evidence.
 
 ### Unevidenced central claims
 
@@ -85,6 +87,8 @@ The project must not be framed as a tool collection. `DEMO-01` must execute the 
 - independent llama.cpp/GGML correctness;
 - native or faithfully captured trace provenance beyond authored/source-derived replay;
 - longitudinal representativeness, inter-rater agreement and adjudicated agent-workflow evidence;
+- a supported ecosystem-wide documentation gap;
+- a reviewed anonymous submission artifact;
 - generalization beyond llama.cpp.
 
 ## Reviewer disposition
@@ -99,9 +103,11 @@ Fatal evidence gaps:
 4. no broader independently coded longitudinal agent dataset;
 5. no canonical integrated end-to-end demo.
 
+Submission-critical but not yet fatal-to-concept gaps: no completed fair baseline, no reviewed anonymous artifact and no completed documentation audit.
+
 ## Venue state
 
-`VENUE-01` verified the official EAAI-27 call on 2026-07-17. Planning now uses:
+`VENUE-01` verified the official EAAI-27 call on 2026-07-17. Planning uses:
 
 - likely category: Main Track, Area 2 — Experience Report and Innovative Practice;
 - abstract deadline: September 1, 2026, 11:59 PM UTC-12;
@@ -115,21 +121,21 @@ The experience-report requirement for context of use, collected data and substan
 
 ## Next 7 dependency-ordered actions
 
-1. **Human + Orchestrator — `STACK-01`:** approve the canonical progress implementation and merge order, then create one combined integration branch and run the complete Documentation CI suite.
+1. **Human + Orchestrator — `STACK-01`:** approve PR #24 as the lowest-risk canonical progress base or explicitly choose an alternative; then reconcile the mapped stack into one combined branch and run the complete Documentation CI suite.
 2. **Validation Architect — `LAB0-03`:** retain one measured model-free Ubuntu 24.04 record when a suitable environment is available.
 3. **Validation Architect — `LAB0-04`:** run the same bounded evidence contract in the devcontainer/Codespaces-compatible environment.
-4. **Orchestrator + Documentation Builder — `DEMO-01`:** execute the frozen `DEMO-01A` route on the canonical branch, including save/export/clear/import/resume and static fallback.
+4. **Orchestrator + Documentation Builder — `DEMO-01`:** execute the frozen `DEMO-01A` route on the canonical branch, including save/export/clear/import/resume and a no-JavaScript/static route.
 5. **Human technical reviewer — `REVIEW-01`:** review fixture, browser explanations, trace anchors, deterministic figure and benchmark answer key; retain corrections.
-6. **Validation Architect — `DATA-01B`:** freeze one immutable study window, extract every eligible durable run, obtain independent double-coding and adjudicate disagreements.
-7. **Human + Validation Architect — `EVAL-01`:** approve an expert-review or learner-evaluation pathway and ethics determination before any recruitment or personal-data collection.
+6. **Validation Architect — `DATA-01B`:** approve an immutable study window, extract every eligible durable run, obtain independent double-coding and adjudicate disagreements.
+7. **Human + Validation Architect — `EVAL-01`:** approve an expert-review or learner-evaluation pathway and ethics determination before recruitment or personal-data collection.
 
-The Literature and Venue Scout should next design the systematic llama.cpp/GGML documentation audit and maintain double-blind/anonymization planning; venue monitoring becomes maintenance rather than a central unknown.
+Parallel maintenance only: materialize `BLIND-01` after canonical integration, and execute `DOC-AUDIT-01` only with an independent second coder. Neither should displace the P0 integration and reproducibility path.
 
 ## Assignments by agent
 
-- **Documentation Builder:** support canonical integration and `DEMO-01`; no broad content expansion.
+- **Documentation Builder:** support `STACK-01` reconciliation and `DEMO-01`; no broad content expansion.
 - **Validation Architect:** `LAB0-03`, `LAB0-04`, then `DATA-01B`; preserve failed runs and never fabricate timings.
-- **Literature and Venue Scout:** systematic documentation-gap audit and `BLIND-01` anonymization/release plan.
+- **Literature and Venue Scout:** retain the official venue record, recruit an independent documentation-audit coder and monitor only material author-kit changes.
 - **Adversarial Reviewer:** review the canonical integration branch and executed demo for evidence inflation, tool-collection framing and browser/native confusion.
 - **Paper Integrator:** disabled.
 
@@ -140,13 +146,15 @@ The Literature and Venue Scout should next design the systematic llama.cpp/GGML 
 - nominate an independent llama.cpp/GGML reviewer;
 - approve an evaluation pathway and any required ethics review;
 - approve the retrospective study revision/window and independent coder;
+- nominate an independent documentation-audit coder;
+- approve the eventual anonymized artifact after identity, licensing, accessibility and technical checks;
 - decide whether optional paid media credentials may ever be used; the core demo does not require them.
 
 ## Readiness judgment
 
-**Coordination estimate:** 54% of pre-manuscript readiness.
+**Coordination estimate:** 55% of pre-manuscript readiness.
 
-This modest increase credits verified venue requirements, the canonical integration map, integrated-demo acceptance contract and frozen DATA-01B coding protocol. It gives no credit for measured educational benefit, independent correctness, measured native/container reproducibility, a combined branch or completed retrospective extraction.
+The one-point increase credits validated `BLIND-01` and `DOC-AUDIT-01` contracts and removal of stale venue uncertainty from the execution plan. It gives no credit for measured educational benefit, independent correctness, measured native/container reproducibility, a combined branch, completed retrospective extraction, an anonymous artifact or completed audit.
 
 ## Manuscript-writing gate
 
@@ -159,5 +167,5 @@ Do not activate the Paper Integrator until all conditions below have durable evi
 - at least one completed fair baseline comparison;
 - independent technical correctness review with correction records;
 - approved and completed learner or expert evaluation pathway, with ethics approval when required;
-- current official EAAI requirements and double-blind release plan;
+- current official EAAI requirements and a reviewed double-blind release artifact;
 - no unresolved fatal reviewer concern that invalidates the central contribution.
