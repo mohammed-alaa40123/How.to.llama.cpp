@@ -1,55 +1,60 @@
 # EAAI readiness scorecard
 
-_Last updated: 2026-07-17 09:22 Africa/Cairo_
+_Last updated: 2026-07-17 17:58 Africa/Cairo_
 
 Scores use a 0-4 evidence scale:
 
 - `0` absent;
 - `1` planned;
-- `2` implemented in a bounded draft artifact;
+- `2` implemented in a bounded artifact;
 - `3` validated and independently reviewed or exercised;
 - `4` publication-ready evidence with limitations documented.
 
 | Category | Score | Current evidence | Next requirement |
 |---|---:|---|---|
-| Educational framing | 2.5/4 | target audience, prerequisites, misconceptions and three lesson contracts frozen | systematic documentation-gap audit and expert review of objectives |
-| Research questions and contribution | 2/4 | four planning RQs and bounded contribution statements | claims-evidence table tied to collected data and baselines |
-| Lab platform architecture | 2/4 | unequal browser/local/cloud tiers and legal fixture policy | reproducibility matrix and clean-environment executions |
-| Lab 0 | 1.5/4 | six-phase schema, validator and model-free report | command runner, diagnostics, timing and local/devcontainer evidence |
-| GGUF browser lab | 1.25/4 | deterministic fixture, golden parse, figure and lesson contract | browser parser, checkpoints, progress adapter and accessibility validation |
-| Executable lecture | 2.5/4 | pinned trace, corrected source anchors, deterministic replay and keyboard-operable viewer with transcript fallback | bounded native/faithful capture, independent review and static baseline comparison |
-| Progress/privacy | 2/4 | local-only schema and privacy constraints | export/import, migration, corruption recovery and storage adapter tests |
-| Media/provenance | 2.5/4 | manifest validator, official API review and deterministic figure with exact checksums | acceptance/revision/rejection dry run and stale-asset test |
-| Accessibility | 2.5/4 | generated-site checks, viewer keyboard controls, live text status, reduced motion and transcript fallback | browser-level keyboard/focus testing for all vertical slices |
-| Technical correctness | 2/4 | pinned sources, source-anchor validation, deterministic fixtures and semantic validators | independent llama.cpp/GGML review |
-| Reproducibility | 2/4 | deterministic fixture/figure/viewer payload and passing integrated CI | supported-environment matrix and clean Lab 0 executions |
-| Agent-workflow evidence | 1.5/4 | durable logs, handoffs, corrections and stacked commits | retrospective extraction, human-correction and cost records |
-| Baseline comparison | 0.5/4 | three workflow conditions named | frozen benchmark tasks and completed fair comparison |
-| Learner/expert evaluation | 0.5/4 | outcomes and instruments outlined | approved protocol and collected evidence |
-| Ethics and AI disclosure | 2/4 | no-data/no-telemetry boundaries, local-first progress and generated-media review requirements | formal pathway decision and final disclosure inventory |
-| Venue fit and requirements | 1/4 | EAAI-26 experience-report criteria verified; AAAI-27 dates recorded separately | official EAAI-27 call and author instructions |
-| Reflection/negative results | 1.5/4 | CI failures, false source anchors, deterministic-output drift and limitations retained | structured retrospective dataset and synthesis |
+| Educational framing | 2.5/4 | primary/secondary audiences, misconceptions and three-experience progression frozen | systematic documentation-gap audit and expert review of objectives |
+| Research questions and contribution | 2.5/4 | four bounded planning RQs, claim boundaries and claims-evidence table | collected data tied to each RQ and evidence of coherence beyond a tool collection |
+| Lab platform architecture | 2.5/4 | unequal browser/local/cloud tiers, legal fixture policy and reproducibility contract | clean local/container execution and canonical integrated branch |
+| Lab 0 | 2/4 | six-phase schema, validator, exact toolchain checks, diagnostics and timing contract | measured Ubuntu 24.04 and devcontainer rows |
+| GGUF browser lab | 2.5/4 | deterministic parser, golden agreement, Predict-Discover-Explain checkpoints, static fallback and progress integration | real-browser accessibility review and educational-use evidence |
+| Executable lecture | 2.75/4 | pinned trace, deterministic replay, keyboard viewer, transcript fallback and frozen fair benchmark | independent correctness review and completed comparison; native/faithful capture remains optional and bounded |
+| Progress/privacy | 2.75/4 | local-only adapter, export/import, version gate, corruption-preserving import and Lab 1 resume state | real-browser denial/quota testing and transparent consent language for research use |
+| Media/provenance | 3/4 | deterministic figure, schema, exact hashes, accepted/revised/rejected lifecycle and stale checks | human technical review of any publishable optional generated asset |
+| Accessibility | 2.5/4 | structural site checks, keyboard controls, reduced motion and static/text alternatives | browser-level keyboard, focus and screen-reader exercise across integrated demo |
+| Technical correctness | 2/4 | source pinning, anchor validation, deterministic fixtures and semantic validators | independent llama.cpp/GGML review with correction records |
+| Reproducibility | 2/4 | deterministic assets and passing component CI | clean Ubuntu/devcontainer executions and one canonical integrated CI path |
+| Agent-workflow evidence | 2/4 | versioned contract and three-archetype retrospective batch | broader sample, coding rules, independent review, labor/cost and maintenance data |
+| Baseline comparison | 1.5/4 | frozen information-equivalent benchmark and scoring contract | approved and completed comparison |
+| Learner/expert evaluation | 0.5/4 | outcomes and instruments named only | approved pathway, ethics decision and collected evidence |
+| Ethics and AI disclosure | 2.5/4 | no-data/no-telemetry boundaries, local-first progress and generated-media review rules | formal evaluation pathway and final disclosure inventory |
+| Venue fit and requirements | 1/4 | EAAI-26 experience-report criteria retained as historical guidance | official EAAI-27 call and author instructions |
+| Reflection/negative results | 2.5/4 | CI repairs, rejected media, blockers, overlapping branches and adversarial risks retained | audited retrospective synthesis with human labor and cost proxies |
+| Integration/deployability | 1.5/4 | stacked validated components | canonical merge map, integrated branch and end-to-end clean-environment demo |
 
 ## Overall readiness
 
-**Weighted planning estimate: 39%**
+**Weighted coordination estimate: 50%**
 
-This percentage is a coordination signal, not a statistical measure. It is intentionally conservative because implementation artifacts cannot substitute for independent review, baseline comparison, native/environment reproducibility, or educational-use evidence.
+This percentage is a planning signal, not a statistical result. It increased for validated Lab 1/progress integration, benchmark freezing, media lifecycle evidence and explicit reviewer gates. It gives no credit for learner benefit, independent correctness, measured native/container reproducibility or current EAAI-27 requirements.
 
-## Week 1 milestone status
+## Two-week milestone status
 
-- **W1.1 Freeze contracts: 90%** — audience, lessons, tiers, legal fixture, trace, progress and media contracts exist; active-stack reviewer integration remains.
-- **W1.2 Smallest vertical slice: 90%** — fixture, authored trace, deterministic figure and minimal viewer exist with passing CI; Lab 0 remains a checker contract rather than an executable bootstrap.
-- **W1.3 Validation before expansion: 75%** — semantic/source/replay/media/accessibility validators and passing integration CI exist; reproducibility matrix, retrospective data schema and independent review remain.
+- **Week 1 foundation: 90%** — architecture, fixtures, schemas, narrow vertical slices and validators exist. The remaining foundation risk is integration of the stacked branch chain and independent review.
+- **Week 2 vertical slices: 45%** — browser GGUF, viewer, progress and media lifecycle components exist; measured Lab 0 local/cloud runs and one canonical end-to-end demo do not.
+- **Evidence package: 35%** — fair benchmark and retrospective contracts exist; completed evaluation, broader longitudinal extraction and independent correctness are absent.
+
+## Adversarial reviewer disposition
+
+**38/100; reject in current state.** This reviewer score and the coordination estimate measure different things. The coordination estimate tracks preparation progress; the reviewer score discounts unmeasured contracts and focuses on submission evidence.
 
 ## Fatal gate failures
 
 The manuscript gate remains closed because the project lacks:
 
-- a reproducible end-to-end Lab 0 and GGUF browser lab;
-- progress export/import connected to the lab;
-- retrospective workflow dataset;
-- baseline comparison;
-- independent technical review;
-- approved learner or expert evaluation pathway;
+- measured Ubuntu 24.04 and devcontainer Lab 0 evidence;
+- a canonical integrated end-to-end demo;
+- a broader independently reviewed retrospective dataset;
+- a completed fair baseline comparison;
+- independent technical correctness review;
+- an approved and completed learner or expert evaluation pathway;
 - verified current EAAI requirements.
