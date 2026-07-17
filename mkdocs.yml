@@ -63,6 +63,7 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js
   - assets/javascripts/mermaid-init.js
   - assets/javascripts/trace-viewer.js
+  - assets/javascripts/gguf-anatomy-lab.js
 
 nav:
   - Home: index.md
@@ -123,6 +124,7 @@ nav:
       - Metal backend semantics: lifecycle/metal-backend-semantics.md
   - Executable learning:
       - Legal fixture decision: labs/legal-fixture-decision.md
+      - Lab 1 GGUF Anatomy: labs/gguf-anatomy.md
       - Authored GGUF trace viewer: executable-lectures/trace-viewer.md
       - Trace source-link validation: executable-lectures/source-link-validation.md
       - Two-week execution plan: publication/two-week-execution-plan.md
