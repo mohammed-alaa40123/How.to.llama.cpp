@@ -1,18 +1,18 @@
 # EAAI research orchestrator state
 
-_Last updated: 2026-07-17 03:06 Africa/Cairo_
+_Last updated: 2026-07-17 09:22 Africa/Cairo_
 
 This file is the single source of truth for the EAAI experience-report preparation. It coordinates bounded repository work; it does not authorize manuscript drafting.
 
 ## Executive status
 
-**Phase:** Week 1 foundation — contracts, deterministic fixtures, schemas, and the smallest executable-learning vertical slice.
+**Phase:** Week 1 foundation — the smallest executable-learning vertical slice now exists as validated contracts, a deterministic fixture and figure, and a keyboard-operable authored trace viewer.
 
-**Overall judgment:** the project has a coherent educational-artifact direction and a useful repository-native agent case study, but it is not manuscript-ready. The strongest completed evidence is machine-checkable provenance and boundary enforcement. The weakest areas are actual learner/expert-use evidence, independent correctness review, baseline comparison, retrospective agent-workflow data, and a working end-to-end demo.
+**Overall judgment:** the repository now demonstrates a coherent evidence-labelled prototype rather than only architecture plans. The strongest evidence is deterministic provenance, source-revision pinning, replay validation, privacy boundaries, and passing integration CI. The weakest areas remain Lab 0 environment reproducibility, browser GGUF learning checkpoints, progress import/export, retrospective agent-workflow extraction, baseline comparison, independent correctness review, and approved educational evaluation.
 
-**Current stacked branch:** `agent/progress-schema-validation` at `82f3f8c7bdfaff1e33ffb4ea733422c07fa00ad5`.
+**Current stacked branch:** `agent/view01-static-trace-viewer` at `d02656c7d5d745c77a68b23613cf42050b6518ac`.
 
-**Current CI state:** Documentation CI run `29543838455` failed only at strict MkDocs integration after all context, link, source-index, unit-test discovery, shell, Python-compilation, and asset-validation steps passed. This is a release blocker for the stacked branch and must be resolved before new viewer or media features are accepted.
+**Current CI state:** Documentation CI run `29559239071` completed successfully for the viewer branch. This closes `VIEW-01` as an integrated prototype. The result proves deterministic build and site integration; it does not prove learner benefit, native capture, or independent technical correctness.
 
 ## Frozen educational framing
 
@@ -50,7 +50,7 @@ These are planning questions, not answered claims.
 ## Defensible contributions under construction
 
 1. A revision-pinned executable-learning environment for source-level AI-systems education.
-2. Machine-checkable contracts for lab evidence, trace provenance/replay, local learner progress, and eventually media provenance.
+2. Machine-checkable contracts for lab evidence, trace provenance/replay, local learner progress, and media provenance.
 3. A longitudinal, auditable case study of scheduled specialist agents operating with human supervision, deterministic tests, and repository memory.
 4. Design lessons about separating deterministic technical evidence from optional generated educational media.
 
@@ -60,20 +60,24 @@ These are planning questions, not answered claims.
 - Legal fixture decision: model-free Lab 0 core, learner-provided optional inference, and project-owned synthetic GGUF.
 - Deterministic 428-byte GGUF v3 generator, manifest, golden parse, checksum, alignment/range assertions, and corruption fixtures.
 - Lab 0 six-phase report contract and semantic validator.
-- Versioned executable-trace schema, authored GGUF-loading trace, replay/provenance validator, and malformed-input tests.
-- Versioned local-only learner-progress schema and privacy-minimizing validator on the latest stacked branch.
-- Initial literature map supporting intentionally unequal browser, local-native, and cloud-container tiers.
+- Versioned executable-trace schema, immutable source anchors, corrected authored GGUF-loading trace, deterministic replay, and malformed-input tests.
+- Minimal static trace viewer with Previous/Next and Arrow/Home/End navigation, evidence labels, pinned source links, live text status, reduced-motion handling, and ordered transcript fallback.
+- Versioned local-only learner-progress schema and privacy-minimizing validator.
+- Media manifest/provenance schema and validator.
+- Deterministic GGUF-layout SVG with exact replay, checksums, alt text, and passing CI.
+- Official media/API capability review that keeps generated media supplemental and manually review-gated.
 
-## Current contradictions and corrections
+## Current claim boundaries
 
-- README/project-state still list trace and progress schemas as unfinished even though stacked PRs implement them. They must be updated only after the stack is integrated and CI passes.
-- The latest progress-schema branch did not append its result to `agent-handoffs.md`; the orchestrator records it here pending a dedicated ledger update.
-- The sample trace is authored/source-derived, not native-captured. No documentation or UI may imply otherwise.
+- The viewer is authored/source-derived, not native-captured.
 - A passing model-free Lab 0 report proves environment/build/executable launch only, not model load or inference.
+- Browser parsing will be evidence about a synthetic fixture, not evidence of native llama.cpp execution.
+- Passing CI establishes deterministic integration, not educational effectiveness.
+- No learner or participant data has been collected.
 
 ## Venue state
 
-As of 2026-07-17, no official EAAI-27 call was found. The official AAAI-27 main-conference page lists Montréal, February 16-23, 2027, with main-track abstract and paper deadlines on July 21 and July 28, 2026; these dates must **not** be assumed to apply to EAAI. The latest verified EAAI call is EAAI-26, whose Experience Report and Innovative Practice area required development and use context, collected data, prior-literature motivation, novelty, and rich reflection on what worked, what did not, and why. Reverify the official EAAI-27 call before any submission decision.
+As of 2026-07-17, no official EAAI-27 call has been verified. The official AAAI-27 main-conference page lists Montréal, February 16-23, 2027, with main-track abstract and paper deadlines on July 21 and July 28, 2026; these dates must **not** be assumed to apply to EAAI. The latest verified EAAI call is EAAI-26, whose Experience Report and Innovative Practice area required development and use context, collected data, prior-literature motivation, novelty, and rich reflection on what worked, what did not, and why. Reverify the official EAAI-27 call before any submission decision.
 
 Official sources:
 
@@ -82,19 +86,19 @@ Official sources:
 
 ## Next 7 dependency-ordered actions
 
-1. **Documentation Builder — CI repair:** inspect strict MkDocs failure for run `29543838455`; make the narrowest integration fix and obtain a passing final-head Documentation CI result.
-2. **Documentation Builder — media contract:** add the media manifest/provenance schema and validator; deterministic technical figures remain authoritative and paid API calls remain manual/review-gated.
-3. **Documentation Builder — viewer shell:** after trace contract review and passing CI, add a static, keyboard-operable viewer shell for the authored GGUF trace with forward/back controls, evidence labels, and transcript fallback.
-4. **Validation Architect — source-link/replay validation:** validate trace source paths against the pinned revision and define browser performance, missing-data, and step-navigation acceptance tests.
-5. **Validation Architect — reproducibility matrix:** define supported local/container environments, exact toolchain checks, time-to-ready instrumentation, and stable diagnostic codes for Lab 0.
-6. **Literature and Venue Scout — media/provenance slice:** verify current official OpenAI, Gemini/Nano Banana, and NotebookLM capabilities and restrictions; produce design requirements, not promotional feature lists.
-7. **Literature and Venue Scout — venue watch:** locate the official EAAI-27 call when published and update venue requirements without borrowing AAAI main-track dates.
+1. **Validation Architect — `LAB0-02`:** define the supported-environment matrix, exact `uv`/compiler/CMake/Ninja checks, stable diagnostic taxonomy, and time-to-ready/time-to-first-token protocol.
+2. **Validation Architect — `DATA-01`:** define a retrospective extraction schema for assignments, commits, failures, corrections, validators, human-review decisions, cost proxies, and accepted/rejected outputs.
+3. **Documentation Builder — `LAB1-01`:** implement the narrow browser GGUF parser/visualizer with Predict-Discover-Explain checkpoints and explicit native-runtime exclusions.
+4. **Validation Architect — `PROGRESS-02`:** implement local export/import, migration, corruption recovery, and storage-adapter tests before connecting progress to Lab 1.
+5. **Adversarial Reviewer + Orchestrator — `REVIEW-02`:** integrate the reviewer package into the active stack and convert every major concern into a required evidence gate.
+6. **Literature and Venue Scout — source-comprehension baseline:** identify primary evidence for a fair static-source/text baseline and code-tracing outcome measures for the viewer.
+7. **Literature and Venue Scout — `VENUE-01`:** continue monitoring official EAAI-27 requirements without borrowing AAAI main-track dates.
 
 ## Human-action blockers
 
 - Approve the intended evaluation pathway before participant recruitment or personal-data collection.
 - Nominate an independent llama.cpp/GGML technical reviewer before correctness claims are made.
-- Decide whether any optional paid media API credentials may be used; no credential is needed for the deterministic Week 1 path.
+- Decide whether any optional paid media API credentials may be used; no credential is needed for the deterministic core path.
 - Review and merge the stacked PR chain in dependency order after CI passes.
 
 ## Manuscript-writing gate
