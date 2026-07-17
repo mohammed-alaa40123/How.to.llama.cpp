@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "2026-07-17T0658Z-figure-ci-repair",
+  "role": "documentation_builder",
+  "assignment": {
+    "id": "FIG-01",
+    "priority": "P1",
+    "objective": "Repair deterministic GGUF-layout figure evidence without weakening byte-for-byte replay validation.",
+    "dependency_state": "in_progress",
+    "selected_reason": "The first figure implementation reached CI but failed exact generator replay and manifest checksum assertions."
+  },
+  "revisions": {
+    "starting_commit": "bcb7555ef8b4e80817b5b812c35db6b1c6f7b9a9",
+    "ending_commit": "61a0ffdc10d421576826ed2325f074839c39d125",
+    "base_branch": "agent/media01-manifest-validation",
+    "working_branch": "agent/fig01-deterministic-gguf-layout"
+  },
+  "outputs": [
+    {"path": "media/generated/gguf-layout-deterministic-v0.svg", "kind": "fixture", "decision": "revised", "reason": "The checked-in SVG differed from generator output and was regenerated exactly."},
+    {"path": "media/manifests/gguf-layout-deterministic-v0.json", "kind": "fixture", "decision": "revised", "reason": "Output checksum and byte count were updated to the regenerated artifact."},
+    {"path": "tests/test_generate_gguf_layout_figure.py", "kind": "test", "decision": "accepted"},
+    {"path": "logs/research/2026-07-17/0658-deterministic-figure-ci-repair.md", "kind": "run_log", "decision": "accepted"}
+  ],
+  "validation": {
+    "validators": ["python3 -m unittest tests.test_generate_gguf_layout_figure", "Documentation CI"],
+    "failures": [
+      {"stage": "Documentation CI run 29551621279", "category": "ci", "resolution": "fixed", "summary": "Exact replay and manifest checksum tests failed because the committed SVG width and output metadata were stale."}
+    ],
+    "ci_state": "passed",
+    "ci_run_id": 29553868078
+  },
+  "human_supervision": {
+    "required": true,
+    "decisions": ["The repair retained strict byte-for-byte validation rather than loosening the evidence contract."],
+    "review_status": "pending"
+  },
+  "effort": {
+    "agent_turns": 1,
+    "tool_calls": 12,
+    "external_api_cost_usd": 0,
+    "paid_generation_calls": 0,
+    "human_minutes": 0
+  },
+  "claims": [
+    {"label": "Verified", "statement": "The deterministic figure now replays byte-for-byte from the structured synthetic GGUF fixture and matches its manifest.", "evidence_paths": ["tests/test_generate_gguf_layout_figure.py", "logs/research/2026-07-17/0658-deterministic-figure-ci-repair.md"]},
+    {"label": "Historical", "statement": "The first committed figure artifact and manifest metadata were inconsistent with generator output.", "evidence_paths": ["logs/research/2026-07-17/0658-deterministic-figure-ci-repair.md"]}
+  ]
+}
