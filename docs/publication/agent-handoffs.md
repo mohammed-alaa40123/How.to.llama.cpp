@@ -233,3 +233,26 @@ Replaced two Markdown links from `docs/publication/agent-handoffs.md` to run not
 ### Validation and next dependency
 
 No runtime, schema, fixture, learner-data, model, paid API, or publication claim changed. After CI passes, the next Documentation Builder assignment is the media manifest/provenance validator.
+
+## 2026-07-18 02:02 — Documentation Builder
+
+### Assignment status
+
+`STACK-01` remains blocked by the required human choice of canonical progress implementation and merge order. The next dependency-safe P0 item was the first available measured `LAB0-03` Ubuntu run, whose dedicated workflow failed while Documentation CI passed.
+
+### Bounded increment completed
+
+Hardened `.github/workflows/lab0-ubuntu-reproducibility.yml` so the exact JSON report is staged, checksummed and uploaded before semantic validation. The workflow now emits `LAB0_REPORT_MISSING` when no report exists and validates the same retained path that reviewers can download.
+
+Detailed record: `logs/research/2026-07-18/0202-lab0-evidence-retention-order.md`.
+
+### Truth labels
+
+- **Verified:** Ubuntu workflow run `29619592906` reached the runner step but failed validation and artifact upload; no artifact was retained. Documentation CI `29619592930` passed on the same PR head.
+- **Interpretation:** failed evidence must be retained before semantic rejection so setup/build/launch contradictions remain diagnosable and educationally useful.
+- **Historical:** the original lane validated before upload.
+- **Open question:** the next run must show whether the emitted report is semantically invalid or whether the failure was only retention/path related.
+
+### Validation and next dependency
+
+No Lab 0 commands, source revision, model policy, schema or claim changed. Commit-scoped workflow results are authoritative. Next: inspect the retained report from the rerun and make at most one evidence-backed repair; do not call `LAB0-03` reproducible until the report validates.
