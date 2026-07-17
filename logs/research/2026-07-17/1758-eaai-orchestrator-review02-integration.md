@@ -79,5 +79,6 @@ This is a documentation/state-only increment. Relevant validation is strict Docu
 - refreshed July 17-31 plan with explicit scope cuts;
 - next 7 assignments by agent.
 
-- **Ending commit:** pending final state-only commit and CI.
+- **Ending content commit:** `418decd653bb7565303c7c90035ea5be5686b43b`.
+- **Durable-record commit:** `a1148a1f3d6b0e146a9952b2c39a0edb2fbf4661`.
 - **Next dependency:** `STACK-01` canonical merge map, then measured `LAB0-03`/`LAB0-04` when suitable environments are available.
