@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 19:04 Africa/Cairo_
+_Last updated: 2026-07-17 19:58 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator, measured run or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -12,7 +12,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P0 | LAB0-04 | blocked | Validation Architect | devcontainer execution environment | measured model-free devcontainer record using the same contract | The cloud-container tier completes the bounded path reproducibly |
 | P0 | REVIEW-01 | blocked | Human technical reviewer | reviewer nominated | signed/dated review and correction record for fixture, lab, trace, figure and benchmark | Technical correctness is independently supported |
 | P1 | DEMO-01A | ready | Documentation Builder + Validation Architect | proposed STACK-01 map; existing vertical slices | integrated-demo acceptance checklist and cross-experience learner path | The contribution is a coherent learning progression rather than a tool collection |
-| P1 | DATA-01B | ready | Validation Architect | DATA-01 contract and first batch | frozen coding/missing-value rules, broader bounded sample and independent coding review | The agent process is analyzable as a longitudinal case study rather than selected anecdotes |
+| P1 | DATA-01B | in progress | Validation Architect | DATA-01 contract and first batch | frozen sampling/codebook, schema, validator and example now exist; still require broader bounded extraction, independent double-coding and adjudication | The agent process is analyzable as a longitudinal case study rather than selected anecdotes |
 | P1 | EVAL-01 | blocked | Human + Validation Architect | pathway and ethics decision | approved expert or learner protocol, instruments, consent/ethics determination and recruitment boundary | Educational usefulness can be evaluated rather than inferred |
 | P1 | BASE-01 | blocked | Validation Architect | EVAL-01; BASE-01A; REVIEW-01 | completed information-equivalent comparison with frozen scoring and limitations | Viewer benefit is measured rather than attributed to visual novelty |
 | P1 | VENUE-01 | in progress | Literature Scout | official publication | verified EAAI-27 call, deadlines, area, format and review criteria | Submission planning matches the current venue |
@@ -32,6 +32,10 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 
 `docs/publication/canonical-integration-map.md` now proposes one retained implementation spine, identifies superseded and overlapping branches, selects PR #24 as the lowest-risk progress default, preserves unique PR #23 migration/recovery behavior as a possible later bounded follow-up, and defines how parallel PRs #30/#31/#32 must be reconciled. The task remains open until the human choice is recorded and the combined branch passes full CI.
 
+## DATA-01B bounded result
+
+`docs/publication/retrospective-analysis.md` freezes the sampling frame, categorical codebook, missingness policy, double-coding workflow, adjudication rule and non-causal analysis boundary. The schema, semantic validator, example row and nine focused tests make silent convenience sampling, mutable revisions, duplicate records, unsafe paths, silent missingness and undocumented disagreement machine-checkable. DATA-01B remains open until a broader immutable sample is extracted and independently double-coded.
+
 ## Current evidence boundaries
 
 - Passing CI proves deterministic integration, not learning, native execution or independent correctness.
@@ -39,6 +43,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 - The viewer replays authored/source-derived evidence and is not yet a native capture.
 - The Lab 0 contract is evidenced, but no measured Ubuntu or devcontainer row exists.
 - The first retrospective batch demonstrates schema coverage, not representativeness or workflow superiority.
+- The DATA-01B protocol constrains future coding but does not itself provide a broader or independently reviewed dataset.
 - Progress is local-only and anonymous; no server sync, identity or telemetry is approved.
 - Deterministic technical figures are authoritative. Optional generated media remains supplemental, cached, review-gated and unnecessary for the core demo.
 
@@ -47,7 +52,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 1. **No usefulness evidence:** EVAL-01 and BASE-01.
 2. **No independent correctness:** REVIEW-01 and retained correction records.
 3. **No measured native/cloud reproducibility:** LAB0-03 and LAB0-04.
-4. **Selected agent anecdotes:** DATA-01B and independent coding review.
+4. **Selected agent anecdotes:** DATA-01B broader extraction and independent coding review.
 5. **Tool collection rather than learning progression:** STACK-01, DEMO-01A and DEMO-01.
 
 ## Scope cuts retained
