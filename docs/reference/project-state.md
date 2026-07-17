@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 17:58 Africa/Cairo_
+_Last updated: 2026-07-17 19:04 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers and next priority.
 
@@ -27,59 +27,61 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - First three-record retrospective workflow batch.
 - Adversarial reviewer package with claims-evidence, rejection risks and reviewer scorecard.
 
-## Latest bounded increment
+## Latest bounded increment — STACK-01 merge map
 
 ### Verified
 
-- The adversarial review identifies four fatal evidence gaps: usefulness evaluation, independent technical correctness, measured Ubuntu/devcontainer Lab 0 runs and a broader longitudinal agent dataset.
-- Component dependencies through MEDIA-02 have passing commit-scoped Documentation CI.
-- The authoritative orchestration state, evidence queue, readiness scorecard, roadmap and two-week plan now use those reviewer gates to order work.
-- The coordination readiness estimate is 50%; the adversarial reviewer score remains 38/100. These measure different things and neither is a publication result.
+- `docs/publication/canonical-integration-map.md` proposes one explicit retained implementation spine and a separate reconciliation order for parallel evidence/state branches.
+- PRs #13/#14 overlap on trace anchor/replay correction; PR #13 is the retained downstream dependency and PR #14 is proposed as superseded after preservation review.
+- PRs #23/#24 overlap on local progress; PR #25 and later learner-facing work depend on PR #24.
+- PRs #30, #31 and #32 are parallel descendants of PR #29 and require authority-state reconciliation rather than blind sequential merging.
+- Historical component CI identifiers are recorded, but no combined-head CI claim is made.
 
 ### Interpretation
 
-- The highest-value next repository increment is canonical integration planning, not another broad feature.
-- A coherent learning progression must be demonstrated explicitly or the contribution will appear to be a collection of tools.
+- PR #24 is the lowest-risk canonical progress default because it preserves the tested Lab 1 integration and later benchmark/media/reviewer stack.
+- Unique migration and last-known-valid recovery semantics from PR #23 should be reconsidered only as a later bounded follow-up after the canonical branch is stable.
+- One current authority state plus retained durable run logs is more reviewable than independently merging every orchestration snapshot.
 
 ### Historical
 
-- Earlier orchestration files still described the project at the minimal-viewer stage even though Lab 1, progress, benchmark and media lifecycle work had advanced.
-- The current update corrects that state mismatch without claiming the reviewer concerns are resolved.
+- The draft stack grew through bounded specialist increments while clean Ubuntu and devcontainer execution remained unavailable.
+- Earlier reviewer and orchestration snapshots remain useful longitudinal evidence but are not current authority.
 
 ### Open questions
 
-- Which overlapping progress branch is canonical?
-- What is the safe dependency/merge order for the stacked PR chain?
-- Can clean Ubuntu 24.04 and devcontainer environments complete the model-free Lab 0 path?
-- Who will perform independent llama.cpp/GGML review?
-- Which expert or learner evaluation pathway will be approved, and what ethics review is required?
-- When will official EAAI-27 requirements be published?
+- Human approval of PR #24 as the canonical progress implementation.
+- Whether PR #14 or PR #23 contains a uniquely stronger invariant that should become a later follow-up.
+- Full CI and deployed-site verification for one combined integration head.
+- Clean Ubuntu 24.04 and devcontainer Lab 0 execution, independent technical review and evaluation approval.
 
 ## Immediate next task
 
 ```text
-STACK-01 canonical integration map
-  → list every active stacked PR and dependency
-  → mark retained, superseded, overlapping and human-choice branches
-  → nominate one canonical merge path without merging automatically
-  → then execute LAB0-03 and LAB0-04 when suitable environments exist
-  → define DEMO-01A acceptance criteria on the canonical path
+STACK-01 human approval and canonical branch execution
+  → approve the PR #24 progress default or choose PR #23 explicitly
+  → apply the retained spine and evidence side branches once
+  → reconcile one current orchestration state
+  → run the full Documentation CI suite on one combined head
+  → then execute LAB0-03/LAB0-04 when environments exist
+  → DEMO-01A may proceed as the next dependency-safe documentation task
 ```
 
 ## Publication and validation state
 
-- `docs/publication/orchestrator-state.md` is authoritative.
-- `docs/publication/evidence-backlog.md` now prioritizes STACK-01, measured Lab 0, independent review, broader DATA-01 and evaluation approval.
-- Passing CI establishes deterministic integration only.
+- `docs/publication/orchestrator-state.md` remains authoritative.
+- `docs/publication/evidence-backlog.md` records STACK-01 as in progress: the proposed map exists, but human approval and passing combined-head CI do not.
+- Passing component CI establishes bounded contracts only; it does not establish combined deployability, learner benefit, native execution or independent correctness.
 - No participant data, telemetry, authenticated sync, restricted model weights, paid generation or manuscript prose were introduced.
 
 ## Known blockers
 
+- no approved canonical progress-branch choice;
+- no canonical combined branch with passing CI;
 - no real Ubuntu 24.04 or devcontainer Lab 0 record;
 - no independent technical reviewer;
-- overlapping progress branches and a long stacked draft-PR chain;
 - no approved evaluation/ethics pathway;
-- no official EAAI-27 call verified;
+- authority-state updates from official venue and retrospective side branches still require reconciliation;
 - Pages verification applies only after canonical integration reaches `main` and deploys.
 
 ## Definition of done for manuscript readiness
