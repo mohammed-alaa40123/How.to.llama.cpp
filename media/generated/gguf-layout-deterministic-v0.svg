@@ -6,12 +6,12 @@
 <rect class="box" x="24" y="24" width="912" height="492" rx="12"/>
 <text class="label" x="48" y="58">Project-owned synthetic GGUF fixture</text>
 <text class="small" x="48" y="82">GGUF v3 · 428 bytes · 32-byte alignment · non-model teaching fixture</text>
-<rect class="box muted" x="48.00" y="110" width="775.25" height="54"/>
+<rect class="box muted" x="48.00" y="110" width="775.18" height="54"/>
 <text class="small" x="56.00" y="133">Header + metadata</text>
 <text class="small" x="56.00" y="152">bytes 0–383</text>
-<rect class="box payload" x="823.25" y="110" width="88.75" height="54"/>
-<text class="small" x="831.25" y="133">Tensor data</text>
-<text class="small" x="831.25" y="152">bytes 384–427</text>
+<rect class="box payload" x="823.18" y="110" width="88.82" height="54"/>
+<text class="small" x="831.18" y="133">Tensor data</text>
+<text class="small" x="831.18" y="152">bytes 384–427</text>
 <text class="label" x="48" y="205">Structured records</text>
 <text class="small" x="48" y="230">Metadata entries: 5</text>
 <text class="small" x="48" y="252">Tensor descriptors: 2</text>
