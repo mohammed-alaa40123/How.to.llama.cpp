@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 16:16 Africa/Cairo_
+_Last updated: 2026-07-17 17:06 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -26,57 +26,59 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Browser-first GGUF Anatomy slice with Predict-Discover-Explain checkpoints.
 - DATA-01 contract and first three-archetype retrospective batch with passing parent CI.
 - PROGRESS-02 local adapter, deterministic export/import and Lab 1 integration with passing run `29579032392`.
+- BASE-01A information-equivalent static-versus-viewer benchmark with passing run `29583844938`.
 
 ## Latest bounded increment
 
 ### Verified
 
-- The Lab 1 progress integration passed commit-scoped Documentation CI run `29579032392`.
+- `BASE-01A` passed commit-scoped Documentation CI run `29583844938`.
 - Measured Ubuntu and devcontainer Lab 0 rows remain blocked by unavailable execution environments; no timing or success record was fabricated.
-- BASE-01A now has a versioned information-equivalent benchmark fixture tied to the validated authored trace and pinned llama.cpp revision.
-- Both conditions expose identical ordered evidence and identical questions. The viewer may add only synchronized navigation, coordinated highlighting and deterministic visualization.
-- Four frozen tasks cover code tracing, evidence boundaries and one transfer item, with explicit answer keys, points, monotonic timing, timeout handling and accessibility fallbacks.
-- A semantic validator and eight focused tests reject mutable revisions, information inequivalence, question-order drift, interactive features in the static condition, missing transfer tasks, unknown evidence and absent static fallbacks.
+- `MEDIA-02` now contains exactly one accepted, revised and rejected deterministic lifecycle record.
+- Revised and rejected records remain unpublished and unapproved with explicit retained reasons.
+- The accepted specimen is approved, source-pinned, licensed and accessibility-described, but is explicitly only a lifecycle specimen rather than llama.cpp technical evidence.
+- The lifecycle validator reuses the individual media-manifest validator and recomputes committed input/output SHA-256 values and output byte counts.
+- Eight focused tests cover state coverage, duplicate identity, external-generation prohibition, generative-mode rejection, stale input/output checks and rejected-asset publication blocking.
 
 ### Interpretation
 
-- Comparing the viewer with an information-equivalent static condition is more defensible than comparing it with raw upstream source, because the latter would confound interface support with missing curated evidence.
-- Freezing tasks and scoring before any approved evaluation reduces outcome-selection and presentation confounds.
+- Retaining revised and rejected candidates may make human supervision and revision costs more visible than keeping only accepted outputs.
+- A deterministic no-cost lifecycle dry run is the safest prerequisite before any optional paid media generation.
 
 ### Historical
 
-- Raw-source comparison was previously identified as a major rejection risk because it would advantage the viewer through content availability rather than interaction design.
-- BASE-01A was taken only after PROGRESS-02 obtained passing final-head CI and the higher-priority measured Lab 0 tasks remained environment-blocked.
+- `MEDIA-01` established individual manifest boundaries and `FIG-01` established deterministic technical-figure replay.
+- `MEDIA-02` was selected after `BASE-01A` passed and the higher-value measured Lab 0 tasks remained environment-blocked.
 
 ### Open questions
 
-- Does final-head CI pass for the benchmark schema, fixture, validator and tests?
-- Will independent technical review accept the task wording and frozen answer key?
-- Does the viewer improve correctness, time, transfer or confidence calibration under an approved evaluation pathway?
+- Does final-head CI pass for the lifecycle fixtures, validator, tests and documentation?
+- Should revision and rejection reasons use a controlled taxonomy before broader retrospective extraction?
+- Will any future supplemental generated asset pass technical, accessibility, licensing, privacy and pedagogical review?
 - Can Ubuntu 24.04 and the devcontainer complete the bounded model-free Lab 0 path?
 
 ## Immediate next task
 
 ```text
-obtain commit-scoped CI for BASE-01A
-  → if failing, repair only the benchmark contract
-  → if passing, run MEDIA-02 deterministic lifecycle dry run
+obtain commit-scoped CI for MEDIA-02
+  → if failing, repair only lifecycle validation or fixture provenance
+  → if passing, close MEDIA-02 and take REVIEW-02 or a bounded DATA-01 extension
   → execute real Ubuntu and devcontainer Lab 0 rows when suitable environments exist
-  → do not recruit participants or claim learner benefit before approval
+  → do not call external media APIs from ordinary CI
 ```
 
 ## Publication and validation state
 
 - `docs/publication/orchestrator-state.md` is the single source of truth.
-- `docs/publication/evidence-backlog.md` records BASE-01A as in progress pending final-head CI.
-- Passing CI establishes a fair pre-evaluation contract, not educational effectiveness.
+- `docs/publication/evidence-backlog.md` records `MEDIA-02` as in progress pending final-head CI.
+- Passing CI can establish deterministic lifecycle integration, not generative-media usefulness or learner benefit.
 - No participant data, learner identity, model weights, telemetry, credentials, paid API generation, native instrumentation or manuscript prose were introduced.
 
 ## Known blockers and caveats
 
 - **Lab 0 execution:** no real Ubuntu/devcontainer row exists.
-- **Benchmark review:** task wording and answer-key correctness still require independent technical review.
-- **Evaluation approval:** the fixture does not authorize recruitment or personal-data collection.
+- **Independent correctness:** fixture, trace, lab explanations, parser, figure and benchmark tasks still require independent technical review.
+- **Evaluation approval:** no recruitment or personal-data collection is authorized.
 - **Retrospective accuracy:** the first DATA-01 records require independent coding review.
 - **Live site:** verify Pages only after the stacked chain merges to `main` and deploys.
 
