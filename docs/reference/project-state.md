@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 15:00 Africa/Cairo_
+_Last updated: 2026-07-17 16:16 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -12,7 +12,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Active milestone
 
-**Executable-learning Week 1 foundation — validated vertical slices plus auditable retrospective evidence**
+**Executable-learning Week 1 foundation transitioning to Week 2 integration and measured evidence**
 
 ## Completed foundations
 
@@ -25,61 +25,59 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Deterministic GGUF-layout figure with provenance and exact replay.
 - Browser-first GGUF Anatomy slice with Predict-Discover-Explain checkpoints.
 - DATA-01 contract and first three-archetype retrospective batch with passing parent CI.
-- PROGRESS-02 local adapter, deterministic export/import and passing commit-scoped CI run `29575542793`.
+- PROGRESS-02 local adapter, deterministic export/import and Lab 1 integration with passing run `29579032392`.
 
 ## Latest bounded increment
 
 ### Verified
 
-- The PROGRESS-02 local progress MVP passed Documentation CI run `29575542793`.
-- Real Lab 0 execution was retried as the higher-priority task but remains blocked in this connector-only runtime; no environment row or timing result was fabricated.
-- Lab 1 now loads the validated local progress adapter from a statically published module, stores anonymous resume state after a successful browser parse, and exposes keyboard-operable JSON export/import controls.
-- The stored lesson remains `in-progress`; all three formative checkpoints remain `unanswered`. Reaching the parser output is not converted into correctness or mastery.
-- Import validation occurs before mutation, and rejected files preserve existing local state.
-- Focused integration tests require the published module to match the canonical module byte-for-byte and reject telemetry or external synchronization hooks.
+- The Lab 1 progress integration passed commit-scoped Documentation CI run `29579032392`.
+- Measured Ubuntu and devcontainer Lab 0 rows remain blocked by unavailable execution environments; no timing or success record was fabricated.
+- BASE-01A now has a versioned information-equivalent benchmark fixture tied to the validated authored trace and pinned llama.cpp revision.
+- Both conditions expose identical ordered evidence and identical questions. The viewer may add only synchronized navigation, coordinated highlighting and deterministic visualization.
+- Four frozen tasks cover code tracing, evidence boundaries and one transfer item, with explicit answer keys, points, monotonic timing, timeout handling and accessibility fallbacks.
+- A semantic validator and eight focused tests reject mutable revisions, information inequivalence, question-order drift, interactive features in the static condition, missing transfer tasks, unknown evidence and absent static fallbacks.
 
 ### Interpretation
 
-- A browser lab can provide portable anonymous resume state without accounts, telemetry or a server dependency.
-- Separating “step reached” from “checkpoint passed” reduces the risk of treating navigation or completion as educational evidence.
+- Comparing the viewer with an information-equivalent static condition is more defensible than comparing it with raw upstream source, because the latter would confound interface support with missing curated evidence.
+- Freezing tasks and scoring before any approved evaluation reduces outcome-selection and presentation confounds.
 
 ### Historical
 
-- Lab 1 integration was added only after the progress schema, privacy contract, storage adapter and commit-scoped CI were established.
-- The source revision retained in the progress export is the immutable course revision embedded in the deterministic Lab 1 payload.
+- Raw-source comparison was previously identified as a major rejection risk because it would advantage the viewer through content availability rather than interaction design.
+- BASE-01A was taken only after PROGRESS-02 obtained passing final-head CI and the higher-priority measured Lab 0 tasks remained environment-blocked.
 
 ### Open questions
 
-- Final-head CI must pass for this integration branch.
-- Real-browser testing must verify storage denial, quota failure, keyboard flow and screen-reader announcements.
-- Checkpoint answer capture and scoring remain deliberately unimplemented.
-- Real Ubuntu and devcontainer Lab 0 measurements remain absent.
-- Independent technical review and an approved educational evaluation pathway remain required.
+- Does final-head CI pass for the benchmark schema, fixture, validator and tests?
+- Will independent technical review accept the task wording and frozen answer key?
+- Does the viewer improve correctness, time, transfer or confidence calibration under an approved evaluation pathway?
+- Can Ubuntu 24.04 and the devcontainer complete the bounded model-free Lab 0 path?
 
 ## Immediate next task
 
 ```text
-obtain commit-scoped CI for the Lab 1 progress integration
-  → execute real Ubuntu and devcontainer Lab 0 rows when network access exists
-  → freeze the information-equivalent BASE-01 benchmark fixture
-  → add browser accessibility evidence without collecting participant data
-  → do not claim learner benefit or workflow superiority before evaluation
+obtain commit-scoped CI for BASE-01A
+  → if failing, repair only the benchmark contract
+  → if passing, run MEDIA-02 deterministic lifecycle dry run
+  → execute real Ubuntu and devcontainer Lab 0 rows when suitable environments exist
+  → do not recruit participants or claim learner benefit before approval
 ```
 
 ## Publication and validation state
 
-- `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` remain authoritative.
-- Passing CI establishes deterministic integration, not learner benefit or workflow superiority.
+- `docs/publication/orchestrator-state.md` is the single source of truth.
+- `docs/publication/evidence-backlog.md` records BASE-01A as in progress pending final-head CI.
+- Passing CI establishes a fair pre-evaluation contract, not educational effectiveness.
 - No participant data, learner identity, model weights, telemetry, credentials, paid API generation, native instrumentation or manuscript prose were introduced.
 
 ## Known blockers and caveats
 
-- **Lab 0 execution:** this runtime cannot perform the required real native environment run; no real environment row was fabricated.
-- **Retrospective accuracy:** historical tool-call and human-minute values may be incomplete and must never be guessed.
-- **Independent review:** the three-run batch requires a human coding check before publication analysis.
-- **Workflow comparison:** DATA-01 enables analysis but does not replace BASE-01.
-- **Educational effectiveness:** no learner-benefit claim is permitted before an approved evaluation and fair baseline.
-- **Progress semantics:** local state records parser-step reachability only; it does not infer answers or mastery.
+- **Lab 0 execution:** no real Ubuntu/devcontainer row exists.
+- **Benchmark review:** task wording and answer-key correctness still require independent technical review.
+- **Evaluation approval:** the fixture does not authorize recruitment or personal-data collection.
+- **Retrospective accuracy:** the first DATA-01 records require independent coding review.
 - **Live site:** verify Pages only after the stacked chain merges to `main` and deploys.
 
 ## Definition of done for this phase
@@ -87,4 +85,4 @@ obtain commit-scoped CI for the Lab 1 progress integration
 - Complete learning contracts, legal fixture policy and three-tier platform boundaries.
 - Deterministic fixture, trace, figure, browser lab and model-free Lab 0 validation contracts.
 - Accessibility and privacy fallbacks for every introduced artifact.
-- Real Lab 0 environment evidence, progress import/export integrated into one lab, first retrospective dataset review and passing integrated CI.
+- Measured Lab 0 Ubuntu/devcontainer evidence, progress integrated into Lab 1, frozen fair benchmark, reviewed retrospective data, media lifecycle dry run and passing integrated CI.
