@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0.0",
+  "environment": {
+    "id": "local-ubuntu-24.04-x86_64",
+    "tier": "local_native",
+    "os": "ubuntu-24.04",
+    "architecture": "x86_64",
+    "support_state": "validated",
+    "offline_mode": "not_tested"
+  },
+  "revisions": {
+    "course": "0c70d9d4dec118095b2049b7442cfee6818c0f07",
+    "llama_cpp": "e3546c7948e3af463d0b401e6421d5a4c2faf565",
+    "uv_lock_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "toolchain": {
+    "uv": {"command": "uv --version", "version": "0.8.0-example", "passed": true},
+    "python": {"command": "python3 --version", "version": "3.12.3-example", "passed": true},
+    "cmake": {"command": "cmake --version", "version": "3.28.3-example", "passed": true},
+    "ninja": {"command": "ninja --version", "version": "1.11.1-example", "passed": true},
+    "compiler": {"command": "c++ --version", "version": "gcc-13.2-example", "passed": true}
+  },
+  "commands": {
+    "python_sync": "uv sync --locked",
+    "configure": "cmake -S llama.cpp -B build/lab0 -G Ninja -DGGML_NATIVE=OFF",
+    "compile": "cmake --build build/lab0 --target llama-cli -j 2",
+    "launch": "build/lab0/bin/llama-cli --help"
+  },
+  "timings": {
+    "started_monotonic_ms": 1000,
+    "ready_monotonic_ms": 91000,
+    "time_to_ready_ms": 90000
+  },
+  "result": {
+    "setup_success": true,
+    "build_success": true,
+    "launch_success": true,
+    "model_kind": "none",
+    "inference_state": "not_attempted",
+    "diagnostics": []
+  },
+  "security": {
+    "model_redistributed": false,
+    "secrets_recorded": false,
+    "personal_paths_recorded": false,
+    "network_required_after_cache": false
+  }
+}
