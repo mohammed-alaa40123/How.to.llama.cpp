@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+<title id="title">Synthetic GGUF v3 layout</title>
+<desc id="desc">A deterministic layout of a 428-byte synthetic GGUF file: header and metadata, tensor descriptors, alignment padding, and two bounded F32 tensor payloads.</desc>
+<style>text{font-family:system-ui,sans-serif;fill:#111}.label{font-size:16px;font-weight:700}.small{font-size:13px}.box{fill:#fff;stroke:#111;stroke-width:2}.muted{fill:#f3f4f6}.payload{fill:#e5e7eb}.guide{stroke:#111;stroke-width:1;stroke-dasharray:5 5}</style>
+<rect class="box" x="24" y="24" width="912" height="492" rx="12"/>
+<text class="label" x="48" y="58">Project-owned synthetic GGUF fixture</text>
+<text class="small" x="48" y="82">GGUF v3 · 428 bytes · 32-byte alignment · non-model teaching fixture</text>
+<rect class="box muted" x="48.00" y="110" width="775.18" height="54"/>
+<text class="small" x="56.00" y="133">Header + metadata</text>
+<text class="small" x="56.00" y="152">bytes 0–383</text>
+<rect class="box payload" x="823.18" y="110" width="88.82" height="54"/>
+<text class="small" x="831.18" y="133">Tensor data</text>
+<text class="small" x="831.18" y="152">bytes 384–427</text>
+<text class="label" x="48" y="205">Structured records</text>
+<text class="small" x="48" y="230">Metadata entries: 5</text>
+<text class="small" x="48" y="252">Tensor descriptors: 2</text>
+<text class="small" x="48" y="274">Tensor payload begins at aligned byte 384</text>
+<line class="guide" x1="48" y1="302" x2="912" y2="302"/>
+<text class="label" x="48" y="330">Tensor payload ranges</text>
+<rect class="box" x="48" y="354" width="864" height="72"/>
+<rect class="payload" stroke="#111" stroke-width="2" x="48.00" y="354" width="314.18" height="72"/>
+<text class="small" x="54.00" y="379">demo.matrix</text>
+<text class="small" x="54.00" y="401">F32 [2, 2] · bytes 384–399</text>
+<rect class="payload" stroke="#111" stroke-width="2" x="676.36" y="354" width="235.64" height="72"/>
+<text class="small" x="682.36" y="379">demo.vector</text>
+<text class="small" x="682.36" y="401">F32 [3] · bytes 416–427</text>
+<text class="small" x="48" y="462">Verified from labs/fixtures/gguf/synthetic-v0.golden.json; no model weights or native inference are represented.</text>
+<text class="small" x="48" y="486">Authority boundary: deterministic byte layout only. Runtime graph construction is outside this figure.</text>
+</svg>
