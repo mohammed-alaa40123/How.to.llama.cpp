@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mohammed-alaa40123.github.io/How.to.llama.cpp/schemas/retrospective-coverage.schema.json",
+  "title": "How.to.llama.cpp retrospective evidence coverage",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "batch_id", "source_revision", "records", "dimensions", "claim_boundary"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "batch_id": {"type": "string", "pattern": "^[a-z0-9-]{3,80}$"},
+    "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{4}Z-[a-z0-9-]{3,64}$"}
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "status", "reason", "evidence_paths"],
+        "properties": {
+          "field": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]{2,80}$"},
+          "status": {"enum": ["observed", "not_reconstructable", "not_applicable"]},
+          "reason": {"type": "string", "minLength": 10, "maxLength": 800},
+          "evidence_paths": {
+            "type": "array",
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 3, "maxLength": 300}
+          }
+        }
+      }
+    },
+    "claim_boundary": {"type": "string", "minLength": 30, "maxLength": 1200}
+  }
+}
