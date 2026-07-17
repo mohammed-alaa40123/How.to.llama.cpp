@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 06:00 Africa/Cairo_
+_Last updated: 2026-07-17 06:58 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -27,22 +27,23 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - EAAI July 17-31 plan, legal fixture boundary, deterministic synthetic GGUF, Lab 0 report contract, trace contract, progress contract, orchestration state, and evidence backlog.
 - Strict MkDocs handoff-link repair verified by Documentation CI run `29546570700`.
 - Media asset manifest/provenance contract verified by Documentation CI run `29549208249`.
-- Deterministic 2526-byte GGUF-layout SVG generated from the golden fixture with exact replay, checksum, byte-count, accessibility and evidence-boundary tests.
+- Deterministic GGUF-layout SVG generator, checked-in output, checksum/byte-count contract, accessibility metadata, and evidence-boundary tests.
 
 ## Latest concrete findings
 
 ### Verified
 
 - `MEDIA-01` passed Documentation CI run `29549208249` for commit `bcb7555ef8b4e80817b5b812c35db6b1c6f7b9a9`.
-- The authoritative GGUF-layout figure is generated only from `labs/fixtures/gguf/synthetic-v0.golden.json`.
-- Input SHA-256 is `ae0fd013da8f7f463e79447978b5a2837e0a52b13029ad6bb23d2fcf3e150968`.
-- Output SHA-256 is `3482f28bde713b4bf335007df8f2a1b73e0aaee8e88186a5c6419063e1b3b178`; output size is 2526 bytes.
-- Focused tests require byte-for-byte regeneration, manifest checksum/size agreement, accessible SVG title/description metadata, and explicit non-inference/runtime-graph boundaries.
+- Documentation CI run `29551621279` reached unit-test discovery and failed only the two deterministic-figure replay assertions; all earlier context, link, and source-index checks passed.
+- The failure was a checked-in-output drift: the generator produced header width `775.18`, while the committed SVG contained `775.25`; the manifest consequently recorded a stale output hash and byte count.
+- The SVG has been regenerated from `labs/fixtures/gguf/synthetic-v0.golden.json` using the committed generator.
+- Input SHA-256 remains `ae0fd013da8f7f463e79447978b5a2837e0a52b13029ad6bb23d2fcf3e150968`.
+- Repaired output SHA-256 is `d93ab0a5eafe0fe7a4ee2db737ce077d2babb275a5c656c07b81105ae851cd25`; repaired output size is 2525 bytes.
 - No generative model, model weight, external corpus, paid API, secret, telemetry or learner data is involved.
 
 ### Interpretation
 
-- Deterministic figures derived from hashed structured inputs are the appropriate authoritative media layer because their transformation can be replayed and checksum-verified.
+- Exact generator replay is stronger evidence than manually reviewed visual similarity; a one-character geometric drift correctly invalidated the manifest and prevented `FIG-01` from being marked evidenced.
 - The figure teaches storage layout only; using it to imply native GGUF loading, graph construction or inference would be evidence inflation.
 
 ### Historical
@@ -51,17 +52,17 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ### Open questions
 
+- The repaired branch still requires passing commit-scoped Documentation CI before `FIG-01` is evidenced.
 - Independent GGUF/llama.cpp technical review remains required before correctness claims rely on the figure.
 - Browser/Python parser agreement and pinned native GGUF-reader acceptance remain unimplemented.
 - The exact bounded Lab 0 target, supported environment matrix and diagnostic taxonomy remain unresolved.
-- Provider-specific media API, licensing, privacy, cost and reproducibility constraints remain assigned to the Literature Scout.
 
 ## Immediate next task
 
 ```text
-obtain commit-scoped Documentation CI for FIG-01
-  → if passing, keep FIG-01 evidenced
-  → wait for TRACE-02 before implementing the keyboard-operable viewer
+obtain commit-scoped Documentation CI for the repaired FIG-01 output
+  → if passing, mark FIG-01 evidenced
+  → do not implement VIEW-01 until TRACE-02 passes
   → proceed only to the next orchestrator-unblocked vertical-slice dependency
 ```
 
@@ -76,14 +77,13 @@ obtain commit-scoped Documentation CI for FIG-01
 ## Publication and validation state
 
 - `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` are authoritative.
-- `CI-01`, `MEDIA-01`, and the implementation evidence for `FIG-01` are closed; final-head CI is still required for this branch.
+- `CI-01` and `MEDIA-01` are evidenced; `FIG-01` implementation exists but remains open pending passing repaired-head CI.
 - No participant data, model, telemetry, credential, paid API call, generative-media output or manuscript prose was introduced.
 
 ## Known blockers and caveats
 
-- **Figure CI closure:** focused tests and manifest evidence are committed, but the final branch head needs a passing Documentation CI result.
+- **Figure CI closure:** the first figure branch CI exposed output/manifest drift; repaired final-head CI is now required.
 - **Viewer dependency:** `VIEW-01` remains blocked until `TRACE-02` validates pinned source links and replay behavior.
-- **Provider selection:** no optional generated-media provider may be selected until current official constraints are verified.
 - **Lab 0 runner:** the report interface exists, but no platform-specific runner or reproducibility matrix exists.
 - **Browser agreement:** no browser parser yet proves agreement with the Python golden output.
 - **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be an inference model.
