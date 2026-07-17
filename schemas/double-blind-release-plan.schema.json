@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://how-to-llama-cpp.example/schemas/double-blind-release-plan.schema.json",
+  "title": "Double-blind artifact release plan",
+  "type": "object",
+  "required": ["schema_version", "venue", "submission_revision", "release_mode", "public_artifact", "private_crosswalk", "checks", "approvals", "release_ready"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "venue": {"const": "EAAI-27"},
+    "submission_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "release_mode": {"enum": ["private_anonymized_supplement", "post_decision_public_release"]},
+    "public_artifact": {
+      "type": "object",
+      "required": ["root", "source_anchor_policy", "included", "excluded"],
+      "properties": {
+        "root": {"type": "string"},
+        "source_anchor_policy": {"const": "opaque_id_plus_sha256"},
+        "included": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "excluded": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+      },
+      "additionalProperties": false
+    },
+    "private_crosswalk": {
+      "type": "object",
+      "required": ["location", "custodian", "contains_identity_mapping", "published_before_decision"],
+      "properties": {
+        "location": {"type": "string"},
+        "custodian": {"type": "string"},
+        "contains_identity_mapping": {"const": true},
+        "published_before_decision": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "status", "evidence"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Z0-9_-]+$"},
+          "category": {"enum": ["identity", "repository", "provenance", "supplement", "licensing", "privacy", "accessibility", "cost"]},
+          "status": {"enum": ["pass", "blocked", "not_applicable"]},
+          "evidence": {"type": "string", "minLength": 1},
+          "blocker": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "approvals": {
+      "type": "object",
+      "required": ["author_anonymization_review", "technical_evidence_review", "licensing_review", "ethics_privacy_review"],
+      "properties": {
+        "author_anonymization_review": {"type": "boolean"},
+        "technical_evidence_review": {"type": "boolean"},
+        "licensing_review": {"type": "boolean"},
+        "ethics_privacy_review": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "release_ready": {"type": "boolean"}
+  },
+  "additionalProperties": false
+}
