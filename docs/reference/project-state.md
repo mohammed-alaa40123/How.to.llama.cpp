@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 11:04 Africa/Cairo_
+_Last updated: 2026-07-18 02:02 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -36,39 +36,45 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ### Verified
 
 - `LAB1-01` final head `0c70d9d4dec118095b2049b7442cfee6818c0f07` passed Documentation CI run `29562479577`.
-- The new Lab 0 reproducibility contract requires full course/upstream revisions, a `uv.lock` checksum, exact `uv sync --locked`, CMake with Ninja, a named bounded target, monotonic readiness timing, explicit offline state, stable diagnostics, and security declarations.
-- The semantic validator prevents model-free runs from recording inference or first-token timings and prevents a matrix row from being called `validated` unless setup, build, and model-free launch all pass.
-- Focused tests cover locked sync, impossible validated states, timing derivation, offline/network contradictions, missing tools, model-free first-token inflation, and a valid learner-provided-model timing path.
+- The Lab 0 reproducibility contract requires full course/upstream revisions, a `uv.lock` checksum, exact `uv sync --locked`, CMake with Ninja, a named bounded target, monotonic readiness timing, explicit offline state, stable diagnostics, and security declarations.
+- Ubuntu workflow run `29619592906` ran on Ubuntu `24.04.4`; the bounded runner step completed, but semantic validation and artifact upload failed.
+- No exact JSON artifact was retained from run `29619592906`, so the failing evidence could not be independently reviewed after the check.
+- Documentation CI run `29619592930` passed on the same pull-request head.
+- The workflow now stages and checksums the report, uploads it before semantic validation, validates the same retained path, and emits `LAB0_REPORT_MISSING` if the runner produces no report.
 
 ### Interpretation
 
 - A separate reproducibility record is useful because the earlier six-phase Lab 0 report identifies phase outcomes but does not define cross-environment comparability, stable failure codes, offline behavior, or timing semantics.
 - Stable diagnostic codes may turn setup failures into educational checkpoints, but learner usefulness is not established by implementation alone.
+- Failed measured evidence must be retained before semantic rejection; otherwise contradictions disappear and the failure is neither reproducible nor educationally diagnosable.
 
 ### Historical
 
 - Earlier work established source-pinned documentation, legal fixture policy, deterministic GGUF evidence, Lab 0 reporting, trace/progress/media contracts, deterministic figures, orchestration state, the authored trace viewer, and the browser GGUF slice.
+- The first Ubuntu workflow validated before upload and used one workspace-relative path for both operations.
 
 ### Open questions
 
-- Final-head CI must validate the new schema, semantic validator, tests, and MkDocs integration.
-- Real Ubuntu, macOS, WSL2, and devcontainer runs remain required; the checked-in report is a contract example, not cross-platform evidence.
-- Exact supported tool-version ranges and the pinned llama.cpp target/options require native execution review.
+- Whether the emitted Ubuntu report is semantically invalid or the failure was limited to report retention/path handling.
+- Whether the next run retains an exact artifact and passes the existing validator.
+- Real devcontainer, macOS, and WSL2 runs remain required.
+- Exact supported tool-version ranges and the pinned llama.cpp target/options require independent native review.
 - Independent technical review and an approved educational evaluation pathway remain required.
 
 ## Immediate next task
 
 ```text
-obtain commit-scoped CI for LAB0-02 contract
-  → if passing, retain status as partial/in-progress until real matrix runs exist
-  → execute Ubuntu local-native and devcontainer rows first
-  → do not claim inference or cross-platform reproducibility from the example report
+inspect the next commit-scoped Ubuntu 24.04 workflow
+  → download and review the retained JSON artifact
+  → classify the exact validator failure, if any
+  → make at most one evidence-backed repair
+  → do not claim LAB0-03 reproducibility before the report validates
 ```
 
 ## In progress
 
 - Draft PR stack for the EAAI executable-learning foundation.
-- `LAB0-02` reproducibility schema, validator, diagnostics, and timing protocol awaiting final-head CI and real environment runs.
+- `LAB0-03` measured Ubuntu run and evidence-retention repair.
 - `DATA-01` retrospective agent-workflow extraction contract.
 - `PROGRESS-02` progress export/import, migration, and corruption recovery.
 - Current-tree CPU_REPACK regeneration and sanitizer validation.
@@ -78,15 +84,16 @@ obtain commit-scoped CI for LAB0-02 contract
 
 - `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` remain authoritative.
 - `CI-01`, `MEDIA-01`, `FIG-01`, `TRACE-02`, `VIEW-01`, and `LAB1-01` have passing commit-scoped CI evidence.
-- `LAB0-02` now has a concrete validation contract but remains in progress until CI and real reproducibility rows are recorded.
+- `LAB0-02` has a validated contract; `LAB0-03` now has a real Ubuntu execution attempt but no validated retained report yet.
 - No participant data, model, telemetry, credential, paid API call, generated media output, native instrumentation, or manuscript prose was introduced.
 
 ## Known blockers and caveats
 
-- **Lab 0 execution:** no real environment row has yet been executed under the new contract.
-- **Lab 0 target:** the initial `llama-cli` command shape must be verified against the pinned upstream checkout before becoming a validated run.
+- **Canonical integration:** `STACK-01` still requires a human choice of progress implementation and merge order.
+- **Lab 0 evidence:** run `29619592906` produced no downloadable artifact; the retention repair requires a new commit-scoped run.
+- **Lab 0 target:** the `llama-cli` command shape must be supported by the retained validated record and independent review.
 - **Educational effectiveness:** no learner-benefit claim is permitted before an approved evaluation pathway and baseline comparison.
-- **Progress integration:** Lab 1 does not save learner answers until `PROGRESS-02` establishes import/export and corruption recovery.
+- **Progress integration:** canonical progress implementation remains unresolved across overlapping branches.
 - **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be a valid inference model.
 - **Live-site verification:** Pages should be rechecked only after stacked changes merge to `main` and deploy.
 - **Evidence retention:** artifact `8368782428` expires on 2026-08-15.

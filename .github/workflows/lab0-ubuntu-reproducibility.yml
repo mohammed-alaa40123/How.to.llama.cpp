@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - agent/lab0-03-ubuntu-measured-run
+      - agent/lab0-03-retain-before-validate
     paths:
       - ".github/workflows/lab0-ubuntu-reproducibility.yml"
       - "scripts/run_lab0_ubuntu_reproducibility.py"
@@ -40,21 +41,39 @@ jobs:
         continue-on-error: true
         run: python3 scripts/run_lab0_ubuntu_reproducibility.py
 
-      - name: Validate retained report
+      - name: Stage exact report for retention
+        id: retained
         if: always()
-        run: python3 scripts/validate_lab0_reproducibility.py artifacts/lab0-ubuntu-24.04-run.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_report="$GITHUB_WORKSPACE/artifacts/lab0-ubuntu-24.04-run.json"
+          retained_report="$RUNNER_TEMP/lab0-ubuntu-24.04-run.json"
+          if [[ ! -f "$source_report" ]]; then
+            echo "LAB0_REPORT_MISSING: runner did not emit $source_report" >&2
+            exit 1
+          fi
+          cp "$source_report" "$retained_report"
+          echo "retained_report=$retained_report" >> "$GITHUB_OUTPUT"
+          echo "Retained report checksum:"
+          sha256sum "$retained_report"
 
-      - name: Upload exact evidence record
-        if: always()
+      - name: Upload exact evidence record before validation
+        if: always() && steps.retained.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: lab0-ubuntu-24.04-${{ github.sha }}
-          path: artifacts/lab0-ubuntu-24.04-run.json
+          path: ${{ steps.retained.outputs.retained_report }}
           if-no-files-found: error
           retention-days: 30
 
+      - name: Validate retained report
+        id: validated
+        if: always() && steps.retained.outcome == 'success'
+        run: python3 scripts/validate_lab0_reproducibility.py "${{ steps.retained.outputs.retained_report }}"
+
       - name: Enforce successful validated path
-        if: steps.measured.outcome != 'success'
+        if: always() && (steps.measured.outcome != 'success' || steps.retained.outcome != 'success' || steps.validated.outcome != 'success')
         run: |
-          echo "The report was retained and validated, but the bounded Lab 0 path did not complete."
+          echo "The exact run result was retained when available, but the bounded Lab 0 path or its evidence validation did not complete."
           exit 1
