@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 21:13 Africa/Cairo_
+_Last updated: 2026-07-17 21:59 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator, measured run or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -16,7 +16,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P1 | EVAL-01 | blocked | Human + Validation Architect | pathway and ethics decision | approved expert or learner protocol, instruments, consent/ethics determination and recruitment boundary | Educational usefulness can be evaluated rather than inferred |
 | P1 | BASE-01 | blocked | Validation Architect | EVAL-01; BASE-01A; REVIEW-01 | completed information-equivalent comparison with frozen scoring and limitations | Viewer benefit is measured rather than attributed to visual novelty |
 | P1 | BLIND-01 | in progress | Literature Scout + Orchestrator | official EAAI-27 call | plan, schema, semantic validator and non-ready example now exist; still require anonymous bundle, identity scan, final license/accessibility checks and human approvals | Submission materials comply without destroying evidence provenance |
-| P1 | DOC-AUDIT-01 | ready | Literature Scout | predefined sampling protocol | systematic audit of official/community llama.cpp and GGML learning resources | The source-level documentation-gap hypothesis is supported, revised or rejected |
+| P1 | DOC-AUDIT-01 | in progress | Literature Scout | independent second coder and frozen result capture | predefined stratified sampling/rubric protocol, schema, validator and test fixture now exist; still require retained search results, double-coding and adjudication | The source-level documentation-gap hypothesis is supported, revised, rejected or left inconclusive |
 | P2 | VENUE-01 | evidenced | Literature Scout | official call | official EAAI-27 dates, area, format and review constraints in PR #31 | Submission planning matches the current venue |
 | P2 | REVIEW-02 | evidenced | Adversarial Reviewer + Orchestrator | reviewer package | rejection-risk package and orchestration integration; CI-backed ancestors | Rejection risks drive ordering rather than feature expansion |
 | P2 | LAB0-02 | evidenced | Validation Architect | Lab 0 report contract | schema, validator, toolchain checks, diagnostic taxonomy, timing and security; CI `29565651085` | Setup/build evidence has a comparable machine-readable contract |
@@ -32,11 +32,12 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 
 ## Dependency decisions
 
-- `STACK-01` is the only implementation-critical P0 task not environment- or human-reviewer-blocked. No new broad feature should precede the canonical branch.
+- `STACK-01` remains implementation-critical and human-blocked; no new broad learner-facing feature should precede the canonical branch.
+- `DOC-AUDIT-01` was the authorized dependency-safe task. Its protocol is now frozen, but the audit result remains open until retained search results, two independent coders and adjudication exist.
 - `DEMO-01A` is closed only as a specification. `DEMO-01` remains blocked until the route is executed on the canonical branch and measured tiers exist.
 - `VENUE-01` is closed because the official EAAI-27 call was verified. Venue monitoring continues only for author-kit changes.
 - `DATA-01B` protocol evidence is complete, but the case-study dataset is not. A protocol must not be reported as a longitudinal result.
-- `BLIND-01` now has a machine-checkable non-ready contract. It remains open until a clean anonymous bundle passes identity, licensing, accessibility and human-review gates.
+- `BLIND-01` has a machine-checkable non-ready contract. It remains open until a clean anonymous bundle passes identity, licensing, accessibility and human-review gates.
 
 ## Current evidence boundaries
 
@@ -45,6 +46,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 - The viewer replays authored/source-derived evidence and is not a native capture.
 - The Lab 0 contract is evidenced, but no measured Ubuntu or devcontainer row exists.
 - The first retrospective batch and coding protocol do not establish representativeness, inter-rater reliability or workflow superiority.
+- The documentation-gap statement remains an Open Question until `DOC-AUDIT-01` completes; the protocol alone cannot support novelty.
 - Progress is local-only and anonymous; no server sync, identity or telemetry is approved.
 - Deterministic technical figures are authoritative. Optional generated media remains supplemental and outside the critical path.
 - The live repository is not a double-blind artifact; public review materials require a clean allowlisted export and private source crosswalk.
@@ -57,6 +59,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 4. **Selected agent anecdotes:** `DATA-01B` extraction, double-coding and adjudication.
 5. **Tool collection rather than progression:** `STACK-01`, `DEMO-01A` and executed `DEMO-01`.
 6. **Double-blind evidence leakage:** complete `BLIND-01` with a scanned, reviewed anonymous bundle.
+7. **Unsupported novelty claim:** complete `DOC-AUDIT-01` or retain the documentation gap as inconclusive.
 
 ## Scope cuts retained
 

@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 21:13 Africa/Cairo_
+_Last updated: 2026-07-17 21:59 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers and next priority.
 
@@ -12,7 +12,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Active milestone
 
-**Executable-learning Week 1 foundation transitioning to canonical integration, measured Lab 0 evidence and independently reviewable longitudinal evidence.**
+**Executable-learning Week 1 foundation transitioning to canonical integration, measured Lab 0 evidence and independently reviewable publication evidence.**
 
 ## Completed bounded foundations
 
@@ -27,31 +27,32 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - First three-record retrospective workflow batch and frozen broader-coding protocol.
 - Adversarial reviewer package with claims-evidence, rejection risks and reviewer scorecard.
 - Official EAAI-27 venue verification, canonical integration map and integrated-demo acceptance contract.
+- Double-blind release contract and predefined documentation-gap audit protocol.
 
-## Latest bounded increment — BLIND-01 release contract
+## Latest bounded increment — DOC-AUDIT-01 protocol
 
 ### Verified
 
-- `docs/publication/double-blind-release-plan.md` defines a clean allowlisted anonymous supplement rather than exposing the live repository or rewriting public history.
-- `schemas/double-blind-release-plan.schema.json` and `scripts/validate_double_blind_release.py` require an immutable submission revision, opaque source IDs plus hashes, a private unpublished crosswalk, eight review categories and four human approvals.
-- The validator rejects public identity/repository tokens, mutable revisions, duplicate or incomplete checks, blocked checks without reasons, published crosswalks and false `release_ready` claims.
-- Eight focused tests, the example validation and Python compilation passed in an isolated local workspace.
+- `docs/publication/documentation-gap-audit.md` freezes four sampling strata, five initial queries, top-20 retained decisions, inclusion/exclusion reasons, nine coding dimensions and bounded conclusions.
+- `schemas/documentation-gap-audit.schema.json`, `scripts/validate_documentation_gap_audit.py`, the example protocol and eight focused tests make the protocol machine-checkable.
+- The protocol requires two independent coders, retained anchors and original labels, visible disagreements and adjudication.
+- The documentation-gap statement remains `open_question`; a single-coder or protocol-only batch cannot close the task.
 
 ### Interpretation
 
-- A clean export with a private crosswalk preserves source-linked verification more safely than sharing the identity-bearing live repository or deleting provenance.
-- Double-blind compliance should be treated as an evidence-release lifecycle, not a last-minute text-redaction step.
+- Stratified, query-retaining sampling is more defensible than selecting only exemplary or already-known resources.
+- Weak source depth is an audit result, not an exclusion reason.
 
 ### Historical
 
-- The live repository, stacked PRs and workflow records contain author/account metadata and are unsuitable as the anonymous review artifact.
+- Earlier literature work found useful educational patterns and noisy broad searches, but did not establish a llama.cpp/GGML documentation gap.
 - `STACK-01`, measured Lab 0 runs, independent review and evaluation remain blocked by human or environment dependencies.
 
 ### Open questions
 
-- Which canonical submission revision and integrated branch will be exported.
-- Whether the final EAAI-27 author kit adds artifact-hosting or self-citation constraints.
-- Who will complete anonymization, technical, licensing and privacy review.
+- What the retained search result frame contains at execution time.
+- Whether two independent coders agree on source-path and conceptual-boundary ratings.
+- Whether the final gap conclusion is supported, revised, rejected or inconclusive.
 - Human approval of PR #24 as the canonical progress implementation and full combined-head CI.
 
 ## Immediate next task
@@ -62,15 +63,17 @@ return to STACK-01 when the canonical progress/merge choice is approved
   → run complete Documentation CI
   → execute DEMO-01 and measured LAB0-03/LAB0-04 when environments exist
 otherwise
-  → design DOC-AUDIT-01 with a predefined sampling protocol
+  → execute DOC-AUDIT-01 only after an independent second coder is available
+  → do not strengthen the documentation-gap claim from the protocol alone
   → do not expand broad learner-facing features
 ```
 
 ## Publication and validation state
 
 - `docs/publication/orchestrator-state.md` remains authoritative.
-- `docs/publication/evidence-backlog.md` records `BLIND-01` as in progress: the release contract exists, but no anonymous bundle or final review exists.
-- Passing component CI establishes bounded contracts only; it does not establish combined deployability, learner benefit, native execution, longitudinal representativeness, independent correctness or anonymous-release readiness.
+- `docs/publication/evidence-backlog.md` records `DOC-AUDIT-01` as in progress: the predefined protocol exists, but retained search results, double-coding and adjudication do not.
+- `BLIND-01` remains in progress: the release contract exists, but no anonymous bundle or final review exists.
+- Passing component CI establishes bounded contracts only; it does not establish combined deployability, learner benefit, native execution, documentation-gap novelty, independent correctness or anonymous-release readiness.
 - No participant data, telemetry, authenticated sync, restricted model weights, paid generation or manuscript prose were introduced.
 
 ## Known blockers and caveats
@@ -80,6 +83,7 @@ otherwise
 - no real Ubuntu 24.04 or devcontainer Lab 0 record;
 - no independent llama.cpp/GGML technical reviewer;
 - no independent DATA-01B coder or approved retrospective study window;
+- no independent DOC-AUDIT-01 second coder or retained result frame;
 - no approved evaluation/ethics pathway;
 - no materialized anonymous artifact, identity scan, final license/accessibility review or release approvals;
 - Pages verification applies only after canonical integration reaches `main` and deploys.
@@ -93,4 +97,5 @@ otherwise
 - independent technical correctness review;
 - approved and completed evaluation pathway;
 - resolved fatal reviewer concerns;
-- verified current venue requirements and reviewed anonymous artifact-release path.
+- verified current venue requirements and reviewed anonymous artifact-release path;
+- documentation-gap language bounded by a completed systematic audit or explicitly reported as inconclusive.

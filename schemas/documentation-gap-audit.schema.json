@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://how-to-llama-cpp.example/schemas/documentation-gap-audit.schema.json",
+  "title": "Documentation gap audit protocol",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "protocol_id",
+    "repository_revision",
+    "hypothesis_status",
+    "target_audience",
+    "search_queries",
+    "strata",
+    "rubric_dimensions",
+    "sampling",
+    "coding",
+    "allowed_conclusions",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "protocol_id": {"const": "DOC-AUDIT-01"},
+    "repository_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "hypothesis_status": {"const": "open_question"},
+    "target_audience": {"type": "string", "minLength": 20},
+    "search_queries": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 5}
+    },
+    "strata": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "official_project_material",
+          "primary_educational_repositories",
+          "contributor_authored_explanations",
+          "community_tutorials"
+        ]
+      }
+    },
+    "rubric_dimensions": {
+      "type": "array",
+      "minItems": 9,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "revision_clarity",
+          "source_references",
+          "execution_path_coverage",
+          "runtime_evidence",
+          "conceptual_boundaries",
+          "learner_action",
+          "reproducibility",
+          "accessibility",
+          "license_clarity"
+        ]
+      }
+    },
+    "sampling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["results_per_query", "deduplicate", "retain_rank", "retain_exclusions", "freeze_before_coding"],
+      "properties": {
+        "results_per_query": {"const": 20},
+        "deduplicate": {"const": true},
+        "retain_rank": {"const": true},
+        "retain_exclusions": {"const": true},
+        "freeze_before_coding": {"const": true}
+      }
+    },
+    "coding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["independent_coders", "retain_original_labels", "retain_anchors", "adjudication_required", "single_coder_closes_task"],
+      "properties": {
+        "independent_coders": {"minimum": 2, "type": "integer"},
+        "retain_original_labels": {"const": true},
+        "retain_anchors": {"const": true},
+        "adjudication_required": {"const": true},
+        "single_coder_closes_task": {"const": false}
+      }
+    },
+    "allowed_conclusions": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {"enum": ["supported", "revised", "rejected", "inconclusive"]}
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 10}
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": "0.1.0",
+  "protocol_id": "DOC-AUDIT-01",
+  "repository_revision": "bd29d42449c8da20598975e2a0187ef0b16f3b32",
+  "hypothesis_status": "open_question",
+  "target_audience": "Advanced undergraduate and beginning graduate systems or ML-systems learners who can read C/C++ and Python.",
+  "search_queries": [
+    "llama.cpp tutorial",
+    "llama.cpp source code walkthrough",
+    "GGML graph construction explanation",
+    "GGUF loading source walkthrough",
+    "llama.cpp mmap scheduler backend internals"
+  ],
+  "strata": [
+    "official_project_material",
+    "primary_educational_repositories",
+    "contributor_authored_explanations",
+    "community_tutorials"
+  ],
+  "rubric_dimensions": [
+    "revision_clarity",
+    "source_references",
+    "execution_path_coverage",
+    "runtime_evidence",
+    "conceptual_boundaries",
+    "learner_action",
+    "reproducibility",
+    "accessibility",
+    "license_clarity"
+  ],
+  "sampling": {
+    "results_per_query": 20,
+    "deduplicate": true,
+    "retain_rank": true,
+    "retain_exclusions": true,
+    "freeze_before_coding": true
+  },
+  "coding": {
+    "independent_coders": 2,
+    "retain_original_labels": true,
+    "retain_anchors": true,
+    "adjudication_required": true,
+    "single_coder_closes_task": false
+  },
+  "allowed_conclusions": ["supported", "revised", "rejected", "inconclusive"],
+  "limitations": [
+    "The first protocol records unsupported languages rather than claiming global coverage.",
+    "Search ranking is time-sensitive and must be retained with UTC retrieval timestamps.",
+    "Documentation features do not by themselves establish learner benefit."
+  ]
+}
