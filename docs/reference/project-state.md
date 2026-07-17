@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 21:59 Africa/Cairo_
+_Last updated: 2026-07-17 23:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers and next priority.
 
@@ -29,23 +29,22 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Official EAAI-27 venue verification, canonical integration map and integrated-demo acceptance contract.
 - Double-blind release contract and predefined documentation-gap audit protocol.
 
-## Latest bounded increment — DOC-AUDIT-01 protocol
+## Latest bounded increment — DOC-AUDIT-01 CI attestation
 
 ### Verified
 
-- `docs/publication/documentation-gap-audit.md` freezes four sampling strata, five initial queries, top-20 retained decisions, inclusion/exclusion reasons, nine coding dimensions and bounded conclusions.
-- `schemas/documentation-gap-audit.schema.json`, `scripts/validate_documentation_gap_audit.py`, the example protocol and eight focused tests make the protocol machine-checkable.
-- The protocol requires two independent coders, retained anchors and original labels, visible disagreements and adjudication.
-- The documentation-gap statement remains `open_question`; a single-coder or protocol-only batch cannot close the task.
+- Documentation CI run `29606172245` completed successfully for protocol commit `40877656364bf3350fe94044068f2df133d18528`.
+- The passing run validates the protocol branch through the repository's Documentation CI workflow; it does not execute the systematic audit.
+- `docs/publication/evidence-backlog.md` now records the exact commit-scoped CI identifier for the protocol package.
 
 ### Interpretation
 
-- Stratified, query-retaining sampling is more defensible than selecting only exemplary or already-known resources.
-- Weak source depth is an audit result, not an exclusion reason.
+- Recording commit-scoped CI closes the protocol-validation uncertainty without inflating the status of `DOC-AUDIT-01`.
+- A validated audit instrument is necessary but not sufficient evidence for the proposed documentation-gap hypothesis.
 
 ### Historical
 
-- Earlier literature work found useful educational patterns and noisy broad searches, but did not establish a llama.cpp/GGML documentation gap.
+- The prior run created the stratified protocol, schema, validator, example and focused tests while commit-scoped CI was still pending.
 - `STACK-01`, measured Lab 0 runs, independent review and evaluation remain blocked by human or environment dependencies.
 
 ### Open questions
@@ -63,15 +62,15 @@ return to STACK-01 when the canonical progress/merge choice is approved
   → run complete Documentation CI
   → execute DEMO-01 and measured LAB0-03/LAB0-04 when environments exist
 otherwise
-  → execute DOC-AUDIT-01 only after an independent second coder is available
-  → do not strengthen the documentation-gap claim from the protocol alone
+  → do not execute or close DOC-AUDIT-01 without an independent second coder
+  → retain the documentation-gap statement as an Open Question
   → do not expand broad learner-facing features
 ```
 
 ## Publication and validation state
 
 - `docs/publication/orchestrator-state.md` remains authoritative.
-- `docs/publication/evidence-backlog.md` records `DOC-AUDIT-01` as in progress: the predefined protocol exists, but retained search results, double-coding and adjudication do not.
+- `docs/publication/evidence-backlog.md` records `DOC-AUDIT-01` as in progress: the protocol passed CI, but retained search results, double-coding and adjudication do not exist.
 - `BLIND-01` remains in progress: the release contract exists, but no anonymous bundle or final review exists.
 - Passing component CI establishes bounded contracts only; it does not establish combined deployability, learner benefit, native execution, documentation-gap novelty, independent correctness or anonymous-release readiness.
 - No participant data, telemetry, authenticated sync, restricted model weights, paid generation or manuscript prose were introduced.
