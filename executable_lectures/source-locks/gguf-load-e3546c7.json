@@ -1,0 +1,37 @@
+{
+  "lock_version": "0.1.0",
+  "repository": "ggml-org/llama.cpp",
+  "revision": "e3546c7948e3af463d0b401e6421d5a4c2faf565",
+  "files": [
+    {
+      "path": "ggml/src/gguf.cpp",
+      "blob_sha": "c3ffa1a13435bd531c259b6106a3a6763e4f2df9",
+      "anchors": [
+        {
+          "line": 451,
+          "function": "gguf_init_from_reader",
+          "line_text": "static struct gguf_context * gguf_init_from_reader(const struct gguf_reader & gr, struct gguf_init_params params) {",
+          "line_sha256": "00198cb175ae07cf034569b668e1628a3c6f72e125dd5d89f6919bb70c2a4a0a"
+        },
+        {
+          "line": 456,
+          "function": "gguf_init_from_reader",
+          "line_text": "    // file magic",
+          "line_sha256": "1c7438182835c6ca149f2294d5f1d012c51ce705500860127ebf6acc75116bf0"
+        },
+        {
+          "line": 623,
+          "function": "gguf_init_from_reader",
+          "line_text": "    // read the tensor info",
+          "line_sha256": "8324d237dd37a7add51ffff462d980d05b593c91bf8af0fb8d8b5fb9937bf110"
+        },
+        {
+          "line": 757,
+          "function": "gguf_init_from_reader",
+          "line_text": "    // we require the data section to be aligned, so take into account any padding",
+          "line_sha256": "10ba3181a91d189ac597150bfb2362c3d2e6d7c688a21c4362ef9db4e0c80ce9"
+        }
+      ]
+    }
+  ]
+}
