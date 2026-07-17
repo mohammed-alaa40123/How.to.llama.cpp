@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 16:24 Africa/Cairo_
+_Last updated: 2026-07-17 17:18 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -23,12 +23,16 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P2 | BASE-01A | evidenced | Validation Architect | information-equivalent baseline design; stable VIEW-01 fixture | versioned static-versus-viewer benchmark fixture, exact tasks, answer key, scoring, timeout, source revision, accessibility fallbacks and semantic validator; passing run `29583741909` | The viewer can be evaluated without confounding information availability |
 | P2 | REVIEW-02 | in progress | Adversarial Reviewer + Orchestrator | active stack | consolidated claims-evidence table, rejection risks and evidence gates | Major rejection risks are visible and drive dependency ordering |
 | P2 | REVIEW-01 | blocked | Human | independent reviewer nominated | signed/dated expert review of fixture, trace, lab explanations, browser parser and figure | Technical correctness is independently supported |
-| P2 | MEDIA-02 | ready | Validation Architect | MEDIA-01; FIG-01 | deterministic accepted/revised/rejected dry run and stale-asset test; no paid API call required | The media lifecycle is auditable without ordinary CI regeneration |
+| P2 | MEDIA-02 | evidenced | Validation Architect | MEDIA-01; FIG-01 | deterministic accepted/revised/rejected dry run, retained decision reasons, exact input/output hashes, stale-asset tests and passing run `29587245436` | The media lifecycle is auditable without ordinary CI regeneration |
 | P3 | BASE-01 | blocked | Validation Architect | DATA-01 review; BASE-01A frozen | completed comparison using the frozen information-equivalent benchmark and approved pathway | Viewer or workflow benefits are measured rather than inferred |
 | P3 | EVAL-01 | blocked | Human + Validation Architect | evaluation pathway approval | learner or expert study protocol, instruments, consent/ethics decision and approved recruitment path | Educational usefulness is evaluated rather than inferred from implementation |
 | P3 | DEMO-01 | blocked | Orchestrator | LAB0-03, LAB0-04, PROGRESS-02, MEDIA-02 | reproducible end-to-end Lab 0 + GGUF lab + viewer + figure + progress demo | The proposed system exists as a coherent educational artifact |
 
 ## Current evidence boundaries
+
+### MEDIA-02
+
+The deterministic dry run contains exactly one accepted, revised and rejected record. Revised and rejected candidates remain cached but unpublished, with explicit human-review reasons. The validator recomputes committed input/output hashes and byte counts and rejects external generation in ordinary CI. Documentation CI run `29587245436` passed the lifecycle fixtures, validator, focused tests and site integration. This establishes lifecycle-contract integration only; it does not establish generative-media usefulness, technical correctness or educational benefit.
 
 ### BASE-01A
 

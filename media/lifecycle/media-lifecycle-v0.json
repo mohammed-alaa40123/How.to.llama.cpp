@@ -1,0 +1,170 @@
+{
+  "schema_version": "0.1.0",
+  "dry_run_id": "media-lifecycle-v0",
+  "source_revision": "a0c4f01c9b9880f016b116e7172772fa572a35e3",
+  "ordinary_ci_external_generation": false,
+  "manifests": [
+    {
+      "schema_version": "0.1.0",
+      "asset_id": "media-lifecycle-accepted-v0",
+      "asset_kind": "diagram",
+      "authority": "authoritative-technical",
+      "review_status": "accepted",
+      "publication": {"publish": true},
+      "source": {
+        "repository": "mohammed-alaa40123/How.to.llama.cpp",
+        "revision": "a0c4f01c9b9880f016b116e7172772fa572a35e3",
+        "input_paths": ["media/lifecycle/media-lifecycle-input-v0.json"],
+        "input_sha256": ["2d92d48cbf9997025ab76b0d6f1a6094f97206095c1ab210aea49adc3aa3416c"]
+      },
+      "generation": {
+        "mode": "deterministic",
+        "generator": "MEDIA-02 committed dry-run fixture",
+        "generator_version": "0.1.0",
+        "model": null,
+        "prompt_path": null,
+        "prompt_sha256": null,
+        "storyboard_path": null,
+        "storyboard_sha256": null,
+        "manual_trigger": false,
+        "cached": true,
+        "ordinary_ci_allowed": true
+      },
+      "output": {
+        "path": "media/lifecycle/accepted-v0.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "ad6fd7a80233e48eb8c475196da899a784b822dca46a98be1f2e73850ecaa00e",
+        "bytes": 569
+      },
+      "accessibility": {
+        "alt_text": "A deterministic text-only media lifecycle specimen marked accepted for validation of review-state handling.",
+        "caption_path": null,
+        "transcript_path": null,
+        "static_fallback_path": "docs/media/lifecycle-dry-run.md",
+        "reduced_motion_safe": true
+      },
+      "technical_claims": [{
+        "claim": "The accepted specimen is generated deterministically from a committed project-owned lifecycle input.",
+        "evidence_kind": "verified"
+      }],
+      "licensing": {
+        "asset_license": "MIT",
+        "input_license_notes": "Project-owned deterministic dry-run input and SVG only.",
+        "redistribution_allowed": true
+      },
+      "human_review": {
+        "required": true,
+        "approved": true,
+        "reviewer_role": "Validation Architect",
+        "reviewed_at": "2026-07-17T17:06:00+03:00",
+        "notes": "Accepted for publication as a deterministic lifecycle specimen; not a llama.cpp technical diagram."
+      }
+    },
+    {
+      "schema_version": "0.1.0",
+      "asset_id": "media-lifecycle-revised-v0",
+      "asset_kind": "illustration",
+      "authority": "supplemental",
+      "review_status": "revised",
+      "publication": {"publish": false},
+      "source": {
+        "repository": "mohammed-alaa40123/How.to.llama.cpp",
+        "revision": "a0c4f01c9b9880f016b116e7172772fa572a35e3",
+        "input_paths": ["media/lifecycle/media-lifecycle-input-v0.json"],
+        "input_sha256": ["2d92d48cbf9997025ab76b0d6f1a6094f97206095c1ab210aea49adc3aa3416c"]
+      },
+      "generation": {
+        "mode": "deterministic",
+        "generator": "MEDIA-02 committed dry-run fixture",
+        "generator_version": "0.1.0",
+        "model": null,
+        "prompt_path": null,
+        "prompt_sha256": null,
+        "storyboard_path": null,
+        "storyboard_sha256": null,
+        "manual_trigger": false,
+        "cached": true,
+        "ordinary_ci_allowed": true
+      },
+      "output": {
+        "path": "media/lifecycle/revised-v0.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "7b3b388ae98b5c7dc5e11ef8e5444e33797980bdf4f018d195c0b3b0245dd747",
+        "bytes": 566
+      },
+      "accessibility": {
+        "alt_text": "A deterministic text-only media lifecycle specimen marked revised for validation of review-state handling.",
+        "caption_path": null,
+        "transcript_path": null,
+        "static_fallback_path": "docs/media/lifecycle-dry-run.md",
+        "reduced_motion_safe": true
+      },
+      "technical_claims": [],
+      "licensing": {
+        "asset_license": "MIT",
+        "input_license_notes": "Project-owned deterministic dry-run input and SVG only.",
+        "redistribution_allowed": true
+      },
+      "human_review": {
+        "required": true,
+        "approved": false,
+        "reviewer_role": null,
+        "reviewed_at": null,
+        "notes": "Revision required: improve the explanatory label before publication."
+      }
+    },
+    {
+      "schema_version": "0.1.0",
+      "asset_id": "media-lifecycle-rejected-v0",
+      "asset_kind": "illustration",
+      "authority": "supplemental",
+      "review_status": "rejected",
+      "publication": {"publish": false},
+      "source": {
+        "repository": "mohammed-alaa40123/How.to.llama.cpp",
+        "revision": "a0c4f01c9b9880f016b116e7172772fa572a35e3",
+        "input_paths": ["media/lifecycle/media-lifecycle-input-v0.json"],
+        "input_sha256": ["2d92d48cbf9997025ab76b0d6f1a6094f97206095c1ab210aea49adc3aa3416c"]
+      },
+      "generation": {
+        "mode": "deterministic",
+        "generator": "MEDIA-02 committed dry-run fixture",
+        "generator_version": "0.1.0",
+        "model": null,
+        "prompt_path": null,
+        "prompt_sha256": null,
+        "storyboard_path": null,
+        "storyboard_sha256": null,
+        "manual_trigger": false,
+        "cached": true,
+        "ordinary_ci_allowed": true
+      },
+      "output": {
+        "path": "media/lifecycle/rejected-v0.svg",
+        "mime_type": "image/svg+xml",
+        "sha256": "548ead3de8702407afd3745fa4fa277d5a604ecf617ffbe3fdbec6ee6f4d3483",
+        "bytes": 569
+      },
+      "accessibility": {
+        "alt_text": "A deterministic text-only media lifecycle specimen marked rejected for validation of review-state handling.",
+        "caption_path": null,
+        "transcript_path": null,
+        "static_fallback_path": "docs/media/lifecycle-dry-run.md",
+        "reduced_motion_safe": true
+      },
+      "technical_claims": [],
+      "licensing": {
+        "asset_license": "MIT",
+        "input_license_notes": "Project-owned deterministic dry-run input and SVG only.",
+        "redistribution_allowed": true
+      },
+      "human_review": {
+        "required": true,
+        "approved": false,
+        "reviewer_role": null,
+        "reviewed_at": null,
+        "notes": "Rejected: intentionally retained only to test auditability and publication blocking."
+      }
+    }
+  ]
+}

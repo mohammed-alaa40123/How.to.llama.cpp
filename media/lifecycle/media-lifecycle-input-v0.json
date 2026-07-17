@@ -1,0 +1,6 @@
+{
+  "dry_run_id": "media-lifecycle-v0",
+  "purpose": "Exercise accepted, revised, and rejected deterministic media states without external generation.",
+  "schema_version": "0.1.0",
+  "source_revision": "a0c4f01c9b9880f016b116e7172772fa572a35e3"
+}
