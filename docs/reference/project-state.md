@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 14:04 Africa/Cairo_
+_Last updated: 2026-07-17 15:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -12,7 +12,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Active milestone
 
-**Executable-learning Week 1 foundation — validated vertical slices plus auditable retrospective evidence**
+**Executable-learning Week 1 foundation transitioning to Week 2 integration and measured evidence**
 
 ## Completed foundations
 
@@ -25,59 +25,60 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Deterministic GGUF-layout figure with provenance and exact replay.
 - Browser-first GGUF Anatomy slice with Predict-Discover-Explain checkpoints.
 - DATA-01 contract and first three-archetype retrospective batch with passing parent CI.
+- Framework-free local progress export/import implementation on the active stack; final-head CI and Lab 1 integration remain open.
 
 ## Latest bounded increment
 
 ### Verified
 
-- The first DATA-01 batch passed commit-scoped Documentation CI run `29572506104`.
-- Real Lab 0 execution was retried first but remained blocked because this runtime could not resolve `github.com`; no environment row was fabricated.
-- `progress/progress-store.mjs` now implements deterministic export, bounded import, explicit version handling and a framework-free `localStorage`-compatible adapter.
-- Import validates before mutation, so corrupt, oversized, privacy-unsafe or unsupported input cannot replace existing local state.
-- Focused Node-backed tests cover deterministic round trip, storage preservation after corrupt import, unsupported versions, privacy-sensitive fields, clear behavior and empty export.
+- The orchestrator re-read the active stack, recent handoffs/run logs, open PR state and official AAAI/EAAI pages.
+- Parent DATA-01 batch CI passed in run `29572506104`.
+- The authoritative orchestration state, dependency queue, roadmap and readiness scorecard now reflect Lab 1, DATA-01 and PROGRESS-02 rather than the older viewer-only stack.
+- Official pages still did not expose an EAAI-27 call; AAAI-27 main-track dates remain non-transferable.
 
 ### Interpretation
 
-- Local progress can be portable and privacy-minimizing without introducing accounts, telemetry or server dependencies.
-- This is implementation evidence for resume-state handling, not evidence that completion implies learning or that browser storage provides authenticated sync.
+- The project is ready for narrow integration and measured-environment work, not broad feature expansion or manuscript drafting.
+- A conservative readiness estimate of 47% reflects separate working vertical-slice components but not educational effectiveness, independent correctness or measured cross-environment reproducibility.
 
 ### Historical
 
-- The storage behavior was added only after the `0.1.0` schema and privacy contract were frozen.
-- The design intentionally rejects implicit migration and requires a future explicit migration function for every new schema version.
+- Two concurrent PROGRESS-02 draft PRs exist and require a human merge-choice decision; this coordination increment builds on PR #24's branch without claiming the duplicate is resolved.
+- Connector-only runtimes repeatedly failed to provide a real Lab 0 checkout/build path, so no timing row has been fabricated.
 
 ### Open questions
 
-- Final-head CI must pass for the progress implementation.
-- Lab 1 is not connected to the adapter in this bounded increment.
-- Browser-level keyboard, screen-reader and corruption-recovery verification remains part of the integrated demo.
-- Real Ubuntu and devcontainer Lab 0 measurements remain absent.
-- Independent technical review and an approved educational evaluation pathway remain required.
+- Does final-head CI pass for the active PROGRESS-02 implementation?
+- Can Lab 1 complete a save/export/clear/import/resume round trip without telemetry or accessibility regressions?
+- Can Ubuntu 24.04 and the devcontainer complete the bounded model-free Lab 0 path?
+- Can the information-equivalent baseline, independent technical review and approved evaluation pathway be completed?
 
 ## Immediate next task
 
 ```text
 obtain commit-scoped CI for PROGRESS-02
-  → connect the validated adapter to Lab 1 without adding telemetry
-  → execute real Ubuntu and devcontainer Lab 0 rows when network access exists
-  → freeze the information-equivalent BASE-01 benchmark fixture
+  → if failing, repair only the bounded progress implementation
+  → if passing, connect one Lab 1 checkpoint to export/import/resume (PROGRESS-03)
+  → execute real Ubuntu and devcontainer Lab 0 rows when a network-capable environment exists
+  → freeze BASE-01A without recruiting participants
   → do not claim learner benefit or workflow superiority before evaluation
 ```
 
 ## Publication and validation state
 
-- `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` remain authoritative.
+- `docs/publication/orchestrator-state.md` is the single source of truth.
+- `docs/publication/evidence-backlog.md` separates the evidenced Lab 0 contract from blocked measured rows.
 - Passing CI establishes deterministic integration, not learner benefit or workflow superiority.
 - No participant data, learner identity, model weights, telemetry, credentials, paid API generation, native instrumentation or manuscript prose were introduced.
 
 ## Known blockers and caveats
 
-- **Lab 0 execution:** this runtime still cannot resolve `github.com`; no real environment row was fabricated.
-- **Retrospective accuracy:** historical tool-call and human-minute values may be incomplete and must never be guessed.
-- **Independent review:** the three-run batch requires a human coding check before publication analysis.
-- **Workflow comparison:** DATA-01 enables analysis but does not replace BASE-01.
+- **Progress CI:** the connected status surface exposed no commit-scoped result for head `43f694b6bc603623b924ffcb3e81286636654fa9`; no pass is inferred.
+- **Duplicate progress PRs:** PR #23 and PR #24 overlap and require human resolution before merge.
+- **Lab 0 execution:** no real Ubuntu/devcontainer row exists.
+- **Retrospective accuracy:** the first three records require independent coding review; missing values must never be guessed.
+- **Independent review:** no nominated llama.cpp/GGML reviewer has signed off.
 - **Educational effectiveness:** no learner-benefit claim is permitted before an approved evaluation and fair baseline.
-- **Progress integration:** this increment provides the adapter, but Lab 1 does not yet save learner answers.
 - **Live site:** verify Pages only after the stacked chain merges to `main` and deploys.
 
 ## Definition of done for this phase
@@ -85,4 +86,4 @@ obtain commit-scoped CI for PROGRESS-02
 - Complete learning contracts, legal fixture policy and three-tier platform boundaries.
 - Deterministic fixture, trace, figure, browser lab and model-free Lab 0 validation contracts.
 - Accessibility and privacy fallbacks for every introduced artifact.
-- Real Lab 0 environment evidence, progress import/export integrated into one lab, first retrospective dataset review and passing integrated CI.
+- Measured Lab 0 Ubuntu/devcontainer evidence, progress integrated into one Lab 1 checkpoint, reviewed first retrospective dataset, media lifecycle dry run and passing integrated CI.
