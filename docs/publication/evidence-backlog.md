@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 16:16 Africa/Cairo_
+_Last updated: 2026-07-17 16:24 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -20,7 +20,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P1 | VENUE-01 | in progress | Literature Scout | official publication | verified EAAI-27 call, deadlines, area, format and review criteria | Submission planning matches the current venue rather than prior-year assumptions |
 | P2 | LAB1-01 | evidenced | Documentation Builder | FIG-01; VIEW-01 | browser parser/visualizer, Python/golden agreement, Predict-Discover-Explain checkpoints, static fallback and passing run `29562479577` | Learners can inspect GGUF layout in-browser without confusing it with native inference |
 | P2 | PROGRESS-02 | evidenced | Documentation Builder / Validation Architect | progress schema; LAB1-01 | local storage adapter, deterministic export/import, version gate, corruption-preserving import, privacy checks and Lab 1 resume-state integration; passing run `29579032392` | Local-first progress is portable and privacy-minimizing at the application-contract level |
-| P2 | BASE-01A | in progress | Validation Architect | information-equivalent baseline design; stable VIEW-01 fixture | versioned static-versus-viewer benchmark fixture, exact tasks, answer key, scoring, timeout, source revision, accessibility fallbacks and semantic validator; final-head CI pending | The viewer can be evaluated without confounding information availability |
+| P2 | BASE-01A | evidenced | Validation Architect | information-equivalent baseline design; stable VIEW-01 fixture | versioned static-versus-viewer benchmark fixture, exact tasks, answer key, scoring, timeout, source revision, accessibility fallbacks and semantic validator; passing run `29583741909` | The viewer can be evaluated without confounding information availability |
 | P2 | REVIEW-02 | in progress | Adversarial Reviewer + Orchestrator | active stack | consolidated claims-evidence table, rejection risks and evidence gates | Major rejection risks are visible and drive dependency ordering |
 | P2 | REVIEW-01 | blocked | Human | independent reviewer nominated | signed/dated expert review of fixture, trace, lab explanations, browser parser and figure | Technical correctness is independently supported |
 | P2 | MEDIA-02 | ready | Validation Architect | MEDIA-01; FIG-01 | deterministic accepted/revised/rejected dry run and stale-asset test; no paid API call required | The media lifecycle is auditable without ordinary CI regeneration |
@@ -32,7 +32,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 
 ### BASE-01A
 
-The frozen fixture gives both conditions the same ordered source-derived evidence and the same four questions. The viewer may add only synchronized navigation, coordinated highlighting and deterministic visualization. The validator rejects information inequivalence, mutable source revisions, unknown evidence, missing transfer tasks, scoring/timing drift and missing accessibility fallbacks. This is a pre-evaluation contract; it does not demonstrate learner benefit.
+The frozen fixture gives both conditions the same ordered source-derived evidence and the same four questions. The viewer may add only synchronized navigation, coordinated highlighting and deterministic visualization. The validator rejects information inequivalence, mutable source revisions, unknown evidence, missing transfer tasks, scoring/timing drift and missing accessibility fallbacks. Passing CI establishes the pre-evaluation contract; it does not demonstrate learner benefit.
 
 ### PROGRESS-02
 
