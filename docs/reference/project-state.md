@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 23:00 Africa/Cairo_
+_Last updated: 2026-07-17 23:58 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers and next priority.
 
@@ -29,55 +29,57 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Official EAAI-27 venue verification, canonical integration map and integrated-demo acceptance contract.
 - Double-blind release contract and predefined documentation-gap audit protocol.
 
-## Latest bounded increment — DOC-AUDIT-01 CI attestation
+## Latest bounded increment — STACK-01 decision gate
 
 ### Verified
 
-- Documentation CI run `29606172245` completed successfully for protocol commit `40877656364bf3350fe94044068f2df133d18528`.
-- The passing run validates the protocol branch through the repository's Documentation CI workflow; it does not execute the systematic audit.
-- `docs/publication/evidence-backlog.md` now records the exact commit-scoped CI identifier for the protocol package.
+- Parent Documentation CI run `29609856424` passed on starting commit `b2a39213615e39852cbfd90f23296a493c8e63a2`.
+- The canonical integration map recommends PR #24 over overlapping PR #23 because PR #25 and all later learner-facing branches depend on #24.
+- A versioned pending decision schema, semantic validator, example and focused tests now encode the reviewed 19-PR spine, the #24 choice, #14→#13 and #23→#24 supersession, and preservation of PR #23 migration/recovery ideas as later follow-ups.
+- The example is explicitly `pending-human-approval` and contains no reviewer identity or approval timestamp.
 
 ### Interpretation
 
-- Recording commit-scoped CI closes the protocol-validation uncertainty without inflating the status of `DOC-AUDIT-01`.
-- A validated audit instrument is necessary but not sufficient evidence for the proposed documentation-gap hypothesis.
+- A machine-checkable pending decision reduces ambiguity and accidental branch drift while preserving the required human authority boundary.
+- This is the narrowest useful work on the highest-priority blocker; it does not justify broad learner-facing expansion.
 
 ### Historical
 
-- The prior run created the stratified protocol, schema, validator, example and focused tests while commit-scoped CI was still pending.
-- `STACK-01`, measured Lab 0 runs, independent review and evaluation remain blocked by human or environment dependencies.
+- Earlier runs produced the merge map and repeatedly recorded the unresolved progress-store choice as the highest-priority blocker.
+- The preceding run validated the documentation-audit protocol and did not alter canonical integration.
 
 ### Open questions
 
-- What the retained search result frame contains at execution time.
-- Whether two independent coders agree on source-path and conceptual-boundary ratings.
-- Whether the final gap conclusion is supported, revised, rejected or inconclusive.
-- Human approval of PR #24 as the canonical progress implementation and full combined-head CI.
+- Whether the human reviewer approves PR #24 and the exact listed spine without amendment.
+- Whether the resulting combined integration branch passes all tests, strict MkDocs build and built-site accessibility validation.
+- Whether any unique invariant from superseded PR #14 or #23 requires a later bounded follow-up.
 
 ## Immediate next task
 
 ```text
-return to STACK-01 when the canonical progress/merge choice is approved
-  → create one combined integration branch
-  → run complete Documentation CI
-  → execute DEMO-01 and measured LAB0-03/LAB0-04 when environments exist
+human reviews progress/examples/canonical-integration-decision-pending-v0.json
+  → approve, reject or amend the canonical choice
+  → only after approval create integration/eaai-july-vertical-slice
+  → apply each retained increment once
+  → run complete Documentation CI on one combined head
 otherwise
-  → do not execute or close DOC-AUDIT-01 without an independent second coder
-  → retain the documentation-gap statement as an Open Question
+  → keep STACK-01 in progress
+  → do not claim an integrated demo
   → do not expand broad learner-facing features
 ```
 
 ## Publication and validation state
 
 - `docs/publication/orchestrator-state.md` remains authoritative.
-- `docs/publication/evidence-backlog.md` records `DOC-AUDIT-01` as in progress: the protocol passed CI, but retained search results, double-coding and adjudication do not exist.
+- `STACK-01` now has a machine-checkable pending decision but remains in progress until human approval and combined-head CI.
+- `DOC-AUDIT-01` remains in progress: its protocol passed CI, but retained search results, double-coding and adjudication do not exist.
 - `BLIND-01` remains in progress: the release contract exists, but no anonymous bundle or final review exists.
 - Passing component CI establishes bounded contracts only; it does not establish combined deployability, learner benefit, native execution, documentation-gap novelty, independent correctness or anonymous-release readiness.
 - No participant data, telemetry, authenticated sync, restricted model weights, paid generation or manuscript prose were introduced.
 
 ## Known blockers and caveats
 
-- no approved canonical progress-branch choice;
+- no human-approved canonical progress-branch choice;
 - no canonical combined branch with passing CI;
 - no real Ubuntu 24.04 or devcontainer Lab 0 record;
 - no independent llama.cpp/GGML technical reviewer;
