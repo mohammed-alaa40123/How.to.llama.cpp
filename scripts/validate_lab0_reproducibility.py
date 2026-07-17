@@ -74,18 +74,19 @@ def validate(data: dict[str, Any]) -> None:
     diagnostics = result.get("diagnostics")
     require(isinstance(diagnostics, list), "diagnostics must be a list")
     require(len(diagnostics) == len(set(diagnostics)), "diagnostics must be unique")
-    require(set(diagnostics) <= DIAGNOSTICS, "unknown diagnostic code")
+    diagnostic_set = set(diagnostics)
+    require(diagnostic_set <= DIAGNOSTICS, "unknown diagnostic code")
 
     all_tools = all(toolchain[name]["passed"] for name in TOOLS)
     if result["setup_success"]:
         require(all_tools, "setup_success requires every required tool check to pass")
-        require(not diagnostics.intersection({"UV_MISSING", "UV_LOCK_DRIFT", "PYTHON_UNSUPPORTED", "CMAKE_MISSING", "NINJA_MISSING", "COMPILER_MISSING"}), "setup_success conflicts with setup diagnostic")
+        require(not diagnostic_set.intersection({"UV_MISSING", "UV_LOCK_DRIFT", "PYTHON_UNSUPPORTED", "CMAKE_MISSING", "NINJA_MISSING", "COMPILER_MISSING"}), "setup_success conflicts with setup diagnostic")
     if result["build_success"]:
         require(result["setup_success"], "build_success requires setup_success")
-        require("CONFIGURE_FAILED" not in diagnostics and "COMPILE_FAILED" not in diagnostics, "build_success conflicts with build diagnostic")
+        require("CONFIGURE_FAILED" not in diagnostic_set and "COMPILE_FAILED" not in diagnostic_set, "build_success conflicts with build diagnostic")
     if result["launch_success"]:
         require(result["build_success"], "launch_success requires build_success")
-        require("EXECUTABLE_MISSING" not in diagnostics, "launch_success conflicts with executable diagnostic")
+        require("EXECUTABLE_MISSING" not in diagnostic_set, "launch_success conflicts with executable diagnostic")
 
     model_kind = result["model_kind"]
     inference_state = result["inference_state"]
