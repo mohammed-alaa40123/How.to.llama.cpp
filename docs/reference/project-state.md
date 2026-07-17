@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 23:00 Africa/Cairo_
+_Last updated: 2026-07-18 00:01 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers and next priority.
 
@@ -12,7 +12,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ## Active milestone
 
-**Executable-learning Week 1 foundation transitioning to canonical integration, measured Lab 0 evidence and independently reviewable publication evidence.**
+**Canonical executable-learning integration, measured Lab 0 evidence and independently reviewable EAAI evidence.**
 
 ## Completed bounded foundations
 
@@ -29,49 +29,52 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Official EAAI-27 venue verification, canonical integration map and integrated-demo acceptance contract.
 - Double-blind release contract and predefined documentation-gap audit protocol.
 
-## Latest bounded increment — DOC-AUDIT-01 CI attestation
+## Latest bounded increment — orchestration reconciliation
 
 ### Verified
 
-- Documentation CI run `29606172245` completed successfully for protocol commit `40877656364bf3350fe94044068f2df133d18528`.
-- The passing run validates the protocol branch through the repository's Documentation CI workflow; it does not execute the systematic audit.
-- `docs/publication/evidence-backlog.md` now records the exact commit-scoped CI identifier for the protocol package.
+- Documentation CI run `29609856424` passed for the DOC-AUDIT CI-attestation head `b2a39213615e39852cbfd90f23296a493c8e63a2`.
+- The official EAAI-27 call is already verified; the prior two-week plan contained one stale blocker saying otherwise.
+- `BLIND-01` and `DOC-AUDIT-01` have machine-checkable contracts, but neither has completed execution evidence.
 
 ### Interpretation
 
-- Recording commit-scoped CI closes the protocol-validation uncertainty without inflating the status of `DOC-AUDIT-01`.
-- A validated audit instrument is necessary but not sufficient evidence for the proposed documentation-gap hypothesis.
+- The critical path has shifted from creating more contracts to integrating the existing stack and obtaining measured or independent evidence.
+- PR #24 remains the lowest-risk default progress implementation because downstream learner-facing work depends on it; the choice still requires explicit human approval.
+- Coordination readiness can rise only marginally for validated planning artifacts while the adversarial reviewer disposition remains reject.
 
 ### Historical
 
-- The prior run created the stratified protocol, schema, validator, example and focused tests while commit-scoped CI was still pending.
-- `STACK-01`, measured Lab 0 runs, independent review and evaluation remain blocked by human or environment dependencies.
+- Earlier runs created and validated the double-blind release and documentation-audit protocols while `STACK-01` stayed blocked.
+- Component-level CI has passed repeatedly, but no single canonical head contains and executes the complete learner route.
 
 ### Open questions
 
-- What the retained search result frame contains at execution time.
-- Whether two independent coders agree on source-path and conceptual-boundary ratings.
-- Whether the final gap conclusion is supported, revised, rejected or inconclusive.
-- Human approval of PR #24 as the canonical progress implementation and full combined-head CI.
+- Human approval of the canonical progress implementation and merge order.
+- Availability of clean Ubuntu 24.04 and devcontainer environments.
+- Nomination of independent technical, retrospective and documentation-audit reviewers/coders.
+- Approval of an expert or learner evaluation pathway and ethics determination.
 
 ## Immediate next task
 
 ```text
-return to STACK-01 when the canonical progress/merge choice is approved
-  → create one combined integration branch
+human records canonical progress choice
+  → reconcile the mapped stack into one branch
   → run complete Documentation CI
-  → execute DEMO-01 and measured LAB0-03/LAB0-04 when environments exist
+  → execute DEMO-01
+  → execute LAB0-03 and LAB0-04 when environments exist
 otherwise
-  → do not execute or close DOC-AUDIT-01 without an independent second coder
-  → retain the documentation-gap statement as an Open Question
   → do not expand broad learner-facing features
+  → preserve BLIND-01 and DOC-AUDIT-01 as validated but incomplete contracts
+  → wait for the required human/environment dependency
 ```
 
 ## Publication and validation state
 
-- `docs/publication/orchestrator-state.md` remains authoritative.
-- `docs/publication/evidence-backlog.md` records `DOC-AUDIT-01` as in progress: the protocol passed CI, but retained search results, double-coding and adjudication do not exist.
-- `BLIND-01` remains in progress: the release contract exists, but no anonymous bundle or final review exists.
+- `docs/publication/orchestrator-state.md` is authoritative.
+- Coordination readiness is 55%; the adversarial reviewer score remains 38/100 and reject in the current state.
+- `BLIND-01` remains in progress because no anonymous bundle, identity scan, final review or human approval exists.
+- `DOC-AUDIT-01` remains in progress because no retained result frame, independent second coder or adjudication exists.
 - Passing component CI establishes bounded contracts only; it does not establish combined deployability, learner benefit, native execution, documentation-gap novelty, independent correctness or anonymous-release readiness.
 - No participant data, telemetry, authenticated sync, restricted model weights, paid generation or manuscript prose were introduced.
 
