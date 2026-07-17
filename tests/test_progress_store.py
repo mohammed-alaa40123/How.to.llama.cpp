@@ -70,6 +70,7 @@ class ProgressStoreTests(unittest.TestCase):
         storage = {}
         store = LocalProgressStore(storage)
         store.save(BASE)
+        previous_snapshot = import_progress_text(storage[STORAGE_KEY])
         updated = copy.deepcopy(BASE)
         updated["lessons"][0]["checkpoints"][0]["attempt_count"] = 2
         store.save(updated)
@@ -77,7 +78,7 @@ class ProgressStoreTests(unittest.TestCase):
         storage[STORAGE_KEY] = "{broken"
         result = store.load()
         self.assertTrue(result.recovered)
-        self.assertEqual(result.progress, BASE)
+        self.assertEqual(result.progress, previous_snapshot)
         self.assertIsNotNone(result.error)
 
     def test_two_corrupt_snapshots_fail_closed(self):
