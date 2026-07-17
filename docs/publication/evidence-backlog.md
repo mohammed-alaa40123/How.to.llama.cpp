@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 06:00 Africa/Cairo_
+_Last updated: 2026-07-17 07:58 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -9,12 +9,12 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P0 | CI-01 | evidenced | Documentation Builder | latest stacked branch | strict MkDocs root cause, narrow fix, passing final-head Documentation CI run `29546570700` | The executable-learning artifacts integrate without degrading the existing site |
 | P0 | COORD-01 | evidenced | Orchestrator | none | `orchestrator-state.md`, this backlog, roadmap, scorecard | Scheduled agents can share an explicit dependency order rather than infer work independently |
 | P1 | MEDIA-01 | evidenced | Documentation Builder | CI-01 | media manifest schema, semantic validator, valid example, malformed-input tests, passing Documentation CI run `29549208249` | Generated educational media can be provenance- and review-gated without making it technical evidence |
-| P1 | TRACE-02 | ready | Validation Architect | trace schema accepted; CI-01 | pinned source-link resolver, deterministic replay tests, missing-field tests, 500-step/2 MiB browser bound | Trace provenance and navigation remain valid against immutable source |
+| P1 | TRACE-02 | in progress | Validation Architect | trace schema accepted; CI-01 | pinned source lock/resolver, deterministic replay tests, missing-field tests, 500-step/2 MiB browser bound, passing final-head CI | Trace provenance and navigation remain valid against immutable source |
 | P1 | VIEW-01 | blocked | Documentation Builder | CI-01, TRACE-02 | keyboard-operable viewer shell, step forward/back, evidence labels, transcript/static fallback | A narrow executable lecture can expose source, state and explanation without evidence inflation |
 | P1 | LAB0-02 | ready | Validation Architect | Lab 0 report contract | reproducibility matrix, toolchain checks, diagnostic taxonomy, time-to-ready protocol | Setup/build evidence is comparable across supported environments |
-| P1 | LIT-02 | ready | Literature Scout | none | official media/API capability matrix with provenance, privacy, accessibility, licensing, cost and caching implications | Optional media choices are evidence-based and reproducible enough for an experience report |
+| P1 | LIT-02 | evidenced | Literature Scout | none | official media/API capability matrix with provenance, privacy, accessibility, licensing, cost and caching implications | Optional media choices are evidence-based and reproducible enough for an experience report |
 | P1 | VENUE-01 | in progress | Literature Scout | official publication | verified EAAI-27 call, deadlines, area, format, review criteria | Submission plan matches the current venue rather than prior-year assumptions |
-| P2 | FIG-01 | evidenced | Documentation Builder | MEDIA-01 | deterministic GGUF-layout SVG generated from the golden fixture, exact replay test, input/output checksums, byte count, alt text and evidence boundary | Authoritative technical figures are reproducible without generative models |
+| P2 | FIG-01 | evidenced | Documentation Builder | MEDIA-01 | deterministic GGUF-layout SVG generated from the golden fixture, exact replay test, input/output checksums, byte count, alt text, evidence boundary, passing Documentation CI run `29553868078` | Authoritative technical figures are reproducible without generative models |
 | P2 | LAB1-01 | blocked | Documentation Builder | CI-01, progress contract integrated | browser parser/visualizer, Python/golden agreement, Predict-Discover-Explain checkpoints, static fallback | Learners can inspect GGUF layout in-browser without confusing it with native inference |
 | P2 | PROGRESS-02 | blocked | Validation Architect | progress schema integrated | import/export round trip, migration, corruption recovery, local storage adapter tests | Local-first progress is portable and privacy-minimizing |
 | P2 | REVIEW-01 | blocked | Human | independent reviewer nominated | expert rubric and signed/dated review of fixture, trace, lab explanations and figure | Technical correctness is independently supported |

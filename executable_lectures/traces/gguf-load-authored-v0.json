@@ -16,8 +16,8 @@
       "phase": "entry",
       "location": {
         "file": "ggml/src/gguf.cpp",
-        "line": 1100,
-        "function": "gguf_init_from_file_impl"
+        "line": 451,
+        "function": "gguf_init_from_reader"
       },
       "call_stack": [],
       "runtime_objects": [
@@ -38,7 +38,7 @@
       "explanation_id": "gguf-load.open-file",
       "evidence_kind": "authored-example",
       "prediction_prompt": "Which evidence label should be shown before any runtime instrumentation exists?",
-      "static_summary": "The viewer begins at the pinned parser entry and explicitly labels this step as an authored example rather than captured execution."
+      "static_summary": "The viewer begins at the pinned reader entry and explicitly labels this step as an authored example rather than captured execution."
     },
     {
       "sequence": 1,
@@ -46,14 +46,14 @@
       "phase": "header",
       "location": {
         "file": "ggml/src/gguf.cpp",
-        "line": 1110,
-        "function": "gguf_init_from_file_impl"
+        "line": 456,
+        "function": "gguf_init_from_reader"
       },
       "call_stack": [
         {
           "file": "ggml/src/gguf.cpp",
-          "line": 1100,
-          "function": "gguf_init_from_file_impl"
+          "line": 451,
+          "function": "gguf_init_from_reader"
         }
       ],
       "runtime_objects": [
@@ -90,14 +90,14 @@
       "phase": "layout",
       "location": {
         "file": "ggml/src/gguf.cpp",
-        "line": 1260,
-        "function": "gguf_init_from_file_impl"
+        "line": 757,
+        "function": "gguf_init_from_reader"
       },
       "call_stack": [
         {
           "file": "ggml/src/gguf.cpp",
-          "line": 1100,
-          "function": "gguf_init_from_file_impl"
+          "line": 451,
+          "function": "gguf_init_from_reader"
         }
       ],
       "runtime_objects": [],
@@ -113,7 +113,7 @@
       "figures": [
         {
           "figure_id": "synthetic-gguf-layout",
-          "path": "media/generated/synthetic-gguf-layout.svg",
+          "path": "media/generated/gguf-layout-deterministic-v0.svg",
           "alt_text": "Linear byte layout showing the GGUF header and metadata before an aligned tensor-data region containing a matrix and a vector.",
           "evidence_kind": "source-derived"
         }
