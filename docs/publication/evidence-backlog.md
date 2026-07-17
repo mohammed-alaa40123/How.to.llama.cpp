@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-17 17:15 Africa/Cairo_
+_Last updated: 2026-07-17 18:00 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -11,7 +11,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P1 | LAB0-02 | evidenced | Validation Architect | Lab 0 report contract | reproducibility schema, semantic validator, exact toolchain checks, diagnostic taxonomy, timing definitions and security boundaries; contract CI passed in run `29565651085` | Setup/build evidence has a comparable machine-readable contract |
 | P1 | LAB0-03 | blocked | Validation Architect | network-capable Ubuntu 24.04 environment | measured model-free local-native record with exact revisions, tools, commands, diagnostics and time-to-ready | The local-native tier can complete the bounded path reproducibly |
 | P1 | LAB0-04 | blocked | Validation Architect | devcontainer execution environment | measured model-free devcontainer record using the same contract fields | The cloud-container tier can complete the bounded path reproducibly |
-| P1 | DATA-01 | in progress | Validation Architect | stable log formats | schema, semantic validator and first three-run batch with passing run `29572506104`; independent coding review and broader bounded extraction pending | The multi-agent process can be analyzed as a longitudinal case study |
+| P1 | DATA-01 | in progress | Validation Architect | stable log formats | schema, semantic validator and first three-run batch with passing run `29572506104`; missing-value coverage contract added on `agent/data01-decision-boundary-sample`; commit-scoped CI, independent coding review and broader bounded extraction pending | The multi-agent process can be analyzed without silently treating unknown effort as zero |
 | P1 | MEDIA-01 | evidenced | Documentation Builder | CI-01 | schema, semantic validator, deterministic example, malformed-input tests and passing run `29549208249` | Generated educational media can be provenance- and review-gated without making it technical evidence |
 | P1 | TRACE-02 | evidenced | Validation Architect | trace schema accepted; CI-01 | pinned source-anchor manifest, corrected authored trace, deterministic replay and missing-data tests; passing run `29556540213` | Trace provenance and navigation remain valid against immutable source |
 | P1 | FIG-01 | evidenced | Documentation Builder | MEDIA-01 | deterministic GGUF-layout SVG, manifest checksums, alt text and passing run `29553868078` | Authoritative technical figures are reproducible without generative models |
@@ -30,6 +30,10 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 
 ## Current evidence boundaries
 
+### DATA-01 missing-value coverage
+
+The new coverage declaration inventories core dimensions across the selected first batch. It marks tool-call totals and human minutes as not reconstructable from retained evidence and requires explicit reasons rather than numeric inference. Passing validation can establish that missingness is disclosed consistently; it cannot establish record accuracy, total labor, longitudinal coverage, inter-rater reliability or workflow superiority.
+
 ### REVIEW-02
 
 The adversarial package classifies four current fatal flaws: no usefulness evaluation, no independent technical review, no measured local/cloud Lab 0 runs and no longitudinal agent dataset. It also identifies evidence inflation, broad audience definition, authored-versus-captured trace ambiguity, visual novelty, stacked-PR integration and accessibility as major risks. The package is a review artifact, not evidence that the risks are resolved.
@@ -46,10 +50,6 @@ The frozen fixture gives both conditions the same ordered source-derived evidenc
 
 The canonical local adapter has passing commit-scoped CI and is connected to Lab 1. A successful parse stores only anonymous resume state: the lesson is `in-progress`, the last reached step is recorded, and formative checkpoints remain `unanswered`. This does not establish cross-browser persistence, checkpoint correctness, mastery, learner benefit, account sync or server-side storage.
 
-### DATA-01
-
-The first bounded retrospective batch contains one clean success, one CI repair retaining strict validation, and one blocked higher-priority task followed by dependency-safe reassignment. This shows representational coverage only. Independent coding review, missing-value rules and broader extraction remain required.
-
 ### LAB0
 
 The comparison contract is evidenced, but no measured Ubuntu or devcontainer record exists. Model-free launch must never be labelled model loading or inference.
@@ -59,7 +59,7 @@ The comparison contract is evidenced, but no measured Ubuntu or devcontainer rec
 - **No educational evidence:** require EVAL-01 and BASE-01; contract coverage is not a substitute.
 - **Incorrect technical content:** require REVIEW-01 and correction records.
 - **Unmeasured reproducibility:** require LAB0-03 and LAB0-04.
-- **Agent anecdotes rather than case-study data:** expand and audit DATA-01.
+- **Agent anecdotes rather than case-study data:** approve missing-value rules, independently code the first batch, then expand DATA-01 across more runs and roles.
 - **Only a tool collection:** require DEMO-01 plus a cross-experience learning progression.
 - **Visual novelty without learning value:** BASE-01A supplies the fair comparison contract; BASE-01 remains required for measured evidence.
 - **Unreproducible AI media:** deterministic figures remain authoritative; optional generated assets require manifest review and lifecycle evidence.
