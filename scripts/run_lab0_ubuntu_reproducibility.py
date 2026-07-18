@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Execute the model-free Lab 0 path and emit a validated evidence record.
+"""Execute the model-free Lab 0 path and emit a reviewable evidence record.
 
-This runner intentionally records failed phases instead of hiding them. It never
-loads or downloads model weights and excludes command output from the JSON record.
+The same bounded runner is used for local-native and cloud-container matrix rows.
+It records failed phases instead of hiding them, never loads or downloads model
+weights, and excludes command output from the JSON record.
 """
 
 from __future__ import annotations
@@ -17,10 +18,13 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "artifacts" / "lab0-ubuntu-24.04-run.json"
+OUT = ROOT / os.environ.get("LAB0_OUTPUT", "artifacts/lab0-ubuntu-24.04-run.json")
 LLAMA_DIR = ROOT / "llama.cpp"
 BUILD_DIR = ROOT / "build" / "lab0"
 LLAMA_REVISION = "e3546c7948e3af463d0b401e6421d5a4c2faf565"
+ENVIRONMENT_ID = os.environ.get("LAB0_ENV_ID", "github-actions-ubuntu-24.04-x86_64")
+EXECUTION_TIER = os.environ.get("LAB0_TIER", "local_native")
+OS_ID = os.environ.get("LAB0_OS", "ubuntu-24.04")
 
 
 def run(command: list[str], *, cwd: Path = ROOT) -> tuple[bool, str]:
@@ -77,6 +81,8 @@ def main() -> int:
             diagnostics.append("UV_LOCK_DRIFT")
 
     if setup_success:
+        shutil.rmtree(LLAMA_DIR, ignore_errors=True)
+        shutil.rmtree(BUILD_DIR, ignore_errors=True)
         clone_ok, _ = run([
             "git", "clone", "--filter=blob:none", "https://github.com/ggml-org/llama.cpp.git", str(LLAMA_DIR)
         ])
@@ -108,16 +114,16 @@ def main() -> int:
 
     ready_ms = time.monotonic_ns() // 1_000_000
     lock_path = ROOT / "uv.lock"
-    course_sha = os.environ.get("GITHUB_SHA", "0" * 40)
+    course_sha = os.environ.get("LAB0_COURSE_SHA", os.environ.get("GITHUB_SHA", "0" * 40))
     arch = "x86_64" if platform.machine() in {"x86_64", "AMD64"} else "arm64"
     validated = setup_success and build_success and launch_success
 
     report = {
         "schema_version": "1.0.0",
         "environment": {
-            "id": "github-actions-ubuntu-24.04-x86_64",
-            "tier": "local_native",
-            "os": "ubuntu-24.04",
+            "id": ENVIRONMENT_ID,
+            "tier": EXECUTION_TIER,
+            "os": OS_ID,
             "architecture": arch,
             "support_state": "validated" if validated else "degraded",
             "offline_mode": "not_tested",

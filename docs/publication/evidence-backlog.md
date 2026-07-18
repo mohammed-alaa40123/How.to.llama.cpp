@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-18 04:00 Africa/Cairo_
+_Last updated: 2026-07-18 05:00 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -11,7 +11,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P0 | COORD-01 | evidenced | Orchestrator | none | `orchestrator-state.md`, this backlog, roadmap, scorecard | Scheduled agents can share an explicit dependency order rather than infer work independently |
 | P1 | LAB0-02 | in progress | Validation Architect | Lab 0 report contract | reproducibility schema, semantic validator, supported-environment matrix, exact toolchain checks, diagnostic taxonomy, timing definitions, offline/security boundaries; additional matrix rows pending | Setup/build evidence is comparable across supported environments |
 | P1 | LAB0-03 | evidenced | Validation Architect | LAB0-02 | successful Ubuntu 24.04 model-free report; run `29622240261`; artifact `8422651113`; Documentation CI `29622240365` | One clean Ubuntu local-native environment completes locked Python setup, pinned CMake/Ninja build and executable launch |
-| P1 | LAB0-04 | ready | Validation Architect | LAB0-03; devcontainer definition | equivalent retained devcontainer/Codespaces-compatible report and semantic validation | The cloud-container tier reproduces the same bounded setup/build/launch path |
+| P1 | LAB0-04 | in progress | Validation Architect | LAB0-03; devcontainer definition | Codespaces-compatible Ubuntu 24.04 devcontainer, shared parameterized runner and retained-evidence workflow implemented; equivalent exact container report, semantic validation and commit-scoped CI still required | The cloud-container tier reproduces the same bounded setup/build/launch path |
 | P1 | DATA-01 | ready | Validation Architect | stable log formats | retrospective extraction schema for assignments, commits, failures, corrections, tests, cost proxies and accepted/rejected outputs | The multi-agent process can be analyzed as a longitudinal case study |
 | P1 | MEDIA-01 | evidenced | Documentation Builder | CI-01 | schema, semantic validator, deterministic example, malformed-input tests, passing run `29549208249` | Generated educational media can be provenance- and review-gated without making it technical evidence |
 | P1 | TRACE-02 | evidenced | Validation Architect | trace schema accepted; CI-01 | pinned source-anchor manifest and validator, corrected authored trace, deterministic replay and missing-data tests; passing run `29556540213` | Trace provenance and navigation remain valid against immutable source |
@@ -44,6 +44,10 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 ## LAB0-03 evidence boundary
 
 Workflow run `29622240261` retained a semantically valid Ubuntu 24.04/x86_64 report after executing `uv sync --locked`, a pinned llama.cpp checkout, Ninja configuration with `GGML_NATIVE=OFF`, the bounded `llama-cli` target build and `llama-cli --help`. Time to ready was 326,905 ms. The report contains no model and marks inference as not attempted. This is positive evidence for one local-native matrix row only; it does not establish time to first token, offline operation, learner benefit, devcontainer equivalence, macOS/WSL2 support or cross-platform reproducibility.
+
+## LAB0-04 implementation boundary
+
+The repository now contains a Codespaces-compatible Ubuntu 24.04 devcontainer and a dedicated `devcontainers/ci` lane that runs the same parameterized model-free runner, retains the exact report before semantic validation and enforces the same success chain. This is implementation evidence only. `LAB0-04` remains in progress until commit-scoped CI produces a retained report that passes semantic validation and shows setup, build and launch success. It does not yet establish Codespaces service reliability, image digest reproducibility, offline use, inference or learner benefit.
 
 ## Viewer evidence boundary
 

@@ -1,0 +1,86 @@
+name: Lab 0 devcontainer reproducibility
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/lab0-04-devcontainer-repro
+    paths:
+      - ".devcontainer/**"
+      - ".github/workflows/lab0-devcontainer-reproducibility.yml"
+      - "scripts/run_lab0_ubuntu_reproducibility.py"
+      - "scripts/validate_lab0_reproducibility.py"
+      - "schemas/lab0-reproducibility-run.schema.json"
+      - "pyproject.toml"
+      - "uv.lock"
+  pull_request:
+    paths:
+      - ".devcontainer/**"
+      - ".github/workflows/lab0-devcontainer-reproducibility.yml"
+      - "scripts/run_lab0_ubuntu_reproducibility.py"
+      - "scripts/validate_lab0_reproducibility.py"
+      - "schemas/lab0-reproducibility-run.schema.json"
+      - "pyproject.toml"
+      - "uv.lock"
+
+permissions:
+  contents: read
+
+jobs:
+  measured-model-free-container-run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build devcontainer and record bounded model-free run
+        id: measured
+        continue-on-error: true
+        uses: devcontainers/ci@v0.3
+        with:
+          configFile: .devcontainer/devcontainer.json
+          push: never
+          runCmd: >-
+            LAB0_ENV_ID=github-actions-devcontainer-ubuntu-24.04-x86_64
+            LAB0_TIER=cloud_container
+            LAB0_OS=devcontainer-ubuntu-24.04
+            LAB0_COURSE_SHA=${{ github.sha }}
+            LAB0_OUTPUT=artifacts/lab0-devcontainer-ubuntu-24.04-run.json
+            python3 scripts/run_lab0_ubuntu_reproducibility.py
+
+      - name: Stage exact report for retention
+        id: retained
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_report="$GITHUB_WORKSPACE/artifacts/lab0-devcontainer-ubuntu-24.04-run.json"
+          retained_report="$RUNNER_TEMP/lab0-devcontainer-ubuntu-24.04-run.json"
+          if [[ ! -f "$source_report" ]]; then
+            echo "LAB0_REPORT_MISSING: container run did not emit $source_report" >&2
+            exit 1
+          fi
+          cp "$source_report" "$retained_report"
+          echo "retained_report=$retained_report" >> "$GITHUB_OUTPUT"
+          echo "Retained report checksum:"
+          sha256sum "$retained_report"
+
+      - name: Upload exact evidence record before validation
+        if: always() && steps.retained.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab0-devcontainer-ubuntu-24.04-${{ github.sha }}
+          path: ${{ steps.retained.outputs.retained_report }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Validate retained report
+        id: validated
+        if: always() && steps.retained.outcome == 'success'
+        run: python3 scripts/validate_lab0_reproducibility.py "${{ steps.retained.outputs.retained_report }}"
+
+      - name: Enforce successful validated path
+        if: always() && (steps.measured.outcome != 'success' || steps.retained.outcome != 'success' || steps.validated.outcome != 'success')
+        run: |
+          echo "The exact devcontainer result was retained when available, but the bounded Lab 0 path or its evidence validation did not complete."
+          exit 1
