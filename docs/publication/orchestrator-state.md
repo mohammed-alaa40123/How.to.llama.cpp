@@ -1,116 +1,114 @@
 # EAAI research orchestrator state
 
-_Last updated: 2026-07-17 09:22 Africa/Cairo_
+_Last updated: 2026-07-18 06:02 Africa/Cairo_
 
-This file is the single source of truth for the EAAI experience-report preparation. It coordinates bounded repository work; it does not authorize manuscript drafting.
+This file is the single source of truth for EAAI experience-report preparation. It coordinates bounded repository work and does not authorize manuscript drafting.
 
 ## Executive status
 
-**Phase:** Week 1 foundation — the smallest executable-learning vertical slice now exists as validated contracts, a deterministic fixture and figure, and a keyboard-operable authored trace viewer.
+**Phase:** Week 1 foundation with two measured Lab 0 reproducibility rows completed ahead of Week 2.
 
-**Overall judgment:** the repository now demonstrates a coherent evidence-labelled prototype rather than only architecture plans. The strongest evidence is deterministic provenance, source-revision pinning, replay validation, privacy boundaries, and passing integration CI. The weakest areas remain Lab 0 environment reproducibility, browser GGUF learning checkpoints, progress import/export, retrospective agent-workflow extraction, baseline comparison, independent correctness review, and approved educational evaluation.
+**Overall judgment:** the project has a coherent executable-learning prototype, deterministic evidence contracts, a successful Ubuntu local-native Lab 0 row and a successful Codespaces-compatible devcontainer row. The decisive weaknesses are no canonical integrated branch, incomplete local progress import/export, no independently coded longitudinal repository dataset, no baseline comparison, no independent technical correctness review and no approved educational evaluation.
 
-**Current stacked branch:** `agent/view01-static-trace-viewer` at `d02656c7d5d745c77a68b23613cf42050b6518ac`.
+**Current evidence head:** `agent/lab0-04-devcontainer-repro` at `ab1db83938176dc4fd766cf66fccf18e5b0e2116`.
 
-**Current CI state:** Documentation CI run `29559239071` completed successfully for the viewer branch. This closes `VIEW-01` as an integrated prototype. The result proves deterministic build and site integration; it does not prove learner benefit, native capture, or independent technical correctness.
+**Current CI:** Documentation CI `29626470196`, Lab 0 devcontainer reproducibility `29626470197`, and Lab 0 Ubuntu reproducibility `29626470190` passed for the implementation head.
 
 ## Frozen educational framing
 
 ### Target audience
 
-Advanced undergraduate, graduate, and early-stage systems researchers who can read C/C++ and Python but cannot yet connect GGUF storage, virtual memory, GGML graph construction, backend scheduling, and token generation.
+Advanced undergraduate, graduate and early-stage systems researchers who can read C/C++ and Python but cannot yet connect GGUF storage, virtual memory, GGML graph construction, backend scheduling and token generation.
 
 ### Educational problem
 
-Existing usage-oriented material does not reliably teach learners to distinguish:
+The environment teaches learners to distinguish file format from runtime graph, mapped bytes from resident pages, authored explanation from captured evidence, build success from model loading/inference, and browser parsing from native llama.cpp execution. The claim that existing documentation broadly fails at this remains a hypothesis until the systematic audit is completed.
 
-- file format from runtime graph;
-- mapped bytes from resident physical pages;
-- authored explanation from captured runtime evidence;
-- build success from model loading and inference;
-- browser simulation from native llama.cpp execution.
+### Initial experiences
 
-The claim that this gap is widespread remains a **hypothesis** until a systematic documentation audit is completed.
-
-### Initial learning experiences
-
-1. **Lab 0 — Build and Run llama.cpp:** distinguish Python tooling, native configuration/compilation, executable launch, model load, and inference.
-2. **Lab 1 — GGUF Anatomy:** predict, parse, inspect, and explain a deterministic synthetic GGUF without implying that GGUF stores an executable graph.
-3. **Executable Lecture 0 — GGUF loading trace:** step through a source-pinned authored/source-derived trace before native instrumentation is attempted.
+1. **Lab 0 — Build and Run llama.cpp:** attribute responsibilities to `uv`, CMake/Ninja, the compiler, llama.cpp and model assets; diagnose bounded failures.
+2. **Lab 1 — GGUF Anatomy:** predict, parse, inspect and explain a deterministic synthetic GGUF without implying that GGUF stores an executable graph.
+3. **Executable Lecture 0 — GGUF loading trace:** step through a source-pinned authored/source-derived path while distinguishing evidence kinds.
 
 ## Research questions
 
-- **RQ1 — Educational artifact:** Can source-pinned executable labs and evidence-labelled traces improve learners' ability to explain and trace difficult llama.cpp/GGML concepts?
-- **RQ2 — Evidence boundaries:** Can the environment make distinctions among browser-derived, source-derived, authored, and native-captured evidence understandable and machine-checkable?
-- **RQ3 — Development workflow:** What succeeds, fails, and requires human correction when role-specialized scheduled agents build and maintain the resource in a persistent repository?
-- **RQ4 — Reproducibility:** Which combination of browser, local-native, and cloud-container execution provides useful learning access without obscuring runtime differences?
+- **RQ1:** Can source-pinned executable labs and evidence-labelled traces improve code-tracing and systems explanations?
+- **RQ2:** Can browser-derived, source-derived, authored and native-captured evidence be made understandable and machine-checkable?
+- **RQ3:** What succeeds, fails and requires human correction when scheduled specialist agents maintain an educational resource in a persistent repository?
+- **RQ4:** Which combination of browser, local-native and cloud-container execution provides access without obscuring runtime differences?
 
-These are planning questions, not answered claims.
+These remain planning questions, not answered claims.
 
 ## Defensible contributions under construction
 
 1. A revision-pinned executable-learning environment for source-level AI-systems education.
-2. Machine-checkable contracts for lab evidence, trace provenance/replay, local learner progress, and media provenance.
-3. A longitudinal, auditable case study of scheduled specialist agents operating with human supervision, deterministic tests, and repository memory.
-4. Design lessons about separating deterministic technical evidence from optional generated educational media.
+2. Machine-checkable contracts for lab evidence, trace provenance/replay, local learner progress and media provenance.
+3. A longitudinal case study of scheduled specialist agents operating with human supervision, deterministic tests and repository memory.
+4. Design lessons separating deterministic technical evidence from optional generated educational media.
 
-## Verified completed evidence
+## Verified evidence
 
-- Dependency-ordered July 17-31 plan and lesson contracts.
-- Legal fixture decision: model-free Lab 0 core, learner-provided optional inference, and project-owned synthetic GGUF.
-- Deterministic 428-byte GGUF v3 generator, manifest, golden parse, checksum, alignment/range assertions, and corruption fixtures.
-- Lab 0 six-phase report contract and semantic validator.
-- Versioned executable-trace schema, immutable source anchors, corrected authored GGUF-loading trace, deterministic replay, and malformed-input tests.
-- Minimal static trace viewer with Previous/Next and Arrow/Home/End navigation, evidence labels, pinned source links, live text status, reduced-motion handling, and ordered transcript fallback.
-- Versioned local-only learner-progress schema and privacy-minimizing validator.
-- Media manifest/provenance schema and validator.
-- Deterministic GGUF-layout SVG with exact replay, checksums, alt text, and passing CI.
-- Official media/API capability review that keeps generated media supplemental and manually review-gated.
+- Frozen learner and lesson contracts for Lab 0, Lab 1 and Executable Lecture 0.
+- Legal fixture policy: model-free Lab 0 core, learner-provided optional models and project-owned synthetic GGUF.
+- Deterministic GGUF fixture, parser agreement, figure and browser-first Predict-Discover-Explain slice.
+- Versioned trace schema, immutable source anchors, deterministic replay and keyboard-operable viewer with transcript fallback.
+- Local-only progress schema and privacy boundary.
+- Media provenance schema and deterministic authoritative figure pipeline.
+- Successful Ubuntu 24.04 local-native Lab 0 row: run `29622240261`, artifact `8422651113`, 326,905 ms model-free time to ready.
+- Successful Ubuntu 24.04 devcontainer Lab 0 row: run `29626470197`, artifact `8424069914`, digest `sha256:2aaf62980561e141244b5552f4cd397cb7c9a4e1215b75c35a04fdc3ad7c3121`, 280,753 ms model-free time to ready.
 
-## Current claim boundaries
+## Claim boundaries
 
-- The viewer is authored/source-derived, not native-captured.
-- A passing model-free Lab 0 report proves environment/build/executable launch only, not model load or inference.
-- Browser parsing will be evidence about a synthetic fixture, not evidence of native llama.cpp execution.
-- Passing CI establishes deterministic integration, not educational effectiveness.
-- No learner or participant data has been collected.
+- Both Lab 0 rows establish locked setup, pinned bounded build and executable launch only; neither establishes model loading, inference or learner benefit.
+- The devcontainer run does not establish Codespaces service reliability, offline use or image-digest reproducibility.
+- The viewer remains authored/source-derived, not native-captured.
+- Browser parsing is evidence about a synthetic fixture, not native execution.
+- Passing CI establishes deterministic integration at each branch head, not educational effectiveness or canonical-stack integration.
+- No participant data has been collected.
 
-## Venue state
+## Two-week milestone status
 
-As of 2026-07-17, no official EAAI-27 call has been verified. The official AAAI-27 main-conference page lists Montréal, February 16-23, 2027, with main-track abstract and paper deadlines on July 21 and July 28, 2026; these dates must **not** be assumed to apply to EAAI. The latest verified EAAI call is EAAI-26, whose Experience Report and Innovative Practice area required development and use context, collected data, prior-literature motivation, novelty, and rich reflection on what worked, what did not, and why. Reverify the official EAAI-27 call before any submission decision.
+- **Week 1 contracts and architecture:** 94% — core contracts, fixtures, schemas and narrow vertical slices exist; systematic documentation audit and canonical reconciliation remain.
+- **Week 1 smallest vertical slice:** 95% — Lab 0 runners, browser GGUF slice, trace viewer and deterministic figure exist with validation.
+- **Week 2 Lab 0 evidence:** 75% — local-native and devcontainer model-free rows pass; inference, offline/degraded behavior and additional platform rows remain explicitly optional or unevidenced.
+- **Week 2 coherent demo:** 52% — components exist in stacked branches, but progress import/export and canonical integration remain blocking.
+- **Publication evidence package:** 45% — reproducibility improved, while learner/expert evaluation, baseline, independent review and longitudinal extraction remain absent.
 
-Official sources:
+## Readiness by category
 
-- https://aaai.org/conference/aaai/aaai-27/
-- https://aaai.org/conference/aaai/aaai-26/eaai-26-call/
+| Category | Readiness | Status |
+|---|---:|---|
+| Educational framing | 70% | frozen but not independently reviewed |
+| Executable-learning architecture | 72% | three tiers specified; two Lab 0 tiers measured |
+| Lab 0 reproducibility | 68% | Ubuntu native and devcontainer model-free rows pass |
+| GGUF browser lab | 62% | bounded slice validated; progress integration incomplete |
+| Executable lecture | 64% | deterministic authored viewer; native capture and baseline absent |
+| Progress/privacy | 48% | schema exists; export/import, migration and recovery pending |
+| Media/provenance | 66% | deterministic core validated; lifecycle dry run incomplete |
+| Agent-workflow evidence | 38% | logs exist; systematic extraction and coding pending |
+| Baseline and evaluation | 15% | protocols not completed |
+| Independent correctness | 20% | source pinning exists; external review absent |
+| Venue readiness | 35% | requirements must remain freshly verified |
 
-## Next 7 dependency-ordered actions
+**Overall coordination readiness: 57%.** This is a conservative project-management signal, not a statistical result. The adversarial disposition remains reject in the current state.
 
-1. **Validation Architect — `LAB0-02`:** define the supported-environment matrix, exact `uv`/compiler/CMake/Ninja checks, stable diagnostic taxonomy, and time-to-ready/time-to-first-token protocol.
-2. **Validation Architect — `DATA-01`:** define a retrospective extraction schema for assignments, commits, failures, corrections, validators, human-review decisions, cost proxies, and accepted/rejected outputs.
-3. **Documentation Builder — `LAB1-01`:** implement the narrow browser GGUF parser/visualizer with Predict-Discover-Explain checkpoints and explicit native-runtime exclusions.
-4. **Validation Architect — `PROGRESS-02`:** implement local export/import, migration, corruption recovery, and storage-adapter tests before connecting progress to Lab 1.
-5. **Adversarial Reviewer + Orchestrator — `REVIEW-02`:** integrate the reviewer package into the active stack and convert every major concern into a required evidence gate.
-6. **Literature and Venue Scout — source-comprehension baseline:** identify primary evidence for a fair static-source/text baseline and code-tracing outcome measures for the viewer.
-7. **Literature and Venue Scout — `VENUE-01`:** continue monitoring official EAAI-27 requirements without borrowing AAAI main-track dates.
+## Next dependency-ordered actions
+
+1. **Human + Orchestrator — `STACK-01`:** approve PR #24 as canonical progress base or record an alternative; reconcile one combined branch and run full CI.
+2. **Validation Architect — `PROGRESS-02`:** implement export/import, migration, corruption recovery and storage-adapter tests.
+3. **Validation Architect — `DATA-01`:** extract assignments, failures, corrections, validators, human effort and cost proxies into a reviewable dataset.
+4. **Human — `REVIEW-01`:** nominate an independent llama.cpp/GGML reviewer.
+5. **Literature Scout — `VENUE-01`:** verify current official EAAI requirements and retain primary-source evidence.
+6. **Validation Architect — `BASE-01`:** freeze benchmark tasks after DATA-01 and compare simpler workflows against the full orchestration workflow.
+7. **Human + Validation Architect — `EVAL-01`:** approve learner or expert evaluation and ethics pathway before collection.
 
 ## Human-action blockers
 
-- Approve the intended evaluation pathway before participant recruitment or personal-data collection.
-- Nominate an independent llama.cpp/GGML technical reviewer before correctness claims are made.
-- Decide whether any optional paid media API credentials may be used; no credential is needed for the deterministic core path.
-- Review and merge the stacked PR chain in dependency order after CI passes.
+- Canonical progress implementation and merge order.
+- Independent technical reviewer nomination.
+- Evaluation and ethics pathway approval.
+- Any optional paid-media credentials; deterministic work does not require them.
 
-## Manuscript-writing gate
+## Exact manuscript-writing condition
 
-Do not activate the Paper Integrator until all conditions below are evidenced:
-
-- stable audience, educational problem, learning objectives, and research questions;
-- frozen workflow/autonomy/human-supervision description;
-- passing integrated CI and reproducible Lab 0, GGUF lab, trace-viewer, progress, and media-manifest vertical slice;
-- retrospective repository dataset with agent runs, assignments, failures, corrections, costs, and accepted/rejected outputs;
-- at least one fair baseline comparison;
-- independent technical correctness review;
-- approved learner or expert evaluation pathway and, when applicable, ethics approval;
-- current official venue requirements;
-- no unresolved fatal or major reviewer concern that invalidates the central contribution.
+Do not activate the Paper Integrator until one canonical integrated branch passes full CI and the following are evidenced: stable framing and research questions; documented workflow and autonomy boundaries; reproducible lab/media/progress architecture; retrospective repository dataset; at least one fair baseline; independent technical correctness review; approved and completed learner or expert evaluation pathway where required; current official venue requirements; and no fatal reviewer concern that invalidates the central contribution.

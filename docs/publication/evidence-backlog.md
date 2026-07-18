@@ -1,64 +1,42 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-18 05:00 Africa/Cairo_
+_Last updated: 2026-07-18 06:02 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
 | Priority | ID | Status | Owner | Dependency | Required evidence | Claim supported or falsified |
 |---|---|---|---|---|---|---|
-| P0 | CI-01 | evidenced | Documentation Builder | latest stacked branch | strict MkDocs root cause, narrow fix, passing final-head Documentation CI run `29546570700` | The executable-learning artifacts integrate without degrading the existing site |
 | P0 | STACK-01 | blocked | Orchestrator + Human | canonical progress choice | approved canonical-progress record, reconciled integration branch and full combined-head CI | The evidence package exists as one reviewable artifact rather than parallel drafts |
-| P0 | COORD-01 | evidenced | Orchestrator | none | `orchestrator-state.md`, this backlog, roadmap, scorecard | Scheduled agents can share an explicit dependency order rather than infer work independently |
-| P1 | LAB0-02 | in progress | Validation Architect | Lab 0 report contract | reproducibility schema, semantic validator, supported-environment matrix, exact toolchain checks, diagnostic taxonomy, timing definitions, offline/security boundaries; additional matrix rows pending | Setup/build evidence is comparable across supported environments |
-| P1 | LAB0-03 | evidenced | Validation Architect | LAB0-02 | successful Ubuntu 24.04 model-free report; run `29622240261`; artifact `8422651113`; Documentation CI `29622240365` | One clean Ubuntu local-native environment completes locked Python setup, pinned CMake/Ninja build and executable launch |
-| P1 | LAB0-04 | in progress | Validation Architect | LAB0-03; devcontainer definition | Codespaces-compatible Ubuntu 24.04 devcontainer, shared parameterized runner and retained-evidence workflow implemented; equivalent exact container report, semantic validation and commit-scoped CI still required | The cloud-container tier reproduces the same bounded setup/build/launch path |
-| P1 | DATA-01 | ready | Validation Architect | stable log formats | retrospective extraction schema for assignments, commits, failures, corrections, tests, cost proxies and accepted/rejected outputs | The multi-agent process can be analyzed as a longitudinal case study |
-| P1 | MEDIA-01 | evidenced | Documentation Builder | CI-01 | schema, semantic validator, deterministic example, malformed-input tests, passing run `29549208249` | Generated educational media can be provenance- and review-gated without making it technical evidence |
-| P1 | TRACE-02 | evidenced | Validation Architect | trace schema accepted; CI-01 | pinned source-anchor manifest and validator, corrected authored trace, deterministic replay and missing-data tests; passing run `29556540213` | Trace provenance and navigation remain valid against immutable source |
-| P1 | FIG-01 | evidenced | Documentation Builder | MEDIA-01 | deterministic GGUF-layout SVG generated from fixture data plus recomputed manifest/input/output checksums and alt text; passing run `29553868078` | Authoritative technical figures are reproducible without generative models |
-| P1 | VIEW-01 | evidenced | Documentation Builder | TRACE-02 | keyboard-operable static viewer, deterministic payload, evidence labels, transcript fallback, focused tests; passing run `29559239071` | A narrow executable lecture can expose source, state and explanation without evidence inflation |
-| P1 | LIT-02 | evidenced | Literature Scout | none | official media/API capability matrix with provenance, privacy, accessibility, licensing, cost and caching implications | Optional media choices are evidence-based and reproducible enough for an experience report |
-| P1 | VENUE-01 | in progress | Literature Scout | official publication | verified EAAI-27 call, deadlines, area, format, review criteria | Submission plan matches the current venue rather than prior-year assumptions |
-| P2 | LAB1-01 | evidenced | Documentation Builder | progress contract; FIG-01; VIEW-01 | browser parser/visualizer, Python/golden agreement, Predict-Discover-Explain checkpoints, static fallback; passing run `29562479577` | Learners can inspect GGUF layout in-browser without confusing it with native inference |
-| P2 | PROGRESS-02 | ready | Validation Architect | progress schema | import/export round trip, migration, corruption recovery, local storage adapter tests | Local-first progress is portable and privacy-minimizing |
-| P2 | REVIEW-02 | in progress | Adversarial Reviewer + Orchestrator | PR #8 integration | integrate reviewer notes, claims-evidence table, rejection risks and scorecard into the active stack | Major rejection risks are visible and drive dependency ordering |
-| P2 | REVIEW-01 | blocked | Human | independent reviewer nominated | expert rubric and signed/dated review of fixture, trace, lab explanations and figure | Technical correctness is independently supported |
-| P2 | BASE-01 | blocked | Validation Architect | DATA-01, frozen benchmark tasks | fair comparison protocol: single authoring agent; author+reviewer; full repository-memory/validator workflow | Specialized scheduled workflow provides measurable benefit over simpler workflows |
-| P3 | EVAL-01 | blocked | Human + Validation Architect | evaluation pathway approval | learner or expert study protocol, instruments, consent/ethics decision | Educational usefulness is evaluated rather than inferred from implementation |
-| P3 | DEMO-01 | blocked | Orchestrator | STACK-01, LAB0-04, LAB1-01, PROGRESS-02 | reproducible end-to-end Lab 0 + GGUF lab + viewer + figure + progress demo | The proposed system exists as a coherent educational artifact |
+| P0 | COORD-01 | evidenced | Orchestrator | none | authoritative orchestrator state, backlog, roadmap, scorecard and handoff ledger | Scheduled agents share an explicit dependency order |
+| P1 | LAB0-02 | in progress | Validation Architect | Lab 0 report contract | reproducibility schema, semantic validator, supported-environment matrix, diagnostics, timing definitions, offline/security boundaries; additional operating-system rows pending | Setup/build evidence is comparable across environments |
+| P1 | LAB0-03 | evidenced | Validation Architect | LAB0-02 | Ubuntu 24.04 model-free report; run `29622240261`; artifact `8422651113`; Documentation CI `29622240365` | One clean local-native environment completes locked setup, pinned build and executable launch |
+| P1 | LAB0-04 | evidenced | Validation Architect | LAB0-03; devcontainer definition | devcontainer run `29626470197`; artifact `8424069914`; report digest `sha256:2aaf62980561e141244b5552f4cd397cb7c9a4e1215b75c35a04fdc3ad7c3121`; Documentation CI `29626470196` | One Codespaces-compatible cloud-container environment reproduces the bounded model-free setup/build/launch path |
+| P1 | DATA-01 | ready | Validation Architect | stable log formats | retrospective extraction schema for assignments, commits, failures, corrections, tests, cost proxies and accepted/rejected outputs | The multi-agent process can be analyzed longitudinally |
+| P1 | MEDIA-01 | evidenced | Documentation Builder | CI-01 | schema, validator, deterministic example, malformed-input tests | Generated educational media can be provenance- and review-gated without becoming technical evidence |
+| P1 | TRACE-02 | evidenced | Validation Architect | trace schema accepted | pinned source anchors, validator, corrected authored trace, deterministic replay and missing-data tests | Trace provenance and navigation remain valid against immutable source |
+| P1 | FIG-01 | evidenced | Documentation Builder | MEDIA-01 | deterministic GGUF-layout SVG, checksums and alt text | Authoritative technical figures are reproducible without generative models |
+| P1 | VIEW-01 | evidenced | Documentation Builder | TRACE-02 | keyboard-operable static viewer, evidence labels and transcript fallback | A narrow executable lecture can expose source, state and explanation without evidence inflation |
+| P1 | VENUE-01 | in progress | Literature Scout | official publication | verified current EAAI call, deadlines, area, format and review criteria | Submission planning matches the current venue |
+| P2 | LAB1-01 | evidenced | Documentation Builder | progress contract; FIG-01; VIEW-01 | browser parser/visualizer, Python/golden agreement, Predict-Discover-Explain checkpoints and static fallback | Learners can inspect GGUF layout in-browser without confusing it with native inference |
+| P2 | PROGRESS-02 | ready | Validation Architect | progress schema | import/export round trip, migration, corruption recovery and local storage tests | Local-first progress is portable and privacy-minimizing |
+| P2 | REVIEW-02 | in progress | Adversarial Reviewer + Orchestrator | canonical integration | integrate reviewer package into the canonical stack | Major rejection risks drive dependency ordering |
+| P2 | REVIEW-01 | blocked | Human | independent reviewer nominated | signed/dated review of fixture, trace, labs and deterministic figures | Technical correctness is independently supported |
+| P2 | BASE-01 | blocked | Validation Architect | DATA-01; frozen benchmark tasks | fair comparison of simpler and full repository-memory/validator workflows | The scheduled multi-agent workflow provides measurable benefit |
+| P3 | EVAL-01 | blocked | Human + Validation Architect | evaluation pathway approval | approved learner or expert protocol, instruments and ethics decision | Educational usefulness is measured rather than inferred |
+| P3 | DEMO-01 | blocked | Orchestrator | STACK-01; PROGRESS-02 | canonical end-to-end Lab 0 + GGUF lab + viewer + figure + progress demo | The system exists as one coherent educational artifact |
 
-## Closed evidence from the current stack
+## Newly verified LAB0-04 evidence
 
-- Legal fixture policy and deterministic synthetic GGUF package.
-- Lab 0 six-phase report schema and semantic checks.
-- One successful Ubuntu 24.04 model-free Lab 0 setup/build/launch report with exact retained artifact and passing Documentation CI.
-- Executable-trace schema, immutable source anchors, corrected authored GGUF trace and deterministic replay.
-- Local-only learner-progress schema and privacy constraints.
-- Initial browser/local/cloud platform literature map.
-- Strict MkDocs handoff-link repair with passing commit-scoped CI.
-- Media manifest/provenance schema, semantic validator and passing commit-scoped CI.
-- Deterministic GGUF-layout figure with exact replay and passing commit-scoped CI.
-- Minimal keyboard-operable trace viewer with deterministic payload, evidence labels and transcript fallback; passing run `29559239071`.
-- Browser-first GGUF Anatomy slice with deterministic Python/browser agreement and passing run `29562479577`.
+Workflow run `29626470197` completed successfully on the repository Development Container. The retained report records Ubuntu 24.04/x86_64, `uv 0.8.0`, Python 3.12.3, CMake 3.28.3, Ninja 1.11.1 and GCC 13.3.0. It executed `uv sync --locked`, checked out llama.cpp revision `e3546c7948e3af463d0b401e6421d5a4c2faf565`, configured with Ninja and `GGML_NATIVE=OFF`, built only `llama-cli`, and launched `llama-cli --help`. Setup, build and launch succeeded with no diagnostics; model use and inference were not attempted. Model-free time to ready was 280,753 ms.
 
-## LAB0-03 evidence boundary
+This evidence supports one devcontainer/Codespaces-compatible matrix row only. It does not establish Codespaces service availability, image-digest reproducibility, offline behavior, model loading, time to first token, learner benefit, macOS/WSL2 equivalence or independent technical correctness.
 
-Workflow run `29622240261` retained a semantically valid Ubuntu 24.04/x86_64 report after executing `uv sync --locked`, a pinned llama.cpp checkout, Ninja configuration with `GGML_NATIVE=OFF`, the bounded `llama-cli` target build and `llama-cli --help`. Time to ready was 326,905 ms. The report contains no model and marks inference as not attempted. This is positive evidence for one local-native matrix row only; it does not establish time to first token, offline operation, learner benefit, devcontainer equivalence, macOS/WSL2 support or cross-platform reproducibility.
+## Immediate dependency order
 
-## LAB0-04 implementation boundary
-
-The repository now contains a Codespaces-compatible Ubuntu 24.04 devcontainer and a dedicated `devcontainers/ci` lane that runs the same parameterized model-free runner, retains the exact report before semantic validation and enforces the same success chain. This is implementation evidence only. `LAB0-04` remains in progress until commit-scoped CI produces a retained report that passes semantic validation and shows setup, build and launch success. It does not yet establish Codespaces service reliability, image digest reproducibility, offline use, inference or learner benefit.
-
-## Viewer evidence boundary
-
-The viewer consumes a deterministic payload generated from the validated trace, provides bounded Previous/Next and Arrow/Home/End navigation, exposes evidence labels and pinned source links, and retains a complete static transcript. Passing CI establishes integration and deterministic replay. It does not establish native capture, technical correctness beyond the pinned source anchors, or educational benefit over a static source-and-text baseline.
-
-## Rejection-risk mapping
-
-- **Only documentation generation:** require DEMO-01, DATA-01 and BASE-01.
-- **No educational evidence:** require EVAL-01 and formative-assessment artifacts in Lab 0/Lab 1/viewer.
-- **Incorrect technical content:** require REVIEW-01 and pinned source-link validation.
-- **Visual novelty without learning value:** require a fair static-source/text baseline and code-tracing outcome measures.
-- **Unreproducible AI media:** deterministic figures are authoritative; optional generated assets require MEDIA-01 and provider-specific review.
-- **Unclear agent contribution:** retain assignments, failures, corrections, human decisions and costs through DATA-01.
-- **Unrealistic two-week scope:** optional generated media, hosted synchronization and cloud polish remain cut before the core vertical slice.
+1. Human: approve PR #24 as the canonical progress base or record an alternative for `STACK-01`.
+2. Orchestrator: reconcile the accepted stack and run full combined-head CI.
+3. Validation Architect: complete `PROGRESS-02` and retain migration/corruption evidence.
+4. Validation Architect: define and begin `DATA-01` retrospective extraction.
+5. Human: nominate an independent llama.cpp/GGML reviewer.
+6. Literature Scout: verify current official EAAI requirements.
+7. Validation Architect + Human: approve an evaluation pathway before any recruitment or personal-data collection.
