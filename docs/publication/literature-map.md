@@ -115,6 +115,59 @@ Do not use a generative image or video model to draw the canonical llama.cpp/GGM
 - This slice verifies documented capabilities and restrictions only. It does not test output quality, factuality, accessibility, latency or cost.
 - No paid API call, NotebookLM workspace, generated asset or learner data was used in this review.
 
+## Slice 3 — configured environments are not measured reproducibility
+
+### Question
+
+What evidence is required before the repository can call its browser, local-native, or cloud-container tiers reproducible?
+
+### Verified operational boundaries
+
+| Source | Verified capability or constraint | Evidence consequence |
+|---|---|---|
+| [JupyterLite storage configuration](https://jupyterlite.readthedocs.io/en/stable/howto/configure/storage.html) | JupyterLite selects browser-supported storage drivers, usually IndexedDB, but can fall back to volatile memory when explicitly configured. | Browser persistence is an implementation capability, not a durability guarantee. The lab must test export/import and disclose that browser data can be cleared or unavailable. |
+| [JupyterLite filesystem access](https://jupyterlite.readthedocs.io/en/stable/howto/content/python.html) | Kernel/file synchronization depends on `SharedArrayBuffer` with required cross-origin headers or a Service Worker fallback; without either, kernel access to file-browser contents can fail. | Browser-lab CI must verify deployment headers or the actual Service Worker path and retain a static, no-kernel fallback. A successful static build alone is insufficient. |
+| [JupyterLite troubleshooting](https://jupyterlite.readthedocs.io/en/stable/troubleshooting.html) | WebAssembly kernels cannot generally use unported native C extensions, system libraries, threading, multiprocessing, or ordinary filesystem assumptions. | The browser tier cannot be used as evidence that native llama.cpp, CMake/Ninja, `mmap`, or GGML runtime behavior works. |
+| [Development Container Specification](https://github.com/devcontainers/spec) | The specification describes configuration for recreatable development environments and CI/testing use. | A valid `devcontainer.json` establishes configuration intent only. Reproducibility requires an actual clean build and bounded command execution against pinned inputs. |
+| [GitHub Codespaces deep dive](https://docs.github.com/en/codespaces/about-codespaces/deep-dive) | `/workspaces` persists across stop/start and container rebuild, while changes outside it may be discarded on rebuild; lifecycle commands can still be running after connection. | Lab instructions must store evidence under the repository workspace, distinguish cold creation from later attachment, and avoid timing races with post-create commands. |
+| [GitHub Codespaces feature page](https://github.com/features/codespaces) | Codespaces is a hosted, metered service with configurable VM sizes and repeatable repository-defined environments; it cannot be self-hosted. | Do not generalize one hosted run to all machine sizes or promise zero cost. Record machine class when available and keep the local devcontainer path independently runnable. |
+| [Binder reproducibility guidance](https://mybinder.readthedocs.io/en/latest/tutorials/reproducibility.html) | Binder depends on repository-defined, pinned environments, but service startup and session lifecycle remain external to the repository. | Binder may support browser notebooks, but it is rejected as the primary native C++ evidence tier for this roadmap. |
+| [It’s Not Just Timestamps: A Study on Docker Reproducibility](https://arxiv.org/abs/2602.17678) | A 2026 empirical study reports that a Dockerfile’s existence and successful image construction do not imply bitwise-reproducible images; floating versions, caches, logs, and other developer-controlled state are major causes. | The case study must avoid claiming bitwise reproducibility from one container run. It should report operational reproducibility of a bounded learner path, exact revisions, versions, commands, artifacts, and observed outcomes. |
+
+### Claim taxonomy
+
+- **Configured:** required files and pins exist and pass static/schema validation.
+- **Buildable:** a clean environment successfully constructs the browser bundle, native target, or container image.
+- **Operationally reproducible:** the same bounded learner command path reaches the defined result in each declared supported environment while retaining exact revisions, versions, timings, outputs, and failures.
+- **Bitwise reproducible:** rebuilt artifacts are byte-identical under a separately defined and tested build contract.
+- **Educationally effective:** learners improve on declared outcomes under an approved evaluation protocol.
+
+These terms are not interchangeable. The July roadmap currently seeks operational reproducibility, not bitwise-identical native binaries.
+
+### Concrete design requirement
+
+Every environment matrix row must retain three independently reportable layers:
+
+1. **Configuration evidence:** repository revision, dependency locks, base image or OS identity, compiler/CMake/Ninja/uv versions, and source revision.
+2. **Execution evidence:** clean-start condition, exact commands, phase outcomes, monotonic time-to-ready, failure classification, and artifact checksum.
+3. **Persistence/degraded-mode evidence:** what survives refresh, stop/start, rebuild, cache loss, or offline execution; export/import recovery; and the static accessibility fallback.
+
+A row is successful only when the measured path—not merely the configuration—passes its declared acceptance gate.
+
+### Rejected alternative
+
+Do not equate a committed `.devcontainer/`, a successful container image build, a passing JupyterLite static build, or a valid `uv.lock` with end-to-end reproducibility. Each proves a narrower layer and can coexist with runtime, storage, network, lifecycle, or learner-path failure.
+
+### EAAI framing implication
+
+This separation turns setup failures and cross-tier asymmetries into analyzable experience-report evidence. The generalizable lesson is a validation hierarchy for executable systems education: configuration-as-code must be followed by clean execution, retained failure evidence, and explicit persistence and accessibility tests. The finding does not establish learner benefit and must not be reported as such.
+
+### Limitations
+
+- Official service semantics and billing may change; reverify them before deployment or submission.
+- The Docker study concerns bitwise image rebuilds, while this project’s immediate target is operational reproducibility of a bounded educational path.
+- This slice does not execute the devcontainer, JupyterLite deployment, or offline path; those remain validation tasks.
+
 ## Next literature dependency
 
-Retain the predefined `DOC-AUDIT-01` search-result frame and complete independent double-coding before strengthening the source-level documentation-gap hypothesis. A separate future slice should review empirical evidence on multimodal explanations and generated-diagram factuality rather than inferring educational benefit from API capability.
+`DOC-AUDIT-01` remains blocked on a nominated independent second coder and retained result frame. Until that human dependency is resolved, the documentation-gap statement must remain an **Open Question**. The next dependency-safe literature slice should examine empirical work on source-code comprehension and trace visualization, with a direct requirement for the planned information-equivalent baseline rather than visual-novelty claims.
