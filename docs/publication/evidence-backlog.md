@@ -1,6 +1,6 @@
 # EAAI evidence backlog
 
-_Last updated: 2026-07-18 07:00 Africa/Cairo_
+_Last updated: 2026-07-18 08:00 Africa/Cairo_
 
 This queue is dependency-aware. Close an item only with a durable artifact, validator or review record. Status values: `blocked`, `ready`, `in progress`, `evidenced`.
 
@@ -9,7 +9,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 | P0 | CI-01 | evidenced | Documentation Builder | latest stacked branch | strict MkDocs root cause, narrow fix, passing final-head Documentation CI run `29546570700` | The executable-learning artifacts integrate without degrading the existing site |
 | P0 | COORD-01 | evidenced | Orchestrator | none | `orchestrator-state.md`, this backlog, roadmap, scorecard | Scheduled agents can share an explicit dependency order rather than infer work independently |
 | P1 | LAB0-02 | in progress | Validation Architect | Lab 0 report contract | reproducibility schema, semantic validator, supported-environment matrix, exact toolchain checks, diagnostic taxonomy, timing definitions, offline/security boundaries; contract CI passed in run `29565651085`; real matrix runs pending | Setup/build evidence is comparable across supported environments |
-| P1 | DATA-01 | in progress | Validation Architect | stable log formats | versioned retrospective schema, semantic validator, first three-run batch, missing-value/coding policy, broader extraction, independent coding review and final-head CI | The multi-agent process can be analyzed as a longitudinal case study without silently imputing absent effort or cost values |
+| P1 | DATA-01 | in progress | Validation Architect | stable log formats | versioned retrospective schema, semantic validator, first three-run batch, missing-value/coding policy, explicit-unknown effort migration, broader extraction, independent coding review and final-head CI | The multi-agent process can be analyzed as a longitudinal case study without silently imputing absent effort or cost values |
 | P1 | MEDIA-01 | evidenced | Documentation Builder | CI-01 | schema, semantic validator, deterministic example, malformed-input tests, passing run `29549208249` | Generated educational media can be provenance- and review-gated without making it technical evidence |
 | P1 | TRACE-02 | evidenced | Validation Architect | trace schema accepted; CI-01 | pinned source-anchor manifest and validator, corrected authored trace, deterministic replay and missing-data tests; passing run `29556540213` | Trace provenance and navigation remain valid against immutable source |
 | P1 | FIG-01 | evidenced | Documentation Builder | MEDIA-01 | deterministic GGUF-layout SVG generated from fixture data plus recomputed manifest/input/output checksums and alt text; passing run `29553868078` | Authoritative technical figures are reproducible without generative models |
@@ -41,7 +41,7 @@ This queue is dependency-aware. Close an item only with a durable artifact, vali
 
 ## DATA-01 evidence boundary
 
-The branch retains the first bounded retrospective batch and now adds a missing-value and coding policy. The policy prohibits using zero to mean unavailable, distinguishes blocked from failed runs, requires evidence for output decisions and keeps incomplete records outside the canonical JSON dataset until the schema can represent unknown required effort values explicitly. This is evidence of an auditable extraction design, not proof of complete history, coding reliability, workflow superiority or educational benefit. Independent double-coding, adjudication and broader extraction remain required.
+The branch retains the first bounded retrospective batch, a missing-value and coding policy, and schema `1.1.0` support for explicit `measured`, `not_available`, and `not_applicable` effort values. New historical records can now omit unavailable numeric values without encoding zero, while legacy `1.0.0` records remain validator-compatible. This is evidence of an auditable extraction design, not proof of complete history, coding reliability, workflow superiority or educational benefit. Final-head CI, independent double-coding, adjudication, legacy-zero review and broader extraction remain required.
 
 ## LAB0-02 evidence boundary
 
