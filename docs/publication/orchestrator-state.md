@@ -1,6 +1,6 @@
 # EAAI research orchestrator state
 
-_Last updated: 2026-07-18 00:01 Africa/Cairo_
+_Last updated: 2026-07-18 03:01 Africa/Cairo_
 
 This file is the single source of truth for EAAI experience-report preparation. It coordinates bounded repository work and does not authorize manuscript drafting.
 
@@ -8,11 +8,13 @@ This file is the single source of truth for EAAI experience-report preparation. 
 
 **Phase:** Week 1 foundation is substantially complete; the critical path is canonical integration, measured reproducibility and independently reviewed evidence.
 
-**Overall judgment:** the repository contains a coherent set of source-pinned, deterministic vertical-slice components and rigorous evidence contracts. The prospective experience report remains rejectable because those components are still distributed across stacked draft PRs, local/cloud Lab 0 reproducibility is unmeasured, independent technical correctness and evaluation pathways are absent, and the longitudinal agent dataset has not been broadly extracted or independently coded.
+**Overall judgment:** the repository contains a coherent set of source-pinned, deterministic vertical-slice components and rigorous evidence contracts. The prospective experience report remains rejectable because those components are still distributed across stacked draft PRs, the first Ubuntu Lab 0 execution produced a measured degraded result rather than a successful bounded path, devcontainer reproducibility remains unmeasured, independent technical correctness and evaluation pathways are absent, and the longitudinal agent dataset has not been broadly extracted or independently coded.
 
-**Current coordination base:** `agent/doc-audit01-ci-attestation` at `b2a39213615e39852cbfd90f23296a493c8e63a2`. The predecessor documentation-audit protocol passed Documentation CI run `29606172245`; final-head CI for this reconciliation is required.
+**Current coordination base:** `agent/eaai-orchestrator-lab0-degraded-evidence`, derived from `f7f856c96e2ed1e4b45186bd444f129f9cd9edf9`.
 
-**Stack state:** `STACK-01` has a canonical merge map, but the human choice between overlapping progress implementations is still unresolved. `DEMO-01A`, `BLIND-01` and `DOC-AUDIT-01` now have bounded contracts; none of those contracts substitutes for an executed integrated demo, anonymous release artifact or completed systematic audit.
+**New measured evidence:** PR #45 head `d96eaf2a0da13fae993931acef839541d6f6a506` passed Documentation CI run `29619847677`. Ubuntu reproducibility run `29619847701` retained artifact `8421805335` before intentionally failing the final success gate. The schema-valid report classified `uv sync --locked` as `UV_LOCK_DRIFT`; setup, build and launch did not complete, and inference was not attempted.
+
+**Stack state:** `STACK-01` has a canonical merge map, but the human choice between overlapping progress implementations is still unresolved. `DEMO-01A`, `BLIND-01` and `DOC-AUDIT-01` have bounded contracts; none substitutes for an executed integrated demo, anonymous release artifact or completed systematic audit.
 
 ## Frozen educational framing
 
@@ -77,12 +79,13 @@ The project must not be framed as a tool collection. `DEMO-01` must execute the 
 - canonical integration map and integrated-demo acceptance specification;
 - official EAAI-27 call verification;
 - machine-checkable double-blind release contract with a deliberately non-ready example;
-- predefined documentation-gap audit protocol with commit-scoped CI evidence.
+- predefined documentation-gap audit protocol with commit-scoped CI evidence;
+- one retained, schema-valid Ubuntu 24.04 degraded Lab 0 record with toolchain versions, revisions, commands, timing and `UV_LOCK_DRIFT` classification.
 
 ### Unevidenced central claims
 
 - one canonical integrated branch with end-to-end passing CI;
-- measured Ubuntu 24.04 and devcontainer Lab 0 reproducibility;
+- successful Ubuntu 24.04 and devcontainer Lab 0 bounded execution;
 - learner benefit or expert usefulness;
 - independent llama.cpp/GGML correctness;
 - native or faithfully captured trace provenance beyond authored/source-derived replay;
@@ -99,7 +102,7 @@ Fatal evidence gaps:
 
 1. no approved and completed learner or expert-usefulness evaluation;
 2. no independent technical correctness review;
-3. no measured Ubuntu 24.04 or devcontainer Lab 0 execution;
+3. no successful Ubuntu 24.04 or measured devcontainer Lab 0 execution;
 4. no broader independently coded longitudinal agent dataset;
 5. no canonical integrated end-to-end demo.
 
@@ -122,7 +125,7 @@ The experience-report requirement for context of use, collected data and substan
 ## Next 7 dependency-ordered actions
 
 1. **Human + Orchestrator — `STACK-01`:** approve PR #24 as the lowest-risk canonical progress base or explicitly choose an alternative; then reconcile the mapped stack into one combined branch and run the complete Documentation CI suite.
-2. **Validation Architect — `LAB0-03`:** retain one measured model-free Ubuntu 24.04 record when a suitable environment is available.
+2. **Validation Architect — `LAB0-03`:** diagnose the retained `UV_LOCK_DRIFT` result using a bounded, secret-safe failure detail, then rerun the unchanged Ubuntu 24.04 setup/build/launch path.
 3. **Validation Architect — `LAB0-04`:** run the same bounded evidence contract in the devcontainer/Codespaces-compatible environment.
 4. **Orchestrator + Documentation Builder — `DEMO-01`:** execute the frozen `DEMO-01A` route on the canonical branch, including save/export/clear/import/resume and a no-JavaScript/static route.
 5. **Human technical reviewer — `REVIEW-01`:** review fixture, browser explanations, trace anchors, deterministic figure and benchmark answer key; retain corrections.
@@ -134,7 +137,7 @@ Parallel maintenance only: materialize `BLIND-01` after canonical integration, a
 ## Assignments by agent
 
 - **Documentation Builder:** support `STACK-01` reconciliation and `DEMO-01`; no broad content expansion.
-- **Validation Architect:** `LAB0-03`, `LAB0-04`, then `DATA-01B`; preserve failed runs and never fabricate timings.
+- **Validation Architect:** preserve the exact Ubuntu degraded artifact, classify the `uv sync --locked` cause without retaining secrets or personal paths, rerun `LAB0-03`, then execute `LAB0-04` and continue `DATA-01B`.
 - **Literature and Venue Scout:** retain the official venue record, recruit an independent documentation-audit coder and monitor only material author-kit changes.
 - **Adversarial Reviewer:** review the canonical integration branch and executed demo for evidence inflation, tool-collection framing and browser/native confusion.
 - **Paper Integrator:** disabled.
@@ -142,7 +145,7 @@ Parallel maintenance only: materialize `BLIND-01` after canonical integration, a
 ## Human-action blockers
 
 - approve the canonical progress implementation and stacked-PR merge order;
-- provide or approve clean Ubuntu 24.04 and devcontainer execution environments;
+- provide or approve a devcontainer execution environment;
 - nominate an independent llama.cpp/GGML reviewer;
 - approve an evaluation pathway and any required ethics review;
 - approve the retrospective study revision/window and independent coder;
@@ -154,7 +157,7 @@ Parallel maintenance only: materialize `BLIND-01` after canonical integration, a
 
 **Coordination estimate:** 55% of pre-manuscript readiness.
 
-The one-point increase credits validated `BLIND-01` and `DOC-AUDIT-01` contracts and removal of stale venue uncertainty from the execution plan. It gives no credit for measured educational benefit, independent correctness, measured native/container reproducibility, a combined branch, completed retrospective extraction, an anonymous artifact or completed audit.
+The measured negative Ubuntu record improves auditability and demonstrates failure retention, but it does not satisfy the reproducibility gate and therefore does not increase the readiness percentage. No credit is given for measured educational benefit, independent correctness, successful native/container execution, a combined branch, completed retrospective extraction, an anonymous artifact or completed audit.
 
 ## Manuscript-writing gate
 
