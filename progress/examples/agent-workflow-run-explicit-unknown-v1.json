@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.1.0",
+  "run_id": "2026-07-17T0206Z-trace-contract",
+  "role": "validation_architect",
+  "assignment": {
+    "id": "TRACE-02",
+    "priority": "P1",
+    "objective": "Define a source-pinned executable-trace contract with deterministic replay and evidence labels.",
+    "dependency_state": "ready",
+    "selected_reason": "The trace schema was the highest dependency-safe validation assignment recorded in the handoff ledger."
+  },
+  "revisions": {
+    "starting_commit": "1111111111111111111111111111111111111111",
+    "ending_commit": "2222222222222222222222222222222222222222",
+    "base_branch": "agent/trace-contract-base",
+    "working_branch": "agent/trace-contract"
+  },
+  "outputs": [
+    {"path": "schemas/executable-trace.schema.json", "kind": "schema", "decision": "accepted"},
+    {"path": "scripts/validate_executable_trace.py", "kind": "validator", "decision": "accepted"},
+    {"path": "logs/research/2026-07-17/0206-trace-contract.md", "kind": "run_log", "decision": "accepted"}
+  ],
+  "validation": {
+    "validators": ["Documentation CI"],
+    "failures": [],
+    "ci_state": "not_run"
+  },
+  "human_supervision": {
+    "required": true,
+    "decisions": ["Independent source-level correctness review remains required before publication claims."],
+    "review_status": "pending"
+  },
+  "effort": {
+    "agent_turns": {
+      "status": "measured",
+      "value": 1,
+      "evidence_paths": ["docs/publication/agent-handoffs.md"]
+    },
+    "tool_calls": {
+      "status": "not_available",
+      "reason": "The retained handoff does not contain a complete tool-call count for this historical run.",
+      "evidence_paths": ["docs/publication/agent-handoffs.md"]
+    },
+    "external_api_cost_usd": {
+      "status": "not_available",
+      "reason": "No retained billing record establishes an exact external API cost for this historical run.",
+      "evidence_paths": []
+    },
+    "paid_generation_calls": {
+      "status": "not_applicable",
+      "reason": "The trace-contract task did not invoke an optional paid media-generation workflow.",
+      "evidence_paths": ["logs/research/2026-07-17/0206-trace-contract.md"]
+    },
+    "human_minutes": {
+      "status": "not_available",
+      "reason": "No contemporaneous human-time log was retained for this historical run.",
+      "evidence_paths": []
+    }
+  },
+  "claims": [
+    {
+      "label": "Verified",
+      "statement": "The record preserves unavailable effort values explicitly rather than silently encoding them as zero.",
+      "evidence_paths": ["schemas/agent-workflow-run.schema.json", "scripts/validate_agent_workflow_run.py"]
+    },
+    {
+      "label": "Open Question",
+      "statement": "Independent coding agreement and broader historical coverage remain unevidenced.",
+      "evidence_paths": []
+    }
+  ]
+}

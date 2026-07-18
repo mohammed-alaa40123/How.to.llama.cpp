@@ -16,6 +16,7 @@ ROLES = {"orchestrator", "documentation_builder", "validation_architect", "liter
 CLAIM_LABELS = {"Verified", "Interpretation", "Historical", "Open Question"}
 OUTPUT_DECISIONS = {"accepted", "revised", "rejected"}
 CI_STATES = {"not_run", "queued", "in_progress", "passed", "failed"}
+MEASUREMENT_STATES = {"measured", "not_available", "not_applicable"}
 SENSITIVE_KEYS = {"email", "name", "username", "user_id", "device_id", "session_id", "ip_address", "prompt", "response", "raw_content", "token", "secret", "api_key"}
 
 
@@ -38,8 +39,36 @@ def walk_sensitive(value: Any, path: str = "root") -> None:
             walk_sensitive(child, f"{path}[{index}]")
 
 
+def validate_measurement(name: str, measurement: Any, *, integer: bool, minimum: float, maximum: float | None = None) -> None:
+    require(isinstance(measurement, dict), f"effort.{name} must be a measurement object")
+    require(set(measurement) <= {"status", "value", "reason", "evidence_paths"}, f"effort.{name} contains unknown fields")
+    status = measurement.get("status")
+    require(status in MEASUREMENT_STATES, f"effort.{name} has invalid status")
+    evidence_paths = measurement.get("evidence_paths", [])
+    require(isinstance(evidence_paths, list) and len(evidence_paths) <= 20, f"effort.{name}.evidence_paths must be a bounded list")
+    require(len(evidence_paths) == len(set(evidence_paths)), f"effort.{name}.evidence_paths must be unique")
+    for path in evidence_paths:
+        require(isinstance(path, str) and 3 <= len(path) <= 300, f"effort.{name} has an invalid evidence path")
+
+    if status == "measured":
+        value = measurement.get("value")
+        if integer:
+            require(isinstance(value, int) and not isinstance(value, bool), f"effort.{name}.value must be an integer")
+        else:
+            require(isinstance(value, (int, float)) and not isinstance(value, bool), f"effort.{name}.value must be numeric")
+        require(value >= minimum, f"effort.{name}.value is below its minimum")
+        if maximum is not None:
+            require(value <= maximum, f"effort.{name}.value exceeds its maximum")
+        require(len(evidence_paths) > 0, f"measured effort.{name} requires evidence_paths")
+        require("reason" not in measurement, f"measured effort.{name} must not use reason")
+    else:
+        require("value" not in measurement, f"unknown effort.{name} must omit value rather than encode zero")
+        require(len(str(measurement.get("reason", ""))) >= 10, f"unknown effort.{name} requires a reason")
+
+
 def validate(data: dict[str, Any]) -> None:
-    require(data.get("schema_version") == "1.0.0", "schema_version must be 1.0.0")
+    schema_version = data.get("schema_version")
+    require(schema_version in {"1.0.0", "1.1.0"}, "schema_version must be 1.0.0 or 1.1.0")
     require(bool(RUN_ID.fullmatch(str(data.get("run_id", "")))), "run_id must be timestamped and stable")
     require(data.get("role") in ROLES, "invalid role")
 
@@ -95,11 +124,24 @@ def validate(data: dict[str, Any]) -> None:
         require(supervision["review_status"] != "not_required", "required human review cannot be marked not_required")
 
     effort = data.get("effort", {})
-    require(isinstance(effort.get("agent_turns"), int) and effort["agent_turns"] >= 1, "agent_turns must be positive")
-    require(isinstance(effort.get("tool_calls"), int) and effort["tool_calls"] >= 0, "tool_calls must be non-negative")
-    require(isinstance(effort.get("external_api_cost_usd"), (int, float)) and effort["external_api_cost_usd"] >= 0, "external_api_cost_usd must be non-negative")
-    require(isinstance(effort.get("paid_generation_calls"), int) and effort["paid_generation_calls"] >= 0, "paid_generation_calls must be non-negative")
-    require(effort["paid_generation_calls"] == 0 or effort["external_api_cost_usd"] > 0, "paid generation calls require a positive recorded cost")
+    if schema_version == "1.0.0":
+        require(isinstance(effort.get("agent_turns"), int) and effort["agent_turns"] >= 1, "agent_turns must be positive")
+        require(isinstance(effort.get("tool_calls"), int) and effort["tool_calls"] >= 0, "tool_calls must be non-negative")
+        require(isinstance(effort.get("external_api_cost_usd"), (int, float)) and effort["external_api_cost_usd"] >= 0, "external_api_cost_usd must be non-negative")
+        require(isinstance(effort.get("paid_generation_calls"), int) and effort["paid_generation_calls"] >= 0, "paid_generation_calls must be non-negative")
+        require(effort["paid_generation_calls"] == 0 or effort["external_api_cost_usd"] > 0, "paid generation calls require a positive recorded cost")
+    else:
+        required_effort = {"agent_turns", "tool_calls", "external_api_cost_usd", "paid_generation_calls", "human_minutes"}
+        require(set(effort) == required_effort, "schema 1.1.0 effort must contain exactly the five measurement fields")
+        validate_measurement("agent_turns", effort["agent_turns"], integer=True, minimum=1, maximum=100)
+        validate_measurement("tool_calls", effort["tool_calls"], integer=True, minimum=0, maximum=1000)
+        validate_measurement("external_api_cost_usd", effort["external_api_cost_usd"], integer=False, minimum=0)
+        validate_measurement("paid_generation_calls", effort["paid_generation_calls"], integer=True, minimum=0)
+        validate_measurement("human_minutes", effort["human_minutes"], integer=True, minimum=0, maximum=100000)
+        calls = effort["paid_generation_calls"]
+        cost = effort["external_api_cost_usd"]
+        if calls["status"] == "measured" and cost["status"] == "measured":
+            require(calls["value"] == 0 or cost["value"] > 0, "paid generation calls require a positive measured cost")
 
     claims = data.get("claims")
     require(isinstance(claims, list) and 1 <= len(claims) <= 20, "claims must contain 1-20 records")

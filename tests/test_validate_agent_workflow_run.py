@@ -10,11 +10,39 @@ validator = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
 SPEC.loader.exec_module(validator)
 EXAMPLE = json.loads((ROOT / "progress" / "examples" / "agent-workflow-run-v0.json").read_text(encoding="utf-8"))
+UNKNOWN_EXAMPLE = json.loads((ROOT / "progress" / "examples" / "agent-workflow-run-explicit-unknown-v1.json").read_text(encoding="utf-8"))
 
 
 class AgentWorkflowRunValidationTests(unittest.TestCase):
-    def test_valid_example(self):
+    def test_valid_legacy_example(self):
         validator.validate(copy.deepcopy(EXAMPLE))
+
+    def test_valid_explicit_unknown_example(self):
+        validator.validate(copy.deepcopy(UNKNOWN_EXAMPLE))
+
+    def test_rejects_unknown_measurement_encoded_as_zero(self):
+        data = copy.deepcopy(UNKNOWN_EXAMPLE)
+        data["effort"]["tool_calls"]["value"] = 0
+        with self.assertRaises(validator.ValidationError):
+            validator.validate(data)
+
+    def test_rejects_measured_value_without_evidence(self):
+        data = copy.deepcopy(UNKNOWN_EXAMPLE)
+        data["effort"]["agent_turns"]["evidence_paths"] = []
+        with self.assertRaises(validator.ValidationError):
+            validator.validate(data)
+
+    def test_rejects_unknown_measurement_without_reason(self):
+        data = copy.deepcopy(UNKNOWN_EXAMPLE)
+        data["effort"]["human_minutes"].pop("reason")
+        with self.assertRaises(validator.ValidationError):
+            validator.validate(data)
+
+    def test_rejects_fractional_integer_measurement(self):
+        data = copy.deepcopy(UNKNOWN_EXAMPLE)
+        data["effort"]["agent_turns"]["value"] = 1.5
+        with self.assertRaises(validator.ValidationError):
+            validator.validate(data)
 
     def test_rejects_blocked_assignment_without_blocker(self):
         data = copy.deepcopy(EXAMPLE)
