@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-18 05:00 Africa/Cairo_
+_Last updated: 2026-07-18 06:01 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -30,37 +30,39 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Authoritative EAAI orchestration state, evidence backlog, roadmap, and readiness scorecard.
 - Strict MkDocs integration, deterministic GGUF figure, immutable trace source anchors, and keyboard-operable trace viewer with passing commit-scoped CI.
 - Browser-first GGUF Anatomy vertical slice with deterministic Python/browser agreement and passing Documentation CI run `29562479577`.
+- Successful model-free Lab 0 setup/build/launch measurements for Ubuntu 24.04 local-native and Ubuntu 24.04 devcontainer tiers.
 
 ## Latest concrete findings
 
 ### Verified
 
-- Ubuntu Lab 0 workflow run `29622240261` completed successfully on the PR head `712016f1522fd6f4f1184f9c37b76e3956b70c6a`.
-- Documentation CI run `29622240365` also completed successfully for the same head.
-- Artifact `8422651113`, `lab0-ubuntu-24.04-d895eddc1c5e69452d90571c4ccb5d80f410da07`, was retained with digest `sha256:2db76be20de63afb5ab080fbdca8354de60859d34d4f21970c5331f9f2871295` and expires on 2026-08-17.
-- The retained report identifies Ubuntu 24.04/x86_64, Python 3.12.3, uv 0.8.0, CMake 3.31.6, Ninja 1.13.2, and GCC 13.3.0.
+- Ubuntu Lab 0 workflow run `29622240261` completed successfully and retained artifact `8422651113` with digest `sha256:2db76be20de63afb5ab080fbdca8354de60859d34d4f21970c5331f9f2871295`.
+- Devcontainer Lab 0 workflow run `29626470197` completed successfully on head `ab1db83938176dc4fd766cf66fccf18e5b0e2116`.
+- Devcontainer artifact `8424069914`, `lab0-devcontainer-ubuntu-24.04-6b5c02d78b36c6283fa40c3c4ccdbdd5c051ea55`, was retained with digest `sha256:2aaf62980561e141244b5552f4cd397cb7c9a4e1215b75c35a04fdc3ad7c3121` and expires on 2026-08-17.
+- The container report identifies Ubuntu 24.04/x86_64, Python 3.12.3, uv 0.8.0, CMake 3.28.3, Ninja 1.11.1, and GCC 13.3.0.
 - The exact required `uv sync --locked` command passed with lock checksum `b332308fd26688b552acd6546a91ea95a3acd9e9d6457a1d3be97c59621f9ba3`.
 - The runner detached llama.cpp at `e3546c7948e3af463d0b401e6421d5a4c2faf565`, configured with Ninja and `GGML_NATIVE=OFF`, built only `llama-cli` with two jobs, and launched `llama-cli --help`.
-- The report recorded `setup_success=true`, `build_success=true`, `launch_success=true`, no diagnostics, no model, and `inference_state=not_attempted`.
-- Monotonic model-free time to ready was 326,905 ms.
-- The report recorded no model redistribution, secrets, personal paths, or learner data.
-- A Codespaces-compatible Ubuntu 24.04 devcontainer definition and dedicated `LAB0-04` retained-evidence workflow now reuse the same parameterized Lab 0 runner and validator as the Ubuntu row.
+- The container report recorded `setup_success=true`, `build_success=true`, `launch_success=true`, no diagnostics, no model, and `inference_state=not_attempted`.
+- Container monotonic model-free time to ready was 280,753 ms; the earlier Ubuntu local-native row was 326,905 ms. These are environment observations, not a performance comparison.
+- Documentation CI `29626470196` and the unchanged Ubuntu regression lane `29626470190` passed on the same head.
+- The reports record no model redistribution, secrets, personal paths, telemetry, or learner data.
 
 ### Interpretation
 
-- The retained run provides bounded positive evidence for one clean Ubuntu local-native setup/build/launch row.
-- The earlier failed report and the successful rerun demonstrate that retaining failed artifacts before semantic rejection improves reproducibility debugging.
-- Reusing one runner and semantic validator reduces measurement drift between the local-native and cloud-container rows.
-- The devcontainer implementation alone is not evidence that the container row succeeds; commit-scoped execution remains required.
+- The retained runs provide bounded positive evidence for one clean Ubuntu local-native row and one clean Ubuntu devcontainer row using the same runner and semantic validator.
+- Reusing one runner and validator reduces measurement drift, but the different tool versions and container image acquisition path remain part of the environment description.
+- The shorter container time-to-ready must not be interpreted as a speed advantage because caches, runner allocation, image-build timing boundaries, and repeated-run state were not controlled.
 
 ### Historical
 
 - The first retained Ubuntu run localized `UV_LOCK_DRIFT` before clone/configure/build/launch.
 - A minimal dependency-free project entry in `uv.lock` corrected the locked-sync contract without weakening `uv sync --locked` or adding external Python dependencies.
+- The devcontainer lane was introduced only after the local-native row passed and deliberately reused its measurement implementation.
 
 ### Open questions
 
-- Whether the repository devcontainer completes the same bounded path and retains a semantically valid report in CI.
+- The Development Container base image tag and package sources are mutable; an exact built-image digest was not retained.
+- Real Codespaces service opening, persistence and failure behavior remain untested.
 - Real macOS and WSL2 runs remain required before any cross-platform claim.
 - Offline/degraded-mode behavior and cached rebuild behavior remain untested.
 - Independent technical review and an approved educational evaluation pathway remain required.
@@ -69,16 +71,14 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ```text
 return to STACK-01 when the human canonical-progress decision exists
-  → otherwise inspect the LAB0-04 devcontainer workflow and retained report
-  → preserve the exact JSON artifact before semantic validation
-  → make at most one phase-specific repair if it fails
-  → do not claim inference, Codespaces service reliability or cross-platform reproducibility
+  → otherwise begin DATA-01 retrospective extraction or PROGRESS-02 according to the orchestrator
+  → do not duplicate Lab 0 environment lanes without a declared matrix need
+  → do not claim inference, Codespaces service reliability, image reproducibility or cross-platform equivalence
 ```
 
 ## In progress
 
 - Draft PR stack for the EAAI executable-learning foundation.
-- `LAB0-04` measured devcontainer run and artifact validation.
 - `DATA-01` retrospective agent-workflow extraction contract.
 - `PROGRESS-02` progress export/import, migration, and corruption recovery.
 - Current-tree CPU_REPACK regeneration and sanitizer validation.
@@ -89,20 +89,21 @@ return to STACK-01 when the human canonical-progress decision exists
 - `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` remain authoritative.
 - `CI-01`, `MEDIA-01`, `FIG-01`, `TRACE-02`, `VIEW-01`, and `LAB1-01` have passing commit-scoped CI evidence.
 - `LAB0-03` has one retained, semantically valid, successful Ubuntu 24.04 model-free setup/build/launch record.
-- `LAB0-04` now has an implementation and workflow, but no successful retained container report yet.
+- `LAB0-04` has one retained, semantically valid, successful Ubuntu 24.04 devcontainer model-free setup/build/launch record.
 - No participant data, model, telemetry, credential, paid API call, generated media output, native instrumentation, inference, or manuscript prose was introduced.
 
 ## Known blockers and caveats
 
 - **Canonical integration:** `STACK-01` still requires a human choice of progress implementation and merge order.
-- **Execution-tier coverage:** the successful Ubuntu row does not cover devcontainer until `LAB0-04` passes, nor macOS, WSL2, browser execution, offline use, model loading, or inference.
-- **Container reproducibility:** the Development Container base image tag and initial package acquisition still depend on external registries; the exact built image digest must be retained by CI or a later evidence increment before making a stronger image-reproducibility claim.
+- **Execution-tier coverage:** the two successful rows do not cover macOS, WSL2, browser execution, offline use, model loading, inference or actual Codespaces service operation.
+- **Container reproducibility:** the Development Container base image tag and initial package acquisition depend on external registries; the exact built image digest was not retained.
+- **Timing comparison:** local-native and container time-to-ready values are not a controlled benchmark and must not be compared as performance results.
 - **Lab 0 target:** the `llama-cli` command shape still requires independent technical review.
 - **Educational effectiveness:** no learner-benefit claim is permitted before an approved evaluation pathway and baseline comparison.
 - **Progress integration:** canonical progress implementation remains unresolved across overlapping branches.
 - **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be a valid inference model.
 - **Live-site verification:** Pages should be rechecked only after stacked changes merge to `main` and deploy.
-- **Evidence retention:** artifact `8368782428` expires on 2026-08-15; successful Lab 0 artifact `8422651113` expires on 2026-08-17.
+- **Evidence retention:** artifact `8368782428` expires on 2026-08-15; Lab 0 artifacts `8422651113` and `8424069914` expire on 2026-08-17.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
 
 ## Definition of done for the executable-learning foundation phase
