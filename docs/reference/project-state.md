@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-17 13:03 Africa/Cairo_
+_Last updated: 2026-07-18 07:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -19,48 +19,45 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - Source-pinned MkDocs documentation, strict CI, deployment checks and durable run context.
 - Frozen July 17-31 learning contracts for Lab 0, Lab 1 and Executable Lecture 0.
 - Legal model-free and learner-provided-model policy plus deterministic synthetic GGUF fixture.
-- Lab 0 phase and reproducibility contracts; real environment rows remain open.
+- Lab 0 phase and reproducibility contracts.
 - Versioned trace, progress, media and retrospective-workflow schemas and validators.
 - Corrected source-pinned authored trace, deterministic replay and keyboard-operable static viewer.
 - Deterministic GGUF-layout figure with provenance and exact replay.
 - Browser-first GGUF Anatomy slice with Predict-Discover-Explain checkpoints.
-- DATA-01 contract with passing Documentation CI run `29568983813`.
+- DATA-01 contract and first three-run retrospective batch.
 
 ## Latest bounded increment
 
 ### Verified
 
-- The parent DATA-01 schema and semantic validator passed commit-scoped Documentation CI run `29568983813`.
-- The first retrospective batch contains exactly three evidence-linked records: a clean viewer success, a deterministic-figure CI repair, and a blocked Lab 0 execution followed by dependency-safe DATA-01 reassignment.
-- `scripts/validate_agent_workflow_batch.py` reuses the individual-record validator, requires unique run IDs, and rejects batches missing any of the three required archetypes.
-- Focused tests cover valid classification, duplicate records and missing archetypes.
+- `STACK-01` remains blocked by the required human canonical-progress and merge-order decision.
+- `PROGRESS-02` already has overlapping draft implementations in PRs #23 and #24, so this run did not create a third implementation.
+- The existing DATA-01 schema requires numeric effort fields and therefore cannot faithfully encode unavailable historical counts.
+- Added `docs/publication/retrospective-missing-value-policy.md` with a source hierarchy, prohibited imputations, coding distinctions, double-coding requirements and acceptance gates for the next extraction batch.
 
 ### Interpretation
 
-- The schema can represent materially different workflow outcomes without reducing all runs to a binary success label.
-- This is a prerequisite for correction-rate and human-supervision analysis, not evidence that the scheduled-agent workflow outperforms simpler baselines.
+- Excluding incomplete candidate records is more defensible than encoding unavailable measurements as zero before a reviewed schema migration.
+- Distinguishing blocked, failed, repaired and clean-success outcomes is necessary for a credible longitudinal case study.
 
 ### Historical
 
-- The extracted records are reconstructed from durable run logs, immutable commits and commit-scoped CI identifiers.
-- Effort counts remain historical proxies and are not independently timed labor measurements.
+- Early scheduled-run logs were not designed as complete time-and-motion records, so tool-call, human-minute and cost fields may be absent.
 
 ### Open questions
 
-- Final-head CI must pass for the first batch.
-- A human reviewer must check coding consistency against source logs and PR history.
-- Missing-value policy, broader historical coverage and inter-rater agreement remain undefined.
-- Real Ubuntu and devcontainer Lab 0 measurements remain absent.
-- BASE-01, independent technical review and an approved educational evaluation pathway remain required.
+- The prevalence and pattern of missing fields across repository history are not yet measured.
+- A human reviewer must approve an explicit unknown-value representation and independently double-code the predefined sample.
+- Workflow superiority remains unevaluated pending DATA-01 completion and BASE-01.
 
 ## Immediate next task
 
 ```text
-obtain commit-scoped CI for the three-run DATA-01 batch
-  → human-review the coding against source logs and PR history
-  → define missing-value and consistency rules before larger extraction
-  → keep LAB0-02 open until real Ubuntu and devcontainer rows exist
-  → do not claim workflow superiority before BASE-01
+run commit-scoped Documentation CI for the missing-value policy
+  → stage the next bounded DATA-01 sample under the policy
+  → exclude candidates with unknown required effort fields until schema migration is approved
+  → independently double-code and adjudicate the predefined sample
+  → do not duplicate PROGRESS-02 before the STACK-01 canonical decision
 ```
 
 ## Publication and validation state
@@ -71,12 +68,11 @@ obtain commit-scoped CI for the three-run DATA-01 batch
 
 ## Known blockers and caveats
 
-- **Lab 0 execution:** this runtime still cannot resolve `github.com`; no real environment row was fabricated.
-- **Retrospective accuracy:** historical tool-call and human-minute values may be incomplete and must never be guessed.
-- **Independent review:** the three-run batch requires a human coding check before publication analysis.
+- **Canonical integration:** human approval of the progress implementation and merge order remains required.
+- **Retrospective accuracy:** unavailable historical values must not be guessed or encoded as zero.
+- **Independent review:** the dataset requires a human coding check and adjudication before publication analysis.
 - **Workflow comparison:** DATA-01 enables analysis but does not replace BASE-01.
 - **Educational effectiveness:** no learner-benefit claim is permitted before an approved evaluation and fair baseline.
-- **Progress integration:** Lab 1 does not save learner answers until PROGRESS-02 is evidenced.
 - **Live site:** verify Pages only after the stacked chain merges to `main` and deploys.
 
 ## Definition of done for this phase
@@ -84,4 +80,4 @@ obtain commit-scoped CI for the three-run DATA-01 batch
 - Complete learning contracts, legal fixture policy and three-tier platform boundaries.
 - Deterministic fixture, trace, figure, browser lab and model-free Lab 0 validation contracts.
 - Accessibility and privacy fallbacks for every introduced artifact.
-- Real Lab 0 environment evidence, progress import/export, first retrospective dataset review and passing integrated CI.
+- Real Lab 0 environment evidence, progress import/export, reviewed retrospective dataset and passing integrated CI.
