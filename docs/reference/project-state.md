@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-18 07:00 Africa/Cairo_
+_Last updated: 2026-07-18 08:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -32,13 +32,14 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 - `STACK-01` remains blocked by the required human canonical-progress and merge-order decision.
 - `PROGRESS-02` already has overlapping draft implementations in PRs #23 and #24, so this run did not create a third implementation.
-- The existing DATA-01 schema requires numeric effort fields and therefore cannot faithfully encode unavailable historical counts.
-- Added `docs/publication/retrospective-missing-value-policy.md` with a source hierarchy, prohibited imputations, coding distinctions, double-coding requirements and acceptance gates for the next extraction batch.
+- Documentation CI run `29629973703` completed successfully for exact commit `6630666e2ea0f5e6dfc11113b84f60dde181d1e1`.
+- That commit contains `docs/publication/retrospective-missing-value-policy.md`, the updated DATA-01 backlog boundary, project-state update, bounded handoff and durable run record.
+- The policy prohibits silent numeric imputation, distinguishes blocked/failed/repaired/clean-success outcomes, and requires independent double-coding plus adjudication before publication analysis.
 
 ### Interpretation
 
-- Excluding incomplete candidate records is more defensible than encoding unavailable measurements as zero before a reviewed schema migration.
-- Distinguishing blocked, failed, repaired and clean-success outcomes is necessary for a credible longitudinal case study.
+- Passing Documentation CI establishes deterministic integration of the policy and links; it does not validate historical coding accuracy or dataset completeness.
+- The next extraction sample can now be staged under a tested policy, while candidates with unknown required effort fields remain excluded from the canonical JSON dataset.
 
 ### Historical
 
@@ -53,9 +54,9 @@ Read this file after the root README on every run. It is the compact checkpoint 
 ## Immediate next task
 
 ```text
-run commit-scoped Documentation CI for the missing-value policy
-  → stage the next bounded DATA-01 sample under the policy
-  → exclude candidates with unknown required effort fields until schema migration is approved
+stage the next bounded DATA-01 sample under the validated missing-value policy
+  → list excluded candidates and exact exclusion reasons
+  → do not encode unavailable required effort fields as zero
   → independently double-code and adjudicate the predefined sample
   → do not duplicate PROGRESS-02 before the STACK-01 canonical decision
 ```
