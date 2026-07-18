@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-18 03:00 Africa/Cairo_
+_Last updated: 2026-07-18 04:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -35,47 +35,47 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ### Verified
 
-- `LAB1-01` final head `0c70d9d4dec118095b2049b7442cfee6818c0f07` passed Documentation CI run `29562479577`.
-- Ubuntu Lab 0 workflow run `29619847701` used Ubuntu `24.04.4` and retained artifact `8421805335` before semantic validation.
-- The retained report checksum is `0e5d3b3db9b706aa6f4ccfaa5608fb76514a6401af5ed8149264485a58583ffa`.
-- The existing semantic validator accepted the degraded report.
-- The report recorded only `UV_LOCK_DRIFT`; setup failed before clone, configuration, compilation, or executable launch.
-- Documentation CI run `29619847677` passed on the same pull-request head.
-- A local lock-consistency reproduction showed that the metadata-only lock omitted the dependency-free virtual project package required by `uv sync --locked`.
-- The branch now contains a minimal dependency-free `pyproject.toml` and corrected `uv.lock`; no external Python dependency was added.
+- Ubuntu Lab 0 workflow run `29622240261` completed successfully on the PR head `712016f1522fd6f4f1184f9c37b76e3956b70c6a`.
+- Documentation CI run `29622240365` also completed successfully for the same head.
+- Artifact `8422651113`, `lab0-ubuntu-24.04-d895eddc1c5e69452d90571c4ccb5d80f410da07`, was retained with digest `sha256:2db76be20de63afb5ab080fbdca8354de60859d34d4f21970c5331f9f2871295` and expires on 2026-08-17.
+- The retained report identifies Ubuntu 24.04/x86_64, Python 3.12.3, uv 0.8.0, CMake 3.31.6, Ninja 1.13.2, and GCC 13.3.0.
+- The exact required `uv sync --locked` command passed with lock checksum `b332308fd26688b552acd6546a91ea95a3acd9e9d6457a1d3be97c59621f9ba3`.
+- The runner detached llama.cpp at `e3546c7948e3af463d0b401e6421d5a4c2faf565`, configured with Ninja and `GGML_NATIVE=OFF`, built only `llama-cli` with two jobs, and launched `llama-cli --help`.
+- The report recorded `setup_success=true`, `build_success=true`, `launch_success=true`, no diagnostics, no model, and `inference_state=not_attempted`.
+- Monotonic model-free time to ready was 326,905 ms.
+- The report recorded no model redistribution, secrets, personal paths, or learner data.
 
 ### Interpretation
 
-- Retaining failed evidence before rejection converted an opaque workflow failure into a phase-specific, reviewable diagnosis.
-- Stable diagnostic codes may turn setup failures into educational checkpoints, but learner usefulness is not established by implementation alone.
-- Correcting the lock is narrower and more defensible than weakening the required `uv sync --locked` command.
+- The retained run provides bounded positive evidence for one clean Ubuntu local-native setup/build/launch row.
+- The earlier failed report and the successful rerun demonstrate that retaining failed artifacts before semantic rejection improves reproducibility debugging.
+- This run does not establish inference, time to first token, learner benefit, cross-platform equivalence, offline operation, or devcontainer reproducibility.
 
 ### Historical
 
-- Earlier work established source-pinned documentation, legal fixture policy, deterministic GGUF evidence, Lab 0 reporting, trace/progress/media contracts, deterministic figures, orchestration state, the authored trace viewer, and the browser GGUF slice.
-- The first Ubuntu run lost its report because validation preceded artifact upload; the retention-order repair resolved that evidence-loss defect.
+- The first retained Ubuntu run localized `UV_LOCK_DRIFT` before clone/configure/build/launch.
+- A minimal dependency-free project entry in `uv.lock` corrected the locked-sync contract without weakening `uv sync --locked` or adding external Python dependencies.
 
 ### Open questions
 
-- Whether the corrected lock permits the pinned llama.cpp clone, CMake/Ninja configuration, bounded `llama-cli` compilation, and model-free launch on Ubuntu 24.04.
-- Real devcontainer, macOS, and WSL2 runs remain required.
-- Exact supported tool-version ranges and the pinned llama.cpp target/options require independent native review.
+- Whether the same bounded path passes in the repository devcontainer/Codespaces-compatible tier.
+- Real macOS and WSL2 runs remain required before any cross-platform claim.
+- Offline/degraded-mode behavior and cached rebuild behavior remain untested.
 - Independent technical review and an approved educational evaluation pathway remain required.
 
 ## Immediate next task
 
 ```text
-inspect the next commit-scoped Ubuntu 24.04 workflow
-  → confirm uv sync --locked passes
-  → download and review the retained JSON artifact
-  → classify only the next failing phase, if any
-  → do not claim LAB0-03 reproducibility before setup, build and launch all validate
+return to STACK-01 when the human canonical-progress decision exists
+  → otherwise execute the equivalent retained devcontainer Lab 0 run
+  → preserve the exact JSON artifact before semantic validation
+  → do not claim inference or cross-platform reproducibility
 ```
 
 ## In progress
 
 - Draft PR stack for the EAAI executable-learning foundation.
-- `LAB0-03` measured Ubuntu run and phase-specific repair.
+- `LAB0-04` measured devcontainer run.
 - `DATA-01` retrospective agent-workflow extraction contract.
 - `PROGRESS-02` progress export/import, migration, and corruption recovery.
 - Current-tree CPU_REPACK regeneration and sanitizer validation.
@@ -85,19 +85,19 @@ inspect the next commit-scoped Ubuntu 24.04 workflow
 
 - `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` remain authoritative.
 - `CI-01`, `MEDIA-01`, `FIG-01`, `TRACE-02`, `VIEW-01`, and `LAB1-01` have passing commit-scoped CI evidence.
-- `LAB0-02` has a validated contract; `LAB0-03` has a retained, semantically valid degraded Ubuntu report and a bounded lock repair awaiting rerun.
-- No participant data, model, telemetry, credential, paid API call, generated media output, native instrumentation, or manuscript prose was introduced.
+- `LAB0-03` now has one retained, semantically valid, successful Ubuntu 24.04 model-free setup/build/launch record.
+- No participant data, model, telemetry, credential, paid API call, generated media output, native instrumentation, inference, or manuscript prose was introduced.
 
 ## Known blockers and caveats
 
 - **Canonical integration:** `STACK-01` still requires a human choice of progress implementation and merge order.
-- **Lab 0 evidence:** the corrected lock requires a new commit-scoped Ubuntu run; native build and launch remain unverified.
-- **Lab 0 target:** the `llama-cli` command shape must be supported by a retained validated record and independent review.
+- **Execution-tier coverage:** the successful Ubuntu row does not cover devcontainer, macOS, WSL2, browser execution, offline use, model loading, or inference.
+- **Lab 0 target:** the `llama-cli` command shape still requires independent technical review.
 - **Educational effectiveness:** no learner-benefit claim is permitted before an approved evaluation pathway and baseline comparison.
 - **Progress integration:** canonical progress implementation remains unresolved across overlapping branches.
 - **Native acceptance:** the synthetic file is a format-teaching fixture and is not claimed to be a valid inference model.
 - **Live-site verification:** Pages should be rechecked only after stacked changes merge to `main` and deploy.
-- **Evidence retention:** artifact `8368782428` expires on 2026-08-15; Lab 0 artifact `8421805335` uses the workflow's 30-day retention.
+- **Evidence retention:** artifact `8368782428` expires on 2026-08-15; successful Lab 0 artifact `8422651113` expires on 2026-08-17.
 - **Upstream permission:** direct issue/PR creation in `ggml-org/llama.cpp` is blocked for the connected GitHub App.
 
 ## Definition of done for the executable-learning foundation phase
