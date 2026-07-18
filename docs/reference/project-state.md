@@ -1,6 +1,6 @@
 # Project state
 
-_Last updated: 2026-07-18 04:00 Africa/Cairo_
+_Last updated: 2026-07-18 05:00 Africa/Cairo_
 
 Read this file after the root README on every run. It is the compact checkpoint for the current milestone, verified work, blockers, and next priority.
 
@@ -44,12 +44,14 @@ Read this file after the root README on every run. It is the compact checkpoint 
 - The report recorded `setup_success=true`, `build_success=true`, `launch_success=true`, no diagnostics, no model, and `inference_state=not_attempted`.
 - Monotonic model-free time to ready was 326,905 ms.
 - The report recorded no model redistribution, secrets, personal paths, or learner data.
+- A Codespaces-compatible Ubuntu 24.04 devcontainer definition and dedicated `LAB0-04` retained-evidence workflow now reuse the same parameterized Lab 0 runner and validator as the Ubuntu row.
 
 ### Interpretation
 
 - The retained run provides bounded positive evidence for one clean Ubuntu local-native setup/build/launch row.
 - The earlier failed report and the successful rerun demonstrate that retaining failed artifacts before semantic rejection improves reproducibility debugging.
-- This run does not establish inference, time to first token, learner benefit, cross-platform equivalence, offline operation, or devcontainer reproducibility.
+- Reusing one runner and semantic validator reduces measurement drift between the local-native and cloud-container rows.
+- The devcontainer implementation alone is not evidence that the container row succeeds; commit-scoped execution remains required.
 
 ### Historical
 
@@ -58,7 +60,7 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ### Open questions
 
-- Whether the same bounded path passes in the repository devcontainer/Codespaces-compatible tier.
+- Whether the repository devcontainer completes the same bounded path and retains a semantically valid report in CI.
 - Real macOS and WSL2 runs remain required before any cross-platform claim.
 - Offline/degraded-mode behavior and cached rebuild behavior remain untested.
 - Independent technical review and an approved educational evaluation pathway remain required.
@@ -67,15 +69,16 @@ Read this file after the root README on every run. It is the compact checkpoint 
 
 ```text
 return to STACK-01 when the human canonical-progress decision exists
-  → otherwise execute the equivalent retained devcontainer Lab 0 run
+  → otherwise inspect the LAB0-04 devcontainer workflow and retained report
   → preserve the exact JSON artifact before semantic validation
-  → do not claim inference or cross-platform reproducibility
+  → make at most one phase-specific repair if it fails
+  → do not claim inference, Codespaces service reliability or cross-platform reproducibility
 ```
 
 ## In progress
 
 - Draft PR stack for the EAAI executable-learning foundation.
-- `LAB0-04` measured devcontainer run.
+- `LAB0-04` measured devcontainer run and artifact validation.
 - `DATA-01` retrospective agent-workflow extraction contract.
 - `PROGRESS-02` progress export/import, migration, and corruption recovery.
 - Current-tree CPU_REPACK regeneration and sanitizer validation.
@@ -85,13 +88,15 @@ return to STACK-01 when the human canonical-progress decision exists
 
 - `docs/publication/orchestrator-state.md` and `docs/publication/evidence-backlog.md` remain authoritative.
 - `CI-01`, `MEDIA-01`, `FIG-01`, `TRACE-02`, `VIEW-01`, and `LAB1-01` have passing commit-scoped CI evidence.
-- `LAB0-03` now has one retained, semantically valid, successful Ubuntu 24.04 model-free setup/build/launch record.
+- `LAB0-03` has one retained, semantically valid, successful Ubuntu 24.04 model-free setup/build/launch record.
+- `LAB0-04` now has an implementation and workflow, but no successful retained container report yet.
 - No participant data, model, telemetry, credential, paid API call, generated media output, native instrumentation, inference, or manuscript prose was introduced.
 
 ## Known blockers and caveats
 
 - **Canonical integration:** `STACK-01` still requires a human choice of progress implementation and merge order.
-- **Execution-tier coverage:** the successful Ubuntu row does not cover devcontainer, macOS, WSL2, browser execution, offline use, model loading, or inference.
+- **Execution-tier coverage:** the successful Ubuntu row does not cover devcontainer until `LAB0-04` passes, nor macOS, WSL2, browser execution, offline use, model loading, or inference.
+- **Container reproducibility:** the Development Container base image tag and initial package acquisition still depend on external registries; the exact built image digest must be retained by CI or a later evidence increment before making a stronger image-reproducibility claim.
 - **Lab 0 target:** the `llama-cli` command shape still requires independent technical review.
 - **Educational effectiveness:** no learner-benefit claim is permitted before an approved evaluation pathway and baseline comparison.
 - **Progress integration:** canonical progress implementation remains unresolved across overlapping branches.
