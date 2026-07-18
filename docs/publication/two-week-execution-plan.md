@@ -1,6 +1,6 @@
 # Executable-learning two-week execution plan
 
-_Last updated: 2026-07-18 00:01 Africa/Cairo_
+_Last updated: 2026-07-18 03:01 Africa/Cairo_
 
 This dependency-ordered plan covers July 17-31, 2026. It is narrower than the long-term interactive-textbook roadmap and does not authorize manuscript drafting or participant recruitment.
 
@@ -71,16 +71,23 @@ Acceptance gate: no evidence is lost, duplicate progress implementations are res
 
 ### W2.2 Measured Lab 0 reproducibility
 
-Deliver:
+Current measured status:
 
-- one Ubuntu 24.04 model-free record;
+- Ubuntu 24.04 run `29619847701` retained schema-valid artifact `8421805335` before failing the final success gate.
+- Toolchain checks passed; `uv sync --locked` failed with `UV_LOCK_DRIFT`; configure, build and launch were not reached; inference was not attempted.
+- This is valid negative evidence, not a successful reproducibility row.
+
+Deliver next:
+
+- bounded, secret-safe classification of the `uv sync --locked` cause;
+- rerun of the unchanged Ubuntu setup/build/launch path;
 - one devcontainer/Codespaces-compatible model-free record;
 - exact repository and llama.cpp revisions, `uv.lock` checksum, tool versions and commands;
 - monotonic time-to-ready;
 - stable failure/degraded/offline classification;
 - common failure explanations that identify the responsible tool/stage.
 
-Acceptance gate: both supported environments reach the expected bounded executable-launch result or retain exact failed evidence. Model-free launch is never called inference.
+Acceptance gate: both supported environments reach the expected bounded executable-launch result or retain exact, sufficiently specific failed evidence. Model-free launch is never called inference.
 
 ### W2.3 Coherent end-to-end demo
 
@@ -110,9 +117,10 @@ Acceptance gate: no recruitment or personal-data collection occurs before approv
 
 ## Current blockers
 
-- clean Ubuntu 24.04 and devcontainer execution environments are unavailable to the connected runtime;
+- canonical progress choice and merge order remain unresolved;
+- the Ubuntu environment exists, but `LAB0-03` is degraded at `uv sync --locked` and requires a bounded diagnostic repair plus rerun;
+- devcontainer execution remains unavailable;
 - an independent llama.cpp/GGML reviewer has not been nominated;
-- overlapping progress PRs require a human canonical-choice decision;
 - learner/expert evaluation and ethics pathways are not approved;
 - no independent DATA-01B coder or approved study window exists;
 - no independent documentation-audit coder exists;
@@ -128,4 +136,4 @@ The July demo excludes authenticated synchronization, mandatory paid media, broa
 
 ## Exact manuscript-start condition
 
-The Paper Integrator remains disabled until the canonical integrated demo, measured local/container Lab 0 evidence, broader audited retrospective dataset, completed fair baseline, independent correctness review, approved and completed evaluation, resolved fatal reviewer risks, verified official EAAI requirements and a reviewed double-blind artifact are all evidenced.
+The Paper Integrator remains disabled until the canonical integrated demo, successful measured local/container Lab 0 evidence, broader audited retrospective dataset, completed fair baseline, independent correctness review, approved and completed evaluation, resolved fatal reviewer risks, verified official EAAI requirements and a reviewed double-blind artifact are all evidenced.
