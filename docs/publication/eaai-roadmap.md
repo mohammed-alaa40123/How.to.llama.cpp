@@ -1,6 +1,6 @@
 # EAAI publication roadmap
 
-_Last updated: 2026-07-17 09:22 Africa/Cairo_
+_Last updated: 2026-07-18 06:02 Africa/Cairo_
 
 This roadmap turns repository milestones into evidence gates for an EAAI experience report. It does not authorize manuscript drafting.
 
@@ -8,97 +8,79 @@ This roadmap turns repository milestones into evidence gates for an EAAI experie
 
 ### A1. Coordination and contracts
 
-- Freeze target audience, educational problem, three lesson contracts and research questions.
-- Maintain authoritative orchestrator state, evidence backlog, handoff ledger and readiness scorecard.
-- Keep browser, local-native and cloud-container tiers intentionally unequal and explicitly labelled.
+Audience, educational problem, three lesson contracts, research questions, evidence kinds, fixture policy, privacy constraints and the three-tier architecture are frozen. The documentation-gap claim remains a hypothesis until the systematic audit is executed.
 
-**Status:** substantially evidenced. Reviewer-package integration and a systematic documentation-gap audit remain.
+**Status:** substantially evidenced; canonical-stack reconciliation and the documentation audit remain.
 
 ### A2. Deterministic evidence foundations
 
-- Integrate legal fixture decision and deterministic synthetic GGUF.
-- Integrate Lab 0 report contract, trace schema/sample and local-progress schema.
-- Add media manifest/provenance contract.
-- Maintain passing strict MkDocs and documentation CI.
+Synthetic GGUF fixtures, Lab 0 reports, trace/source schemas, local-progress schema, media provenance and deterministic figure generation have validators and retained CI evidence. Ordinary CI performs no paid generation or unauthorized model download.
 
-**Status:** evidenced on the current stacked viewer branch. Ordinary CI performs no paid API calls or model downloads.
+**Status:** evidenced at component level.
 
 ### A3. Smallest vertical slice
 
-- Add a narrow keyboard-operable viewer for the authored GGUF trace.
-- Generate one deterministic technical figure from structured data.
-- Add source-link and replay validation.
+A browser GGUF slice, authored/source-derived trace viewer, deterministic technical figure and model-free Lab 0 runners exist with explicit evidence boundaries and accessibility fallbacks.
 
-**Status:** evidenced by immutable source anchors, deterministic trace replay, the generated GGUF-layout SVG, the static viewer and passing Documentation CI run `29559239071`.
-
-**Boundary:** this is an authored/source-derived prototype. Native capture, learner benefit and independent technical correctness remain unevidenced.
+**Status:** evidenced at component level; not yet one canonical integrated artifact.
 
 ## Phase B — Vertical slices, July 24-31, 2026
 
 ### B1. Lab 0 end to end
 
-- Require `uv sync --locked` for Python tooling.
-- Require CMake/Ninja native build and bounded executable-launch smoke test.
-- Add stable failure taxonomy, machine-readable report and time-to-ready instrumentation.
-- Execute a supported local/container reproducibility matrix.
-- Keep optional learner-provided model loading and time-to-first-token separate from the model-free core.
+- Ubuntu 24.04 local-native row passed: run `29622240261`, artifact `8422651113`, time to ready 326,905 ms.
+- Ubuntu 24.04 devcontainer row passed: run `29626470197`, artifact `8424069914`, time to ready 280,753 ms.
+- Both rows use `uv sync --locked`, a pinned llama.cpp revision, CMake/Ninja, `GGML_NATIVE=OFF`, bounded `llama-cli` compilation and model-free executable launch.
 
-**Exit evidence:** clean supported environments reach expected output; model-free success is not called inference; optional model paths are not redistributed.
+**Status:** two reproducibility rows evidenced. These are not inference or learner-benefit results. Offline/degraded behavior and additional platforms remain unevidenced.
 
 ### B2. Browser GGUF Anatomy lab
 
-- Parse the synthetic fixture in-browser.
-- Verify browser/Python golden agreement.
-- Add Predict-Discover-Explain checkpoints, keyboard completion and static table/text fallback.
-- Persist local progress with export/import and corruption recovery.
+The bounded parser/visualizer, Predict-Discover-Explain checkpoints, golden agreement and static fallback exist. Progress portability and corruption recovery remain prerequisites for end-to-end closure.
 
-**Exit evidence:** deterministic parsing, checkpoint logic, privacy-minimizing progress and explicit exclusion of native-runtime claims.
+**Status:** component evidenced; integration incomplete.
 
 ### B3. Executable lecture and media dry run
 
-- Preserve the validated authored/source-derived viewer as the baseline artifact.
-- Add one bounded real or faithfully captured path only after instrumentation and trace-size risks are reviewed.
-- Define a fair static-source/text comparison before claiming that the viewer improves code tracing.
-- Run deterministic media-manifest acceptance/revision/rejection and stale-asset checks.
+The authored/source-derived viewer and deterministic figure are retained. Native or faithful capture, static baseline comparison, media lifecycle dry run and independent technical review remain open.
 
-**Exit evidence:** coherent local/deployed demo with no paid generation in ordinary CI and no evidence-kind inflation.
+**Status:** prototype evidenced; research claims not yet supported.
+
+### B4. Canonical end-to-end demo
+
+One reconciled branch must combine Lab 0, GGUF lab, viewer, deterministic figure, progress export/import and validation without weakening evidence labels or privacy boundaries.
+
+**Status:** blocked by `STACK-01` human canonical-progress decision.
 
 ## Phase C — Evidence development, August-September 2026
 
-- Extract a retrospective repository dataset from scheduled runs, commits, tests, CI failures, corrections and handoffs.
+- Extract and independently code the longitudinal repository dataset.
 - Freeze benchmark tasks and run fair workflow baselines.
 - Obtain independent llama.cpp/GGML correctness review.
-- Pilot expert or learner evaluation only after approval and any required ethics review.
+- Pilot expert or learner evaluation only after approval and ethics determination.
 - Record negative results, failed generations, human labor, infrastructure maintenance and cost proxies.
-
-**Exit evidence:** longitudinal dataset, baseline comparison, independent review and approved evaluation pathway.
 
 ## Phase D — Venue and manuscript readiness
 
-- Reverify official EAAI call, area, deadlines, author kit, length and anonymity requirements.
+- Verify current official EAAI call, area, deadlines, author kit, length and anonymity rules.
 - Freeze claims-evidence table and limitations.
-- Resolve fatal and major adversarial-review concerns.
+- Resolve fatal and major reviewer concerns.
 - Activate Paper Integrator only after the gate in `orchestrator-state.md` is met.
 
 ## Immediate dependency order
 
-1. `LAB0-02` reproducibility and diagnostics protocol.
-2. `DATA-01` retrospective extraction schema.
-3. `LAB1-01` browser GGUF vertical slice.
-4. `PROGRESS-02` local persistence/export/import.
-5. `REVIEW-02` active-stack adversarial review integration.
-6. Static-source/text baseline literature and benchmark design.
-7. `VENUE-01` official EAAI-27 verification.
+1. `STACK-01`: human canonical progress choice and combined integration branch.
+2. `PROGRESS-02`: export/import, migration, corruption recovery and local storage tests.
+3. `DATA-01`: retrospective extraction and independent coding.
+4. `REVIEW-01`: independent technical review.
+5. `VENUE-01`: current official EAAI verification.
+6. `BASE-01`: fair workflow baseline.
+7. `EVAL-01`: approved evaluation and ethics pathway.
 
 ## Generalization boundary
 
-The artifact is llama.cpp/GGML-specific. The potentially generalizable contribution is the method: source-pinned executable explanations, evidence-labelled traces, deterministic validators, local-first learner state and human-supervised repository agents. Generalization beyond this codebase must be argued from replicated tasks or explicitly presented as a design hypothesis.
+The artifact is llama.cpp/GGML-specific. The potentially generalizable method is source-pinned executable explanation, evidence-labelled traces, deterministic validators, local-first learner state and human-supervised repository agents. Generalization beyond this codebase remains a design hypothesis until replicated.
 
 ## Ethics and AI-use boundary
 
-- No participant recruitment or personal-data collection without explicit approval and required review.
-- No silent telemetry.
-- No authenticated progress sync during the two-week vertical slice.
-- Deterministic technical graphics are authoritative.
-- Generated images/audio/video are optional supplements with provenance, accessibility, licensing/privacy review and human technical approval.
-- Manuscript AI-use disclosure must report agent roles, model/tool versions when known, human corrections, validation, failures and retained evidence.
+No participant recruitment, personal-data collection, silent telemetry or authenticated progress sync is authorized. Deterministic technical graphics are authoritative. Generated media remains optional, provenance-recorded, accessibility-reviewed, cached and human-approved. Manuscript AI-use disclosure must report agent roles, tool/model versions when known, human corrections, validation failures and retained evidence.
